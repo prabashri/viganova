@@ -1,4 +1,4 @@
-name = "astroweb-theme"
+name = "astroweb-theme-ssr"
 main = "./dist/_worker.js/index.js"
 compatibility_date = "2025-07-20"
 compatibility_flags = [ "nodejs_compat" ]
