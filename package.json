@@ -1,5 +1,5 @@
 {
-  "name": "astroweb",
+  "name": "astroweb-template-ssr",
   "type": "module",
   "version": "0.0.1",
   "scripts": {

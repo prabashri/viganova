@@ -10,7 +10,7 @@ import icon from 'astro-icon';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://astroweb.dev',
+  site: 'https://template-ssr.astroweb.dev',
   integrations: [mdx(), sitemap(), icon()],
   adapter: cloudflare(),
   output: 'server',
