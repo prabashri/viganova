@@ -1,0 +1,30 @@
+{
+  "css": {
+    "inline": {
+      "file": "/src/data/generated-inline-css.js",
+      "datetime": "2025-07-20T11:55:00.057Z"
+    },
+    "main": {
+      "file": "/styles/main.4pdj95.css",
+      "datetime": "2025-07-20T11:55:01.450Z"
+    },
+    "nonCritical": {
+      "file": "/styles/non-critical.puefkw.min.css",
+      "datetime": "2025-07-20T11:55:02.654Z"
+    }
+  },
+  "preload": {
+    "components.css": {
+      "file": "D:\\Onedrive\\websites\\astroweb-theme-ssr\\src\\styles\\preload\\components.css",
+      "datetime": "2025-07-20T11:55:01.333Z"
+    },
+    "form.css": {
+      "file": "D:\\Onedrive\\websites\\astroweb-theme-ssr\\src\\styles\\preload\\form.css",
+      "datetime": "2025-07-20T11:55:01.340Z"
+    },
+    "utilities.css": {
+      "file": "D:\\Onedrive\\websites\\astroweb-theme-ssr\\src\\styles\\preload\\utilities.css",
+      "datetime": "2025-07-20T11:55:01.430Z"
+    }
+  }
+}

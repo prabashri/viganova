@@ -1,57 +1,249 @@
 ---
-// Import the global.css file here so that it is included on
-// all pages through the use of the <BaseHead /> component.
-import '../styles/global.css';
-import { SITE_TITLE } from '../consts';
-import FallbackImage from '../assets/blog-placeholder-1.jpg';
-import type { ImageMetadata } from 'astro';
+// src/components/BaseHead.astro
+import { siteDefaults } from '../config/siteDefaults';
+import { parseToIsoString } from '../utils/date-utils';
+import CssHead from './CssHead.astro';
+import type { HeadProps } from '../types/HeadProps';
 
-interface Props {
-	title: string;
-	description: string;
-	image?: ImageMetadata;
+
+const props: HeadProps = {
+  ...Astro.props,
+  title: Astro.props.title ?? siteDefaults.title,
+};
+
+const canonicalURL = new URL(props.canonicalUrl ?? Astro.url.pathname, Astro.site).toString();
+
+const {
+  title,
+  description = '',
+  image,
+  preloadImages = [], // Expected format: [{ src, width, aspect }]
+  type = 'webpage',
+  url = Astro.url.toString(),
+  siteName = siteDefaults.title,
+  authorName = siteDefaults.authorName,
+  authorUrl = siteDefaults.authorUrl,
+  publishedAt,
+  updatedAt,
+  index = true,
+  keywords = [],
+  faq = [],
+  breadcrumb = [],
+  listItems = [],
+} = props;
+
+const imageUrl =
+  typeof image === 'string' ? new URL(image, Astro.site).toString() : siteDefaults.image;
+
+const datePublished = parseToIsoString(publishedAt? publishedAt : siteDefaults.publishedDate);
+const dateModified = parseToIsoString(updatedAt);
+
+let primaryJsonLd: Record<string, any> = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  headline: title,
+  name: title,
+  description,
+  url,
+  image: imageUrl,
+  keywords,
+  datePublished,
+  dateModified,
+  author: {
+    '@type': 'Person',
+    name: authorName,
+    url: authorUrl,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: siteName,
+    logo: {
+      '@type': 'ImageObject',
+      url: siteDefaults.logo,
+    },
+  },
+};
+
+if (type === 'article') {
+  primaryJsonLd['@type'] = 'Article';
+} else if (type === 'collection') {
+  primaryJsonLd['@type'] = 'CollectionPage';
+  if (listItems.length > 0) {
+    primaryJsonLd['hasPart'] = listItems.map(item => ({
+      '@type': 'Article',
+      name: item.name,
+      url: new URL(item.url, Astro.site).toString(),
+    }));
+  }
 }
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
-const { title, description, image = FallbackImage } = Astro.props;
+// ✅ Always present JSON-LD (Organization, Speakable)
+const speakableJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.speak-head', '.speak-text'],
+  },
+};
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: siteName,
+  url: 'https://clampgenerator.com',
+  logo: {
+    '@type': 'ImageObject',
+    url: siteDefaults.logo,
+  },
+  sameAs: [
+    'https://linkedin.com/in/prabakaran-shankar',
+    'https://prabakaranshankar.com',
+  ],
+};
+
+// ✅ Optional schemas
+const faqJsonLd = faq.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map(({ question, answer }) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: answer,
+    },
+  })),
+} : null;
+
+const breadcrumbJsonLd = breadcrumb.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: breadcrumb.map((item, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: item.name,
+    item: item.url,
+  })),
+} : null;
 ---
 
-<!-- Global Metadata -->
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<!-- Global Metadata primary -->
+<title>{title}</title>   
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="preconnect" href="/" crossorigin="">
+<meta name="robots" content={ index !== true ?"index":"no-index" } />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<!-- css tags -->
+<CssHead />
+<!-- global metadata others -->
+<meta name="preview-image" content="true" />
+<link rel="sitemap" href="/sitemap.xml" />
 <link
 	rel="alternate"
 	type="application/rss+xml"
-	title={SITE_TITLE}
+	title={siteDefaults.title}
 	href={new URL('rss.xml', Astro.site)}
 />
 <meta name="generator" content={Astro.generator} />
 
-<!-- Font preloads -->
-<link rel="preload" href="/fonts/atkinson-regular.woff" as="font" type="font/woff" crossorigin />
-<link rel="preload" href="/fonts/atkinson-bold.woff" as="font" type="font/woff" crossorigin />
+<!-- Web App Manifest -->
+<link rel="manifest" href="/manifest.webmanifest" />
+
+<!-- Theme Color for Android -->
+<meta name="theme-color" content="#0d9488" />
+
+<!-- Apple Touch Icon (iOS Home Screen) -->
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+
+<!-- Windows Tile (optional) -->
+<meta name="msapplication-TileColor" content="#0d9488" />
+<meta name="msapplication-TileImage" content="/android-chrome-192x192.png" />
+
+<meta name="application-name" content={siteDefaults.siteName} />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+
+<!-- ✅ Responsive Image Preload -->
+{/* ✅ Responsive Image Preload */}
+{preloadImages?.length > 0 && (
+  <>
+    {preloadImages.map((img) => {
+      if (!img.src.includes('w320') && !img.src.includes('w640') && !img.src.includes('w960')) {
+        return null;
+      }
+
+      let media = '';
+      if (img.src.includes('w320')) {
+        media = '(max-width: 600px)';
+      } else if (img.src.includes('w640')) {
+        media = '(max-width: 1024px)';
+      } else if (img.src.includes('w960')) {
+        media = '(min-width: 1280px)';
+      }
+
+      return (
+        <link
+          rel="preload"
+          as="image"
+          href={img.src}
+          media={media || undefined}
+        />
+      );
+    })}
+  </>
+)}
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
 
-<!-- Primary Meta Tags -->
-<title>{title}</title>
+<!-- Primary SEO Meta Tags -->
+
 <meta name="title" content={title} />
 <meta name="description" content={description} />
+<meta name="keywords" content={keywords.join(', ')} />
+<meta name="author" content={authorName} />
+<meta property="article:author" content={authorName} />
 
 <!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
+<meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteName} />
 <meta property="og:url" content={Astro.url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image.src, Astro.url)} />
+<meta property="og:image" content={imageUrl} />
+{type === 'article' && <>
+  <meta property="article:published_time" content={datePublished} />
+  <meta property="article:modified_time" content={dateModified} />
+</>}
 
 <!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
 <meta property="twitter:url" content={Astro.url} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+<!--meta property="twitter:image" content={new URL(image, Astro.url)} /-->
+<meta name="twitter:image" content={image} />
+
+<link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+
+
+<!-- JSON-LD Structured Data -->
+<script is:inline type="application/ld+json" set:html={JSON.stringify(primaryJsonLd)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(speakableJsonLd)} />
+<script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
+{faqJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
+{breadcrumbJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />}
+
+<>
+  <script is:inline src="/scripts/headerMenu.js?v=1.0.1" defer />
+</>
