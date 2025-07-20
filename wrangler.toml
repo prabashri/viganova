@@ -1,12 +1,5 @@
-name = "your-worker-name"
+name = "astroweb-theme"
 compatibility_date = "2025-07-20"
 
 [build]
 command = "npm run build"
-
-[site]
-entry-point = "."
-
-[upload]
-format = "service-worker"
-
