@@ -1,0 +1,125 @@
+---
+// src/components/ui/Anchor.astro
+import { siteDefaults } from '../../config/siteDefaults';
+import type { Variant } from '../../types/navigation'; // Importing the Variant type
+
+interface Props {
+  href: string;
+  className?: string;
+  target?: '_blank' | '_self';
+  rel?: string;
+  ariaLabel?: string;
+  title?: string;
+
+  type?: 'link' | 'button'; // NEW: control styling
+  variant?: Variant; // NEW: for button-style links
+  dataId?: string; // Optional, for tracking or identification
+  dataAttributes?: string; // Optional, for additional data attributes
+  role?: string | undefined; // Optional, defaults to 'link' for standard links
+}
+
+const {
+  href,
+  className = '',
+  target,
+  rel,
+  ariaLabel,
+  title,
+  type = 'link',
+  variant = 'plain',
+  dataId, // Optional for tracking
+  role = 'link', // Default role for standard links
+  
+} = Astro.props;
+
+// Site origin and external check
+const siteOrigin = Astro.site?.origin ?? new URL(siteDefaults.siteUrl).origin;
+
+let resolvedHref: URL;
+try {
+  resolvedHref = new URL(href, siteOrigin);
+} catch {
+  resolvedHref = new URL('/', siteOrigin);
+}
+
+const isExternal = resolvedHref.origin !== siteOrigin;
+const finalTarget = target ?? (isExternal ? '_blank' : '_self');
+const finalRel = rel ?? (isExternal && finalTarget === '_blank' ? 'noopener noreferrer' : undefined);
+
+const dataAttributes = dataId ? `data-id="${dataId}"` : '';
+
+// Variant class logic
+const variantClassMap = {
+  plain: '',
+  nav: 'no-bb br',
+  ghost: 'button bg-transparent col-inherit hover-bg-base-200 transition focus-vis-bg-base-200 focus-vis-col-base-900',
+  primary: 'button col-base-00 hover-col-base-100 border-2 bg-primary hover-bg-primary-lighter transition focus-vis-bg-primary-lighter focus-vis-col-base-100 p-05',
+  secondary: 'button bg-transparent col-primary hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
+};
+
+const variantClass = variantClassMap[variant as Variant] ?? '';
+const computedClass = `${variantClass} ${className}`.trim();
+
+/**
+ * Anchor component for links and link-style buttons
+ * - Automatically detects external links and sets rel/target accordingly
+ * - Supports both standard links and button-style links via `type="button"`
+ * - Accepts `variant="primary" | "secondary"` when `type="button"` is used
+ * - Inherits styling from your utility-based CSS system
+ * - Supports accessibility via `aria-label`, `title`, etc.
+ * 
+ * Example usage:
+ * 
+ * <!-- Standard link -->
+ * <Anchor href="/contact">Contact Us</Anchor>
+ * 
+ * <!-- External link with icon -->
+ * <Anchor href="https://github.com/nviewsweb" target="_blank">
+ *   GitHub
+ *   <img src="/icons/github.svg" alt="GitHub logo" />
+ * </Anchor>
+ * 
+ * <!-- Button-styled link (primary) -->
+ * <Anchor href="/tools/font-size-typescale" type="button" variant="primary">
+ *   Font Size Tool
+ * </Anchor>
+ * 
+ * <!-- Button-styled link (secondary) -->
+ * <Anchor href="/learn-more" type="button" variant="secondary">
+ *   Learn More
+ * </Anchor>
+ * 
+ * <!-- Plain link -->
+<Anchor href="/terms" variant="plain">Terms</Anchor>
+
+<!-- Nav link -->
+<Anchor href="/about" variant="nav">About Us</Anchor>
+
+<!-- Ghost button -->
+<Anchor href="/join" type="button" variant="ghost">Join Now</Anchor>
+
+<!-- Primary button -->
+<Anchor href="/signup" type="button" variant="primary">Sign Up</Anchor>
+
+<!-- Secondary button -->
+<Anchor href="/contact" type="button" variant="secondary">Contact</Anchor>
+
+ */
+
+---
+<a
+  href={href}
+  target={finalTarget}
+  rel={finalRel}
+  class={computedClass}
+  aria-label={ariaLabel}
+  title={title}
+  itemprop="url"
+  role={role as any}
+  data-attributes={dataAttributes}
+  data-id={dataId}
+>
+  <slot name="icon-left" />
+  <slot />
+  <slot name="icon-right" />
+</a>

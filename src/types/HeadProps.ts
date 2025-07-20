@@ -1,0 +1,36 @@
+// src/types/HeadProps.ts
+export interface CollectionItem {
+  name: string;
+  url: string;
+}
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+  speakable: boolean;
+}
+
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+export interface HeadProps {
+  title: string;
+  description?: string;
+  image?: string;
+  preloadImages?: { src: string; width: string; aspect: string }[];
+  type?: 'webpage' | 'article' | 'collection';
+  url?: string;
+  canonicalUrl?: string;
+  siteName?: string;
+  authorName?: string;
+  authorUrl?: string;
+  publishedAt?: string;
+  updatedAt?: string;
+  index?: boolean;
+  keywords?: string[];
+  faq?: FaqItem[];
+  breadcrumb?: BreadcrumbItem[];
+  listItems?: CollectionItem[];
+}

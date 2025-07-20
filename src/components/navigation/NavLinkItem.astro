@@ -1,0 +1,67 @@
+---
+import Anchor from '../ui/Anchor.astro';
+import { Icon } from 'astro-icon/components';
+
+const { item, index = 0, isActive = false } = Astro.props;
+
+// Size classes
+const iconSize =
+  item.iconSize === 'small' ? 'w-1-0' :
+  item.iconSize === 'medium' ? 'w-1-5' :
+  item.iconSize === 'large' ? 'w-2-0' : 'w-1-5';
+
+const imageSize =
+  item.imageSize === 'thumbnail' ? 'w-150' :
+  item.imageSize === 'small' ? 'w-300' : 'w-150';
+
+const iconClass = item.iconClass || '';
+
+// Icon placement
+const isRight = item.iconLocation === 'right' || item.layout === 'right';
+const isLeft = item.iconLocation === 'left' || item.layout === 'left';
+
+const showIconLeft = isLeft && (item.iconUrl || item.image || item.iconName);
+const showIconRight = isRight && (item.iconUrl || item.image || item.iconName);
+const iconPosition = isLeft ? 'icon-left' : isRight ? 'icon-right' : '';
+
+const isCard = item.layout === 'card';
+const showDescription = !!item.description;
+const dataId = index ? `nav-link-item-${index}` : undefined;
+---
+
+<Anchor
+  href={item.href}
+  className={`nav-link-item flex ai-start gap-05 pi-05 pb-02 ${isCard ? 'card-style' : ''} ${item.className || ''}`}
+  rel={item.external ? 'noopener noreferrer' : undefined}
+  ariaLabel={item.ariaLabel || item.label}
+  title={item.title || item.label}
+  variant={item.variant || 'nav'}
+  type="link"
+  dataId={dataId}
+  role="link"
+>
+
+  {(showIconLeft || showIconRight) && iconPosition && (
+    <div slot={iconPosition} class={`p-02 inline-flex ai-center jc-center ${iconSize} ${iconClass}`}>
+      {item.image && (
+        <img src={item.image} alt={item.altText || item.label} class={imageSize} />
+      )}
+      {!item.image && item.iconUrl && (
+        <img src={item.iconUrl} alt={item.altText || item.label} class={iconSize} />
+      )}
+      {!item.image && item.iconName && (
+        <Icon name={item.iconName} class={`${iconSize} fill-current`} />
+      )}
+    </div>
+  )}
+
+  {showDescription ? (
+    <div class="inline-flex flex-col label-block flex-1">
+        <div class="label text-s">{item.label}</div>
+        <div class="description text-xs sm-display-inherit">{item.description}</div>
+    </div>
+    ) : (
+    <div class="inline-flex label text-s flex-1">{item.label}</div>
+    )}
+
+</Anchor>

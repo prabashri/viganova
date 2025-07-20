@@ -1,0 +1,51 @@
+---
+import { siteDefaults } from '../../config/siteDefaults'
+import { siteLogo } from '../../config/navigation'
+import DesktopLogo from '../../config/DesktopLogo.astro'
+import MobileLogo from '../../config/MobileLogo.astro'
+import Anchor from '../ui/Anchor.astro'
+
+const logoAlt = `${siteDefaults.siteName} Logo`
+const logoTitle = `Logo of ${siteDefaults.siteName}`
+const mobileAlt = `${siteDefaults.siteName} Mobile Logo`
+const mobileTitle = `Mobile logo of ${siteDefaults.siteName}`
+---
+
+<!--div class="h-60"--->
+  <Anchor
+    href="/"
+    title={siteDefaults.siteName}
+    ariaLabel={`${siteDefaults.siteName} Home`}
+    className="inline-flex order-1 h-60 w-auto no-bb hover-bg-transparent hover-box-shadow-glow p-0"
+  >
+    {siteLogo.desktopSvg ? (
+      siteLogo.withText ? (
+        <span class="flex ai-center big-display-inherit gap-05">
+          {/* Render SVG logo with text */}
+          <DesktopLogo className="h-60 w-auto br" ariaLabel={logoAlt} title={logoTitle} />
+          <span class="bold text-base col-primary hover-col-base-100">{siteDefaults.siteName}</span>
+        </span>
+      ) : (
+        <DesktopLogo className="h-60 w-auto big-display-inherit br" ariaLabel={logoAlt} title={logoTitle} />
+      )
+    ) : siteLogo.desktop ? (
+      siteLogo.withText ? (
+        <span class="flex ai-center big-display-inherit gap-05">
+          <img src={siteLogo.desktop} alt={logoAlt} title={logoTitle} class="h-60 w-auto br" />
+          <span class="bold text-base col-primary hover-col-base-100">{siteDefaults.siteName}</span>
+        </span>
+      ) : (
+        <img src={siteLogo.desktop} alt={logoAlt} title={logoTitle} class="h-60 w-auto big-display-inherit br" />
+      )
+    ) : (
+      <span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
+    )}
+
+    {siteLogo.mobileSvg ? (
+      <MobileLogo className="h-60 w-auto sm-display-inherit br" ariaLabel={mobileAlt} title={mobileTitle} />
+    ) : siteLogo.mobile ? (
+      <img src={siteLogo.mobile} alt={mobileAlt} title={mobileTitle} class="h-60 w-auto sm-display-inherit br" />
+    ) : null
+    }
+  </Anchor>
+<!--/div-->

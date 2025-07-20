@@ -1,0 +1,72 @@
+---
+import Button from '../ui/Button.astro';
+import { Icon } from 'astro-icon/components';
+
+const { item, index = 0, isActive = false } = Astro.props;
+
+// Size classes
+const iconSize =
+  item.iconSize === 'small' ? 'w-1-0' :
+  item.iconSize === 'medium' ? 'w-1-5' :
+  item.iconSize === 'large' ? 'w-2-0' : 'w-1-5';
+
+const imageSize =
+  item.imageSize === 'thumbnail' ? 'w-150' :
+  item.imageSize === 'small' ? 'w-300' : 'w-150';
+
+const iconClass = item.iconClass || '';
+
+// Icon placement
+const isRight = item.iconLocation === 'right' || item.layout === 'right';
+const isLeft = item.iconLocation === 'left' || item.layout === 'left';
+
+const showIconLeft = isLeft && (item.iconUrl || item.image || item.iconName);
+const showIconRight = isRight && (item.iconUrl || item.image || item.iconName);
+const iconPosition = isLeft ? 'icon-left' : isRight ? 'icon-right' : '';
+
+const isCard = item.layout === 'card';
+const showDescription = !!item.description;
+---
+
+<Button
+    id={`dropdown-${index}`} 
+    className={`nav-link-item dropdown-toggle pi-05 pb-02 hover-bg-primary hover-col-base-00 ${item.className || ''}`}
+    ariaLabel={item.ariaLabel || item.label}
+    title={item.title || item.label}
+    variant={item.variant || 'plain'}
+    label={item.label}
+    dataAction={`menu-dropdown-${index}`}
+    dataLabel={item.label}
+    aria-haspopup="true"
+    aria-expanded="false"
+    type="button"
+    aria-controls={`dropdown-menu-${index}`}
+>
+    {/** Icon if any */}
+    {(item.iconName || item.iconUrl || item.image) ? (
+        <div slot="icon-left" class={`p-02 inline-flex ai-center jc-center ${iconSize} ${iconClass}`}>
+        {item.iconName && (
+            <Icon name={item.iconName} class={`${iconSize} fill-current`} />
+        )}
+        {!item.iconName && item.iconUrl && (
+            <img src={item.iconUrl} alt={item.altText || item.label} class={iconSize} />
+        )}
+        {!item.iconName && item.image && (
+            <img src={item.image} alt={item.altText || item.label} class={imageSize} />
+        )}     
+        </div>
+    ) : null}
+    {/** Label and Description */}
+    {showDescription ? (
+        <div class="inline-flex label-block flex-1">
+            <div class="label text-sm">{item.label}</div>
+            <div class="description text-xs sm-display-inherit">{item.description}</div>
+        </div>
+    ) : (
+        <div class="inline-flex label text-sm flex-1">{item.label}</div>
+    )}
+    {/* Down Arrow Icon */}
+    <div class="inline-flex down-arrow w-1-0 h-1-0" aria-hidden="true" slot="icon-right">
+        <Icon name="DownArrow-2" class="hover-down-arrow-rotate fill-primary hover-fill-base-00 w-1-0 h-1-0"/>                       
+    </div>
+</Button>
