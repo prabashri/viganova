@@ -1,5 +1,6 @@
 // src/middleware.ts
-import type { MiddlewareHandler } from 'astro';
+import { defineMiddleware } from "astro:middleware";
+
 
 import { securityHeaders, extraHttpHeaders } from './config/security.mjs';
 
@@ -20,9 +21,10 @@ interface SecurityHeaders {
 interface ExtraHttpHeaders {
   [key: string]: string | object;
 }
+export const onRequest = defineMiddleware(async (context, next) => {
+  const isDev = import.meta.env.DEV;
+  const isServerOutput = import.meta.env.ASTRO_OUTPUT === 'server';
 
-export const onRequest: MiddlewareHandler = async (context, next) => {
-  // Only apply CSP if output is server
   if (!isServerOutput) return next();
 
   const nonce = crypto.randomUUID();
@@ -35,7 +37,6 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const contentType = headers.get('content-type') || '';
   const isHtml = contentType.includes('text/html');
 
-  // --- Construct Content-Security-Policy or Report-Only ---
   const cspValue = Object.entries(securityHeaders as SecurityHeaders)
     .map(([directive, value]) => {
       if (typeof value === 'boolean' && value) return directive;
@@ -48,12 +49,10 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
   const cspHeaderName = isDev ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
   headers.set(cspHeaderName, cspValue);
 
-  // --- Set extra security headers ---
   for (const [key, val] of Object.entries(extraHttpHeaders as ExtraHttpHeaders)) {
     headers.set(key, typeof val === 'string' ? val : JSON.stringify(val));
   }
 
-  // --- Modify HTML response body to inject nonce ---
   if (isHtml && response.body) {
     const rawHtml = await response.text();
 
@@ -69,10 +68,9 @@ export const onRequest: MiddlewareHandler = async (context, next) => {
     });
   }
 
-  // Non-HTML responses: keep body, just update headers
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
     headers,
   });
-};
+});

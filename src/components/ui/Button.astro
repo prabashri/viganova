@@ -1,4 +1,5 @@
 ---
+// src/components/ui/Button.astro
 interface Props {
   id: string;           // ✅ Required for uniqueness and targeting
   label: string;        // ✅ Required for accessibility, tracking
@@ -20,6 +21,7 @@ interface Props {
 
   dataAction?: string;
   dataLabel?: string;
+  dataTargets?: string; // Optional for tracking or targeting
 }
 
 const {
@@ -43,6 +45,7 @@ const {
 
   dataAction,
   dataLabel,
+  dataTargets,
 } = Astro.props;
 
 const variantClassMap = {
@@ -57,6 +60,20 @@ const computedClass = `${variantClass} ${className}`.trim();
 // Shared fallback label for all purposes
 const resolvedLabel = label;
 
+// Filter only defined optional attributes
+const extraAttributes = {
+  'aria-label': ariaLabel ?? resolvedLabel,
+  'aria-expanded': ariaExpanded,
+  'aria-controls': ariaControls,
+  'aria-pressed': ariaPressed,
+  'title': title ?? resolvedLabel,
+  'name': name,
+  'value': value,
+  'form': form,
+  'data-action': dataAction ?? 'button-click',
+  'data-label': dataLabel ?? resolvedLabel,
+  'data-targets': dataTargets,
+};
 /*
 <Button id="btn-submit" label="Submit">Submit</Button>
 Icon-left + text
@@ -74,17 +91,8 @@ Icon-only button
   id={id}
   type={type}
   class={computedClass}
-  aria-label={ariaLabel ?? resolvedLabel}
-  aria-expanded={ariaExpanded}
-  aria-controls={ariaControls}
-  aria-pressed={ariaPressed}
   disabled={disabled}
-  title={title ?? resolvedLabel}
-  name={name}
-  value={value}
-  form={form}
-  data-action={dataAction ?? 'button-click'}
-  data-label={dataLabel ?? resolvedLabel}
+  {...Object.fromEntries(Object.entries(extraAttributes).filter(([_, val]) => val !== undefined))}
 >
   <slot name="icon-left" />
   <slot />

@@ -260,9 +260,9 @@ header a{
         aria-label="Toggle Menu"
         type="button"
         variant="plain"
-        aria-controls="main-nav main-nav-cta secondary-nav"
-        aria-expanded="false"
-        data-targets="#main-nav,#main-nav-cta,#secondary-nav"
+        ariaControls="main-nav main-nav-cta secondary-nav"
+        ariaExpanded="false"		
+        dataTargets="#main-nav,#main-nav-cta,#secondary-nav"
       >
         <Icon name="hamburger" id="menu-icon" class="block fill-base-100 w-1-5 h-1-5" />
         <Icon name="close" id="close-icon" class="display-none fill-base-100 w-1-5 h-1-5" />
@@ -449,18 +449,20 @@ header a{
     </nav>
   )}
 </header>
-<script type="module">
+<script id="header-script" type="module">
   'use strict';
 (() => {
   
   document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('menu-toggle');
+	console.log('Toggle Button:', toggleBtn);
     const targetIds = ['main-nav', 'main-nav-cta', 'secondary-nav'];
 
     const hamburgerIcon = document.getElementById('menu-icon');
     const closeIcon = document.getElementById('close-icon');
 
     const selector = toggleBtn.getAttribute('data-targets');
+	
     const targets = selector
     ? selector.split(',').map((s) => document.querySelector(s.trim())).filter(Boolean)
     : [];
@@ -478,6 +480,7 @@ console.log('Targets:', targets.map((t) => t?.id));
 
     // Toggle mobile menu (hamburger)
      toggleBtn.addEventListener('click', () => {
+										console.log('Toggle button clicked');
       const isOpen = targets[0]?.classList.contains('is-open');
       const willOpen = !isOpen;
 
