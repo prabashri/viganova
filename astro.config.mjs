@@ -11,6 +11,7 @@ export default defineConfig({
   site: 'https://astroweb.dev',
   integrations: [mdx(), sitemap()],
   adapter: cloudflare(),
+  output: 'server',
   trailingSlash: 'always', 
   
     vite: {
