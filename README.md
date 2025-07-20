@@ -1,4 +1,5 @@
-# Astro Starter Kit: Blog
+# Astro Starter Kit: Blog : SSR Cloudflare Workers
+![ssr-cloudflare-workers](https://developers.cloudflare.com/workers/framework-guides/web-apps/astro/)
 
 ```sh
 npm create astro@latest -- --template blog
