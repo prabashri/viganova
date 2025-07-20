@@ -1,7 +1,32 @@
+# Ignore everything by default
 *
-!index.html
-_worker.js
-_routes.json
 
-_headers
-_redirects
+# ✅ Keep entrypoint + routes + worker
+!index.html
+!_worker.js
+!_routes.json
+
+# ✅ Keep custom headers or redirects if present
+!_headers
+!_redirects
+
+# ✅ Allow entire public/ folder (fonts, scripts, robots.txt, logos, etc)
+!public/**
+
+# ✅ Allow build assets like fonts, CSS, and JS under dist
+!dist/**
+
+# ✅ Optional: allow manifest and injected files
+!manifest.webmanifest
+!injected.js
+
+# ✅ Optional: include CSS & JS from other folders
+!**/*.css
+!**/*.js
+!**/*.woff
+!**/*.woff2
+!**/*.ttf
+!**/*.svg
+!**/*.webp
+!**/*.png
+!**/*.jpg
