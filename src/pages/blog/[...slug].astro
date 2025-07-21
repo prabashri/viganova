@@ -1,22 +1,26 @@
 ---
-export const prerender = true;
-import { type CollectionEntry, getCollection } from 'astro:content';
+// src/pages/blog/[slug].astro
+import { getEntry, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
-import { render } from 'astro:content';
 
-export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts.map((post) => ({
-		params: { slug: post.id },
-		props: post,
-	}));
+const { slug } = Astro.params;
+
+// 💡 Use string check in case of dynamic routing edge cases
+if (typeof slug !== 'string') {
+  throw new Error(`Invalid slug: ${slug}`);
 }
-type Props = CollectionEntry<'blog'>;
 
-const post = Astro.props;
+// ✅ Fetch entry by ID (file name without extension)
+const post = await getEntry('blog', slug);
+
+if (!post) {
+  throw new Error(`Post not found for slug: ${slug}`);
+}
+
+// ✅ Render content with render(entry)
 const { Content } = await render(post);
 ---
 
-<BlogPost {...post.data}>
-	<Content />
+<BlogPost {...post.data} >
+  <Content />
 </BlogPost>
