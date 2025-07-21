@@ -20,14 +20,13 @@ export const siteDefaults = {
 
   analyticsId: "G-01234567", // google analytics id
 
+ 
   collections: {
-    post:{
-      name: "post",
-      url: "",
-      plural: "post"
-    }
-    // guides: "/guides/",
-    // docs: "/docs/"
+    blog: true,
+    post: true,
+    // products: true,
+    // testimonials: true,
+    team: true,
   },
 
   tagMeta: [

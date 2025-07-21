@@ -1,0 +1,40 @@
+---
+# Title of the post (used in SEO and UI)
+title: "Sample Post Title"
+# Short description of the post (used for meta description and preview)
+description: "This is a placeholder post for the 'posts' collection."
+# Author's ID or name, typically linked to an author profile
+author: "deepan" # reference("team"), // ✅ references a document in the `team` collection
+# Date when the post was originally published (ISO format)
+publishedDate: "2025-02-02"
+# Date when the post was last updated or modified
+lastModified: "2025-02-05"
+# Optional custom URL slug (if not auto-generated from title)
+slug: "sample-post"
+# Optional canonical URL for SEO; used to prevent duplicate content issues
+canonicalUrl: "https://example.com/sample-post"
+# Hero image for the post (displayed in header, social preview, etc.)
+heroImage:
+  src: "../../assets/blog-placeholder-3.jpg"  # Relative path to the image
+  alt: "Cover image for the article"          # Alt text for accessibility and SEO
+  title: "Optional image title"               # Optional image title
+  caption: "Optional caption text"            # Optional image caption (used in UI)
+# Tags for filtering, search, or display
+tags: ["post", "example", "reference"]
+# Single category for organizing content
+category: "Tutorials"
+# Keywords for SEO (comma-separated or array)
+keywords: ["Astro post", "static content"]
+# Whether to feature this post on home or other prominent UI spots
+featured: false
+# Whether the post is still in draft mode (not published)
+draft: true
+# FAQ section — each item can be shown in schema.org FAQ or UI
+faq:
+  - question: "Why does this post exist?"
+    answer: "To serve as a boilerplate reference."
+    speakable: false  # Whether this FAQ is voice assistant-friendly (for structured data)
+# Optional type to define custom post classification or UI treatment
+type: "example"
+---
+Placeholder content for the `posts` collection...

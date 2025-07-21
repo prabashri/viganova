@@ -1,8 +1,21 @@
 ---
-title: 'Second post'
+title: 'First post'
+author: 'prabakaran-shankar'
 description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 15 2022'
-heroImage: '../../assets/blog-placeholder-4.jpg'
+publishedDate: "2025-01-01"
+lastModified: "2025-01-10"
+heroImage:
+  src: "../../assets/blog-placeholder-3.jpg"
+  alt: "Cover image for the article"
+  title: "Optional image title"
+  caption: "Optional caption text"
+slug: 'first-post'
+canonicalUrl: 'https://example.com/first-post'
+tags: ['blog', 'example', 'reference']
+keywords: ['Astro blog post', 'static content']
+featured: true
+draft: false
+category: 'Reference'   
 ---
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.

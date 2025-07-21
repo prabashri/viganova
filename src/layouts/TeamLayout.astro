@@ -1,0 +1,126 @@
+---
+// src/layouts/TeamLayout.astro
+// This layout is used for team member profiles
+import BaseLayout from './BaseLayout.astro';
+import { siteDefaults } from '../config/siteDefaults';
+import type { HeadProps } from '../types/HeadProps';
+
+interface Props {
+  name: string;
+  prefix?: string;
+  role?: string;
+  highestDegree?: string;
+  shortBio?: string;
+  experience?: number;
+  expertise?: string[];
+  awards?: string[];
+  affiliation?: string;
+  addressing?: string;
+  email?: string;
+  website?: string;
+  joined?: string;
+  useGravatar?: boolean;
+  photo?: string;
+  social?: Record<string, string>;
+  featured?: boolean;
+  slug?: string;
+  canonicalUrl?: string;
+  id?: string;
+}
+
+// ✅ Destructure props with fallback defaults
+const {
+  name,
+  prefix = '',
+  role = '',
+  highestDegree = '',
+  shortBio = '',
+  experience,
+  expertise = [],
+  awards = [],
+  affiliation = '',
+  addressing = '',
+  email,
+  website,
+  joined,
+  useGravatar = false,
+  photo = '',
+  social = {},
+  featured = false,
+  slug = '',
+  canonicalUrl,
+} = Astro.props as Props;
+
+const resolvedSlug = slug || Astro.props.id || '';
+const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}/team/${resolvedSlug}/`;
+
+const headProps: HeadProps = {
+  title: `${name} | ${siteDefaults.siteName}`,
+  description: shortBio || `${prefix} ${name} – ${role}`,
+  image: photo || siteDefaults.image,
+  canonicalUrl: fullCanonical,
+  index: true,
+  authorName: name,
+};
+---
+
+<BaseLayout headProps={headProps}>
+  <article class="team-profile">
+    <header class="team-header">
+      <h1 class="team-name">{prefix ? `${prefix} ` : ''}{name}</h1>
+      {role && <p class="team-role">{role}</p>}
+      {highestDegree && <p class="team-degree">{highestDegree}</p>}
+      {shortBio && <p class="team-short-bio">{shortBio}</p>}
+
+      {photo && (
+        <img src={photo} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
+      )}
+    </header>
+
+    <section class="team-details">
+      {affiliation && <p><strong>Affiliation:</strong> {affiliation}</p>}
+      {experience && <p><strong>Experience:</strong> {experience} years</p>}
+      {joined && <p><strong>Joined:</strong> {new Date(joined).toLocaleDateString()}</p>}
+      {addressing && <p><strong>Pronouns:</strong> {addressing}</p>}
+
+      {expertise.length > 0 && (
+        <div>
+          <h3>Expertise</h3>
+          <ul>{expertise.map(item => <li>{item}</li>)}</ul>
+        </div>
+      )}
+
+      {awards.length > 0 && (
+        <div>
+          <h3>Awards</h3>
+          <ul>{awards.map(award => <li>{award}</li>)}</ul>
+        </div>
+      )}
+
+      {(email || website) && (
+        <div>
+          <h3>Contact</h3>
+          <ul>
+            {email && <li>Email: <a href={`mailto:${email}`}>{email}</a></li>}
+            {website && <li>Website: <a href={website} target="_blank" rel="noopener">{website}</a></li>}
+          </ul>
+        </div>
+      )}
+
+      {Object.keys(social).length > 0 && (
+        <div>
+          <h3>Social</h3>
+          <ul>
+            {Object.entries(social).map(([platform, url]) => (
+              <li><a href={url} target="_blank" rel="noopener">{platform}</a></li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </section>
+
+    <section class="team-slot-content">
+      <slot />
+    </section>
+  </article>
+</BaseLayout>

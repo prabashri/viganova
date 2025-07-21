@@ -1,0 +1,135 @@
+---
+// layouts/PostLayout.astro
+import BaseLayout from './BaseLayout.astro';
+import { siteDefaults } from '../config/siteDefaults';
+import type { HeadProps } from '../types/HeadProps';
+// import ResponsiveImage from '../components/ResponsiveImage.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  slug: string;
+  canonicalUrl?: string;
+  index?: boolean;
+  pubDate?: string;
+  updatedDate?: string;
+   lastModified?: string | null; //new update to check last modified date
+  authorName?: string;
+  authorUrl?: string;
+  tags?: string[];
+  category?: string;
+  collection?: string;
+  coverImage?: string;
+  coverImageAlt? :string;
+  toc?: { id: string; text: string; level: number }[];
+  allPosts?: any[];
+}
+
+const {
+  title,
+  description,
+  slug,
+  canonicalUrl,
+  index = true,
+  pubDate,
+  updatedDate,
+   lastModified,
+  authorName,
+  authorUrl,
+  tags = [],
+  collection = 'post',
+  coverImage,
+  coverImageAlt,
+  toc = [],
+  allPosts = []
+} = Astro.props as Props;
+
+const collectionBase = ''; // siteDefaults.collections[collection as keyof typeof siteDefaults.collections]?.url || '';
+const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}${collectionBase}${slug}/`;
+
+const currentIndex = allPosts.findIndex(post => (post.data?.slug || post.slug) === slug);
+const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+
+const headProps: HeadProps = {
+  title: `${title} | ${siteDefaults.siteName}`,
+  description,
+  image: coverImage || siteDefaults.image,
+  preloadImages: coverImage ? [{ src: coverImage, width: '960', aspect: '16x9' }] : [], 
+  canonicalUrl: fullCanonical,
+  index,
+  keywords: tags,
+  publishedAt: pubDate,
+  updatedAt: lastModified ?? undefined,
+  authorName: authorName || siteDefaults.authorName,
+  authorUrl: authorUrl || siteDefaults.authorUrl,
+};
+---
+
+<BaseLayout headProps={headProps}>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
+  <article class="post-layout">
+    <header class="post-header">
+        <h1 class="post-title">{title}</h1>
+        {description && <p class="post-desc">{description}</p>}
+        <div class="post-meta">
+        {authorName && <span>✍️ {authorName}</span>}
+        {pubDate && <time datetime={pubDate}> 📅 {new Date(pubDate).toLocaleDateString()}</time>}
+        {updatedDate && <span> 🔄 Updated: {new Date(updatedDate).toLocaleDateString()}</span>}
+        {lastModified && (
+          <span> | 🕒 Last Modified: <time datetime={lastModified}>{new Date(lastModified).toLocaleDateString()}</time></span>
+        )}
+        </div>
+        <!-- <ResponsiveImage image={coverImage} alt={coverImageAlt || 'Default alt text'} className="w-320 lg-w-960" /> -->
+    </header>
+    {toc.length > 0 && (
+      <aside class="post-toc">
+        <h2>Contents</h2>
+        <ul>
+          {toc.map((item) => (
+            <li><a href={`#${item.id}`}>{item.text}</a></li>
+          ))}
+        </ul>
+      </aside>
+    )}
+
+    <div class="post-content">
+      <slot />
+    </div>
+
+    {tags.length > 0 && (
+      <footer class="post-tags">
+        <h3>Tags</h3>
+        <ul>
+          {tags.map((tag) => (
+            <li><a href={`/tags/${tag}/`}>{tag}</a></li>
+          ))}
+        </ul>
+      </footer>
+    )}
+
+    {(prevPost || nextPost) && (
+      <nav class="post-navigation mt-2">
+        <ul class="flex wrap gap-2 jc-space-between no-list-style-type no-margin">
+          <li class="w-50-1">
+            {prevPost && (
+              <a href={`/${collectionBase}${prevPost.data?.slug || prevPost.slug}/`} class="prev-post">
+                ← {prevPost.data?.title}
+              </a>
+            )}
+          </li>
+          <li class="w-50-1 ta-right">
+            {nextPost && (
+              <a href={`/${collectionBase}${nextPost.data?.slug || nextPost.slug}/`} class="next-post">
+                {nextPost.data?.title} →
+              </a>
+            )}
+          </li>
+        </ul>
+      </nav>
+    )}
+  </article>
+
+  <Fragment slot="extraScripts" />
+</BaseLayout>

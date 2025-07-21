@@ -1,23 +1,24 @@
 ---
-// src/pages/blog/[slug].astro
-// This file handles dynamic blog post slugs
+// src/pages/[slug].astro
+// to handle dynamic slugs for posts without explicit paths
+
 import { getEntry, render } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
-import { siteDefaults } from '../../config/siteDefaults';
-import modifiedDatesJson from '../../data/modified-dates.json';
+import PostLayout from '../layouts/PostLayout.astro';
+import { siteDefaults } from '../config/siteDefaults';
+import modifiedDatesJson from '../data/modified-dates.json';
 const modifiedDates = modifiedDatesJson as Record<string, string>;
 
-const { slug } = Astro.params;
+const { slug } = Astro.params as { slug: string };
 
-// ✅ Ensure slug is a valid string
+// ❌ Invalid slug param — show 404
 if (!slug || typeof slug !== 'string') {
   throw Astro.redirect('/404');
 }
 
-// ✅ Fetch entry from 'blog' collection
+// ✅ Get post entry from 'post' collection
 let post;
 try {
-  post = await getEntry('blog', slug);
+  post = await getEntry('post', slug);
 } catch {
   throw Astro.redirect('/404');
 }
@@ -26,10 +27,10 @@ if (!post) {
   throw Astro.redirect('/404');
 }
 
-// ✅ Render Markdown/MDX content
+// ✅ Render the Markdown/MDX content
 const { Content, headings } = await render(post);
 
-// ✅ Build Table of Contents from h2 elements (optional)
+// ✅ Table of Contents from h2 headings
 const toc = headings
   .filter((h) => h.depth === 2)
   .map((h) => ({
@@ -38,8 +39,9 @@ const toc = headings
     level: h.depth,
   }));
 
-// ✅ Last modified date fallback from JSON
+// ✅ Last modified from JSON fallback
 const relativeKey = `${post.collection}/${post.data.slug}`;
+
 const lastModifiedRaw = modifiedDates[relativeKey] || post.data.publishedDate;
 
 const lastModifiedFormatted = lastModifiedRaw
@@ -50,10 +52,10 @@ const lastModifiedFormatted = lastModifiedRaw
     })
   : null;
 
-// ✅ Canonical URL resolution
+// ✅ Canonical URL
 const canonicalUrl =
   post.data.canonicalUrl ||
-  `${siteDefaults.siteUrl}/blog/${slug}/`;
+  `${siteDefaults.siteUrl}/post/${slug}/`;
 ---
 
 <PostLayout

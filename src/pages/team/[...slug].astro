@@ -1,0 +1,28 @@
+---
+// src/pages/team/[...slug].astro
+import { getEntry, render } from 'astro:content';
+import TeamLayout from '../../layouts/TeamLayout.astro';
+
+const { slug } = Astro.params;
+
+// ✅ Normalize slug to string (handles [...slug] edge case)
+const slugId = Array.isArray(slug) ? slug.join('/') : slug;
+
+// ❌ Exclude demo/example content
+if (!slugId || slugId === '0-example-team') {
+  throw Astro.redirect('/404');
+}
+
+// ✅ Fetch the content entry
+const post = await getEntry('team', slugId);
+
+if (!post) {
+  throw Astro.redirect('/404');
+}
+
+// ✅ Render MDX content from entry
+const { Content } = await render(post);
+---
+<TeamLayout {...post.data}>
+  <Content />
+</TeamLayout>
