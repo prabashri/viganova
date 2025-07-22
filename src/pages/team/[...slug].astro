@@ -1,28 +1,76 @@
 ---
 // src/pages/team/[...slug].astro
+
 import { getEntry, render } from 'astro:content';
 import TeamLayout from '../../layouts/TeamLayout.astro';
 
 const { slug } = Astro.params;
-
-// ✅ Normalize slug to string (handles [...slug] edge case)
 const slugId = Array.isArray(slug) ? slug.join('/') : slug;
 
-// ❌ Exclude demo/example content
+// Exclude demo/example or invalid slugs
 if (!slugId || slugId === '0-example-team') {
   throw Astro.redirect('/404');
 }
 
-// ✅ Fetch the content entry
+// Fetch the team entry
 const post = await getEntry('team', slugId);
-
 if (!post) {
   throw Astro.redirect('/404');
 }
 
-// ✅ Render MDX content from entry
+// Render the MDX content
 const { Content } = await render(post);
+
+// Normalize fallback values for optional fields
+const {
+  name,
+  prefix = '',
+  role,
+  highestDegree = '',
+  shortBio = '',
+  experience,
+  expertise = [],
+  awards = [],
+  affiliation = '',
+  addressing = '',
+  email,
+  website = '',
+  color = 'hsl(220, 60%, 70%)',
+  joined = '',
+  left = '',
+  useGravatar = false,
+  gravatarEmail = '',
+  photo = '',
+  social = {},
+  featured = false,
+} = post.data;
+
+const teamProps = {
+  name,
+  prefix,
+  role,
+  highestDegree,
+  shortBio,
+  experience,
+  expertise,
+  awards,
+  affiliation,
+  addressing,
+  email,
+  website,
+  color,
+  joined,
+  left,
+  useGravatar,
+  gravatarEmail,
+  photo,
+  social: social ?? {},
+  featured,
+  slug: post.data.slug ?? slugId,
+  id: slugId,
+};
 ---
-<TeamLayout {...post.data}>
+<TeamLayout {...teamProps}>
   <Content />
 </TeamLayout>
+

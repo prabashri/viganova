@@ -2,113 +2,170 @@
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 import { getCollection } from 'astro:content';
-import FormattedDate from '../../components/FormattedDate.astro';
 import { Image } from 'astro:assets';
+import { siteDefaults } from '../../config/siteDefaults';
+import { Icon } from 'astro-icon/components';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+import gravatarHashesJson from '../../data/email-hash.json';
+const gravatarHashes: Record<string, string> = gravatarHashesJson;
+
+const allMembers = await getCollection('team');
+
+// Sort by `joined` date (newest first), fallback to slug if missing
+const team = allMembers
+  .filter(member => !member.data.left) // exclude those who left
+  .sort((a, b) => {
+    const aDate = a.data.joined ? new Date(a.data.joined).valueOf() : 0;
+    const bDate = b.data.joined ? new Date(b.data.joined).valueOf() : 0;
+    return bDate - aDate;
+  });
+
+const featured = team.filter(member => member.data.featured);
+const others = team.filter(member => !member.data.featured);
+
+// helper
+type AvatarParams = {
+  slug: string;
+  photo?: string;
+  useGravatar?: boolean;
+  color?: string;
+};
+
+function getAvatar({ slug, photo, useGravatar = true, color }: AvatarParams) {
+  if (photo) return { type: 'img', src: photo };
+
+  if (useGravatar !== false && gravatarHashes[slug]) {
+    return {
+      type: 'gravatar',
+      src: `https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon`,
+    };
+  }
+
+  return {
+    type: 'icon',
+    color: color || 'hsl(220, 60%, 70%)', // fallback default
+  };
+}
+
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead 
+      title={`Team | ${siteDefaults.siteName}`} 
+      description="Meet the team behind our work — experts, researchers, and creators." 
+    />
+    <style>
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+      }
+      ul {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      li {
+        width: calc(50% - 1rem);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .featured {
+        width: 100%;
+      }
+      img {
+        border-radius: 50%;
+        margin-bottom: 1rem;
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+      }
+      h2 {
+        font-size: 1.25rem;
+        margin: 0.25rem 0 0.5rem;
+      }
+      .role {
+        font-style: italic;
+        color: var(--gray-text, #555);
+        margin-bottom: 0.5rem;
+      }
+      .expertise {
+        font-size: 0.875rem;
+        color: var(--accent-text, #666);
+      }
+      @media (max-width: 720px) {
+        li {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main>
+      <h1>Our Team</h1>
+
+      <section>
+        <ul>
+          {featured.map(member => {
+            const { name, role, expertise, photo, useGravatar, slug } = member.data;
+            const avatar = getAvatar({ slug, photo, useGravatar });
+            return (
+              <li class="featured">
+                <a href={`/team/${slug}/`}>
+                  	{avatar.type === 'img' && <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
+					{avatar.type === 'gravatar' && <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
+					{avatar.type === 'icon' && (
+					<Icon name="avatar" width="150" height="150" style={`fill: ${avatar.color};`} />
+					)}
+
+                  <h2>{name}</h2>
+                  <p class="role">{role}</p>
+                  <p class="expertise">{expertise?.join(', ')}</p>
+                </a>
+              </li>
+            );
+          })}
+
+          {others.map(member => {
+            const { name, role, expertise, photo, useGravatar, slug } = member.data;
+            const avatar = getAvatar({ slug, photo, useGravatar });
+            return (
+              <li>
+                <a href={`/team/${slug}/`}>
+                  {avatar && (avatar.type === 'img' || avatar.type === 'gravatar') ? (
+                    <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />
+                  ) : (
+                    <div
+                      style={`background:${avatar.color};width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;`}
+                      aria-label={`Avatar for ${name}`}
+                    >
+                      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                        <circle cx="32" cy="32" r="32" fill={avatar.color} />
+                        <text x="50%" y="55%" text-anchor="middle" fill="#fff" font-size="24" font-family="Arial" dy=".3em">
+                          {name?.charAt(0) ?? "?"}
+                        </text>
+                      </svg>
+                    </div>
+                  )}
+                  <h2>{name}</h2>
+                  <p class="role">{role}</p>
+                  <p class="expertise">{expertise?.join(', ')}</p>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </main>
+    <Footer />
+  </body>
 </html>

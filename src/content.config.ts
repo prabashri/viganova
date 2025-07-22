@@ -64,8 +64,12 @@ export const collections = {
         addressing: z.string().optional(), // he/him, she/her, they/them
         email: z.string().email(),
         website: z.string().url().optional(),
+        color: z.string().optional(), // e.g., 'hsl(220, 80%, 70%)' or '#5588cc'
         joined: z.string().optional(), // YYYY-MM-DD
-        useGravatar: z.boolean().default(true), // fallback gravatar support
+        left: z.string().optional(), // e.g., '2024-12-31'
+
+        useGravatar: z.boolean().default(false), // fallback gravatar support
+        gravatarEmail: z.string().email().optional(), // if useGravatar is true, this is used to fetch the gravatar image
         photo: z.string().optional(), // custom image URL
         social: z
           .object({

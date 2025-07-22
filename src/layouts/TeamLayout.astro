@@ -1,9 +1,13 @@
 ---
 // src/layouts/TeamLayout.astro
 // This layout is used for team member profiles
+
 import BaseLayout from './BaseLayout.astro';
 import { siteDefaults } from '../config/siteDefaults';
 import type { HeadProps } from '../types/HeadProps';
+import { Icon } from 'astro-icon/components';
+import emailHashes from '../data/email-hash.json'; // map: slug -> hash
+const emailHashesMap = emailHashes as Record<string, string>;
 
 interface Props {
   name: string;
@@ -26,9 +30,9 @@ interface Props {
   slug?: string;
   canonicalUrl?: string;
   id?: string;
+  color?: string;
 }
 
-// ✅ Destructure props with fallback defaults
 const {
   name,
   prefix = '',
@@ -49,6 +53,7 @@ const {
   featured = false,
   slug = '',
   canonicalUrl,
+  color = 'hsl(220, 60%, 70%)'
 } = Astro.props as Props;
 
 const resolvedSlug = slug || Astro.props.id || '';
@@ -62,19 +67,29 @@ const headProps: HeadProps = {
   index: true,
   authorName: name,
 };
+const avatarSrc = photo
+  ? { type: 'img', src: photo }
+  : useGravatar !== false && emailHashesMap[resolvedSlug]
+    ? { type: 'gravatar', src: `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300&d=identicon` }
+    : { type: 'icon', color };
 ---
-
 <BaseLayout headProps={headProps}>
   <article class="team-profile">
     <header class="team-header">
+      {avatarSrc.type === 'img' && (
+        <img src={avatarSrc.src} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
+      )}
+      {avatarSrc.type === 'gravatar' && (
+        <img src={avatarSrc.src} alt={`Gravatar of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
+      )}
+      {avatarSrc.type === 'icon' && (
+        <Icon name="avatar" width="160" height="160" style={`fill: ${avatarSrc.color};`} class="team-photo" />
+      )}
+
       <h1 class="team-name">{prefix ? `${prefix} ` : ''}{name}</h1>
       {role && <p class="team-role">{role}</p>}
       {highestDegree && <p class="team-degree">{highestDegree}</p>}
       {shortBio && <p class="team-short-bio">{shortBio}</p>}
-
-      {photo && (
-        <img src={photo} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
-      )}
     </header>
 
     <section class="team-details">
