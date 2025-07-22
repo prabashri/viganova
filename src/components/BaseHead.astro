@@ -39,6 +39,8 @@ const imageUrl =
 const datePublished = parseToIsoString(publishedAt? publishedAt : siteDefaults.publishedDate);
 const dateModified = parseToIsoString(updatedAt);
 
+const rssEnabled = siteDefaults.rss === true;
+
 let primaryJsonLd: Record<string, any> = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
@@ -76,6 +78,15 @@ if (type === 'article') {
       url: new URL(item.url, Astro.site).toString(),
     }));
   }
+}
+const rssSchema ={
+  "@id": "https://astrotheme.nviewsweb.com/rss.xml",
+  "name": `${siteDefaults.title} RSS Feed`,
+  "@context": "https://schema.org",
+  "@type": "DataFeed",
+  "dataFeedElement": [
+    { "@type": "DataFeedItem", "dateCreated": "2025-07-21", "url": `${Astro.site}/rss.xml` }
+  ]
 }
 
 
@@ -236,7 +247,7 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 
 <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
 {/*-- RSS Feed Discovery */}
-<Rss />
+{rssEnabled && <Rss />}
 
 
 <!-- JSON-LD Structured Data -->
@@ -245,6 +256,7 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 <script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
 {faqJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
 {breadcrumbJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />}
+{rssEnabled && <script is:inline type="application/ld+json" set:html={JSON.stringify(rssSchema)} />}
 
 <>
   <!--<script is:inline src="/scripts/headerMenu.js?v=1.0.1" defer /> -->
