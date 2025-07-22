@@ -37,7 +37,7 @@ export const siteNav: NavItem[] = [
 
   {
     label: 'Tools',
-    href: '/tools',
+    href: '/tools/',
     type: 'dropdown',
     iconName: 'clamp',
     menuId: 'dropdown-tools',
@@ -65,8 +65,8 @@ export const siteNav: NavItem[] = [
     ]
   },
 
-  { label: 'Docs', href: '/docs', type: 'link', menuId: '', icon: '', title: 'Go to docs', altText: 'Docs icon', ariaLabel: 'Docs', variant: 'nav' },
-  { label: 'Blog', href: '/blog', type: 'link', menuId: '', icon: '', title: 'Go to blog', altText: 'Blog icon', ariaLabel: 'Blog', variant: 'nav' },
+  { label: 'Docs', href: '/docs/', type: 'link', menuId: '', icon: '', title: 'Go to docs', altText: 'Docs icon', ariaLabel: 'Docs', variant: 'nav' },
+  { label: 'Blog', href: '/blog/', type: 'link', menuId: '', icon: '', title: 'Go to blog', altText: 'Blog icon', ariaLabel: 'Blog', variant: 'nav' },
 
   {
     label: 'Resources',

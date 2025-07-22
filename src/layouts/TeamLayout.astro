@@ -1,13 +1,15 @@
 ---
 // src/layouts/TeamLayout.astro
-// This layout is used for team member profiles
 
 import BaseLayout from './BaseLayout.astro';
 import { siteDefaults } from '../config/siteDefaults';
 import type { HeadProps } from '../types/HeadProps';
 import { Icon } from 'astro-icon/components';
-import emailHashes from '../data/email-hash.json'; // map: slug -> hash
-const emailHashesMap = emailHashes as Record<string, string>;
+import emailHashes from '../data/email-hash.json'; // map: slug -> { email, sha256 }
+
+const emailHashesMap: Record<string, string> = Object.fromEntries(
+  Object.entries(emailHashes).map(([slug, obj]) => [slug, obj.sha256])
+);
 
 interface Props {
   name: string;
@@ -23,14 +25,18 @@ interface Props {
   email?: string;
   website?: string;
   joined?: string;
-  useGravatar?: boolean;
-  photo?: string;
   social?: Record<string, string>;
   featured?: boolean;
   slug?: string;
   canonicalUrl?: string;
   id?: string;
   color?: string;
+  // avatar logic
+  useImage?: boolean;
+  useInitial?: boolean;
+  initialText?: string;
+  photo?: string;
+  useGravatar?: boolean;
 }
 
 const {
@@ -47,16 +53,20 @@ const {
   email,
   website,
   joined,
-  useGravatar = false,
-  photo = '',
   social = {},
   featured = false,
   slug = '',
   canonicalUrl,
-  color = 'hsl(220, 60%, 70%)'
+  id = '',
+  color = 'hsl(220, 60%, 70%)',
+  useImage = false,
+  useInitial = false,
+  initialText,
+  photo = '',
+  useGravatar = false
 } = Astro.props as Props;
 
-const resolvedSlug = slug || Astro.props.id || '';
+const resolvedSlug = slug || id;
 const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}/team/${resolvedSlug}/`;
 
 const headProps: HeadProps = {
@@ -65,13 +75,27 @@ const headProps: HeadProps = {
   image: photo || siteDefaults.image,
   canonicalUrl: fullCanonical,
   index: true,
-  authorName: name,
+  authorName: name
 };
-const avatarSrc = photo
-  ? { type: 'img', src: photo }
-  : useGravatar !== false && emailHashesMap[resolvedSlug]
-    ? { type: 'gravatar', src: `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300&d=identicon` }
-    : { type: 'icon', color };
+
+let avatarSrc: { type: 'img' | 'gravatar' | 'initial' | 'icon'; src?: string; color?: string; text?: string };
+
+if (useImage && photo) {
+  avatarSrc = { type: 'img', src: photo };
+} else if (useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]) {
+  avatarSrc = {
+    type: 'gravatar',
+    src: `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300`
+  };
+} else if (useInitial) {
+  avatarSrc = {
+    type: 'initial',
+    color,
+    text: initialText || name?.charAt(0) || '?'
+  };
+} else {
+  avatarSrc = { type: 'icon', color };
+}
 ---
 <BaseLayout headProps={headProps}>
   <article class="team-profile">
@@ -81,6 +105,13 @@ const avatarSrc = photo
       )}
       {avatarSrc.type === 'gravatar' && (
         <img src={avatarSrc.src} alt={`Gravatar of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
+      )}
+      {avatarSrc.type === 'initial' && (
+        <div style={`background:${avatarSrc.color};width:160px;height:160px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;`}>
+          <span style="color:#fff;font-size:48px;font-family:sans-serif;">
+            {avatarSrc.text}
+          </span>
+        </div>
       )}
       {avatarSrc.type === 'icon' && (
         <Icon name="avatar" width="160" height="160" style={`fill: ${avatarSrc.color};`} class="team-photo" />

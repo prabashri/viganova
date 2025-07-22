@@ -70,7 +70,10 @@ export const collections = {
 
         useGravatar: z.boolean().default(false), // fallback gravatar support
         gravatarEmail: z.string().email().optional(), // if useGravatar is true, this is used to fetch the gravatar image
-        photo: z.string().optional(), // custom image URL
+        useImage: z.boolean().default(false), // use custom image instead of gravatar
+        image: z.string().optional(), // custom image URL        photo: z.string().optional(), // custom image URL
+        useInitial: z.boolean().optional(), // fallback initials
+        initialText: z.string().max(2).optional(), // e.g., 'JS' for John Smith
         social: z
           .object({
             twitter: z.string().url().optional(),

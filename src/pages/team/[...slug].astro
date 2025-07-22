@@ -3,6 +3,7 @@
 
 import { getEntry, render } from 'astro:content';
 import TeamLayout from '../../layouts/TeamLayout.astro';
+import { init } from 'astro/virtual-modules/prefetch.js';
 
 const { slug } = Astro.params;
 const slugId = Array.isArray(slug) ? slug.join('/') : slug;
@@ -40,7 +41,10 @@ const {
   left = '',
   useGravatar = false,
   gravatarEmail = '',
-  photo = '',
+  useImage = false,
+  useInitial = false,
+  initialText = '',
+  image = '',
   social = {},
   featured = false,
 } = post.data;
@@ -61,9 +65,12 @@ const teamProps = {
   color,
   joined,
   left,
-  useGravatar,
-  gravatarEmail,
-  photo,
+  useGravatar: post.data.useGravatar ?? false,
+  gravatarEmail: post.data.gravatarEmail ?? '',
+  useImage: post.data.useImage ?? false,
+  image: post.data.image ?? '',
+  useInitial: post.data.useInitial ?? false,
+  initialText: post.data.initialText ?? '',
   social: social ?? {},
   featured,
   slug: post.data.slug ?? slugId,

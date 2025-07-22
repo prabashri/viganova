@@ -12,7 +12,7 @@ function walkDir(dir, fileList = []) {
   if (!fs.existsSync(dir)) return fileList;
 
   const files = fs.readdirSync(dir);
-  files.forEach((file) => {
+  for (const file of files) {
     const fullPath = path.join(dir, file);
     const stat = fs.statSync(fullPath);
 
@@ -21,24 +21,23 @@ function walkDir(dir, fileList = []) {
     } else if (extensions.includes(path.extname(file))) {
       fileList.push(fullPath);
     }
-  });
+  }
 
   return fileList;
 }
-// @ref https://docs.gravatar.com/sdk/images/ to create gravatar image URL
-// @ref https://www.gravatar.com/site/implement/hash/
+
 function hashEmail(email) {
   return crypto.createHash('sha256').update(email.trim().toLowerCase()).digest('hex');
 }
 
-// 1. Load existing hash map
+// 1. Load existing hash map (optional but helps reduce unnecessary writes)
 let emailHashes = {};
 if (fs.existsSync(OUTPUT_FILE)) {
   try {
-    const rawData = fs.readFileSync(OUTPUT_FILE, 'utf-8');
-    emailHashes = JSON.parse(rawData);
+    const raw = fs.readFileSync(OUTPUT_FILE, 'utf8');
+    emailHashes = JSON.parse(raw);
   } catch (err) {
-    console.warn(`⚠️  Failed to read existing hash file: ${err.message}`);
+    console.warn(`⚠️  Failed to parse ${OUTPUT_FILE}: ${err.message}`);
   }
 }
 
@@ -47,37 +46,41 @@ if (teamFiles.length === 0) {
   console.warn(`⚠️  No team files found in ${TEAM_DIR}`);
 }
 
-let updatedCount = 0;
+let updated = 0;
 
 for (const filePath of teamFiles) {
   try {
-    const fileContent = fs.readFileSync(filePath, 'utf8');
-    const { data } = matter(fileContent);
+    const raw = fs.readFileSync(filePath, 'utf8');
+    const { data } = matter(raw);
     const slug = data.slug || path.basename(filePath, path.extname(filePath));
 
-    if (!data.useGravatar) {
+    if (!data.useGravatar) continue;
+
+    const email = data.gravatarEmail || data.email;
+    if (!email) {
+      console.warn(`⚠️  No gravatarEmail or email found for ${slug}`);
       continue;
     }
 
-    if (!data.email) {
-      console.warn(`⚠️  Missing email for: ${slug}`);
-      continue;
-    }
+    const sha256 = hashEmail(email);
 
-    const emailHash = hashEmail(data.email);
-
-    if (emailHashes[slug] !== emailHash) {
-      emailHashes[slug] = emailHash;
-      updatedCount++;
+    // Only update if changed or new
+    if (
+      !emailHashes[slug] ||
+      emailHashes[slug].sha256 !== sha256 ||
+      emailHashes[slug].email !== email
+    ) {
+      emailHashes[slug] = { email, sha256 };
+      updated++;
     }
   } catch (err) {
-    console.warn(`⚠️  Failed to process: ${filePath}\n   ↳ ${err.message}`);
+    console.warn(`⚠️  Failed to process ${filePath}: ${err.message}`);
   }
 }
 
-if (updatedCount > 0) {
+if (updated > 0) {
   fs.writeFileSync(OUTPUT_FILE, JSON.stringify(emailHashes, null, 2));
-  console.log(`✅ ${updatedCount} hash${updatedCount > 1 ? 'es' : ''} updated in ${OUTPUT_FILE}`);
+  console.log(`✅ ${updated} email hash${updated > 1 ? 'es' : ''} updated in ${OUTPUT_FILE}`);
 } else {
-  console.log(`ℹ️  No changes. Existing email hashes are up to date.`);
+  console.log(`ℹ️  No updates needed. Hashes are current.`);
 }

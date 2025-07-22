@@ -56,6 +56,7 @@ export const securityHeaders = {
     // "https://*.googleusercontent.com",
     "https://api.producthunt.com",
     "https://www.producthunt.com",
+    "https://www.gravatar.com/"
     // "https://*.google-analytics.com",
     // "https://*.googletagmanager.com",
     // "https://*.gstatic.com"

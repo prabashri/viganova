@@ -1,20 +1,19 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import { siteDefaults } from '../../config/siteDefaults';
 import { Icon } from 'astro-icon/components';
-
 import gravatarHashesJson from '../../data/email-hash.json';
-const gravatarHashes: Record<string, string> = gravatarHashesJson;
+import type { HeadProps } from '../../types/HeadProps';
+
+const gravatarHashes: Record<string, string> = Object.fromEntries(
+  Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
+);
 
 const allMembers = await getCollection('team');
 
-// Sort by `joined` date (newest first), fallback to slug if missing
 const team = allMembers
-  .filter(member => !member.data.left) // exclude those who left
+  .filter(member => !member.data.left)
   .sort((a, b) => {
     const aDate = a.data.joined ? new Date(a.data.joined).valueOf() : 0;
     const bDate = b.data.joined ? new Date(b.data.joined).valueOf() : 0;
@@ -24,148 +23,124 @@ const team = allMembers
 const featured = team.filter(member => member.data.featured);
 const others = team.filter(member => !member.data.featured);
 
-// helper
-type AvatarParams = {
-  slug: string;
-  photo?: string;
-  useGravatar?: boolean;
-  color?: string;
-};
-
-function getAvatar({ slug, photo, useGravatar = true, color }: AvatarParams) {
-  if (photo) return { type: 'img', src: photo };
-
-  if (useGravatar !== false && gravatarHashes[slug]) {
-    return {
-      type: 'gravatar',
-      src: `https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon`,
-    };
+function getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color }: any) {
+  if (useImage && image) {
+    return { type: 'img', src: image };
   }
-
-  return {
-    type: 'icon',
-    color: color || 'hsl(220, 60%, 70%)', // fallback default
-  };
+  if (useInitial && initialText) {
+    return { type: 'initial', text: initialText, color };
+  }
+  if (useGravatar && gravatarHashes[slug]) {
+    return { type: 'gravatar', src: `https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon` };
+  }
+  return { type: 'icon', color: color || 'hsl(220, 60%, 70%)' };
 }
 
+const headProps: HeadProps = {
+  title: 'Our Team',
+  description: 'Meet our team of experts dedicated to delivering the best solutions and secret to success.',
+  url: `${siteDefaults.siteUrl}/team/`,
+  image: siteDefaults.image,
+  index: true,
+  keywords: ['team', 'experts', 'professionals', 'staff'],
+  authorName: siteDefaults.authorName,
+  authorUrl: siteDefaults.authorUrl,
+  publishedAt: siteDefaults.publishedDate,
+};
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <BaseHead 
-      title={`Team | ${siteDefaults.siteName}`} 
-      description="Meet the team behind our work — experts, researchers, and creators." 
-    />
-    <style>
-      main {
-        max-width: 960px;
-        margin: 0 auto;
-        padding: 2rem 1rem;
-      }
-      ul {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      }
+<BaseLayout headProps={headProps}>
+  <style>
+    ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      justify-content: center;
+    }
+    li {
+      width: calc(50% - 1rem);
+      text-align: center;
+    }
+    img, .avatar-box {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      margin: 0 auto 1rem;
+      object-fit: cover;
+    }
+    .avatar-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: bold;
+      color: white;
+    }
+    h2 {
+      font-size: 1.25rem;
+      margin: 0.25rem 0 0.5rem;
+    }
+    .role {
+      font-style: italic;
+      color: var(--gray-text, #555);
+    }
+    .expertise {
+      font-size: 0.875rem;
+      color: var(--accent-text, #666);
+    }
+    @media (max-width: 720px) {
       li {
-        width: calc(50% - 1rem);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-      .featured {
         width: 100%;
       }
-      img {
-        border-radius: 50%;
-        margin-bottom: 1rem;
-        width: 150px;
-        height: 150px;
-        object-fit: cover;
-      }
-      h2 {
-        font-size: 1.25rem;
-        margin: 0.25rem 0 0.5rem;
-      }
-      .role {
-        font-style: italic;
-        color: var(--gray-text, #555);
-        margin-bottom: 0.5rem;
-      }
-      .expertise {
-        font-size: 0.875rem;
-        color: var(--accent-text, #666);
-      }
-      @media (max-width: 720px) {
-        li {
-          width: 100%;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <Header />
-    <main>
-      <h1>Our Team</h1>
+    }
+  </style>
 
-      <section>
-        <ul>
-          {featured.map(member => {
-            const { name, role, expertise, photo, useGravatar, slug } = member.data;
-            const avatar = getAvatar({ slug, photo, useGravatar });
-            return (
-              <li class="featured">
-                <a href={`/team/${slug}/`}>
-                  	{avatar.type === 'img' && <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
-					{avatar.type === 'gravatar' && <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
-					{avatar.type === 'icon' && (
-					<Icon name="avatar" width="150" height="150" style={`fill: ${avatar.color};`} />
-					)}
+  <header class="mx-w-site mi-auto ta-center mb-2">
+    <h1>{headProps.title}</h1>
+    <p>{headProps.description}</p>
+  </header>
 
-                  <h2>{name}</h2>
-                  <p class="role">{role}</p>
-                  <p class="expertise">{expertise?.join(', ')}</p>
-                </a>
-              </li>
-            );
-          })}
+  <section class="mx-w-site mi-auto">
+    <ul>
+      {[...featured, ...others].map(member => {
+        const {
+          slug,
+          name,
+          role,
+          expertise,
+          color,
+          image,
+          useImage,
+          useInitial,
+          initialText,
+          useGravatar,
+        } = member.data;
 
-          {others.map(member => {
-            const { name, role, expertise, photo, useGravatar, slug } = member.data;
-            const avatar = getAvatar({ slug, photo, useGravatar });
-            return (
-              <li>
-                <a href={`/team/${slug}/`}>
-                  {avatar && (avatar.type === 'img' || avatar.type === 'gravatar') ? (
-                    <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />
-                  ) : (
-                    <div
-                      style={`background:${avatar.color};width:150px;height:150px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;`}
-                      aria-label={`Avatar for ${name}`}
-                    >
-                      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                        <circle cx="32" cy="32" r="32" fill={avatar.color} />
-                        <text x="50%" y="55%" text-anchor="middle" fill="#fff" font-size="24" font-family="Arial" dy=".3em">
-                          {name?.charAt(0) ?? "?"}
-                        </text>
-                      </svg>
-                    </div>
-                  )}
-                  <h2>{name}</h2>
-                  <p class="role">{role}</p>
-                  <p class="expertise">{expertise?.join(', ')}</p>
-                </a>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
-    </main>
-    <Footer />
-  </body>
-</html>
+        const avatar = getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color });
+
+        return (
+          <li>
+            <a href={`/team/${slug}/`}>
+              {avatar.type === 'img' && <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
+              {avatar.type === 'gravatar' && <img src={avatar.src} alt={`Gravatar of ${name}`} loading="lazy" />}
+              {avatar.type === 'initial' && (
+                <div class="avatar-box" style={`background:${avatar.color || '#888'};`}>
+                  {avatar.text}
+                </div>
+              )}
+              {avatar.type === 'icon' && (
+                <Icon name="avatar" width="150" height="150" style={`fill:${avatar.color}; margin-bottom:1rem;`} />
+              )}
+              <h2>{name}</h2>
+              <p class="role">{role}</p>
+              <p class="expertise">{expertise?.join(', ')}</p>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+</BaseLayout>
