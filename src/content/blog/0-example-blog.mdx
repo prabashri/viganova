@@ -14,11 +14,11 @@ slug: "sample-post"
 # Optional canonical URL for SEO; used to prevent duplicate content issues
 canonicalUrl: "https://example.com/sample-post"
 # Hero image for the post (displayed in header, social preview, etc.)
-heroImage:
-  src: "../../assets/blog-placeholder-3.jpg"  # Relative path to the image
-  alt: "Cover image for the article"          # Alt text for accessibility and SEO
-  title: "Optional image title"               # Optional image title
-  caption: "Optional caption text"            # Optional image caption (used in UI)
+
+heroImage: "../../assets/blog-placeholder-3.jpg"  # Relative path to the image
+heroImageAlt: "Cover image for the article"          # Alt text for accessibility and SEO
+heroImageTitle: "Optional image title"               # Optional image title
+heroImageCaption: "Optional caption text"            # Optional image caption (used in UI)
 # Tags for filtering, search, or display
 tags: ["post", "example", "reference"]
 # Single category for organizing content
@@ -35,6 +35,7 @@ faq:
     answer: "To serve as a boilerplate reference."
     speakable: false  # Whether this FAQ is voice assistant-friendly (for structured data)
 # Optional type to define custom post classification or UI treatment
-type: "example"
+# type: "example"
+index: true # Whether to include this post in search indexing (default is true)
 ---
 Placeholder content for the `posts` collection...

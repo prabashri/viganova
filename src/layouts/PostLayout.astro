@@ -1,26 +1,35 @@
 ---
 // layouts/PostLayout.astro
+
 import BaseLayout from './BaseLayout.astro';
 import { siteDefaults } from '../config/siteDefaults';
 import type { HeadProps } from '../types/HeadProps';
-// import ResponsiveImage from '../components/ResponsiveImage.astro';
+import { Image } from 'astro:assets';
+
 
 interface Props {
-  title: string;
-  description: string;
-  slug: string;
+  title?: string;
+  description?: string;
+  slug?: string;
   canonicalUrl?: string;
   index?: boolean;
-  pubDate?: string;
-  updatedDate?: string;
-   lastModified?: string | null; //new update to check last modified date
+  publishedDate?: string;  
+  lastModified?: string | null;
+  author?: string
   authorName?: string;
   authorUrl?: string;
   tags?: string[];
   category?: string;
+  keywords?: string[];
+  featured?: boolean;
+  draft?: boolean;
+  faq?: { question: string; answer: string; speakable: boolean }[];
   collection?: string;
-  coverImage?: string;
-  coverImageAlt? :string;
+  collectionBase?: string;
+  heroImage?: string;
+  heroImageAlt?: string;
+  heroImageTitle?: string;
+  heroImageCaption?: string;
   toc?: { id: string; text: string; level: number }[];
   allPosts?: any[];
 }
@@ -31,20 +40,26 @@ const {
   slug,
   canonicalUrl,
   index = true,
-  pubDate,
-  updatedDate,
-   lastModified,
+  featured = false,
+  publishedDate,
+  lastModified,
+  author,
   authorName,
   authorUrl,
   tags = [],
-  collection = 'post',
-  coverImage,
-  coverImageAlt,
+  category,
+  keywords = [],
+  collection = '',  
+  collectionBase = '',
+  heroImage,
+  heroImageAlt,
+  heroImageTitle,
+  heroImageCaption,
+  faq = [],
   toc = [],
   allPosts = []
 } = Astro.props as Props;
 
-const collectionBase = ''; // siteDefaults.collections[collection as keyof typeof siteDefaults.collections]?.url || '';
 const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}${collectionBase}${slug}/`;
 
 const currentIndex = allPosts.findIndex(post => (post.data?.slug || post.slug) === slug);
@@ -54,35 +69,57 @@ const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1]
 const headProps: HeadProps = {
   title: `${title} | ${siteDefaults.siteName}`,
   description,
-  image: coverImage || siteDefaults.image,
-  preloadImages: coverImage ? [{ src: coverImage, width: '960', aspect: '16x9' }] : [], 
+  image: heroImage || siteDefaults.image,
   canonicalUrl: fullCanonical,
   index,
   keywords: tags,
-  publishedAt: pubDate,
+  publishedAt: publishedDate,
   updatedAt: lastModified ?? undefined,
   authorName: authorName || siteDefaults.authorName,
   authorUrl: authorUrl || siteDefaults.authorUrl,
 };
----
 
+---
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top" />
   <Fragment slot="headContent-bottom" />
+
   <article class="post-layout">
+    <div class="hero-image">      
+      {heroImage && (
+        <figure>
+          <img
+            src={heroImage}
+            alt={heroImageAlt ?? ''}
+            width="1020"
+            height="510"
+            loading="lazy"
+          />
+          {heroImageCaption && <figcaption>{heroImageCaption}</figcaption>}
+        </figure>
+      )}
+    </div>
+
     <header class="post-header">
-        <h1 class="post-title">{title}</h1>
-        {description && <p class="post-desc">{description}</p>}
-        <div class="post-meta">
+      <h1 class="post-title">{title}</h1>
+      {description && <p class="post-desc">{description}</p>}
+      <div class="post-meta">
         {authorName && <span>✍️ {authorName}</span>}
-        {pubDate && <time datetime={pubDate}> 📅 {new Date(pubDate).toLocaleDateString()}</time>}
-        {updatedDate && <span> 🔄 Updated: {new Date(updatedDate).toLocaleDateString()}</span>}
-        {lastModified && (
-          <span> | 🕒 Last Modified: <time datetime={lastModified}>{new Date(lastModified).toLocaleDateString()}</time></span>
+        {author && <span>Author: {author}</span>}
+        {publishedDate && (
+          <time datetime={publishedDate}> 📅 {new Date(publishedDate).toLocaleDateString()}</time>
         )}
-        </div>
-        <!-- <ResponsiveImage image={coverImage} alt={coverImageAlt || 'Default alt text'} className="w-320 lg-w-960" /> -->
+        {lastModified && (
+          <span> 🔄 Updated: {new Date(lastModified).toLocaleDateString()}</span>
+        )}
+        {lastModified && (
+          <span> | 🕒 Last Modified: <time datetime={lastModified}>
+            {new Date(lastModified).toLocaleDateString()}
+          </time></span>
+        )}
+      </div>
     </header>
+
     {toc.length > 0 && (
       <aside class="post-toc">
         <h2>Contents</h2>

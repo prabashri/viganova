@@ -4,18 +4,20 @@ author: 'prabakaran-shankar'
 description: 'Lorem ipsum dolor sit amet'
 publishedDate: "2025-01-01"
 lastModified: "2025-01-10"
-heroImage:
-  src: "../../assets/blog-placeholder-3.jpg"
-  alt: "Cover image for the article"
-  title: "Optional image title"
-  caption: "Optional caption text"
+# Cover / Featured image for the post
+heroImage:  "../assets/blog-placeholder-3.jpg"
+heroImageAlt:  "Cover image for the article"
+heroImageTitle:  "Optional image title"
+heroImageCaption:  "Optional caption text"
+
 slug: 'first-post'
 canonicalUrl: 'https://example.com/first-post'
 tags: ['blog', 'example', 'reference']
 keywords: ['Astro blog post', 'static content']
 featured: true
 draft: false
-category: 'Reference'   
+category: 'Reference'  
+index: true # Whether to include this post in search indexing (default is true) 
 ---
 
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.

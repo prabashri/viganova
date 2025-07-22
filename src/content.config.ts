@@ -10,20 +10,19 @@ const baseSchema = ({ image }: SchemaContext) =>
     lastModified: z.string().optional(),
     slug: z.string().optional(),
     canonicalUrl: z.string().optional(), // removes the .url() check
-    heroImage: z
-      .object({
-        src: image().describe('Image must be in the same folder as this MDX file. Optimized with astro:assets.'),
-        alt: z.string().describe('Alt text for accessibility.'),
-        title: z.string().optional(),
-        caption: z.string().optional(),
-      })
-      .optional(),
+
+    heroImage: z.string().optional(), // Relative path to the hero image, used in header and social preview
+    heroImageAlt: z.string().optional(), // 'Alt text for the hero image, used for accessibility and SEO.')
+    heroImageTitle: z.string().optional(), // .describe('Optional title for the hero image, used in UI.')
+    heroImageCaption: z.string().optional(), // .describe('Optional caption for the hero image, used in UI.'),
+    // Use astro: assets for image optimization
+    
     tags: z.array(z.string()).optional(),
     keywords: z.array(z.string()).optional(),
     featured: z.boolean().optional(),
     draft: z.boolean().optional(),
     category: z.string().optional(),
-    type: z.string().optional(),
+    // type: z.string().optional(),
     faq: z
       .array(
         z.object({
@@ -33,6 +32,7 @@ const baseSchema = ({ image }: SchemaContext) =>
         })
       )
       .optional(),
+    index: z.boolean().default(true), // Default to true, can be set to false to exclude from search indexing
   });
 
 export const collections = {
@@ -52,17 +52,17 @@ export const collections = {
     schema: () =>
       z.object({
         name: z.string(),
-		slug: z.string().optional(),
+		    slug: z.string(),
         prefix: z.string().optional(), // Dr., Mr., etc.
         role: z.string(),
         highestDegree: z.string().optional(),
-        shortBio: z.string().optional(),
+        shortBio: z.string(),
         experience: z.number().int().nonnegative().optional(),
-        expertise: z.array(z.string()).optional(),
+        expertise: z.array(z.string()),
         awards: z.array(z.string()).optional(),
         affiliation: z.string().optional(),
         addressing: z.string().optional(), // he/him, she/her, they/them
-        email: z.string().email().optional(),
+        email: z.string().email(),
         website: z.string().url().optional(),
         joined: z.string().optional(), // YYYY-MM-DD
         useGravatar: z.boolean().default(true), // fallback gravatar support

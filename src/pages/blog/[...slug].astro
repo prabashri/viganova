@@ -1,67 +1,112 @@
 ---
 // src/pages/blog/[slug].astro
-// This file handles dynamic blog post slugs
-import { getEntry, render } from 'astro:content';
+
+import { getEntry, getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
 import modifiedDatesJson from '../../data/modified-dates.json';
-const modifiedDates = modifiedDatesJson as Record<string, string>;
+
+import type { CollectionEntry } from 'astro:content';
 
 const { slug } = Astro.params;
+const collectionBase = 'blog';
+const modifiedDates = modifiedDatesJson as Record<string, string>;
 
-// ✅ Ensure slug is a valid string
-if (!slug || typeof slug !== 'string') {
+// ✅ Validate slug
+if (!slug || typeof slug !== 'string' || slug.startsWith('0-example-')) {
   throw Astro.redirect('/404');
 }
 
-// ✅ Fetch entry from 'blog' collection
-let post;
+// ✅ Get the post entry
+let post: CollectionEntry<'blog'>;
 try {
-  post = await getEntry('blog', slug);
+  const entry = await getEntry('blog', slug);
+  if (!entry) {
+    throw Astro.redirect('/404');
+  }
+  post = entry;
 } catch {
   throw Astro.redirect('/404');
 }
 
-if (!post) {
+if (post.data?.draft === true) {
   throw Astro.redirect('/404');
 }
 
-// ✅ Render Markdown/MDX content
+// ✅ Render markdown and extract headings
 const { Content, headings } = await render(post);
-
-// ✅ Build Table of Contents from h2 elements (optional)
 const toc = headings
   .filter((h) => h.depth === 2)
-  .map((h) => ({
-    id: h.slug,
-    text: h.text,
-    level: h.depth,
-  }));
+  .map((h) => ({ id: h.slug, text: h.text, level: h.depth }));
 
-// ✅ Last modified date fallback from JSON
-const relativeKey = `${post.collection}/${post.data.slug}`;
+// ✅ Modified date
+const relativeKey = `${collectionBase}/${post.data.slug}`;
 const lastModifiedRaw = modifiedDates[relativeKey] || post.data.publishedDate;
-
-const lastModifiedFormatted = lastModifiedRaw
-  ? new Date(lastModifiedRaw).toLocaleDateString('en-US', {
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    })
+const lastModified = lastModifiedRaw
+  ? new Date(lastModifiedRaw).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
   : null;
 
-// ✅ Canonical URL resolution
-const canonicalUrl =
-  post.data.canonicalUrl ||
-  `${siteDefaults.siteUrl}/blog/${slug}/`;
----
+// ✅ Author (string or reference object)
+const authorSlug = typeof post.data.author === 'object' && post.data.author?.id
+  ? post.data.author.id
+  : post.data.author;
 
-<PostLayout
-  {...post.data}
-  toc={toc}
+let authorEntry: Awaited<ReturnType<typeof getEntry>> | null = null;
+if (typeof authorSlug === 'string' && authorSlug) {
+  try {
+    authorEntry = await getEntry('team', authorSlug);
+  } catch {
+    authorEntry = null;
+  }
+}
+const authorName = authorEntry?.data?.name || (typeof post.data.author === 'string' ? post.data.author : undefined);
+const authorUrl = authorEntry ? `/team/${authorSlug}/` : undefined;
+
+// ✅ Canonical URL
+const canonicalUrl = post.data?.canonicalUrl?.startsWith('http')
+  ? post.data.canonicalUrl
+  : `${siteDefaults.siteUrl}${post.data?.canonicalUrl || `/${collectionBase}/${slug}/`}`;
+
+// ✅ Load all posts from same collection for prev/next/related
+const allPosts = await getCollection(collectionBase);
+
+// ✅ Sort posts by publishedDate (recommended for chronological prev/next)
+const sortedPosts = allPosts
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => new Date(a.data.publishedDate).getTime() - new Date(b.data.publishedDate).getTime());
+
+---
+<PostLayout  
+  title={post.data.title}
+  description={post.data.description}
   slug={slug}
   canonicalUrl={canonicalUrl}
-  lastModified={lastModifiedFormatted}
+  index={post.data.index ?? true}
+  publishedDate={post.data.publishedDate}
+  lastModified={lastModified}
+  author={typeof authorSlug === 'string' ? authorSlug : undefined}
+  authorName={authorName}
+  authorUrl={authorUrl}
+  tags={post.data.tags}
+  category={post.data.category}
+  keywords={post.data.keywords}
+  featured={post.data.featured ?? false}
+  draft={post.data.draft ?? false}
+  heroImage={post.data.heroImage}
+  toc={toc}
+  collection='',
+  collectionBase={`${collectionBase}/`}
+  allPosts={sortedPosts}
+  faq={
+    post.data.faq?.map(f => ({
+      question: f.question,
+      answer: f.answer,
+      speakable: typeof f.speakable === 'boolean' ? f.speakable : false
+    })) ?? []
+  }
+  heroImageAlt={post.data.heroImageAlt}
+  heroImageTitle={post.data.heroImageTitle}
+  heroImageCaption={post.data.heroImageCaption}
 >
   <Content />
 </PostLayout>
