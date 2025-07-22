@@ -1,0 +1,34 @@
+---
+// src/components/Rss.astro
+// This component generates RSS feed links for the site
+import { siteDefaults } from '../config/siteDefaults';
+
+const rssEnabled = siteDefaults.rss ? siteDefaults.rss === true : true;
+
+const feedLinks = Object.entries(siteDefaults.collections)
+  .filter(([_, config]) => config?.rss === true);
+
+const combinedFeed = {
+  href: '/rss.xml',
+  title: 'Combined Feed – All Updates',
+};
+---
+
+{rssEnabled && (
+  <>
+    <!-- 📡 RSS Feeds -->
+
+    <!-- 🧠 Combined RSS Feed -->
+    <link rel="alternate" type="application/rss+xml" href={combinedFeed.href} title={combinedFeed.title} />
+
+    <!-- 📚 Individual Collection Feeds -->
+    {feedLinks.map(([key, config]) => {
+      const href = config.base ? `/${config.base}/rss.xml` : `/${key}/rss.xml`;
+      const label = config.label ?? key.charAt(0).toUpperCase() + key.slice(1);
+      const title = `${label} Feed – Latest ${label === 'Post' ? 'Notes' : 'Articles'}`;
+      return (
+        <link rel="alternate" type="application/rss+xml" href={href} title={title} />
+      );
+    })}
+  </>
+)}

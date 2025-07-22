@@ -4,6 +4,7 @@ import { siteDefaults } from '../config/siteDefaults';
 import { parseToIsoString } from '../utils/date-utils';
 import CssHead from './CssHead.astro';
 import type { HeadProps } from '../types/HeadProps';
+import Rss from './Rss.astro';
 
 
 const props: HeadProps = {
@@ -234,7 +235,8 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 <meta name="twitter:image" content={image} />
 
 <link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
-<link rel="alternate" type="application/rss+xml" title="RSS" href="/rss.xml" />
+{/*-- RSS Feed Discovery */}
+<Rss />
 
 
 <!-- JSON-LD Structured Data -->

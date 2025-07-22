@@ -963,7 +963,7 @@ svg use {
 }
 
 @media (max-width: 768px) {
-  /* sm- */
+  /* sm- [ only small screens]*/
 	main {
 		padding: 1em;
 	}
@@ -1004,7 +1004,7 @@ svg use {
 }
 
 @media (min-width: 1280px) {
-  /* full- */
+  /* full- [ only above 1280px wide screen] */
 	.full-display-none {
 		display: none !important;
 	}
@@ -1012,7 +1012,10 @@ svg use {
 
 
 @media (min-width: 768px) {
-  /* big- */
+  /* 
+   * above small screens
+   * prefix: big- 
+   */
 	.big-display-block {
 		display: block;
 	}
@@ -1069,7 +1072,7 @@ svg use {
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-  /* md- */
+  /* md- [ only medium screens - tablets ] */
 	.md-display-none {
 		display: none !important;
 	}
@@ -1084,7 +1087,7 @@ svg use {
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
-  /* lg- */
+  /* lg- [ only large screens - above tablet version desktops ] */
 	.lg-display-none {
 		display: none !important;
 	}
@@ -1107,6 +1110,9 @@ svg use {
 
 	.lg-display-flex {
 		display: flex !important;
+	}
+	.lg-jc-center {
+		justify-content: center;
 	}
 }
 

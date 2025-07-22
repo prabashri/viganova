@@ -1,5 +1,5 @@
 ---
-// src/pages/blog/[slug].astro
+// src/pages/[...slug].astro
 
 import { getEntry, getCollection, render } from 'astro:content';
 import PostLayout from '../layouts/PostLayout.astro';
@@ -9,7 +9,8 @@ import modifiedDatesJson from '../data/modified-dates.json';
 import type { CollectionEntry } from 'astro:content';
 
 const { slug } = Astro.params;
-const collectionBase = 'blog';
+
+const collectionBase = siteDefaults.collections['post']?.base ?? '';
 const modifiedDates = modifiedDatesJson as Record<string, string>;
 
 // ✅ Validate slug
@@ -18,9 +19,9 @@ if (!slug || typeof slug !== 'string' || slug.startsWith('0-example-')) {
 }
 
 // ✅ Get the post entry
-let post: CollectionEntry<'blog'>;
+let post: CollectionEntry<'post'>;
 try {
-  const entry = await getEntry('blog', slug);
+  const entry = await getEntry('post', slug);
   if (!entry) {
     throw Astro.redirect('/404');
   }
@@ -40,7 +41,7 @@ const toc = headings
   .map((h) => ({ id: h.slug, text: h.text, level: h.depth }));
 
 // ✅ Modified date
-const relativeKey = `${collectionBase}/${post.data.slug}`;
+const relativeKey = `post/${post.data.slug}`;
 const lastModifiedRaw = modifiedDates[relativeKey] || post.data.publishedDate;
 const lastModified = lastModifiedRaw
   ? new Date(lastModifiedRaw).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
@@ -68,7 +69,7 @@ const canonicalUrl = post.data?.canonicalUrl?.startsWith('http')
   : `${siteDefaults.siteUrl}${post.data?.canonicalUrl || `/${collectionBase}/${slug}/`}`;
 
 // ✅ Load all posts from same collection for prev/next/related
-const allPosts = await getCollection(collectionBase);
+const allPosts = await getCollection('post');
 
 // ✅ Sort posts by publishedDate (recommended for chronological prev/next)
 const sortedPosts = allPosts
@@ -94,8 +95,8 @@ const sortedPosts = allPosts
   draft={post.data.draft ?? false}
   heroImage={post.data.heroImage}
   toc={toc}
-  collection='',
-  collectionBase={`${collectionBase}/`}
+  collection='post'
+  collectionBase={collectionBase}
   allPosts={sortedPosts}
   faq={
     post.data.faq?.map(f => ({

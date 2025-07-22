@@ -151,14 +151,14 @@ const headProps: HeadProps = {
         <ul class="flex wrap gap-2 jc-space-between no-list-style-type no-margin">
           <li class="w-50-1">
             {prevPost && (
-              <a href={`/${collectionBase}${prevPost.data?.slug || prevPost.slug}/`} class="prev-post">
+              <a href={`/${collection}${prevPost.data?.slug || prevPost.slug}/`} class="prev-post">
                 ← {prevPost.data?.title}
               </a>
             )}
           </li>
           <li class="w-50-1 ta-right">
             {nextPost && (
-              <a href={`/${collectionBase}${nextPost.data?.slug || nextPost.slug}/`} class="next-post">
+              <a href={`/${collection}${nextPost.data?.slug || nextPost.slug}/`} class="next-post">
                 {nextPost.data?.title} →
               </a>
             )}

@@ -1,12 +1,12 @@
 export const siteDefaults = {
-  siteName: "Astro Theme by Nviews WEB",
+  siteName: "AstroWEB by Nviews WEB",
   publishedDate: "June 19 2025",
   adminName: "nviews web",
   adminEmail: "admin@nviewsweb.com",
   authorName: "Prabakaran Shankar",
   authorUrl: "https://prabakaranshankar.com",
-  domainName: "astrotheme.nviewsweb.com",
-  siteUrl: "https://astrotheme.nviewsweb.com",
+  domainName: "astroweb.dev",
+  siteUrl: "https://astroweb.dev",
   title: "Theme for Astro by nViewsWEB - The Ultimate Frontend Toolkit",
   description: "some description",
   keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],
@@ -17,17 +17,32 @@ export const siteDefaults = {
   logo: "/logos/AstroWEB-logo.png",
   icon: "/logos/AstroWEB-icon.png",
   separator: "|",
+  rss: true,
+  sitemap: true,
 
-  analyticsId: "G-01234567", // google analytics id
 
  
   collections: {
-    blog: true,
-    post: true,
-    // products: true,
-    // testimonials: true,
-    team: true,
+    blog: {
+      index: true,
+      base: 'blog',        // base path → used as /blog/slug/
+      label: 'Blog',       // display label (optional)
+      rss: true,           // should generate RSS?
+    },
+    post: {
+      index: true,
+      base: '',            // no prefix → /slug/
+      label: 'Post',
+      rss: true,
+    },
+    team: {
+      index: true,
+      base: 'team',
+      label: 'Team',
+      rss: false,
+    }
   },
+
 
   tagMeta: [
     {
