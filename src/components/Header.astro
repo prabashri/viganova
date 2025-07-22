@@ -261,7 +261,7 @@ header a{
         type="button"
         variant="plain"
         ariaControls="main-nav main-nav-cta secondary-nav"
-        ariaExpanded="false"		
+        ariaExpanded={false}		
         dataTargets="#main-nav,#main-nav-cta,#secondary-nav"
       >
         <Icon name="hamburger" id="menu-icon" class="block fill-base-100 w-1-5 h-1-5" />
@@ -272,7 +272,7 @@ header a{
       {siteNav.length > 0 && (
       <nav id="main-nav" class={`main-nav sm-bg scroll-container flex flex-row text-small ${navClasses} p-05 gap br-1 sm-br col-base-100 z-1000 big-display-inherit ${navOrder}`} itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Primary site navigation">
         {/* Logo for Desktop */}
-        <ul class="nav-list flex ai-center no-bullets gap sm-flex-col sm-ai-start">
+        <ul class="nav-list flex ai-center lg-w-full lg-jc-center no-bullets gap sm-flex-col sm-ai-start">
         {/* Loop through siteNav items */}
         {Array.isArray(siteNav) && siteNav.map((item, navIndex) => (           
             <li
@@ -455,7 +455,7 @@ header a{
   
   document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('menu-toggle');
-	console.log('Toggle Button:', toggleBtn);
+	
     const targetIds = ['main-nav', 'main-nav-cta', 'secondary-nav'];
 
     const hamburgerIcon = document.getElementById('menu-icon');
@@ -466,7 +466,6 @@ header a{
     const targets = selector
     ? selector.split(',').map((s) => document.querySelector(s.trim())).filter(Boolean)
     : [];
-console.log('Targets:', targets.map((t) => t?.id));
 
     const navItems = document.querySelectorAll('.nav-item.dropdown');
     const activeClass = 'dropdown-active';
