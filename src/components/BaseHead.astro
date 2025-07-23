@@ -10,6 +10,7 @@ import Rss from './Rss.astro';
 const props: HeadProps = {
   ...Astro.props,
   title: Astro.props.title ?? siteDefaults.title,
+  authors: Astro.props.authors ?? siteDefaults.authors ?? [],
 };
 
 const canonicalURL = new URL(props.canonicalUrl ?? Astro.url.pathname, Astro.site).toString();
@@ -22,6 +23,7 @@ const {
   type = 'webpage',
   url = Astro.url.toString(),
   siteName = siteDefaults.title,
+  authors = [],
   authorName = siteDefaults.authorName,
   authorUrl = siteDefaults.authorUrl,
   publishedAt,

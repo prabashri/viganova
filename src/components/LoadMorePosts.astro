@@ -1,0 +1,114 @@
+---
+interface Props {
+  slug: string;
+  loaded: number;
+  total: number;
+  sort?: string;
+  collections: string[];
+}
+
+const {
+  slug,
+  loaded = 0,
+  total = 0,
+  sort = 'lastmodified',
+  collections = ['blog', 'post'],
+} = Astro.props;
+---
+
+<div class="mt-6 text-center">
+  <button
+    id="loadMoreBtn"
+    class="btn"
+    data-slug={slug}
+    data-loaded={loaded}
+    data-total={total}
+    data-sort={sort}
+    data-collections={collections.join(',')}
+  >
+    Load More
+  </button>
+</div>
+
+<script type="module">
+  const btn = document.querySelector('#loadMoreBtn');
+  const container = document.querySelector('#author-posts');
+  const offset = 6; // Adjust this based on your initial load size
+
+  if (!btn || !container) {
+    console.warn('Missing Load More button or author-posts container.');
+  }
+
+  const slug = btn.dataset.slug || '';
+  let loaded = Number(btn.dataset.loaded || '0');
+  const total = Number(btn.dataset.total || '0');
+  const sort = btn.dataset.sort || 'lastmodified';
+  const collections = (btn.dataset.collections || 'blog,post').split(',');
+
+  async function loadMorePosts() {
+    btn.disabled = true;
+
+    const params = new URLSearchParams({
+      slug,
+      offset: offset.toString(),
+      loaded: loaded.toString(),
+      total: total.toString(),
+      sort,
+    });
+
+    collections.forEach((c) => params.append('collections', c));
+
+    try {
+      const res = await fetch(`/api/posts-by-author/?${params.toString()}`);
+      const { posts, hasMore } = await res.json();
+
+      posts.forEach((p) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'border rounded shadow hover:shadow-md transition bg-white';
+
+        const anchor = document.createElement('a');
+        anchor.href = `/${p.collection}/${p.slug}/`;
+        anchor.className = 'block no-bb';
+
+        if (p.heroImage) {
+          const img = document.createElement('img');
+          img.src = p.heroImage;
+          img.alt = p.heroImageAlt || p.title;
+          img.className = 'w-full h-48 object-cover rounded-t';
+          anchor.appendChild(img);
+        }
+
+        const content = document.createElement('div');
+        content.className = 'p-4';
+
+        const title = document.createElement('h3');
+        title.className = 'font-bold text-lg';
+        title.textContent = p.title;
+
+        const desc = document.createElement('p');
+        desc.className = 'text-sm text-gray-600';
+        desc.textContent = p.description;
+
+        content.appendChild(title);
+        content.appendChild(desc);
+        anchor.appendChild(content);
+        wrapper.appendChild(anchor);
+        container?.appendChild(wrapper);
+      });
+
+      loaded += posts.length;
+      btn.dataset.loaded = loaded.toString();
+      btn.disabled = false;
+
+      if (loaded >= total || !hasMore) {
+        btn.style.display = 'none';
+      }
+    } catch (err) {
+      console.error('❌ Failed to load posts:', err);
+      btn.disabled = false;
+      btn.textContent = 'Try Again';
+    }
+  }
+
+  btn?.addEventListener('click', loadMorePosts);
+</script>

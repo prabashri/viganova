@@ -5,7 +5,7 @@ const baseSchema = ({ image }: SchemaContext) =>
   z.object({
     title: z.string(),
     description: z.string(),
-    author: reference('team'),
+    authors: z.array(reference('team')), // Array of author references
     publishedDate: z.string(),
     lastModified: z.string().optional(),
     slug: z.string().optional(),
@@ -18,10 +18,11 @@ const baseSchema = ({ image }: SchemaContext) =>
     // Use astro: assets for image optimization
     
     tags: z.array(z.string()).optional(),
+    category: z.string().optional(),
     keywords: z.array(z.string()).optional(),
     featured: z.boolean().optional(),
     draft: z.boolean().optional(),
-    category: z.string().optional(),
+    
     // type: z.string().optional(),
     faq: z
       .array(
@@ -35,18 +36,17 @@ const baseSchema = ({ image }: SchemaContext) =>
     index: z.boolean().default(true), // Default to true, can be set to false to exclude from search indexing
   });
 
-export const collections = {
-  blog: defineCollection({
+const blog = defineCollection({
     loader: glob({ pattern: '**/*.(md|mdx)', base: './src/content/blog' }),
     schema: baseSchema,
-  }),
+  });
 
-  post: defineCollection({
+const post = defineCollection({
     loader: glob({ pattern: '**/*.(md|mdx)', base: './src/content/post' }),
     schema: baseSchema,
-  }),
+  });
 
-  team: defineCollection({
+const team = defineCollection({
     // type: 'content',
     loader: glob({ pattern: '**/*.(md|mdx)', base: './src/content/team' }),
     schema: () =>
@@ -87,5 +87,6 @@ export const collections = {
           .optional(),
         featured: z.boolean().optional(),
       }),
-  }),
-};
+  });
+
+export const collections = { blog, post, team };

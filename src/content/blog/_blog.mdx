@@ -4,13 +4,15 @@ title: "Sample Post Title"
 # Short description of the post (used for meta description and preview)
 description: "This is a placeholder post for the 'posts' collection."
 # Author's ID or name, typically linked to an author profile
-author: "deepan" # reference("team"), // ✅ references a document in the `team` collection
+authors: 
+  - { id: 'prabakaran-shankar', collection: 'team' }
+  - { id: 'lakshmishri-prabakaran', collection: 'team' }
 # Date when the post was originally published (ISO format)
 publishedDate: "2025-02-02"
 # Date when the post was last updated or modified
 lastModified: "2025-02-05"
 # Optional custom URL slug (if not auto-generated from title)
-slug: "sample-post"
+slug: "_blog"
 # Optional canonical URL for SEO; used to prevent duplicate content issues
 canonicalUrl: "https://example.com/sample-post"
 # Hero image for the post (displayed in header, social preview, etc.)
@@ -35,6 +37,7 @@ faq:
     answer: "To serve as a boilerplate reference."
     speakable: false  # Whether this FAQ is voice assistant-friendly (for structured data)
 # Optional type to define custom post classification or UI treatment
-type: "example"
+# type: "example"
+index: true # Whether to include this post in search indexing (default is true)
 ---
 Placeholder content for the `posts` collection...

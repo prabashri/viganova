@@ -1,28 +1,78 @@
 ---
 // src/pages/team/[...slug].astro
-
-import { getEntry, render } from 'astro:content';
+import { getEntry, getCollection, render } from 'astro:content';
 import TeamLayout from '../../layouts/TeamLayout.astro';
-import { init } from 'astro/virtual-modules/prefetch.js';
+import { siteDefaults } from '../../config/siteDefaults';
+import type { DataEntryMap } from 'astro:content';
+import LoadMorePosts from '../../components/LoadMorePosts.astro';
+
 
 const { slug } = Astro.params;
 const slugId = Array.isArray(slug) ? slug.join('/') : slug;
 
-// Exclude demo/example or invalid slugs
-if (!slugId || slugId === '0-example-team') {
-  throw Astro.redirect('/404');
+if (!slugId || slugId === '_team-member' || slugId === '_team') {
+  throw Astro.redirect('/404/');
 }
 
-// Fetch the team entry
 const post = await getEntry('team', slugId);
-if (!post) {
-  throw Astro.redirect('/404');
-}
+if (!post) throw Astro.redirect('/404/');
 
-// Render the MDX content
 const { Content } = await render(post);
 
-// Normalize fallback values for optional fields
+// Get collections with authors
+const collectionsWithAuthors = Object.entries(siteDefaults.collections)
+  .filter(([_, config]) => typeof config === 'object' && 'authors' in config && config.authors === true)
+  .map(([key]) => key);
+
+  // 2. Collect authored posts across all matching collections
+  const authoredPosts: {
+    title: string;
+    description: string;
+    slug: string;
+    collection: string;
+    heroImage?: string | null;
+    heroImageAlt?: string;
+  }[] = [];
+
+  
+
+  for (const coll of collectionsWithAuthors) {
+    // 👇 Ensure proper typing with keyof DataEntryMap
+    const posts = await getCollection(coll as keyof DataEntryMap); 
+
+    for (const entry of posts) {
+        // 🔁 Skip draft posts
+      if ('draft' in entry.data && entry.data.draft === true) {
+        continue;
+      }
+
+      // 🔁 Skip file names starting with `_` (e.g., _post.md)
+      if (entry.data.slug?.startsWith('_')) {
+        continue;
+      }
+      const authors = 'authors' in entry.data ? entry.data.authors : undefined;
+
+      const isMatch =
+        Array.isArray(authors) &&
+        authors.some((author) => typeof author === 'object' && author?.id === slugId);
+
+      if (isMatch && 'title' in entry.data && 'description' in entry.data) {
+        
+        authoredPosts.push({
+          title: entry.data.title ?? 'Untitled',
+          description: entry.data.description ?? '',
+          slug: entry.data.slug ?? '',
+          collection: entry.collection,
+          heroImage: entry.data.heroImage ?? null,
+          heroImageAlt: entry.data.heroImageAlt ?? '',
+        });
+      }
+    }
+  }
+// limit authored posts to 9 for initial load
+const initialPosts = authoredPosts.slice(0, 3);
+const hasMore = authoredPosts.length > 3;
+// Team props
 const {
   name,
   prefix = '',
@@ -45,7 +95,7 @@ const {
   useInitial = false,
   initialText = '',
   image = '',
-  social = {},
+  social = {} as Record<string, string>,
   featured = false,
 } = post.data;
 
@@ -65,19 +115,56 @@ const teamProps = {
   color,
   joined,
   left,
-  useGravatar: post.data.useGravatar ?? false,
-  gravatarEmail: post.data.gravatarEmail ?? '',
-  useImage: post.data.useImage ?? false,
-  image: post.data.image ?? '',
-  useInitial: post.data.useInitial ?? false,
-  initialText: post.data.initialText ?? '',
-  social: social ?? {},
+  useGravatar,
+  gravatarEmail,
+  useImage,
+  useInitial,
+  initialText,
+  photo: image,
+  social,
   featured,
   slug: post.data.slug ?? slugId,
   id: slugId,
 };
+
 ---
+
 <TeamLayout {...teamProps}>
   <Content />
-</TeamLayout>
 
+  {initialPosts.length > 0 && (
+    <section class="mt-8">
+      <h2 class="text-xl font-semibold mb-4">Posts by {name}</h2>
+
+      <div id="author-posts" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {initialPosts.map((p) => (
+          <div class="border rounded shadow hover:shadow-md transition bg-white">
+            <a href={`/${p.collection}/${p.slug}/`} class="block no-bb">
+              {p.heroImage && (
+                <img
+                  src={p.heroImage}
+                  alt={p.heroImageAlt || p.title}
+                  class="w-full h-48 object-cover rounded-t"
+                />
+              )}
+              <div class="p-4">
+                <h3 class="font-bold text-lg">{p.title}</h3>
+                <p class="text-sm text-gray-600">{p.description}</p>
+              </div>
+            </a>
+          </div>
+        ))}
+      </div>
+
+      {hasMore && (
+        <LoadMorePosts
+          slug={slugId}
+          loaded={initialPosts.length}
+          total={authoredPosts.length}
+          sort="lastmodified"
+          collections={collectionsWithAuthors}
+        />
+      )}
+    </section>
+  )}
+</TeamLayout>

@@ -75,6 +75,15 @@ const headProps: HeadProps = {
   image: photo || siteDefaults.image,
   canonicalUrl: fullCanonical,
   index: true,
+  authors: [
+    {
+      id: resolvedSlug,
+      slug: resolvedSlug,
+      url: `/team/${resolvedSlug}/`,
+      name,
+      data: { name, role, photo, email, website, social }
+    }
+  ],
   authorName: name
 };
 

@@ -1,0 +1,14 @@
+---
+// src/components/PaginationRedirect.astro
+const {
+  currentPage = 1,
+  pathPrefix = '',
+} = Astro.props;
+
+// If current page is 1 and URL ends with "/2/" or similar → redirect to base
+if (currentPage === 1 && Astro.url.pathname.match(/\d+\/$/)) {
+  return Astro.redirect(`${pathPrefix}`, 301);
+}
+---
+
+<Fragment />

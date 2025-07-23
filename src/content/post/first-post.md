@@ -1,6 +1,8 @@
 ---
 title: 'First post'
-author: 'prabakaran-shankar'
+authors: 
+  - { id: 'prabakaran-shankar', collection: 'team' }
+  - { id: 'lakshmishri-prabakaran', collection: 'team' }
 description: 'Lorem ipsum dolor sit amet'
 publishedDate: "2025-01-01"
 lastModified: "2025-01-10"
@@ -13,10 +15,11 @@ heroImageCaption:  "Optional caption text"
 slug: 'first-post'
 canonicalUrl: 'https://example.com/first-post'
 tags: ['blog', 'example', 'reference']
+category: 'Reference'  
 keywords: ['Astro blog post', 'static content']
 featured: true
 draft: false
-category: 'Reference'  
+
 index: true # Whether to include this post in search indexing (default is true) 
 ---
 

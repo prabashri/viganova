@@ -24,6 +24,7 @@ export interface HeadProps {
   url?: string;
   canonicalUrl?: string;
   siteName?: string;
+  authors: { id: string; slug: string; url: string; name: string; data: any }[] // or a more specific type if available
   authorName?: string;
   authorUrl?: string;
   publishedAt?: string;

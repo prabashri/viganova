@@ -1,11 +1,9 @@
 ---
-// layouts/PostLayout.astro
-
 import BaseLayout from './BaseLayout.astro';
 import { siteDefaults } from '../config/siteDefaults';
 import type { HeadProps } from '../types/HeadProps';
-import { Image } from 'astro:assets';
-
+import { getEntry } from 'astro:content';
+import type { DataEntryMap } from 'astro:content';
 
 interface Props {
   title?: string;
@@ -15,9 +13,7 @@ interface Props {
   index?: boolean;
   publishedDate?: string;  
   lastModified?: string | null;
-  author?: string
-  authorName?: string;
-  authorUrl?: string;
+  authors?: { id: string }[]; // Simplified for team-only assumption
   tags?: string[];
   category?: string;
   keywords?: string[];
@@ -43,9 +39,7 @@ const {
   featured = false,
   publishedDate,
   lastModified,
-  author,
-  authorName,
-  authorUrl,
+  authors = [],
   tags = [],
   category,
   keywords = [],
@@ -66,6 +60,26 @@ const currentIndex = allPosts.findIndex(post => (post.data?.slug || post.slug) =
 const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
 const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
 
+// ✅ Always load authors from the `team` collection
+const resolvedAuthors = await Promise.all(
+  authors.map(async ({ id }) => {
+    try {
+      const entry = await getEntry('team', id);
+      return entry
+        ? {
+            id,
+            slug: entry.data.slug,
+            url: `/team/${entry.data.slug}/`,
+            name: entry.data.name ?? entry.data.name ?? id,
+            data: entry.data,
+          }
+        : null;
+    } catch {
+      return null;
+    }
+  })
+).then((entries) => entries.filter(Boolean));
+
 const headProps: HeadProps = {
   title: `${title} | ${siteDefaults.siteName}`,
   description,
@@ -75,17 +89,17 @@ const headProps: HeadProps = {
   keywords: tags,
   publishedAt: publishedDate,
   updatedAt: lastModified ?? undefined,
-  authorName: authorName || siteDefaults.authorName,
-  authorUrl: authorUrl || siteDefaults.authorUrl,
+  authors: resolvedAuthors.filter((a): a is NonNullable<typeof a> => a !== null)
 };
-
+console.log("authors list: ", resolvedAuthors);
 ---
+
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top" />
   <Fragment slot="headContent-bottom" />
 
   <article class="post-layout">
-    <div class="hero-image">      
+    <div class="hero-image">
       {heroImage && (
         <figure>
           <img
@@ -103,19 +117,24 @@ const headProps: HeadProps = {
     <header class="post-header">
       <h1 class="post-title">{title}</h1>
       {description && <p class="post-desc">{description}</p>}
+
       <div class="post-meta">
-        {authorName && <span>✍️ {authorName}</span>}
-        {author && <span>Author: {author}</span>}
+        {resolvedAuthors.length > 0 && (
+          <span>
+            ✍️ By{' '}
+            {resolvedAuthors.map((a, i) => (
+              <>
+                <a href={a!.url} class="author-link">{a!.name}</a>
+                {i < resolvedAuthors.length - 1 && ', '}
+              </>
+            ))}
+          </span>
+        )}
         {publishedDate && (
-          <time datetime={publishedDate}> 📅 {new Date(publishedDate).toLocaleDateString()}</time>
+          <time datetime={publishedDate}> 📅 {new Date(publishedDate).toLocaleDateString() }</time>
         )}
         {lastModified && (
-          <span> 🔄 Updated: {new Date(lastModified).toLocaleDateString()}</span>
-        )}
-        {lastModified && (
-          <span> | 🕒 Last Modified: <time datetime={lastModified}>
-            {new Date(lastModified).toLocaleDateString()}
-          </time></span>
+          <span> 🔄 Updated: {new Date(lastModified).toLocaleDateString() }</span>
         )}
       </div>
     </header>

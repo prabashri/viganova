@@ -1,0 +1,15 @@
+---
+// src/components/PaginationSeo.astro
+const { baseUrl = '', currentPage = 1, totalPages = 1 } = Astro.props;
+---
+
+{totalPages > 1 && (
+  <>
+    {currentPage > 1 && (
+      <link rel="prev" href={`${baseUrl}${currentPage === 2 ? '/' : `/${currentPage - 1}/`}`} />
+    )}
+    {currentPage < totalPages && (
+      <link rel="next" href={`${baseUrl}/${currentPage + 1}/`} />
+    )}
+  </>
+)}

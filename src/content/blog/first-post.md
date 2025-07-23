@@ -1,6 +1,8 @@
 ---
 title: 'First Blog Post'
-author: 'prabakaran-shankar'
+authors: 
+  - { id: 'prabakaran-shankar', collection: 'team' }
+  - { id: 'lakshmishri-prabakaran', collection: 'team' }
 description: 'Lorem ipsum dolor sit amet'
 publishedDate: "2025-01-01"
 lastModified: "2025-01-10"

@@ -1,0 +1,71 @@
+---
+// src/components/Pagination.astro
+export interface Props {
+  currentPage: number;
+  totalPages: number;
+  basePath: string; // e.g., "/tags/css"
+}
+const { currentPage, totalPages, basePath } = Astro.props;
+
+function getPageUrl(page: number) {
+  return page === 1 ? `${basePath}/` : `${basePath}/${page}/`;
+}
+
+function getPageRange(current: number, total: number): (number | string)[] {
+  const delta = 1;
+  const range = [];
+  const rangeWithDots = [];
+  let l: number = 0;
+
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+      range.push(i);
+    }
+  }
+
+  for (const i of range) {
+    if (l !== 0) {
+      if ((i as number) - l === 2) {
+        rangeWithDots.push(l + 1);
+      } else if ((i as number) - l !== 1) {
+        rangeWithDots.push('…');
+      }
+    }
+    rangeWithDots.push(i);
+    l = i as number;
+  }
+
+  return rangeWithDots;
+}
+---
+
+{totalPages > 1 && (
+  <nav class="pagination ta-center mt-8">
+    <ul class="flex wrap gap justify-center">
+      {currentPage > 1 && (
+        <li>
+          <a href={getPageUrl(currentPage - 1)} class="pagination-link">Previous</a>
+        </li>
+      )}
+
+      {getPageRange(currentPage, totalPages).map((item) => (
+        <li>
+          {item === '…' ? (
+            <span class="pagination-link">…</span>
+          ) : item === currentPage ? (
+            <span class="pagination-link active">{item}</span>
+          ) : (
+            <a href={getPageUrl(item as number)} class="pagination-link">{item}</a>
+          )}
+        </li>
+      ))}
+
+      {currentPage < totalPages && (
+        <li>
+          <a href={getPageUrl(currentPage + 1)} class="pagination-link">Next</a>
+        </li>
+      )}
+    </ul>
+    <p class="mt-2 text-sm text-gray-500">Page {currentPage} of {totalPages}</p>
+  </nav>
+)}
