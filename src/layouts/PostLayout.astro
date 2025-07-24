@@ -92,7 +92,7 @@ const headProps: HeadProps = {
   updatedAt: lastModified ?? undefined,
   authors: resolvedAuthors.filter((a): a is NonNullable<typeof a> => a !== null)
 };
-console.log("authors list: ", resolvedAuthors);
+
 ---
 
 <BaseLayout headProps={headProps}>
