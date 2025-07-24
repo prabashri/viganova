@@ -1,0 +1,102 @@
+---
+// src/components/TableOfContents.astro
+// <TableOfContents toc={toc} heading="On This Page" depth = 'h2,h3' />
+import { Icon } from 'astro-icon/components';
+export interface TOCItem {
+  id: string;
+  text: string;
+  level?: number;
+}
+
+export interface Props {
+  toc: TOCItem[];
+  heading?: string;
+  depth?: 'h2' | 'h2,h3';
+}
+
+
+const props = Astro.props;
+
+const {
+  toc = [],
+  heading = 'On this Page',
+  depth = 'h2,h3'
+} = props;
+
+const allowedLevels = depth === 'h2' ? [2] : [2, 3];
+---
+
+{toc.length > 0 && (
+    <div class="sticky top-20">
+  <details class="toc group block lg:[open]" open>
+    <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
+      <h2 class="cg-base no-bold no-margin">{heading}</h2>      
+      <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
+    </summary>
+    <nav class="text-sm px-2 py-2 overflow-y-auto max-h-[80vh]">
+        <ul id="toc" class="toc-list cg-small no-bullets">
+            {props.toc
+                .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
+                .map(item => (
+                <li class={item.level === 3 ? 'ml-4' : 'ml-0'}>
+                    <a class="block no-bb pi-05 pb-02" href={`#${item.id}`}>{item.text}</a>
+                </li>
+            ))}
+        </ul>
+    </nav>
+  </details>
+  </div>
+)}
+
+
+
+<style>
+    details.toc {
+  border: none;
+  background: none;
+}
+
+
+details.toc summary::-webkit-details-marker {
+  display: none; /* hide default arrow */
+}
+
+/* Custom arrow */
+.arrow-icon {
+  transition: transform 0.3s ease;
+  transform: rotate(0deg);
+}
+
+/* Rotate when parent <details> is open */
+details[open] .arrow-icon {
+  transform: rotate(180deg);
+}
+
+#toc li.active-heading > a {
+  font-weight: bold;
+  color: #1d4ed8;
+  border-left: 2px solid #1d4ed8;
+  background-color: #f0f4ff;
+  padding-left: 0.5rem;
+}
+
+
+    /* Highlight active TOC link */
+.toc-list a {
+  
+  border-left: 2px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.toc-list li.active-heading a {
+  color: var(--text-active, #111);
+  font-weight: 600;
+  border-left-color: var(--accent, #4f46e5); /* Indigo or your brand color */
+  background-color: var(--highlight-bg, #f0f4ff);
+}
+
+
+  @media (max-width: 768px) {
+   
+  }
+</style>

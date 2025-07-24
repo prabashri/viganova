@@ -4,6 +4,7 @@ import { siteDefaults } from '../config/siteDefaults';
 import type { HeadProps } from '../types/HeadProps';
 import { getEntry } from 'astro:content';
 import type { DataEntryMap } from 'astro:content';
+import TableOfContents from '../components/TableOfContents.astro';
 
 interface Props {
   title?: string;
@@ -149,7 +150,7 @@ console.log("authors list: ", resolvedAuthors);
         </ul>
       </aside>
     )}
-
+    <TableOfContents toc={toc} heading="On This Page" depth="h2,h3" />
     <div class="post-content">
       <slot />
     </div>
