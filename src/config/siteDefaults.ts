@@ -20,7 +20,7 @@ export const siteDefaults = {
   sitemap: true,
   noOfPostsPerPage: 3, // Number of posts to display per page in blog and post collections
 
-  image: "/images/astro-theme-nviewsweb-main.png",
+  image: "/featured/astroweb-modern-website-theme-astro.png",
   imageAlt: "design to represent the nviewsweb astro theme using text and images",
   imageTitle: "nViewsWEB Astro Theme",
   imageVariants: [
@@ -35,7 +35,7 @@ export const siteDefaults = {
     // jpg  // 
   ],   
   compressionLevel: 80, // default quality if not overridden
-    
+
   outputImageBase: './public/images', // fixed output folder
 
   inputImageFolder: './src/assets/images', // user-editable image folder

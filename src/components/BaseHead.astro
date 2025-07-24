@@ -5,6 +5,7 @@ import { parseToIsoString } from '../utils/date-utils';
 import CssHead from './CssHead.astro';
 import type { HeadProps } from '../types/HeadProps';
 import Rss from './Rss.astro';
+import ImagePreload from './ImagePreload.astro';
 
 
 const props: HeadProps = {
@@ -188,7 +189,10 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 
 <!-- ✅ Responsive Image Preload -->
 {/* ✅ Responsive Image Preload */}
+
 {preloadImages?.length > 0 && (
+  <ImagePreload images={preloadImages} type={type === 'collection' ? 'collection' : 'default'} />
+  /*
   <>
     {preloadImages.map((img) => {
       if (!img.src.includes('w320') && !img.src.includes('w640') && !img.src.includes('w960')) {
@@ -213,8 +217,8 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
         />
       );
     })}
-  </>
-)}
+  </>*/
+  )}
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />

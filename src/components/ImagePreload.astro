@@ -1,0 +1,59 @@
+---
+// src/components/ImagePreload.astro
+import imageMetadataJson from '../data/image-format-details.json';
+import { siteDefaults } from '../config/siteDefaults';
+
+interface Props {
+  images: string[];
+  type?: 'default' | 'collection';
+}
+
+const { images = [], type = 'default' } = Astro.props;
+const metadata = imageMetadataJson as Record<string, any>;
+
+const generatePreloadLinks = (imgPath: string) => {
+  const data = metadata[imgPath];
+  if (!data) return [];
+
+  const base = `/images${data.path}`;
+  const name = imgPath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
+  const webpAvailable = data.format.includes('webp');
+  const format = webpAvailable ? 'webp' : data.format[0]; // fallback
+
+  const widths = data.variants.map(Number);
+  const thumbnailSize = siteDefaults.thumbnailSize ?? 120;
+  const featuredSize = siteDefaults.featuredImageSize ?? 960;
+
+  const srcForWidth = (w: number) => `${base}${name}-w${w}-a${data.aspect}.${format}`;
+
+  if (type === 'collection') {
+    return [
+      widths.includes(thumbnailSize) && {
+        src: srcForWidth(thumbnailSize),
+        media: '(max-width: 768px)'
+      },
+      widths.includes(320) && {
+        src: srcForWidth(320),
+        media: '(min-width: 768px)'
+      }
+    ].filter(Boolean);
+  }
+
+  return [
+    widths.includes(320) && {
+      src: srcForWidth(320),
+      media: '(max-width: 768px)'
+    },
+    widths.includes(featuredSize) && {
+      src: srcForWidth(featuredSize),
+      media: '(min-width: 768px)'
+    }
+  ].filter(Boolean);
+};
+
+const preloadLinks = images.flatMap(generatePreloadLinks);
+---
+
+{preloadLinks.length > 0 && preloadLinks.map(({ src, media }) => (
+  <link rel="preload" as="image" href={src} media={media} />
+))}

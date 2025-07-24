@@ -2,18 +2,43 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import ResponsiveImage from '../components/ResponsiveImage.astro';
+import type { HeadProps } from '../types/HeadProps';
+import { siteDefaults } from '../config/siteDefaults';	
+import { getImageVariants } from '../utils/getImageVariants';
+
+const heroImageAll = getImageVariants('astroweb-theme-features-listed-by-user-hero-image.png');
+const heroImageFullWebp = heroImageAll?.full?.webp;
+const heroImageFullPng = heroImageAll?.full?.png;
+
+const headProps: HeadProps = {
+  title: `Modern flexible Astro theme by Astroweb.dev`,
+  description: "Astroweb.dev is a modern flexible Astro theme for building fast, secure, and SEO-optimized websites. It includes features like a mega menu, schema for SEO, and strict content security policies.",
+  image: siteDefaults.image,
+  preloadImages: ['astroweb-theme-features-listed-by-user-hero-image.png'],
+  type: 'article',
+  // canonicalUrl: fullCanonical,
+  keywords: siteDefaults.keywords,
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt: "",
+  authors: [],
+};
+
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
+<BaseLayout headProps={headProps}>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
 			<h1>Hello, Astronaut!</h1>
+			<ResponsiveImage
+				src="astroweb-theme-features-listed-by-user-hero-image.png"
+				alt="A beautiful view of the cosmos with stars and galaxies"
+				title="Astro Hero Image"
+				width="100%"
+				loading="eager"
+			/>
 			<p>
 				we have the theme for astro framework to build modern websites with full strict content security policies, speed 100%, google analytics, and all necessary features like mega menu, schema for generative engine optimization, semantic html5 seo optimized static (free theme) and server side generation, ssr (for 69 USD unlimited usage) - theme name is astroweb.dev. 
 
@@ -50,7 +75,7 @@ we not only sell theme, we are here to promote you.
 				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
 				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
 			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+		
+
+  <Fragment slot="extraScripts" />
+</BaseLayout>

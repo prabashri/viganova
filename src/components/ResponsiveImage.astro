@@ -1,0 +1,126 @@
+---
+//  src/components/ResponsiveImage.astro
+import imageMetadataJson from '../data/image-format-details.json';
+import { siteDefaults } from '../config/siteDefaults';
+
+interface Props {
+  src: string; // src/assets/images/... or /featured/... path
+  alt: string;
+  width?: string | number; // Optional width for the image
+  title?: string;
+  className?: string;
+  imageClassName?: string;
+  caption?: string;
+  loading?: 'lazy' | 'eager';  
+  sizes?: string;
+  objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+  thumbnail?: boolean;
+  height?: number;
+}
+
+const {
+  src,
+  alt,
+  title,
+  className = '',
+  imageClassName = 'inline-image',
+  objectFit = 'cover',
+  caption,
+  loading = 'lazy',
+  sizes,
+  thumbnail = false,
+  height,
+  width
+} = Astro.props as Props;
+
+const fetchPriority = loading === 'eager' ? 'high' : undefined;
+
+const metadata = imageMetadataJson as Record<string, any>;
+const data = metadata[src];
+
+if (!data) {
+  throw new Error(`No image metadata found for: ${src}`);
+}
+
+const basePath = `/images${data.path}`;
+const availableWidths = data.variants.map(Number);
+const defaultAspect = data.aspect;
+
+// ✅ Sort formats so webp comes first
+const formats = [...data.format].sort((a, b) => (a === 'webp' ? -1 : b === 'webp' ? 1 : 0));
+
+const targetWidth = thumbnail ? (siteDefaults.thumbnailSize ?? 120) : (siteDefaults.featuredImageSize ?? 960);
+const sizesAttr = sizes ?? (
+  availableWidths.includes(1280)
+    ? '(max-width: 768px) 320px, (max-width: 1024px) 640px, 1280px'
+    : '(max-width: 768px) 320px, (max-width: 1024px) 640px, 960px'
+);
+
+const sortedWidths = availableWidths.filter((w: number) => w <= targetWidth).sort((a: number, b: number) => a - b);
+const fallbackWidth = sortedWidths[0];
+const fallbackSrc = `${basePath}${src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '')}-w${fallbackWidth}-a${defaultAspect}.${formats[0]}`;
+const aspectClass = `a-${defaultAspect}`;
+const objectFitClass = `of-${objectFit}`;
+
+---
+
+{caption ? (
+  <figure class={`block image-wrapper ${className}`}>
+    <picture>
+    {formats.map((format: string) => (
+      <source
+        type={`image/${format === 'jpg' ? 'jpeg' : format}`}
+        srcset={sortedWidths
+          .map((w: number) => `${basePath}${src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '')}-w${w}-a${defaultAspect}.${format} ${w}w`)
+          .join(', ')}
+        sizes={sizesAttr}
+      />
+    ))}
+    <img
+      src={fallbackSrc}
+      width={fallbackWidth}
+      height={height}
+      alt={alt}
+      title={title}
+      loading={loading}
+      decoding="async"
+      fetchpriority={fetchPriority}
+      class={`block full-width h-auto ${imageClassName} ${aspectClass} ${objectFitClass}`}
+    />
+  </picture>
+    <figcaption class="cg-small">{caption}</figcaption>
+    <noscript>
+      <img
+        src={fallbackSrc}
+        width={fallbackWidth}
+        height={height}
+        alt={alt}
+        title={title}
+        class={`block full-width h-auto ${imageClassName} ${aspectClass} ${objectFitClass}`}
+      />
+    </noscript>
+  </figure>
+) : (
+  <picture class={`block image-wrapper ${className}`}>
+    {formats.map((format: string) => (
+      <source
+        type={`image/${format === 'jpg' ? 'jpeg' : format}`}
+        srcset={sortedWidths
+          .map((w: number) => `${basePath}${src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '')}-w${w}-a${defaultAspect}.${format} ${w}w`)
+          .join(', ')}
+        sizes={sizesAttr}
+      />
+    ))}
+    <img
+      src={fallbackSrc}
+      width={fallbackWidth}
+      height={height}
+      alt={alt}
+      title={title}
+      loading={loading}
+      decoding="async"
+      fetchpriority={fetchPriority}
+      class={`block full-width h-auto ${imageClassName} ${aspectClass} ${objectFitClass}`}
+    />
+  </picture>
+)}
