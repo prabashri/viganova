@@ -1,0 +1,35 @@
+{
+  "astroweb-theme-features-listed-by-user-hero-image.png": {
+    "lastModified": 1753347156398.56,
+    "path": "/2025/07/",
+    "variants": [
+      "320",
+      "640",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "1x1"
+  },
+  "astroweb-modern-website-theme-astro.png": {
+    "lastModified": 1753346042886.558,
+    "path": "/2025/07/",
+    "variants": [
+      "320",
+      "640",
+      "1280",
+      "960",
+      "120"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  }
+}

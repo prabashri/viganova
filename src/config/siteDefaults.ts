@@ -11,9 +11,7 @@ export const siteDefaults = {
   description: "some description",
   keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],
   twitterHandle: "@cnviewsweb",
-  image: "/images/astro-theme-nviewsweb-main.png",
-  imageAlt: "design to represent the nviewsweb astro theme using text and images",
-  imageTitle: "nViewsWEB Astro Theme",
+  
   logo: "/logos/AstroWEB-logo.png",
   icon: "/logos/AstroWEB-icon.png",
   separator: "|",
@@ -21,9 +19,32 @@ export const siteDefaults = {
   rss: true,
   sitemap: true,
   noOfPostsPerPage: 3, // Number of posts to display per page in blog and post collections
-  
 
+  image: "/images/astro-theme-nviewsweb-main.png",
+  imageAlt: "design to represent the nviewsweb astro theme using text and images",
+  imageTitle: "nViewsWEB Astro Theme",
+  imageVariants: [
+    320, // standard width for mobile devices
+    640,  // standard width for tablets, content width
+    1280, // standard width to support image seo according to google's image seo guidelines
+  ],
+  imageFormats: [ // upload png images, and this script will generate resized variants in these formats
+    'avif', // supports modern browsers - most efficient
+    'webp', // supports modern browsers - widely used
+    // 'jpeg' //  only select if you need jpeg fallback
+    // jpg  // 
+  ],   
+  compressionLevel: 80, // default quality if not overridden
+    
+  outputImageBase: './public/images', // fixed output folder
 
+  inputImageFolder: './src/assets/images', // user-editable image folder
+  featuredImageFolder: './src/assets/featured', // featured images only
+  featuredImageSize: 960, // larger size for SEO & cards
+
+  // General thumbnail settings
+  thumbnail: true,
+  thumbnailSize: 120,
 
   collections: {
     blog: {

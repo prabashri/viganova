@@ -3,8 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-   "dev": "node src/scripts/generate-all.mjs && astro dev",
-   "generate:all": "node src/scripts/generate-all.mjs",     
+    "dev": "node src/scripts/generate-all.mjs && astro dev",
+    "generate:all": "node src/scripts/generate-all.mjs",
     "build": "npm run generate:all && astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -21,6 +21,7 @@
   "devDependencies": {
     "esbuild": "^0.25.8",
     "gray-matter": "^4.0.3",
-    "lightningcss": "^1.30.1"
+    "lightningcss": "^1.30.1",
+    "tsx": "^4.20.3"
   }
 }
