@@ -18,9 +18,9 @@ const generatePreloadLinks = (imgPath: string) => {
   const base = `/images${data.path}`;
   const name = imgPath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
   const webpAvailable = data.format.includes('webp');
-  const format = webpAvailable ? 'webp' : data.format[0]; // fallback
+  const format = webpAvailable ? 'webp' : data.format[0];
 
-  const widths = data.variants.map(Number);
+  const widths = data.variants.map(Number).sort((a: number, b: number) => a - b);
   const thumbnailSize = siteDefaults.thumbnailSize ?? 120;
   const featuredSize = siteDefaults.featuredImageSize ?? 960;
 
@@ -39,13 +39,20 @@ const generatePreloadLinks = (imgPath: string) => {
     ].filter(Boolean);
   }
 
+  // Default logic
+  const mobile = widths.includes(320) ? 320 : widths[0];
+  const desktop =
+    widths.includes(featuredSize)
+      ? featuredSize
+      : widths.find((w: number) => w >= 640) ?? widths.at(-1); // fallback to last available
+
   return [
-    widths.includes(320) && {
-      src: srcForWidth(320),
+    mobile && {
+      src: srcForWidth(mobile),
       media: '(max-width: 768px)'
     },
-    widths.includes(featuredSize) && {
-      src: srcForWidth(featuredSize),
+    desktop && {
+      src: srcForWidth(desktop),
       media: '(min-width: 768px)'
     }
   ].filter(Boolean);
@@ -54,6 +61,7 @@ const generatePreloadLinks = (imgPath: string) => {
 const preloadLinks = images.flatMap(generatePreloadLinks);
 ---
 
-{preloadLinks.length > 0 && preloadLinks.map(({ src, media }) => (
-  <link rel="preload" as="image" href={src} media={media} />
-))}
+{preloadLinks.length > 0 &&
+  preloadLinks.map(({ src, media }) => (
+    <link rel="preload" as="image" href={src} media={media} />
+  ))}
