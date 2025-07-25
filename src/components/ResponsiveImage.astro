@@ -1,5 +1,52 @@
 ---
 //  src/components/ResponsiveImage.astro
+
+/**
+  * @file ResponsiveImage.astro
+ *
+ * ✅ Purpose:
+ * Renders a responsive `<picture>` element using multiple formats (WebP, PNG, etc.)
+ * and sizes based on preprocessed image metadata.
+ * It ensures optimized loading with preload compatibility, aspect ratio control,
+ * object-fit styling, and optional caption support.
+ *
+ * ✅ Props:
+ * - src (string) [required] – Path to the original image (e.g. `/featured/image.png` or `src/assets/...`)
+ * - alt (string) [required] – Alt text for accessibility
+ * - title (string) – Optional title attribute
+ * - width (number|string) – Optional width override for the rendered <img>
+ * - height (number) – Optional height override for the rendered <img>
+ * - caption (string) – If provided, wraps image in `<figure>` with a `<figcaption>`
+ * - loading ('lazy' | 'eager') – Image loading strategy; defaults to `"lazy"`
+ * - fetchpriority ('high' | undefined) – Automatically set when `loading="eager"` to improve LCP
+ * - sizes (string) – Custom `sizes` attribute; if omitted, a default responsive sizes string is used
+ * - className (string) – Optional custom class for outer <picture> or <figure> wrapper
+ * - imageClassName (string) – Optional custom class for the actual <img>; defaults to `inline-image`
+ * - objectFit ('cover' | 'contain' | 'fill' | 'none' | 'scale-down') – Image fit style; default is `"cover"`
+ * - thumbnail (boolean) – If true, uses `thumbnailSize` from `siteDefaults`; else uses `featuredImageSize`
+ *
+ * ✅ Behavior:
+ * - Uses `image-format-details.json` to fetch:
+ *   • Available formats (webp, png, jpg…)
+ *   • Available width variants (320, 640, 960…)
+ *   • Aspect ratio for wrapper and fallback src construction
+ * - Automatically sorts `webp` format first in `<source>`
+ * - Automatically falls back to lowest available image ≤ target size
+ *
+ * ✅ Example:
+ * ```astro
+ * <ResponsiveImage
+ *   src="/featured/my-image.png"
+ *   alt="Description of image"
+ *   caption="This is a featured image"
+ * />
+ * ```
+ *
+ * ✅ Notes:
+ * - Integrates with <ImagePreload /> for optimal LCP.
+ * - Ensure `image-format-details.json` is kept up-to-date via your build process.
+ */
+
 import imageMetadataJson from '../data/image-format-details.json';
 import { siteDefaults } from '../config/siteDefaults';
 

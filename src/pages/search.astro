@@ -1,0 +1,30 @@
+---
+// src/pages/search.astro
+// export const prerender = true;
+
+import SearchComponent from '../components/Search.astro';
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageSeo = {
+  title: 'Search Results | nViewsWEB Astro Theme',
+  description: 'Find content in the website using the search functionality.',
+  authors: [],
+};
+
+
+// Get query from URL
+const url = new URL(Astro.request.url);
+const query = url.searchParams.get('q')?.toLowerCase() ?? '';
+
+
+---
+<BaseLayout headProps={pageSeo} >
+  <Fragment slot="headContent-top"></Fragment>  
+  <Fragment slot="headContent-bottom"></Fragment>
+      <h1 class="cc-h3">
+        {query ? `Search Results for: "${query}"` : 'Search ...'}
+      </h1>
+      <SearchComponent client:load/>
+  <Fragment slot="extraScripts"></Fragment>
+</BaseLayout>

@@ -54,6 +54,7 @@ export const siteDefaults = {
       rss: true,          // should generate RSS?
       tags: true,
       authors: true, // enable authors in blog posts
+      search: true, // enable search indexing for blog posts
     },
     post: {
       index: true,
@@ -62,16 +63,20 @@ export const siteDefaults = {
       rss: true,
       tags: true,
       authors: true, // enable authors in posts
+      search: true, // enable search indexing for posts
     },
     team: {
       index: true,
       base: 'team',
       label: 'Team',
       rss: false,
-      tags: false
-    }
+      tags: false,
+      search: false
+    },    
   },
 
+  searchPages: ["home"],
+  searchIndexPath: "/search-index.json",
 
   tagMeta: [
     {

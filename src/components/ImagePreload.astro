@@ -1,5 +1,39 @@
 ---
 // src/components/ImagePreload.astro
+
+/**
+ * <ImagePreload />
+ * 
+ * ✅ Purpose:
+ * Preloads responsive image sources to improve Largest Contentful Paint (LCP).
+ * Generates <link rel="preload" as="image" /> tags based on available metadata.
+ * 
+ * ✅ Props:
+ * - images (string[]) – List of image paths from `image-format-details.json`
+ * - type ('default' | 'collection') – Behavior toggle:
+ *   • 'default': Loads `320px` and `featuredSize` (or best fallback ≥ 640px)
+ *   • 'collection': Loads `thumbnailSize` for mobile and 320px for desktop
+ * 
+ * ✅ Behavior:
+ * - Uses WebP if available, otherwise uses the first listed format.
+ * - For mobile, always tries to load 320px width.
+ * - For desktop:
+ *   • Uses `siteDefaults.featuredImageSize` if present in metadata.
+ *   • Falls back to the next best size ≥ 640px, or the largest available.
+ * 
+ * ✅ Example:
+ * ```astro
+ * <ImagePreload images={['/featured/some-image.png']} />
+ * ```
+ * 
+ * ✅ Integration:
+ * Typically used in <BaseHead /> via props like:
+ * ```ts
+ * preloadImages: ['/featured/example-image.png']
+ * ```
+ */
+
+ 
 import imageMetadataJson from '../data/image-format-details.json';
 import { siteDefaults } from '../config/siteDefaults';
 

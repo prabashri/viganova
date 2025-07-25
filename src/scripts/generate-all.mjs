@@ -12,6 +12,8 @@ function run(script, label) {
 // Run all generate scripts
 run('node src/scripts/generate-last-modified-date.mjs', 'Last Modified Date');
 run('npx tsx src/scripts/generate-images.ts', 'Image Generation');
+run('npx tsx src/scripts/generate-search-index.ts', 'Search Index');
+run('npx tsx src/scripts/generate-search-assets.ts', 'Fuse Assets Checking');
 run('node src/scripts/generate-email-hash.mjs', 'Email Hash');
 run('node src/scripts/generate-inline-css.mjs', 'Inline CSS');
 run('node src/scripts/generate-main-css.mjs', 'Main CSS');
