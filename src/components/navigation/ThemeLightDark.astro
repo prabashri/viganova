@@ -1,8 +1,25 @@
 ---
 // src/components/navigation/ThemeLightDark.astro
 import { Icon } from 'astro-icon/components';
+import searchIndex from '/public/search-index.json';
 ---
 <div class="theme-toggle relative h-2-0 w-2-0 mb-1 as-f-start">
+
+    <!-- Trigger -->
+    <button id="global-search-button" aria-label="Open search" class="search-trigger">🔍</button>
+
+    <!-- Modal -->
+    <div id="search-modal" class="search-modal hidden" role="dialog" aria-modal="true" aria-label="Site search dialog">
+      <div class="search-modal-content" tabindex="-1">
+        <button id="close-search-modal" aria-label="Close search">✖</button>
+        <form id="search-modal-form" role="search">
+          <input id="search-modal-input" type="search" placeholder="Search..." autocomplete="off" />
+        </form>
+        <ul id="search-modal-results" class="search-results"></ul>
+      </div>
+    </div>
+
+
     <!-- Trigger Button -->
     <button id="theme-button" aria-haspopup="true" aria-expanded="false"
       class="round box-shadow-glow transition p-02">
@@ -31,6 +48,33 @@ import { Icon } from 'astro-icon/components';
       </button>
     </div>
   </div>
+  <style>
+    .search-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding-top: 10vh;
+  z-index: 1000;
+}
+.search-modal.hidden {
+  display: none;
+}
+.search-modal-content {
+  background: white;
+  max-width: 700px;
+  width: 90%;
+  border-radius: 8px;
+  padding: 1rem;
+}
+.search-results li {
+  padding: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+  </style>
  <script id="theme-script" type="module">
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -129,5 +173,6 @@ import { Icon } from 'astro-icon/components';
   });
 })();
 </script>
+<script type="application/json" id="search-index" set:html={JSON.stringify(searchIndex)} />
 
-
+<script is:inline src="/scripts/search.js"></script>

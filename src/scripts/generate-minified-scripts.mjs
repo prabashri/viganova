@@ -1,3 +1,4 @@
+// src/scripts/generate-minified-scripts.mjs
 import fs from 'fs/promises';
 import path from 'path';
 import { build } from 'esbuild';
