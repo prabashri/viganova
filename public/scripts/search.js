@@ -7,13 +7,22 @@ async function loadSearchAssets() {
   if (!window.Fuse) await import('/vendor/fuse.min.js?v=7.1.0');
 
   try {
-    const script = document.getElementById('search-index');
-    if (!script || !script.textContent) {
-      throw new Error('search-index script tag is missing or empty.');
+    // Get the current <script type="module" data-search-index="...">
+    const currentScript = document.currentScript || [...document.querySelectorAll('script[type="module"]')].find(s => s.dataset.searchIndex);
+
+    if (!currentScript) {
+      throw new Error('No <script> with data-search-index found.');
     }
 
-    // Read inlined JSON directly from the DOM
-    searchData = JSON.parse(script.textContent);
+    const indexUrl = currentScript.dataset.searchIndex;
+    if (!indexUrl) {
+      throw new Error('Missing data-search-index attribute.');
+    }
+
+    const res = await fetch(indexUrl, { cache: 'no-cache' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    searchData = await res.json();
 
     fuseInstance = new Fuse(searchData, {
       keys: ['title', 'description', 'content', 'tags'],
@@ -30,6 +39,7 @@ async function loadSearchAssets() {
     return { fuse: null, data: [] };
   }
 }
+
 
 
 

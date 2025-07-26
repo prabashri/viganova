@@ -2,6 +2,11 @@
 // src/components/navigation/ThemeLightDark.astro
 import { Icon } from 'astro-icon/components';
 import searchIndex from '/public/search-index.json';
+import manifest from '../../data/assets-manifest.json'; // no destructuring here
+
+const searchIndexPath = manifest.js?.['search-index']?.file || '/search-index.json';
+const searchScriptPath = manifest.js?.['search']?.file || '/scripts/search.js';
+
 ---
 <div class="theme-toggle relative h-2-0 w-2-0 mb-1 as-f-start">
 
@@ -173,6 +178,12 @@ import searchIndex from '/public/search-index.json';
   });
 })();
 </script>
-<script type="application/json" id="search-index" set:html={JSON.stringify(searchIndex)} />
 
-<script is:inline src="/scripts/search.js"></script>
+
+{searchIndexPath && searchScriptPath && (
+  <script
+    type="module"
+    src={searchScriptPath}
+    data-search-index={searchIndexPath}
+  ></script>
+)}
