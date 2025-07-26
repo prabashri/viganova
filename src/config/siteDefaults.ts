@@ -80,8 +80,8 @@ export const siteDefaults = {
   searchIndexPath: "/search-index.json",
 
   serviceWorkerPaths: [ // paths including fonts, css, js to cache in service worker
-    // '/fonts/Inter-Regular-Subset.woff2',
-    //'/fonts/Inter-Bold-Subset.woff2',
+    '/fonts/Inter-Regular-Subset.woff2',
+    '/fonts/Inter-Bold-Subset.woff2',
   ],
 
   tagMeta: [
