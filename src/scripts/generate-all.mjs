@@ -21,6 +21,7 @@ run('npx tsx src/scripts/generate-inline-css.ts', 'Inline CSS');
 run('npx tsx src/scripts/generate-main-css.ts', 'Main CSS');
 run('npx tsx src/scripts/generate-non-critical-css.ts', 'Non-Critical CSS');
 run('npx tsx src/scripts/generate-minified-scripts.ts', 'Minified Scripts');
+run('npx tsx src/scripts/generate-web-manifest.ts', 'Web Manifest');
 run('npx tsx src/scripts/generate-sw.ts', 'Service Worker Generation');
 
 /**

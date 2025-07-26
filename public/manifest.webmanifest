@@ -1,11 +1,11 @@
 {
-  "name": "nviewsweb-theme-astro",
-  "short_name": "nweb-theme",
+  "name": "AstroWEB by Nviews WEB",
+  "short_name": "AstroWEB",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0d9488",
-  "description": "Theme for Astro by NViewsWeb - A minimal, performance-first Astro theme with responsive design and 100 PageSpeed score.",
+  "description": "some description",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

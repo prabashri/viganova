@@ -1,5 +1,6 @@
 export const siteDefaults = {
   siteName: "AstroWEB by Nviews WEB",
+  shortName: "AstroWEB",
   publishedDate: "June 19 2025",
   adminName: "nviews web",
   adminEmail: "admin@nviewsweb.com",
@@ -8,12 +9,20 @@ export const siteDefaults = {
   domainName: "astroweb.dev",
   siteUrl: "https://astroweb.dev",
   title: "Theme for Astro by nViewsWEB - The Ultimate Frontend Toolkit",
-  description: "some description",
+  description: "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
   keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],
   twitterHandle: "@cnviewsweb",
+
+  primaryColor: "#a55aff",
+  secondaryColor: "#081ea6",
+  backgroundColor: "#ffffff",  
   
-  logo: "/logos/AstroWEB-logo.png",
-  icon: "/logos/AstroWEB-icon.png",
+  logo: "public/logos/AstroWEB-logo.png",
+  mobileLogo: "public/logos/AstroWEB-icon-white-background.png",
+  icon: "public/logos/AstroWEB-icon.png",
+  favIconPng: "public/logos/AstroWEB-icon.png",
+  favIconSvg: "public/logos/AstroWEB-icon.svg",
+
   separator: "|",
   authors: [],
   rss: true,

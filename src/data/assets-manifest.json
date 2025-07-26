@@ -35,5 +35,22 @@
     "search-index": {
       "file": "/search-index.0dy0yk.json"
     }
+  },
+  "icons": {
+    "android-chrome-192x192.png": {
+      "datetime": "2025-07-26T13:44:29.370Z"
+    },
+    "android-chrome-512x512.png": {
+      "datetime": "2025-07-26T13:44:29.421Z"
+    },
+    "apple-touch-icon.png": {
+      "datetime": "2025-07-26T13:44:29.480Z"
+    },
+    "favicon-32x32.png": {
+      "datetime": "2025-07-26T13:44:29.513Z"
+    }
+  },
+  "siteDefaults": {
+    "datetime": "2025-07-26T13:31:18.126Z"
   }
 }
