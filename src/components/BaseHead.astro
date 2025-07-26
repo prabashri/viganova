@@ -265,5 +265,14 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 {rssEnabled && <script is:inline type="application/ld+json" set:html={JSON.stringify(rssSchema)} />}
 
 <>
+<script is:inline>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').then(() => {
+      console.log('✅ Service Worker Registered');
+    }).catch(err => {
+      console.warn('❌ Service Worker Failed:', err);
+    });
+  }
+</script>
   <!--<script is:inline src="/scripts/headerMenu.js?v=1.0.1" defer /> -->
 </>

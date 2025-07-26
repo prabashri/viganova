@@ -2,15 +2,15 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { transform } from 'lightningcss';
-import { writeManifestEntry } from '../utils/write-manifest.mjs';
+import { writeManifestEntry } from '../utils/write-manifest';
 
 const sourceDir = path.resolve('./src/styles/non-critical');
 const outputDir = path.resolve('./public/styles');
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
 
-const getRandomId = () => Math.random().toString(36).slice(2, 8);
+const getRandomId = (): string => Math.random().toString(36).slice(2, 8);
 
-async function getManifestNonCriticalDatetime() {
+async function getManifestNonCriticalDatetime(): Promise<Date> {
   try {
     const content = await fs.readFile(manifestPath, 'utf8');
     const manifest = JSON.parse(content);
@@ -21,16 +21,20 @@ async function getManifestNonCriticalDatetime() {
   }
 }
 
-async function deleteOldNonCriticalVariants() {
-  const files = await fs.readdir(outputDir);
-  const regex = /^non-critical\.[a-z0-9]{6}\.min\.css$/i;
-  const toDelete = files.filter(f => regex.test(f));
-  await Promise.allSettled(toDelete.map(f => fs.unlink(path.join(outputDir, f))));
+async function deleteOldNonCriticalVariants(): Promise<void> {
+  try {
+    const files = await fs.readdir(outputDir);
+    const regex = /^non-critical\.[a-z0-9]{6}\.min\.css$/i;
+    const toDelete = files.filter((f) => regex.test(f));
+    await Promise.allSettled(toDelete.map((f) => fs.unlink(path.join(outputDir, f))));
+  } catch (err) {
+    console.warn('⚠️ Error cleaning old variants:', err);
+  }
 }
 
-async function buildNonCriticalCSS() {
+async function buildNonCriticalCSS(): Promise<void> {
   const exists = await fs.readdir(sourceDir).catch(() => []);
-  const cssFiles = exists.filter(f => f.endsWith('.css'));
+  const cssFiles = exists.filter((f) => f.endsWith('.css'));
 
   if (cssFiles.length === 0) {
     console.log('ℹ️ No non-critical CSS files found.');
@@ -60,20 +64,21 @@ async function buildNonCriticalCSS() {
   }
 
   const { code: minified } = transform({
-    filename: 'non-critical.css',
-    code: Buffer.from(combinedCss),
-    minify: true,
-    targets: {
-      chrome: 100,
-      firefox: 100,
-      safari: 15,
-      edge: 100
-    },
-    drafts: {
-      nesting: true,
-      customMedia: true
-    }
-  });
+  filename: 'non-critical.css',
+  code: Buffer.from(combinedCss),
+  minify: true,
+  targets: {
+    chrome: 100,
+    firefox: 100,
+    safari: 15,
+    edge: 100,
+  },
+  drafts: {
+    nesting: true,
+    customMedia: true,
+  } as unknown as Record<string, boolean>, // ✅ cast to bypass TS error
+});
+
 
   const randomId = getRandomId();
   const hashedName = `non-critical.${randomId}.min.css`;
@@ -84,7 +89,9 @@ async function buildNonCriticalCSS() {
   await deleteOldNonCriticalVariants();
   await fs.writeFile(path.join(outputDir, hashedName), minified, 'utf8');
 
-  await writeManifestEntry('css', 'nonCritical', `/styles/${hashedName}`);
+  await writeManifestEntry('css', 'nonCritical', `/styles/${hashedName}`, {
+    datetime: new Date().toISOString(),
+  });
 
   console.log(`✅ Non-critical CSS built:`);
   console.log(`- non-critical.css`);

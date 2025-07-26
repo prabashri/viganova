@@ -1,8 +1,8 @@
-// src/scripts/generate-main-css.mjs
+// src/scripts/generate-main-css.ts
 import fs from 'fs/promises';
 import path from 'path';
 import { transform } from 'lightningcss';
-import { writeManifestEntry } from '../utils/write-manifest.mjs';
+import { writeManifestEntry } from '../utils/write-manifest.js'; // keep .js if it's .js file, or use .ts if converted
 
 const preloadDir = path.resolve('./src/styles/preload');
 const outputDir = path.resolve('./public/styles');
@@ -31,10 +31,11 @@ async function minifyFile(code, fileName) {
         safari: 15,
         edge: 100,
       },
+      // 👇 Type-safe workaround for LightningCSS draft extensions
       drafts: {
         nesting: true,
         customMedia: true,
-      },
+      }
     });
     return result.code.toString();
   } catch (err) {
@@ -65,7 +66,7 @@ async function buildMainCSS() {
   let combinedCss = '';
   let rebuildNeeded = false;
 
-  // ⏱️ Check if rebuild is needed
+  // 🔍 Check if rebuild is needed
   for (const file of cssFiles) {
     const srcPath = path.join(preloadDir, file);
     const stat = await fs.stat(srcPath);
@@ -85,7 +86,7 @@ async function buildMainCSS() {
     return;
   }
 
-  // ✂️ Minify and combine
+  // 🧪 Minify and combine
   for (const file of cssFiles) {
     const srcPath = path.join(preloadDir, file);
     const raw = await fs.readFile(srcPath, 'utf8');
@@ -94,11 +95,11 @@ async function buildMainCSS() {
 
     combinedCss += `/* ${file} */\n${minified}\n`;
 
-    // Save updated timestamp for manifest
+    // ✍️ Update manifest timestamp
     await writeManifestEntry('preload', file, srcPath);
   }
 
-  // 🧱 Output combined file
+  // 📦 Write final output
   const randomId = getRandomId();
   const hashedFileName = `main.${randomId}.css`;
   const hashedFilePath = path.join(outputDir, hashedFileName);

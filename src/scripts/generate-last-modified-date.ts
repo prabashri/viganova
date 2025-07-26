@@ -1,19 +1,17 @@
-// src/scripts/generate-last-modified-dates.mjs
+// src/scripts/generate-last-modified-dates.ts
 import fs from 'fs';
 import path from 'path';
 import { execSync } from 'child_process';
 
 const CONTENT_DIR = 'src/content';
 const OUTPUT_FILE = 'src/data/modified-dates.json';
-
-// Supported extensions
 const extensions = ['.md', '.mdx', '.astro', '.html'];
 
-function walkDir(dir, fileList = []) {
+function walkDir(dir: string, fileList: string[] = []): string[] {
   if (!fs.existsSync(dir)) return fileList;
 
   const files = fs.readdirSync(dir);
-  files.forEach((file) => {
+  for (const file of files) {
     const fullPath = path.join(dir, file);
     const stat = fs.statSync(fullPath);
 
@@ -22,18 +20,18 @@ function walkDir(dir, fileList = []) {
     } else if (extensions.includes(path.extname(file))) {
       fileList.push(fullPath);
     }
-  });
+  }
 
   return fileList;
 }
 
 const contentFiles = walkDir(CONTENT_DIR);
-const modifiedMap = {};
+const modifiedMap: Record<string, string> = {};
 
 for (const filePath of contentFiles) {
-  const relativePath = path.relative(CONTENT_DIR, filePath).replace(/\\/g, '/'); // normalize for Windows
+  const relativePath = path.relative(CONTENT_DIR, filePath).replace(/\\/g, '/');
+  let modified: string;
 
-  let modified;
   try {
     modified = execSync(`git log -1 --pretty="format:%cI" "${filePath}"`, {
       encoding: 'utf8',
@@ -44,10 +42,10 @@ for (const filePath of contentFiles) {
     modified = stat.mtime.toISOString();
   }
 
-  // Save using slug-like key: e.g., blog/my-post
   const key = relativePath.replace(path.extname(relativePath), '');
   modifiedMap[key] = modified;
 }
 
-fs.writeFileSync(OUTPUT_FILE, JSON.stringify(modifiedMap, null, 2));
+fs.writeFileSync(OUTPUT_FILE, JSON.stringify(modifiedMap, null, 2), 'utf8');
 console.log(`✅ Modified dates written to ${OUTPUT_FILE}`);
+

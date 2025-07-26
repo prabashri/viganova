@@ -28,17 +28,12 @@
     }
   },
   "js": {
-    "search-client": {
-      "file": "/scripts/search-client.dlz3ll.min.js",
-      "datetime": "2025-07-25T18:17:30.668Z"
-    },
-    "search-index": {
-      "file": "/search-index.5un4j3.json",
-      "datetime": "2025-07-25T17:58:36.373Z"
-    },
     "search": {
       "file": "/scripts/search.t9nimk.min.js",
       "datetime": "2025-07-26T04:35:43.715Z"
+    },
+    "search-index": {
+      "file": "/search-index.0dy0yk.json"
     }
   }
 }

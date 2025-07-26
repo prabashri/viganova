@@ -8,14 +8,14 @@ import remarkMdx from 'remark-mdx';
 import remarkStringify from 'remark-stringify';
 import { htmlToText } from 'html-to-text';
 import { siteDefaults } from '../config/siteDefaults';
-import { writeManifestEntry } from '../utils/write-manifest.mjs';
+import { writeManifestEntry } from '../utils/write-manifest';
 
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
 const outputDir = path.resolve('./public');
 const versionedFilePrefix = 'search-index';
 const TOLERANCE_MS = 10;
 
-function generateId() {
+function generateId(): string {
   return Math.random().toString(36).slice(2, 8);
 }
 
@@ -23,7 +23,7 @@ function isSameLastModified(oldTime: number, newTime: number): boolean {
   return Math.abs((oldTime ?? 0) - newTime) < TOLERANCE_MS;
 }
 
-function makeKey(slug: string, collection: string) {
+function makeKey(slug: string, collection: string): string {
   return `${collection}::${slug}`;
 }
 
@@ -46,7 +46,7 @@ async function getPreviousVersionedFilename(): Promise<string | null> {
   return manifest?.js?.[versionedFilePrefix]?.file?.replace(/^\//, '') ?? null;
 }
 
-async function deleteOldSearchIndexes(exclude: string) {
+async function deleteOldSearchIndexes(exclude: string): Promise<void> {
   const files = await fs.readdir(outputDir);
   const regex = new RegExp(`^${versionedFilePrefix}\\.[a-z0-9]{6}\\.json$`);
   const toDelete = files.filter(f => regex.test(f) && f !== exclude);
@@ -59,7 +59,7 @@ async function generateSearchIndex() {
   const previousFileName = await getPreviousVersionedFilename();
   const previousFilePath = previousFileName ? path.join(outputDir, previousFileName) : null;
 
-  // Load previous data to skip unchanged entries
+  // Load previous index if it exists
   try {
     if (previousFilePath) {
       const raw = await fs.readFile(previousFilePath, 'utf-8');
@@ -114,7 +114,7 @@ async function generateSearchIndex() {
 
       const plainText = htmlToText(parsed.toString(), {
         wordwrap: false,
-        selectors: [{ selector: 'a', options: { ignoreHref: true } }],
+        selectors: [{ selector: 'a', options: { ignoreHref: true } }]
       });
 
       allIndexEntries.push({
@@ -126,14 +126,14 @@ async function generateSearchIndex() {
         content: plainText,
         url,
         slug,
-        collection: collectionName,
+        collection: collectionName
       });
     }
   }
 
-  // Compare with previous
   const previousKeys = Object.keys(previousIndex);
-  const isUnchanged = previousKeys.length === allIndexEntries.length &&
+  const isUnchanged =
+    previousKeys.length === allIndexEntries.length &&
     allIndexEntries.every(entry => {
       const old = previousIndex[makeKey(entry.slug, entry.collection)];
       return old && old.lastModified === entry.lastModified;
@@ -144,37 +144,26 @@ async function generateSearchIndex() {
     return;
   }
 
-  // Write new versioned search-index.[id].json
   const id = generateId();
   const newFileName = `${versionedFilePrefix}.${id}.json`;
   const newPath = path.join(outputDir, newFileName);
-
   const json = JSON.stringify(allIndexEntries);
+
   await fs.writeFile(newPath, json);
   await writeManifestEntry('js', versionedFilePrefix, `/${newFileName}`);
 
+  // Clean up older files
   await deleteOldSearchIndexes(newFileName);
 
-  const kb = (Buffer.byteLength(json) / 1024).toFixed(2);
-  if (Number(kb) > 100) {
-    console.warn(`⚠️ Search index is ${kb} KB — consider reducing fields.`);
-  }
+  // Delete unversioned fallback if exists
+  const fallbackPath = path.join(outputDir, `${versionedFilePrefix}.json`);
+  try {
+    await fs.unlink(fallbackPath);
+  } catch {}
 
+  const kb = (Buffer.byteLength(json) / 1024).toFixed(2);
   console.log(`🆕 Updated: ${newFileName} (${allIndexEntries.length} items, ${kb} KB)`);
 
-  // 🔁 Update fetch path in search-client.js
-  const searchClientPath = path.join('./public/scripts/search-client.js');
-  try {
-    let content = await fs.readFile(searchClientPath, 'utf8');
-    content = content.replace(
-      /const\s+searchIndex\s*=\s*["'][^"']+["'];/,
-      `const searchIndex = "/${newFileName}";`
-    );
-    await fs.writeFile(searchClientPath, content, 'utf8');
-    console.log(`🔁 Updated search-client.js to use new index: ${newFileName}`);
-  } catch (err) {
-    console.warn(`⚠️ Could not patch search-client.js: ${(err instanceof Error ? err.message : String(err))}`);
-  }
 }
 
-generateSearchIndex();
+generateSearchIndex().catch(console.error);

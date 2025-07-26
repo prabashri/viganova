@@ -1,3 +1,5 @@
+// src/scripts/generate-all.mjs
+// This script runs all necessary generation scripts in sequence
 import { execSync } from 'child_process';
 
 function run(script, label) {
@@ -10,15 +12,16 @@ function run(script, label) {
 }
 
 // Run all generate scripts
-run('node src/scripts/generate-last-modified-date.mjs', 'Last Modified Date');
+run('npx tsx src/scripts/generate-last-modified-date.ts', 'Last Modified Date');
 run('npx tsx src/scripts/generate-images.ts', 'Image Generation');
 run('npx tsx src/scripts/generate-search-index.ts', 'Search Index');
 run('npx tsx src/scripts/generate-search-assets.ts', 'Fuse Assets Checking');
-run('node src/scripts/generate-email-hash.mjs', 'Email Hash');
-run('node src/scripts/generate-inline-css.mjs', 'Inline CSS');
-run('node src/scripts/generate-main-css.mjs', 'Main CSS');
-run('node src/scripts/generate-non-critical-css.mjs', 'Non-Critical CSS');
-run('node src/scripts/generate-minified-scripts.mjs', 'Minified Scripts');
+run('npx tsx src/scripts/generate-email-hash.ts', 'Email Hash');
+run('npx tsx src/scripts/generate-inline-css.ts', 'Inline CSS');
+run('npx tsx src/scripts/generate-main-css.ts', 'Main CSS');
+run('npx tsx src/scripts/generate-non-critical-css.ts', 'Non-Critical CSS');
+run('npx tsx src/scripts/generate-minified-scripts.ts', 'Minified Scripts');
+run('npx tsx src/scripts/generate-sw.ts', 'Service Worker Generation');
 
 /**
  * "gen:headers": "node src/scripts/generate-headers.mjs",

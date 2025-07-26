@@ -1,27 +1,31 @@
-// src/scripts/generate-inline-css.mjs
+// src/scripts/generate-inline-css.ts
 import fs from 'fs/promises';
 import path from 'path';
 import { transform } from 'lightningcss';
-import { writeManifestEntry } from '../utils/write-manifest.mjs';
+import { writeManifestEntry } from '../utils/write-manifest.ts'; // or `.ts` if available
 
 const inlineDir = path.resolve('./src/styles/inline');
-const outputModule = path.resolve('./src/data/generated-inline-css.js');
+const outputModule = path.resolve('./src/data/generated-inline-css.ts');
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
 const manifestKey = 'inline';
-const outputPublicPath = '/src/data/generated-inline-css.js'; // used in manifest
+const outputPublicPath = '/src/data/generated-inline-css.ts';
 
-async function getInlineManifestDatetime() {
+type Manifest = {
+  css?: Record<string, { datetime?: string }>;
+};
+
+async function getInlineManifestDatetime(): Promise<Date> {
   try {
     const content = await fs.readFile(manifestPath, 'utf8');
-    const manifest = JSON.parse(content);
+    const manifest: Manifest = JSON.parse(content);
     const datetime = manifest?.css?.[manifestKey]?.datetime;
     return datetime ? new Date(datetime) : new Date(0);
   } catch {
-    return new Date(0); // fallback to epoch
+    return new Date(0);
   }
 }
 
-async function buildInlineModule() {
+async function buildInlineModule(): Promise<void> {
   const files = await fs.readdir(inlineDir);
   const cssFiles = files.filter(file => file.endsWith('.css'));
 
@@ -47,7 +51,7 @@ async function buildInlineModule() {
     return;
   }
 
-  // Build combined + minified inline CSS
+  // Combine and minify
   let combinedCss = '';
   for (const file of cssFiles) {
     const content = await fs.readFile(path.join(inlineDir, file), 'utf8');
@@ -67,13 +71,14 @@ async function buildInlineModule() {
   });
 
   const jsExport = `export const inlineCss = ${JSON.stringify(code.toString())};\n`;
+
   await fs.mkdir(path.dirname(outputModule), { recursive: true });
   await fs.writeFile(outputModule, jsExport, 'utf8');
 
-  // Update manifest (datetime handled inside)
   await writeManifestEntry('css', manifestKey, outputPublicPath);
 
   console.log(`🆕 Inline CSS module written: ${outputModule}`);
 }
 
 buildInlineModule().catch(console.error);
+

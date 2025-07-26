@@ -18,6 +18,7 @@ export const siteDefaults = {
   authors: [],
   rss: true,
   sitemap: true,
+  cdnPath: "",
   noOfPostsPerPage: 3, // Number of posts to display per page in blog and post collections
 
   image: "/featured/astroweb-modern-website-theme-astro.png",
@@ -75,8 +76,13 @@ export const siteDefaults = {
     },    
   },
 
-  searchPages: ["home"],
+  searchPages: ["home"], // this is not added  in the search index function
   searchIndexPath: "/search-index.json",
+
+  serviceWorkerPaths: [ // paths including fonts, css, js to cache in service worker
+    // '/fonts/Inter-Regular-Subset.woff2',
+    //'/fonts/Inter-Bold-Subset.woff2',
+  ],
 
   tagMeta: [
     {
