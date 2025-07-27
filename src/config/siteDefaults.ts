@@ -39,7 +39,7 @@ export const siteDefaults = {
     "X",
     "Facebook",
     "LinkedIn",
-    // "Reddit",
+    "Reddit",
     "Copy Link",
     "Email",
   ],

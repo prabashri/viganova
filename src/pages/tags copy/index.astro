@@ -1,0 +1,106 @@
+---
+import { getCollection } from 'astro:content';
+
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteDefaults } from '../../config/siteDefaults';
+import type { HeadProps } from '../../types/HeadProps';
+
+type TagMeta = {
+  name: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
+};
+
+const tagMetaEntries: TagMeta[] = siteDefaults.tagMeta ?? [];
+const tagMetaMap = new Map(tagMetaEntries.map(item => [item.name.toLowerCase(), item]));
+
+// Step 1: Collect all tags from enabled collections
+const taggedCollections = Object.entries(siteDefaults.collections)
+  .filter(([_, config]) => config?.tags === true)
+  .map(([key]) => key) as (keyof typeof siteDefaults.collections)[];
+
+const tagCounts = new Map<string, number>();
+
+for (const collectionKey of taggedCollections) {
+  const entries = await getCollection(collectionKey);
+  for (const entry of entries) {
+    if ('tags' in entry.data && Array.isArray(entry.data.tags)) {
+      for (const tag of entry.data.tags) {
+        const lowerTag = tag.toLowerCase();
+        tagCounts.set(lowerTag, (tagCounts.get(lowerTag) ?? 0) + 1);
+      }
+    }
+  }
+}
+
+// Step 2: Separate known and unknown tags
+const knownTags: (TagMeta & { count: number })[] = [];
+const unknownTags: { name: string; count: number }[] = [];
+
+for (const [tag, count] of tagCounts.entries()) {
+  if (tagMetaMap.has(tag)) {
+    knownTags.push({ ...tagMetaMap.get(tag)!, count });
+  } else {
+    unknownTags.push({ name: tag, count });
+  }
+}
+
+const headProps: HeadProps = {
+  title: `All Tags | ${siteDefaults.siteName}`,
+  description: `Explore all tags used across tools, guides, and blog posts on ${siteDefaults.siteName}. Discover topics related to responsive design, CSS clamp, typography, layout, and more.`,
+  image: siteDefaults.image,
+  canonicalUrl: `${siteDefaults.siteUrl}/tags/`,
+  index: true,
+  keywords: [
+    ...knownTags.map(t => t.name), // optional tag-based keywords
+  ],
+  publishedAt: undefined,
+  updatedAt: undefined,
+  authors: [],
+  type: 'collection',
+  url: `${siteDefaults.siteUrl}/tags/`,
+  authorName: siteDefaults.authorName,
+  authorUrl: siteDefaults.authorUrl,
+};
+
+---
+<BaseLayout headProps={headProps}>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
+<h1>All Tags</h1>
+
+<section class="mb-4">
+  <h2 class="text-xl font-bold mb-2">✨ Primary Tags</h2>
+  <ul class="grid gap-4 md:grid-cols-2">
+    {knownTags.map(tag => (
+      <li class="border p-4 rounded bg-white shadow-sm">
+        <a href={tag.url ?? `/tags/${tag.name.toLowerCase()}/`} class="block no-bb">
+          {tag.image && (
+            <img src={tag.image} alt={tag.title} class="mb-2 h-32 w-full object-cover rounded" />
+          )}
+          <h3 class="text-lg font-semibold mb-1">{tag.title ?? tag.name}</h3>
+          <p class="text-sm text-gray-600">{tag.description}</p>
+          <span class="inline-block mt-2 text-xs text-gray-500">{tag.count} posts</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<section>
+  <h2 class="text-xl font-bold mb-2">🧩 Other Tags</h2>
+  <ul class="flex flex-wrap gap-2 text-sm">
+    {unknownTags.map(tag => (
+      <li>
+        <a href={`/tags/${tag.name}/`} class="inline-block px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 border">
+          {tag.name} ({tag.count})
+        </a>
+      </li>
+    ))}
+  </ul>
+</section>
+  <Fragment slot="extraScripts" />
+</BaseLayout>
+

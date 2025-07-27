@@ -267,111 +267,108 @@ header a{
         <Icon name="hamburger" id="menu-icon" class="block fill-base-100 w-1-5 h-1-5" />
         <Icon name="close" id="close-icon" class="display-none fill-base-100 w-1-5 h-1-5" />
       </Button>
-    </div>
 
-    {/* NAV ITEMS */}
-    {siteNav.length > 0 && (
-    <nav id="main-nav" class={`main-nav sm-bg scroll-container flex flex-row text-small ${navClasses} p-05 gap br-1 sm-br col-base-100 z-1000 big-display-inherit ${navOrder}`} itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Primary site navigation">
-      {/* Logo for Desktop */}
-      <ul class="nav-list flex ai-center lg-w-full lg-jc-center no-bullets gap sm-flex-col sm-ai-start">
-      {/* Loop through siteNav items */}
-      {Array.isArray(siteNav) && siteNav.map((item, navIndex) => (           
-          <li
-            itemprop="name"
-            class={`nav-item${item.type === 'dropdown' || item.type === 'mega' ? ' dropdown' : ''}${item.type === 'link' ? ' nav-link' : ''}${item.href === Astro.url.pathname ? ' active-page' : ''}`}
-            data-id={`nav-item-${navIndex}`}
-          >
-            {/* Icon or Image */}
-            {/* Link or Button based on item type */}
-            {item.type === 'link' && (
-              <NavLinkItem
-                index={navIndex}
-                item={item}
-              />
-            )}
-            
-            {item.type === 'dropdown' && item.content && (
-              <NavButton 
-                index={navIndex}
-                item={item}
-              /> 
-              <div
-                id={`dropdown-menu-${navIndex}`}
-                role="menu"
-                aria-hidden="true"
-                class="dropdown-menu pb-1 bg-transparent static big-absolute top-70 z-1000"
-              >
-                <div class="bg-base-00 p-1 flex flex-col wrap gap br big-b-thin-primary-lighter">
-                  {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
-                    <NavLinkItem
-                      item={subItem} index={subItemIndex}
-                    />                        
-                  ))}
-                </div>
-              </div>               
-            )}
+      {/* NAV ITEMS */}
+      {siteNav.length > 0 && (
+      <nav id="main-nav" class={`main-nav sm-bg scroll-container flex flex-row text-small ${navClasses} p-05 gap br-1 sm-br col-base-100 z-1000 big-display-inherit ${navOrder}`} itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Primary site navigation">
+        {/* Logo for Desktop */}
+        <ul class="nav-list flex ai-center lg-w-full lg-jc-center no-bullets gap sm-flex-col sm-ai-start">
+        {/* Loop through siteNav items */}
+        {Array.isArray(siteNav) && siteNav.map((item, navIndex) => (           
+            <li
+              itemprop="name"
+              class={`nav-item${item.type === 'dropdown' || item.type === 'mega' ? ' dropdown' : ''}${item.type === 'link' ? ' nav-link' : ''}${item.href === Astro.url.pathname ? ' active-page' : ''}`}
+              data-id={`nav-item-${navIndex}`}
+            >
+              {/* Icon or Image */}
+              {/* Link or Button based on item type */}
+              {item.type === 'link' && (
+                <NavLinkItem
+                  index={navIndex}
+                  item={item}
+                />
+              )}
+             
+              {item.type === 'dropdown' && item.content && (
+                <NavButton 
+                  index={navIndex}
+                  item={item}
+                /> 
+                <div
+                  id={`dropdown-menu-${navIndex}`}
+                  role="menu"
+                  aria-hidden="true"
+                  class="dropdown-menu pb-1 bg-transparent static big-absolute top-70 z-1000"
+                >
+                  <div class="bg-base-00 p-1 flex flex-col wrap gap br big-b-thin-primary-lighter">
+                    {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
+                      <NavLinkItem
+                        item={subItem} index={subItemIndex}
+                      />                        
+                    ))}
+                  </div>
+                </div>               
+              )}
 
-            {/* Mega Menu */}
+              {/* Mega Menu */}
 
-            {item.type === 'mega' && Array.isArray(item.columns) && (
-              <NavButton 
-                index={navIndex}
-                item={item}
-              />                
-            
-              <div
-                id={`dropdown-menu-${navIndex}`}
-                role="menu"
-                aria-hidden="true" 
-                class="dropdown-menu mega-menu-panel pb-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
-              >
-                <div class="bg-base-00 sm-bg p-05 br flex flex-row wrap w-full gap big-b-thin-primary-lighter">
-                  {item.columns.map((col, colIndex) => (
-                    <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
-                      <h4 class="bold capitalize text-s mb-2">{col.title}</h4>
-                      <ul>
-                        {Array.isArray(col.items) && col.items.map((subItem, subItemIndex) => (
-                          <li data-id={`mega-item-${navIndex}-${colIndex}-${subItemIndex}`} class="mb-1">
-                            <NavLinkItem
-                              item={subItem}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>                
-            )}
-          </li>
-        ))}
-      </ul>
-    </nav>
-    )}
-    {/* Primary CTA Button */}
-    {primaryCTA.length > 0 && ( 
-      <div id="main-nav-cta" class="flex br sm-bg sm-w-full p-05 ai-center gap-05 order-3 lg-order-2" aria-label="Primary Call to Action">
-        {/* Theme Toggle */}
-        <ThemeLightDark />
-        {/* Loop through primaryCTA items */}
-        {primaryCTA.map((cta) => (
-          <Anchor
-            href={cta.href}
-            title={cta.title || cta.label}
-            variant={cta.variant || 'primary'}
-            ariaLabel={cta.ariaLabel || cta.label}
-            className={cta.icon ? 'flex ai-center ac-center gap-05' : ''}
-          >
-            {cta.icon && <img src={cta.icon} alt={cta.altText || cta.label} width="24" class="w-20 inline" />}
-            {cta.label}
-          </Anchor>
-        ))}
-
-      </div>
-    )}
+              {item.type === 'mega' && Array.isArray(item.columns) && (
+                <NavButton 
+                  index={navIndex}
+                  item={item}
+                />                
+             
+                <div
+                  id={`dropdown-menu-${navIndex}`}
+                  role="menu"
+                  aria-hidden="true" 
+                  class="dropdown-menu mega-menu-panel pb-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
+                >
+                  <div class="bg-base-00 sm-bg p-05 br flex flex-row wrap w-full gap big-b-thin-primary-lighter">
+                    {item.columns.map((col, colIndex) => (
+                      <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
+                        <h4 class="bold capitalize text-s mb-2">{col.title}</h4>
+                        <ul>
+                          {Array.isArray(col.items) && col.items.map((subItem, subItemIndex) => (
+                            <li data-id={`mega-item-${navIndex}-${colIndex}-${subItemIndex}`} class="mb-1">
+                              <NavLinkItem
+                                item={subItem}
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </div>                
+              )}
+            </li>
+          ))}
+        </ul>
+      </nav>
+      )}
+      {/* Primary CTA Button */}
+      {primaryCTA.length > 0 && ( 
+        <div id="main-nav-cta" class="flex br sm-bg sm-w-full p-05 ai-center gap-05 order-3 lg-order-2" aria-label="Primary Call to Action">
+          {/* Loop through primaryCTA items */}
+          {primaryCTA.map((cta) => (
+            <Anchor
+              href={cta.href}
+              title={cta.title || cta.label}
+              variant={cta.variant || 'primary'}
+              ariaLabel={cta.ariaLabel || cta.label}
+              className={cta.icon ? 'flex ai-center ac-center gap-05' : ''}
+            >
+              {cta.icon && <img src={cta.icon} alt={cta.altText || cta.label} width="24" class="w-20 inline" />}
+              {cta.label}
+            </Anchor>
+          ))}
+        </div>
+      )}
      
-   
-    
+    </div>
+    {/* Theme Toggle */}
+    <ThemeLightDark />
   </div>
   {/* SECONDARY NAVIGATION (Optional) */}
   {secondaryNavigation.length > 0 && (

@@ -45,6 +45,12 @@ export const onRequest = defineMiddleware(async (context, next) => {
   for (const [key, val] of Object.entries(extraHttpHeaders as ExtraHttpHeaders)) {
     headers.set(key, typeof val === 'string' ? val : JSON.stringify(val));
   }
+  if (context.url.pathname === '/sw.js') {
+    headers.set('Cache-Control', 'no-cache'); // 🔁 Always checks for updates on reload
+    headers.set('Content-Type', 'application/javascript'); // ✅ Ensures correct MIME type
+    headers.set('Service-Worker-Allowed', '/'); // 🔓 Allows controlling full scope of the origin
+  }
+
 
   // Add nonce to inline scripts
   if (isHtml && response.body) {

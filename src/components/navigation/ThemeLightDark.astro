@@ -8,8 +8,8 @@ const searchIndexPath = manifest.json?.['search-index']?.file || '';
 const searchScriptPath = manifest.js?.['search']?.file || '';
 
 ---
-<div class="theme-toggle relative h-2-0 w-2-0 mb-1 as-f-start">
-  { (searchIndexPath && searchScriptPath) && (
+{ (searchIndexPath && searchScriptPath) && (
+  <div id="global-search-button" class="flex flex-row relative h-2-0 w-2-0 mb-1 as-f-start">
     <!-- Trigger -->
     <button id="global-search-button" aria-label="Open search" class="search-trigger">🔍</button>
 
@@ -23,7 +23,9 @@ const searchScriptPath = manifest.js?.['search']?.file || '';
         <ul id="search-modal-results" class="search-results"></ul>
       </div>
     </div>
+  </div>
   )}  
+<div class="theme-toggle flex flex-row relative h-2-0 w-2-0 mb-1 as-f-start"> 
 
     <!-- Trigger Button -->
     <button id="theme-button" aria-haspopup="true" aria-expanded="false"
