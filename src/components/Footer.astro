@@ -1,9 +1,14 @@
 ---
 const today = new Date();
+import SocialLink from './SocialLink.astro';
+import { siteDefaults } from '../config/siteDefaults';
+import ShareLink from './ShareLink.astro';
 ---
 
 <footer>
-	&copy; {today.getFullYear()} Your name here. All rights reserved.
+	<ShareLink id="footer-share-links" class="mb-1" />
+	<SocialLink id="footer-social-links" />
+	&copy; {today.getFullYear()} {siteDefaults.siteName}. All rights reserved.
 	<div class="social-links">
 		<a href="https://m.webtoo.ls/@astro" target="_blank">
 			<span class="sr-only">Follow Astro on Mastodon</span>

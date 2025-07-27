@@ -155,4 +155,9 @@
   color: var(--base-100);
 }
 
-
+.icon-primary {
+  fill: var(--primary-light, #a55aff);
+}   
+.icon-link:hover .icon-primary{
+    fill: revert-layer;
+}

@@ -1,0 +1,144 @@
+---
+// src/components/ShareLink.astro
+import { Icon } from 'astro-icon/components';
+import { siteDefaults } from '../config/siteDefaults';
+
+interface Props {
+  id?: string;
+  title?: string;
+  url?: string;
+  location?: string;
+  className?: string;
+  iconSize?: string;
+  description?: string;
+}
+
+const {
+  id = 'share-links',
+  title: titleProp,
+  url: urlProp,
+  description: descProp,
+  location = 'page',
+  className = '',
+  iconSize = 'w-1-5 h-1-5'
+} = Astro.props;
+
+const pageTitle = titleProp || Astro.props.page?.title || '';
+const pageDescription = descProp || Astro.props.page?.description || '';
+let resolvedUrl = urlProp || Astro.url?.pathname || '/';
+
+// Resolve relative URL using domain
+if (!/^https?:\/\//.test(resolvedUrl)) {
+  const domain = siteDefaults.siteUrl || Astro.site?.href || 'http://localhost:4321';
+  resolvedUrl = new URL(resolvedUrl, domain).href;
+}
+
+const encodedURL = encodeURIComponent(resolvedUrl);
+const encodedTitle = encodeURIComponent(pageTitle);
+const encodedDesc = encodeURIComponent(pageDescription);
+
+const shareLinks = siteDefaults.shareLinks ?? [];
+
+const platforms = [
+  {
+    name: 'Whatsapp',
+    href: `https://wa.me/?text=${encodedTitle}%20${encodedURL}`,
+  },
+  {
+    name: 'Facebook',
+    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`,
+  },
+  {
+    name: 'X',
+    href: `https://x.com/intent/tweet?url=${encodedURL}&text=${encodedTitle}`,
+  },
+  {
+    name: 'LinkedIn',
+    href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedURL}&title=${encodedTitle}`,
+  },
+  {
+    name: 'Reddit',
+    href: `https://www.reddit.com/submit?url=${encodedURL}&title=${encodedTitle}`,
+  },
+  {
+    name: 'Email',
+    href: `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encodedURL}`,
+  },
+  {
+    name: 'Copy Link',
+    href: null, // special handling
+  }
+];
+
+function toId(name: string) {
+  return `${location}-share-${name.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
+function toIconName(name: string) {
+  return name === 'Copy Link' ? 'clipboard' : name.toLowerCase().replace(/\s+/g, '-');
+}
+---
+
+<style>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+<nav
+  id={id}
+  aria-label="Share this page"
+  class={`share-toolbar flex gap ai-center pb-05 mb-05 ${className}`}
+  data-title={pageTitle}
+  data-url={resolvedUrl}
+  data-description={pageDescription}
+  data-location={location}
+>
+  {shareLinks.map((name) => {
+    const platform = platforms.find((p) => p.name.toLowerCase() === name.toLowerCase());
+    if (!platform) return null;
+
+    const label = `Share on ${name}`;
+    const icon = toIconName(name);
+    const dataId = toId(name);
+    const dataLabel = `${name} Share`;
+
+    return platform.href ? (
+      <a
+        href={platform.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={label}
+        aria-label={label}
+        data-id={dataId}
+        data-label={dataLabel}
+        data-action="share"
+        class="flex no-bb h-30 w-30 br no-padding hover-bs-1-1-8-2-base-100"
+      >
+        <Icon name={icon} class={iconSize} />
+        <span class="sr-only">{label}</span>
+      </a>
+    ) : (
+      <button
+        type="button"
+        data-id="share-copy-button"
+        data-label="copy link"
+        data-action="share"
+        title="Copy Link"
+        aria-label="Copy Link"
+        class="flex center bg-col-ff h-30 w-30 br hover-bs-1-1-8-2-base-100 no-border"
+      >
+        <Icon name="clipboard" class={iconSize} />
+        <span class="sr-only">Copy Link</span>
+      </button>
+    );
+  })}
+</nav>

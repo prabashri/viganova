@@ -31,12 +31,12 @@
     "search": {
       "file": "/scripts/search.t9nimk.min.js",
       "datetime": "2025-07-26T04:35:43.715Z"
-    },
-    "search-index": {
-      "file": "/search-index.0dy0yk.json"
     }
   },
   "icons": {
+    "favicon.ico": {
+      "datetime": "2025-07-27T09:50:30.657Z"
+    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -48,9 +48,24 @@
     },
     "favicon-32x32.png": {
       "datetime": "2025-07-26T13:44:29.513Z"
+    },
+    "favicon.svg": {
+      "datetime": "2025-07-26T08:39:30.340Z"
+    },
+    "manifest.webmanifest": {
+      "datetime": "2025-07-27T09:50:30.389Z"
+    },
+    "favicon-16x16.png": {
+      "datetime": "2025-06-27T05:12:16.114Z"
     }
   },
   "siteDefaults": {
-    "datetime": "2025-07-26T13:31:18.126Z"
+    "datetime": "2025-07-27T06:33:44.547Z"
+  },
+  "json": {
+    "search-index": {
+      "file": "/search-index.re67wu.json",
+      "datetime": "2025-07-27T09:50:14.028Z"
+    }
   }
 }

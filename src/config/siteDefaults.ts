@@ -11,7 +11,7 @@ export const siteDefaults = {
   title: "Theme for Astro by nViewsWEB - The Ultimate Frontend Toolkit",
   description: "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
   keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],
-  twitterHandle: "@cnviewsweb",
+
 
   primaryColor: "#a55aff",
   secondaryColor: "#081ea6",
@@ -22,6 +22,27 @@ export const siteDefaults = {
   icon: "public/logos/AstroWEB-icon.png",
   favIconPng: "public/logos/AstroWEB-icon.png",
   favIconSvg: "public/logos/AstroWEB-icon.svg",
+
+  socialLinks: {
+    x: "@nviewsweb", // twitter handle without @
+    github: "https://github.com/nviewsweb",
+    linkedin: "https://linkedin.com/company/nviewsweb",
+    facebook: "https://facebook.com/nviewsweb",
+    instagram: "https://instagram.com/nviewsweb",
+    youtube: "https://youtube.com/@nviewsweb",
+    mastodon: "https://mastodon.social/@nviewsweb",
+    bluesky: "https://bsky.app/profile/nviewsweb.com",
+    email: "mailto:admin@nviewsweb.com"
+  },
+  shareLinks: [
+    "Whatsapp",
+    "X",
+    "Facebook",
+    "LinkedIn",
+    // "Reddit",
+    "Copy Link",
+    "Email",
+  ],
 
   separator: "|",
   authors: [],

@@ -4,12 +4,12 @@ import { Icon } from 'astro-icon/components';
 import searchIndex from '/public/search-index.json';
 import manifest from '../../data/assets-manifest.json'; // no destructuring here
 
-const searchIndexPath = manifest.js?.['search-index']?.file || '/search-index.json';
-const searchScriptPath = manifest.js?.['search']?.file || '/scripts/search.js';
+const searchIndexPath = manifest.json?.['search-index']?.file || '';
+const searchScriptPath = manifest.js?.['search']?.file || '';
 
 ---
 <div class="theme-toggle relative h-2-0 w-2-0 mb-1 as-f-start">
-
+  { (searchIndexPath && searchScriptPath) && (
     <!-- Trigger -->
     <button id="global-search-button" aria-label="Open search" class="search-trigger">🔍</button>
 
@@ -23,7 +23,7 @@ const searchScriptPath = manifest.js?.['search']?.file || '/scripts/search.js';
         <ul id="search-modal-results" class="search-results"></ul>
       </div>
     </div>
-
+  )}  
 
     <!-- Trigger Button -->
     <button id="theme-button" aria-haspopup="true" aria-expanded="false"
@@ -181,6 +181,7 @@ const searchScriptPath = manifest.js?.['search']?.file || '/scripts/search.js';
 
 
 {searchIndexPath && searchScriptPath && (
+  
   <script
     type="module"
     src={searchScriptPath}

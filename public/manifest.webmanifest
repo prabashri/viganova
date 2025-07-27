@@ -4,8 +4,8 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0d9488",
-  "description": "some description",
+  "theme_color": "#a55aff",
+  "description": "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

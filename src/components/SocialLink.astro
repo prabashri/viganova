@@ -1,0 +1,68 @@
+---
+// src/components/SocialLink.astro
+import { Icon } from 'astro-icon/components';
+import { siteDefaults } from '../config/siteDefaults';
+
+interface Props {
+  id?: string;
+  className?: string;
+  iconSize?: string;
+}
+
+const { id = 'social-links', className = '', iconSize = 'w-1-5 h-1-5' } = Astro.props;
+
+const links = siteDefaults.socialLinks;
+
+function getHref(key: string, value: string): string {
+  if (value.startsWith('http://') || value.startsWith('https://') || value.startsWith('mailto:')) {
+    return value;
+  }
+  if (key === 'x') {
+    return `https://x.com/${value.replace(/^@/, '')}`;
+  }
+  return `https://${value}`;
+}
+
+const baseClass = 'social-links flex gap-1 mi-0 ai-center';
+const combinedClass = `${baseClass} ${className}`.trim();
+---
+<style>
+
+
+/* Icon visual feedback */
+.icon-wrapper {
+  transition: background-color 0.2s ease;
+}
+
+
+.icon-link:hover .icon-primary {
+  fill: revert-layer;
+}
+</style>
+
+<nav aria-label="Social media links" id={id}>
+  <ul class={combinedClass}>
+    {Object.entries(links).map(([key, value]) => {
+      if (!value) return null;
+
+      const href = getHref(key, value);
+      const label = `Follow us on ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+
+      return (
+        <li class="icon-wrapper flex ai-center jc-center p-02 br">
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={label}
+            title={label}
+            class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible"
+          >
+            <Icon name={key} class={iconSize} />
+            <span class="sr-only">{label}</span>
+          </a>
+        </li>
+      );
+    })}
+  </ul>
+</nav>

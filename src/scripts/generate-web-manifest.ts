@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
+import { encode as encodeIco } from 'sharp-ico';
+
+
+
 import { siteDefaults } from '../config/siteDefaults';
 type AssetsManifest = {
   css: Record<string, { file: string; datetime: string }>;
@@ -18,6 +22,8 @@ const manifestPath = path.join(publicDir, 'manifest.webmanifest');
 
 const siteDefaultsPath = path.resolve('src/config/siteDefaults.ts');
 const recordedSiteDefaultsTime = assetsManifest?.siteDefaults?.datetime;
+
+const faviconIcoSizes = [16, 32, 48];
 
 const iconSizes = [
   { name: 'android-chrome-192x192.png', size: 192 },
@@ -122,14 +128,26 @@ function writeWebManifest() {
 }
 
 // --- Update assets-manifest.json
-function updateAssetsManifest(siteDefaultsTime: string) {
-  const updatedIcons: Record<string, { datetime: string }> = {};
+function updateAssetsManifest(
+  siteDefaultsTime: string,
+  extraIcons: Record<string, { datetime: string }> = {}
+) {
+  const updatedIcons: Record<string, { datetime: string }> = { ...extraIcons };
 
   for (const { name } of iconSizes) {
     const iconPath = path.join(publicDir, name);
     if (fs.existsSync(iconPath)) {
       const time = fs.statSync(iconPath).mtime.toISOString();
       updatedIcons[name] = { datetime: time };
+    }
+  }
+
+  const otherFiles = ['favicon.svg', 'manifest.webmanifest', 'favicon-16x16.png'];
+  for (const file of otherFiles) {
+    const filePath = path.join(publicDir, file);
+    if (fs.existsSync(filePath)) {
+      const time = fs.statSync(filePath).mtime.toISOString();
+      updatedIcons[file] = { datetime: time };
     }
   }
 
@@ -147,6 +165,33 @@ function updateAssetsManifest(siteDefaultsTime: string) {
   );
 
   console.log('📦 Updated assets-manifest.json (icons + siteDefaults.ts timestamp)');
+}
+
+
+
+async function generateFaviconIco(source: string): Promise<Record<string, { datetime: string }>> {
+  const icoPath = path.join(publicDir, 'favicon.ico');
+  const recordedTime = assetsManifest?.icons?.['favicon.ico']?.datetime;
+
+  if (fs.existsSync(icoPath)) {
+    const mtime = fs.statSync(icoPath).mtime.toISOString();
+    if (recordedTime === mtime) {
+      return {}; // No need to regenerate
+    }
+  }
+
+  const pngBuffer = await sharp(source)
+    .resize(64, 64, { fit: 'cover', position: 'center' })
+    .png({ compressionLevel: 9 })
+    .toBuffer();
+
+  const icoBuffer = await encodeIco([pngBuffer]);
+  fs.writeFileSync(icoPath, icoBuffer);
+
+  const updatedTime = new Date().toISOString();
+  console.log('✅ Generated favicon.ico');
+
+  return { 'favicon.ico': { datetime: updatedTime } };
 }
 
 
@@ -180,7 +225,9 @@ async function main() {
 
     await generateIcons(pngSource);
     handleSvgIcon();
-    updateAssetsManifest(currentSiteDefaultsTime);
+    const icoMeta = await generateFaviconIco(pngSource);
+    updateAssetsManifest(currentSiteDefaultsTime, icoMeta);
+
 
     if (!updated) {
       console.log('✅ No changes in siteDefaults.ts. Icons updated only if required.');

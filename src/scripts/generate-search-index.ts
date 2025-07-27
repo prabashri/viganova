@@ -150,7 +150,7 @@ async function generateSearchIndex() {
   const json = JSON.stringify(allIndexEntries);
 
   await fs.writeFile(newPath, json);
-  await writeManifestEntry('js', versionedFilePrefix, `/${newFileName}`);
+  await writeManifestEntry('json', versionedFilePrefix, `/${newFileName}`);
 
   // Clean up older files
   await deleteOldSearchIndexes(newFileName);
