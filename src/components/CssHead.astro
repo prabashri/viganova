@@ -9,44 +9,40 @@ let inlineCssFiles: string[] = [];
 let preloadCssFiles: string[] = [];
 let nonCriticalCssFiles: string[] = [];
 
-if (isDev) {
-  const inlineModules = import.meta.glob('../styles/inline/*.css', { eager: true });
-  const preloadModules = import.meta.glob('../styles/preload/*.css', { eager: true });
-  const nonCriticalModules = import.meta.glob('../styles/non-critical/*.css', { eager: true });
+if (isDev) {  
+  import.meta.glob([
+    '../styles-css/inline/**/*.css',
+    '../styles-css/preload/**/*.css',
+    '../styles-css/non-critical/**/*.css'
+  ], { eager: true });
 
-  inlineCssFiles = Object.keys(inlineModules) as string[];
-  preloadCssFiles = Object.keys(preloadModules) as string[];
 // Removed invalid import statement; not needed here
-  nonCriticalCssFiles = Object.keys(nonCriticalModules) as string[];
+  
 } else {
   preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
   nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
 }
-preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
-  nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
-
-
 ---
 {/* -- ✅ Preload fonts --*/}
 <link rel="preload" href="/fonts/Inter-Regular-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Inter-Bold-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
-{ preloadCssFiles[0] && (
+{ !isDev && preloadCssFiles[0] && (
   <>
     <link rel="preload" as="style" href={preloadCssFiles[0]} />
   </>
 )}
 
 {/* -- ✅ PROD: Inline critical CSS -- */}
-{inlineCss && <style id="inline-css" set:html={inlineCss} />}
+{ !isDev && inlineCss && <style id="inline-css" set:html={inlineCss} />}
 
 {/* -- ✅ PROD: Preload + load main CSS -- */}
-{ preloadCssFiles[0] && (
+{ !isDev &&preloadCssFiles[0] && (
   <>
     <link rel="stylesheet" href={preloadCssFiles[0]} fetchpriority="high" />
   </>
 )}
 
 {/* -- ✅ PROD: Load non-critical CSS with media="print" + data-swap -- */}
-{ nonCriticalCssFiles[0] && (
+{ !isDev &&nonCriticalCssFiles[0] && (
   <link rel="stylesheet" data-href={nonCriticalCssFiles[0]} data-swap="true" />
 )}
