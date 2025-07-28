@@ -7,7 +7,7 @@ description: 'Lorem ipsum dolor sit amet'
 publishedDate: "2025-01-01"
 lastModified: "2025-01-10"
 # Cover / Featured image for the post
-heroImage:  "../assets/blog-placeholder-3.jpg"
+heroImage:  "astroweb-modern-website-theme-astro.png"
 heroImageAlt:  "Cover image for the article"
 heroImageTitle:  "Optional image title"
 heroImageCaption:  "Optional caption text"

@@ -16,9 +16,9 @@ type TagMeta = {
 const tagMetaEntries: TagMeta[] = siteDefaults.tagMeta ?? [];
 const tagMetaMap = new Map(tagMetaEntries.map(item => [item.name.toLowerCase(), item]));
 
-// Step 1: Collect all tags from enabled collections
+// Step 1: Collect all categories from enabled collections
 const taggedCollections = Object.entries(siteDefaults.collections)
-  .filter(([_, config]) => config?.tags === true)
+  .filter(([_, config]) => config?.categories === true)
   .map(([key]) => key) as (keyof typeof siteDefaults.collections)[];
 
 const tagCounts = new Map<string, number>();
@@ -26,7 +26,7 @@ const tagCounts = new Map<string, number>();
 for (const collectionKey of taggedCollections) {
   const entries = await getCollection(collectionKey);
   for (const entry of entries) {
-    if ('tags' in entry.data && Array.isArray(entry.data.tags)) {
+    if ('category' in entry.data && Array.isArray(entry.data.tags)) {
       for (const tag of entry.data.tags) {
         const lowerTag = tag.toLowerCase();
         tagCounts.set(lowerTag, (tagCounts.get(lowerTag) ?? 0) + 1);
@@ -48,10 +48,10 @@ for (const [tag, count] of tagCounts.entries()) {
 }
 
 const headProps: HeadProps = {
-  title: `All Tags | ${siteDefaults.siteName}`,
-  description: `Explore all tags used across tools, guides, and blog posts on ${siteDefaults.siteName}. Discover topics related to responsive design, CSS clamp, typography, layout, and more.`,
+  title: `All Categories | ${siteDefaults.siteName}`,
+  description: `Explore all categories used across tools, guides, and blog posts on ${siteDefaults.siteName}. Discover topics related to responsive design, CSS clamp, typography, layout, and more.`,
   image: siteDefaults.image,
-  canonicalUrl: `${siteDefaults.siteUrl}/tags/`,
+  canonicalUrl: `${siteDefaults.siteUrl}/categories/`,
   index: true,
   keywords: [
     ...knownTags.map(t => t.name), // optional tag-based keywords
@@ -60,7 +60,7 @@ const headProps: HeadProps = {
   updatedAt: undefined,
   authors: [],
   type: 'collection',
-  url: `${siteDefaults.siteUrl}/tags/`,
+  url: `${siteDefaults.siteUrl}/categories/`,
   authorName: siteDefaults.authorName,
   authorUrl: siteDefaults.authorUrl,
 };

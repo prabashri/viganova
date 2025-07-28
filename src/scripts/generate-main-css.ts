@@ -4,7 +4,7 @@ import path from 'path';
 import { transform } from 'lightningcss';
 import { writeManifestEntry } from '../utils/write-manifest.js'; // keep .js if it's .js file, or use .ts if converted
 
-const preloadDir = path.resolve('./src/styles/preload');
+const preloadDir = path.resolve('./src/styles-css/preload');
 const outputDir = path.resolve('./public/styles');
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
 
@@ -19,7 +19,19 @@ async function loadManifest() {
   }
 }
 
-async function minifyFile(code, fileName) {
+interface MinifyFileResult {
+  code: Buffer;
+  map?: Buffer;
+}
+
+interface TransformError extends Error {
+  loc?: {
+    line?: number;
+    column?: number;
+  };
+}
+
+async function minifyFile(code: string, fileName: string): Promise<string | null> {
   try {
     const result = transform({
       filename: fileName,
@@ -33,16 +45,16 @@ async function minifyFile(code, fileName) {
       },
       // 👇 Type-safe workaround for LightningCSS draft extensions
       drafts: {
-        nesting: true,
         customMedia: true,
       }
     });
-    return result.code.toString();
+    return Buffer.from(result.code).toString();
   } catch (err) {
-    const line = err?.loc?.line ? ` at line ${err.loc.line}` : '';
-    const column = err?.loc?.column ? `, column ${err.loc.column}` : '';
+    const error = err as TransformError;
+    const line = error?.loc?.line ? ` at line ${error.loc.line}` : '';
+    const column = error?.loc?.column ? `, column ${error.loc.column}` : '';
     console.error(`❌ Error in ${fileName}${line}${column}`);
-    console.error(`→ ${err.message}\n`);
+    console.error(`→ ${error.message}\n`);
     return null;
   }
 }

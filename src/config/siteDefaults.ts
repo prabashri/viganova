@@ -84,6 +84,7 @@ export const siteDefaults = {
       label: 'Blog',      // display label (optional)
       rss: true,          // should generate RSS?
       tags: true,
+      categories: true, // enable categories in blog posts
       authors: true, // enable authors in blog posts
       search: true, // enable search indexing for blog posts
     },
@@ -93,6 +94,7 @@ export const siteDefaults = {
       label: 'Post',
       rss: true,
       tags: true,
+      categories: true, // enable categories in posts
       authors: true, // enable authors in posts
       search: true, // enable search indexing for posts
     },
@@ -102,6 +104,7 @@ export const siteDefaults = {
       label: 'Team',
       rss: false,
       tags: false,
+      categories: false,
       search: false
     },    
   },

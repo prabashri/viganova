@@ -2,11 +2,11 @@
   "css": {
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-07-27T15:30:47.095Z"
+      "datetime": "2025-07-28T07:49:30.615Z"
     },
     "main": {
-      "file": "/styles/main.qxo1rl.css",
-      "datetime": "2025-07-27T15:30:49.708Z"
+      "file": "/styles/main.3vx590.css",
+      "datetime": "2025-07-28T08:47:27.788Z"
     },
     "nonCritical": {
       "file": "/styles/non-critical.9l2ski.min.css",
@@ -15,16 +15,16 @@
   },
   "preload": {
     "components.css": {
-      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles\\preload\\components.css",
-      "datetime": "2025-07-27T15:30:49.647Z"
+      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles-css\\preload\\components.css",
+      "datetime": "2025-07-28T08:47:27.723Z"
     },
     "form.css": {
-      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles\\preload\\form.css",
-      "datetime": "2025-07-27T15:30:49.656Z"
+      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles-css\\preload\\form.css",
+      "datetime": "2025-07-28T08:47:27.728Z"
     },
     "utilities.css": {
-      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles\\preload\\utilities.css",
-      "datetime": "2025-07-27T15:30:49.690Z"
+      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles-css\\preload\\utilities.css",
+      "datetime": "2025-07-28T08:47:27.756Z"
     }
   },
   "js": {
@@ -34,6 +34,9 @@
     }
   },
   "icons": {
+    "favicon.ico": {
+      "datetime": "2025-07-28T08:47:35.493Z"
+    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -50,19 +53,19 @@
       "datetime": "2025-07-26T08:39:30.340Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-07-27T15:30:59.483Z"
+      "datetime": "2025-07-28T00:51:16.717Z"
     },
     "favicon-16x16.png": {
       "datetime": "2025-06-27T05:12:16.114Z"
     }
   },
   "siteDefaults": {
-    "datetime": "2025-07-27T15:26:55.139Z"
+    "datetime": "2025-07-28T00:47:21.577Z"
   },
   "json": {
     "search-index": {
-      "file": "/search-index.vq23kx.json",
-      "datetime": "2025-07-27T15:30:37.737Z"
+      "file": "/search-index.z8jksn.json",
+      "datetime": "2025-07-28T08:47:18.630Z"
     }
   }
 }

@@ -15,10 +15,20 @@ export default defineConfig({
   adapter: cloudflare({
      imageService: 'compile'
   }),
+  build: {
+    // Inline stylesheets up to 6KB
+    inlineStylesheets: "always",
+  },
   output: 'server',
   trailingSlash: 'always', 
   
     vite: {
+      build: {
+      assetsInlineLimit: 6 * 1024 // 6 KB
+    },
+      css: {
+        transformer: "lightningcss",
+      },
       resolve: {
         alias: {
           '@': path.resolve('./src')

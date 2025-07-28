@@ -57,11 +57,7 @@ const pageSeo: HeadProps = {
   preloadImages: paginatedEntries
     .filter((p) => typeof p.data.heroImage === 'string')
     .slice(0, 3)
-    .map((p) => ({
-      src: p.data.heroImage,
-      width: 'auto',
-      aspect: 'auto',
-    })),
+    .map((p) => p.data.heroImage),
   listItems: paginatedEntries.map((p) => ({
     name: p.data.title ?? 'Untitled',
     url: `/${p.collection}/${p.slug ?? p.data.slug ?? p.id}/`,
@@ -69,15 +65,15 @@ const pageSeo: HeadProps = {
   type: 'collection',
   breadcrumb: [
     { name: 'Home', url: '/' },
-    { name: 'Tags', url: '/tags/' },
-    { name: isKnownTag ? meta.title ?? tag : tag, url: `/tags/${tag}/` },
+    { name: 'Category', url: '/category/' },
+    { name: isKnownTag ? meta.title ?? tag : tag, url: `/category/${tag}/` },
   ],
   index: shouldIndex,
   authors: [
     {
-      id: 'tag',
+      id: 'category',
       slug: tag,
-      url: `/tags/${tag}/`,
+      url: `/category/${tag}/`,
       name: isKnownTag ? meta.title ?? tag : tag,
       data: { name: isKnownTag ? meta.title ?? tag : tag, description: seoDescription }
     }
@@ -85,8 +81,8 @@ const pageSeo: HeadProps = {
 };
 ---
 <BaseLayout headProps={pageSeo}>
-  <PaginationRedirect basePath={`/tags/${tag}`} currentPage={currentPage} />
-  <PaginationSeo basePath={`/tags/${tag}`} currentPage={currentPage} totalPages={totalPages} />
+  <PaginationRedirect basePath={`/category/${tag}`} currentPage={currentPage} />
+  <PaginationSeo basePath={`/category/${tag}`} currentPage={currentPage} totalPages={totalPages} />
 
   <Fragment slot="headContent-top" />
   <Fragment slot="headContent-bottom" />

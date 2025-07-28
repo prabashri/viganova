@@ -2,9 +2,9 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { transform } from 'lightningcss';
-import { writeManifestEntry } from '../utils/write-manifest.ts'; // or `.ts` if available
+import { writeManifestEntry } from '../utils/write-manifest.ts';
 
-const inlineDir = path.resolve('./src/styles/inline');
+const inlineDir = path.resolve('./src/styles-css/inline');
 const outputModule = path.resolve('./src/data/generated-inline-css.ts');
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
 const manifestKey = 'inline';
@@ -51,7 +51,7 @@ async function buildInlineModule(): Promise<void> {
     return;
   }
 
-  // Combine and minify
+  // 🔧 Combine and minify
   let combinedCss = '';
   for (const file of cssFiles) {
     const content = await fs.readFile(path.join(inlineDir, file), 'utf8');
@@ -61,24 +61,20 @@ async function buildInlineModule(): Promise<void> {
   const { code } = transform({
     filename: 'inline.css',
     code: Buffer.from(combinedCss),
-    targets: {
-      chrome: 100,
-      firefox: 100,
-      safari: 15,
-      edge: 100
-    },
+    targets: { chrome: 100, firefox: 100, safari: 15, edge: 100 },
     minify: true
   });
 
-  const jsExport = `export const inlineCss = ${JSON.stringify(code.toString())};\n`;
+  const finalCss = code.toString();
+  const jsExport = `export const inlineCss = ${JSON.stringify(finalCss)};\n`;
 
   await fs.mkdir(path.dirname(outputModule), { recursive: true });
   await fs.writeFile(outputModule, jsExport, 'utf8');
-
   await writeManifestEntry('css', manifestKey, outputPublicPath);
 
-  console.log(`🆕 Inline CSS module written: ${outputModule}`);
+  const sizeBytes = Buffer.byteLength(finalCss);
+  const sizeKb = (sizeBytes / 1024).toFixed(2);
+  console.log(`✅ Inline CSS generated (${sizeBytes} bytes ≈ ${sizeKb} KB) → ${outputModule}`);
 }
 
 buildInlineModule().catch(console.error);
-

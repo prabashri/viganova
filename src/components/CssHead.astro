@@ -1,6 +1,6 @@
 ---
 import manifest from '../data/assets-manifest.json';
-import { inlineCss } from '../data/generated-inline-css.js';
+import { inlineCss } from '../data/generated-inline-css.ts';
 
 
 const isDev = import.meta.env.DEV;
@@ -22,6 +22,9 @@ if (isDev) {
   preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
   nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
 }
+preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
+  nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
+
 
 ---
 {/* -- ✅ Preload fonts --*/}
@@ -29,13 +32,11 @@ if (isDev) {
 <link rel="preload" href="/fonts/Inter-Bold-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
 
 
-{/* -- ✅ Inline critical CSS --*/}
-
 {/* -- ✅ PROD: Inline critical CSS -- */}
-{!isDev && inlineCss && <style is:inline>{inlineCss}</style>}
+{inlineCss && <style id="inline-css" set:html={inlineCss} />}
 
 {/* -- ✅ PROD: Preload + load main CSS -- */}
-{!isDev && preloadCssFiles[0] && (
+{ preloadCssFiles[0] && (
   <>
     <link rel="preload" as="style" href={preloadCssFiles[0]} data-swap="true" />
     <link rel="stylesheet" href={preloadCssFiles[0]} fetchpriority="high" />
@@ -43,6 +44,6 @@ if (isDev) {
 )}
 
 {/* -- ✅ PROD: Load non-critical CSS with media="print" + data-swap -- */}
-{!isDev && nonCriticalCssFiles[0] && (
+{ nonCriticalCssFiles[0] && (
   <link rel="stylesheet" href={nonCriticalCssFiles[0]} media="print" data-swap="true" />
 )}

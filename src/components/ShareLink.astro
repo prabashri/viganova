@@ -23,8 +23,8 @@ const {
   iconSize = 'w-1-5 h-1-5'
 } = Astro.props;
 
-const pageTitle = titleProp || Astro.props.page?.title || '';
-const pageDescription = descProp || Astro.props.page?.description || '';
+const pageTitle = titleProp || Astro.props.title || '';
+const pageDescription = descProp || Astro.props.description || '';
 let resolvedUrl = urlProp || Astro.url?.pathname || '/';
 
 // Resolve relative URL using domain
@@ -79,20 +79,6 @@ function toIconName(name: string) {
 }
 ---
 
-<style>
-  .sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-    border: 0;
-  }
-</style>
-
 <nav
   id={id}
   aria-label="Share this page"
@@ -134,7 +120,7 @@ function toIconName(name: string) {
         data-action="share"
         title="Copy Link"
         aria-label="Copy Link"
-        class="flex center bg-col-ff h-30 w-30 br hover-bs-1-1-8-2-base-100 no-border"
+        class="flex center bg-col-ff h-30 w-30 br hover-bs-1-1-8-2-base-100 border-none"
       >
         <Icon name="clipboard" class={iconSize} />
         <span class="sr-only">Copy Link</span>
