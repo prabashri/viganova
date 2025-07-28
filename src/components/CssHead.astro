@@ -9,19 +9,9 @@ let inlineCssFiles: string[] = [];
 let preloadCssFiles: string[] = [];
 let nonCriticalCssFiles: string[] = [];
 
-if (isDev) {  
-  import.meta.glob([
-    '../styles-css/inline/**/*.css',
-    '../styles-css/preload/**/*.css',
-    '../styles-css/non-critical/**/*.css'
-  ], { eager: true });
 
-// Removed invalid import statement; not needed here
-  
-} else {
-  preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
+preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
   nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
-}
 ---
 {/* -- ✅ Preload fonts --*/}
 <link rel="preload" href="/fonts/Inter-Regular-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
