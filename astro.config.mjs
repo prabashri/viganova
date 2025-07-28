@@ -17,7 +17,7 @@ export default defineConfig({
   }),
   build: {
     // Inline stylesheets up to 6KB
-    inlineStylesheets: "always",
+    inlineStylesheets: "auto",
   },
   output: 'server',
   trailingSlash: 'always', 
