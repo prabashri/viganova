@@ -1,7 +1,4 @@
-@import url('/src/styles-css/inline/base.css');
-@import url('/src/styles-css/inline/color.css');
-@import url('/src/styles-css/inline/header.css');
-@import url('/src/styles-css/non-critical/non-critical.css');
-@import url('/src/styles-css/preload/utilities.css');
-@import url('/src/styles-css/preload/components.css');  
-@import url('/src/styles-css/preload/form.css');
+@import url('/src/styles/non-critical/non-critical.css');
+@import url('/src/styles/preload/utilities.css');
+@import url('/src/styles/preload/components.css');  
+@import url('/src/styles/preload/form.css');
