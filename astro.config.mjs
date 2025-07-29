@@ -19,6 +19,8 @@ export default defineConfig({
   trailingSlash: 'always', 
   
     vite: {
+      
+    
       resolve: {
         alias: {
           '@': path.resolve('./src')

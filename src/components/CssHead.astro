@@ -4,11 +4,11 @@ import { inlineCss } from '../data/generated-inline-css.ts';
 
 
 const isDev = import.meta.env.DEV;
+let cssFiles: string[] = [];
 
-let inlineCssFiles: string[] = [];
+
 let preloadCssFiles: string[] = [];
 let nonCriticalCssFiles: string[] = [];
-
 
 preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
   nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
@@ -35,4 +35,15 @@ preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc1
 {/* -- ✅ PROD: Load non-critical CSS with media="print" + data-swap -- */}
 { !isDev &&nonCriticalCssFiles[0] && (
   <link rel="stylesheet" data-href={nonCriticalCssFiles[0]} data-swap="true" />
+)}
+{isDev && (
+  <>
+    <link rel="stylesheet" href="/src/styles-css/preload/utilities.css" />
+    <link rel="stylesheet" href="/src/styles-css/preload/components.css" />
+    <link rel="stylesheet" href="/src/styles-css/preload/form.css" />
+    <link rel="stylesheet" href="/src/styles-css/inline/base.css" />
+    <link rel="stylesheet" href="/src/styles-css/inline/color.css" />
+    <link rel="stylesheet" href="/src/styles-css/inline/header.css" />
+    <link rel="stylesheet" href="/src/styles-css/non-critical/non-critical.css" />
+  </>
 )}
