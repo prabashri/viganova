@@ -40,9 +40,6 @@ async function loadSearchAssets() {
   }
 }
 
-
-
-
 // Highlight helpers
 function highlightMatch(text, indices = []) {
   const frag = document.createDocumentFragment();
@@ -96,31 +93,42 @@ function createSnippet(text, query) {
 // Modal Mode
 function initSearchModal(fuse) {
   const modal = document.getElementById('search-modal');
-  const modalContent = modal?.querySelector('.search-modal-content');
-  const input = document.getElementById('search-modal-input');
-  const button = document.getElementById('global-search-button');
-  const closeBtn = document.getElementById('close-search-modal');
-  const results = document.getElementById('search-modal-results');
+  const modalContent = modal ? modal.querySelector('.search-modal-content') : null;
+  const input = /** @type {HTMLInputElement|null} */ (document.getElementById('search-modal-input'));
+  const button = /** @type {HTMLButtonElement|null} */ (document.getElementById('global-search-button'));
+  const closeBtn = /** @type {HTMLButtonElement|null} */ (document.getElementById('close-search-modal'));
+  const results = /** @type {HTMLUListElement|null} */ (document.getElementById('search-modal-results'));
 
-  if (!modal || !input || !results || !button) return;
+  if (!modal || !input || !results || !button || !modalContent) return;
 
+  // 🔹 Trap focus within modal
   let removeTrap = () => {};
   function trapFocus(container) {
-    const focusable = container.querySelectorAll('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    function handle(e) {
+    function handleFocusTrap(e) {
       if (e.key !== 'Tab') return;
+
+      const focusable = container.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
       if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault(); last.focus();
+        e.preventDefault();
+        last.focus();
       } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault(); first.focus();
+        e.preventDefault();
+        first.focus();
       }
     }
-    container.addEventListener('keydown', handle);
-    return () => container.removeEventListener('keydown', handle);
+
+    container.addEventListener('keydown', handleFocusTrap);
+    return () => container.removeEventListener('keydown', handleFocusTrap);
   }
 
+  // 🔹 Show search results
   function showResults(query) {
     results.innerHTML = '';
     if (!fuse || query.length < 2) return;
@@ -160,7 +168,8 @@ function initSearchModal(fuse) {
     }
   }
 
-  async function openModal() {
+  // 🔹 Open & close modal
+  function openModal() {
     modal.classList.remove('hidden');
     modal.setAttribute('aria-hidden', 'false');
     input.focus();
@@ -176,23 +185,37 @@ function initSearchModal(fuse) {
     button.focus();
   }
 
+  // 🔹 Event listeners
   button.addEventListener('click', openModal);
   closeBtn?.addEventListener('click', closeModal);
 
+  // Close on outside click
+  document.addEventListener('mousedown', (e) => {
+    if (!modal.classList.contains('hidden') && !modalContent.contains(e.target)) {
+      closeModal();
+    }
+
+  });
+
+  // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-      e.preventDefault(); closeModal();
+      e.preventDefault();
+      closeModal();
     }
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-      e.preventDefault(); openModal();
+      e.preventDefault();
+      openModal();
     }
   });
 
+  // Live search input
   input.addEventListener('input', () => {
     const query = input.value.trim();
     showResults(query);
   });
 }
+
 
 // Page Mode
 function initSearchPage(fuse) {

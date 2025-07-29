@@ -1,7 +1,6 @@
 ---
 // src/components/navigation/ThemeLightDark.astro
 import { Icon } from 'astro-icon/components';
-import searchIndex from '/public/search-index.json';
 import manifest from '../../data/assets-manifest.json'; // no destructuring here
 
 const searchIndexPath = manifest.json?.['search-index']?.file || '';
@@ -9,11 +8,12 @@ const searchScriptPath = manifest.js?.['search']?.file || '';
 
 ---
 { (searchIndexPath && searchScriptPath) && (
-  <div id="global-search-button" class="flex flex-row relative h-2-0 w-2-0 mb-1 as-f-start">
-    <!-- Trigger -->
-    <button id="global-search-button" aria-label="Open search" class="search-trigger">🔍</button>
-
-    <!-- Modal -->
+  <div id="global-search-button" class="flex flex-row relative h-2-0 w-2-0 mb-1 as-f-start">    
+    <button id="global-search-button" aria-label="Open search" class="search-trigger">
+      __<Icon name="search" class="w-1-5 h-1-5" />
+      <span class="sr-only">Search</span>
+    </button>
+    
     <div id="search-modal" class="search-modal hidden" role="dialog" aria-modal="true" aria-label="Site search dialog">
       <div class="search-modal-content" tabindex="-1">
         <button id="close-search-modal" aria-label="Close search">✖</button>
@@ -56,10 +56,16 @@ const searchScriptPath = manifest.js?.['search']?.file || '';
     </div>
   </div>
   <style>
+    .search-trigger{
+      background: red;
+      border: 1px solid #ccc;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
     .search-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.75);
+  /* background: rgba(0,0,0,0.75); */
   display: flex;
   justify-content: center;
   align-items: start;

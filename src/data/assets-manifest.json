@@ -9,8 +9,8 @@
       "datetime": "2025-07-28T08:47:27.788Z"
     },
     "nonCritical": {
-      "file": "/styles/non-critical.9l2ski.min.css",
-      "datetime": "2025-07-27T15:30:51.866Z"
+      "file": "/styles/non-critical.m5ntj8.css",
+      "datetime": "2025-07-29T03:37:39.127Z"
     }
   },
   "preload": {
@@ -34,9 +34,6 @@
     }
   },
   "icons": {
-    "favicon.ico": {
-      "datetime": "2025-07-28T13:56:01.348Z"
-    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -64,8 +61,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.cawtk6.json",
-      "datetime": "2025-07-28T13:55:45.107Z"
+      "file": "/search-index.nvony8.json",
+      "datetime": "2025-07-29T03:58:25.439Z"
     }
   }
 }

@@ -7,6 +7,8 @@ import type { HeadProps } from '../types/HeadProps';
 import Rss from './Rss.astro';
 import ImagePreload from './ImagePreload.astro';
 
+import globalcss from '../styles/global.css';
+
 
 const props: HeadProps = {
   ...Astro.props,
@@ -35,6 +37,8 @@ const {
   breadcrumb = [],
   listItems = [],
 } = props;
+
+const isDev = import.meta.env.DEV;
 
 const imageUrl =
   typeof image === 'string' ? new URL(image, Astro.site).toString() : siteDefaults.image;
@@ -264,7 +268,8 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 {breadcrumbJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />}
 {rssEnabled && <script is:inline type="application/ld+json" set:html={JSON.stringify(rssSchema)} />}
 
-<>
+{ !isDev &&(
+  <>
 <script is:inline>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(() => {
@@ -276,3 +281,4 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 </script>
   <!--<script is:inline src="/scripts/headerMenu.js?v=1.0.1" defer /> -->
 </>
+)}

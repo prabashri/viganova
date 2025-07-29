@@ -1,0 +1,112 @@
+:root{ 
+	/* Common transitions for UI elements (e.g., buttons, links) */
+  	--transition-common: background-color 0.2s ease, color 0.2s ease, fill 0.2s ease, stroke 0.2s ease;
+  	--transition-box-shadow: box-shadow 0.2s ease;
+	/* Transform-only transitions (e.g., icons, cards, modals) */
+	--transition-transform: transform 0.3s ease;
+	/* Opacity + transform combo for fades/slides */
+	--transition-fade-slide: opacity 0.3s ease, transform 0.3s ease;
+	/* Border-only (for custom outlines or hover borders) */
+	--transition-border: border-color 0.2s ease;
+
+	--success-light:rgb(163, 255, 176);
+  	--success:rgb(0, 200, 0);
+  	--success-dark:rgb(0, 100, 0);
+
+  	--error:rgb(255, 52, 37);
+  	--error-light:rgb(255, 191, 186);
+  	--error-dark:rgb(151, 10, 0);
+
+  	--alert:rgb(211, 153, 5);
+  	--alert-light:rgb(255, 228, 137);
+  	--alert-dark:rgb(172, 74, 0);
+}
+/* Inter Italic */
+  @font-face {
+	font-family: 'Inter';
+	src: local('Inter Italic'), local('Inter-Italic'),
+		 url('/fonts/Inter-Italic-Subset.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+  }
+  /* Inter Bold Italic */
+  @font-face {
+	font-family: 'Inter';
+	src: local('Inter Bold Italic'), local('Inter-BoldItalic'),
+		 url('/fonts/Inter-BoldItalic-Subset.woff2') format('woff2');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+  }
+  /* Roboto Mono Italic */
+  @font-face {
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono Italic'), local('RobotoMono-Italic'),
+		 url('/fonts/RobotoMono-Italic-Subset.woff2') format('woff2');
+	font-weight: 400;
+	font-style: italic;
+	font-display: swap;
+  }
+   /* Roboto Mono Regular */
+  @font-face {
+  font-family: 'Roboto Mono';
+  src: url('/fonts/RobotoMono-Regular-Subset.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+ /* Roboto Mono Bold */
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url('/fonts/RobotoMono-Bold-Subset.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+  /* Roboto Mono Bold Italic */
+  @font-face {
+	font-family: 'Roboto Mono';
+	src: local('Roboto Mono Bold Italic'), local('RobotoMono-BoldItalic'),
+		 url('/fonts/RobotoMono-BoldItalic-Subset.woff2') format('woff2');
+	font-weight: 700;
+	font-style: italic;
+	font-display: swap;
+  }
+
+blockquote {
+  border-left: 4px solid var(--secondary);
+  padding-left: 1rem;
+  margin-block: 1rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--base-40);
+}
+ 
+code {
+  font-family: var(--font-family-mono);
+  font-size: clamp(0.88rem, 0.795rem + 0.398vw, 1.09rem);
+  background-color: #eaeaea;
+  padding: 0.1em 0.3em;
+  border-radius: var(--border-radius);
+}
+
+pre {
+  font-family: var(--font-family-mono);
+  font-size: clamp(0.88rem, 0.795rem + 0.398vw, 1.09rem);
+  background-color: var(--base-90);
+  color: var(--base-00);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.focus-outline {
+  outline: 2px dashed var(--primary-color-light);
+  outline-offset: 2px;
+}
+
+

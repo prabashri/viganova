@@ -1,0 +1,163 @@
+.sr-only {
+	border: 0;
+	padding: 0;
+	margin: 0;
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
+	clip: rect(1px 1px 1px 1px);
+	/* maybe deprecated but we need to support legacy browsers */
+	clip: rect(1px, 1px, 1px, 1px);
+	/* modern browsers, clip-path works inwards from each corner */
+	clip-path: inset(50%);
+	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
+	white-space: nowrap;
+}
+.image-link {
+    border-bottom: none;
+}
+.image-link:hover {
+    border-bottom: solid 2px var(--secondary-color);
+    background-color: unset;
+}
+
+
+
+.primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6em 1.2em;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.2;
+  border: 2px solid var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--base-00);
+  border-radius: 6px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.primary-button:hover, .primary-button:focus-visible {
+    background-color: var(--primary-color-lighter);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05); 
+    outline: none;
+    color: var(--base-100);
+}
+.primary-button:active {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+.primary-button:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.primary-button:disabled,
+.primary-button[aria-disabled="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.tool-button {
+    padding: clamp(0.2rem, calc(0.091rem + 0.545vw), 0.5rem);
+    background-color: var(--primary-color-light);
+    color: #000;
+    border-radius: var(--border-radius);
+    font-size: var(--cg-font-small);
+    border: 1px solid transparent;
+}
+.tool-button.active {
+    background-color: var(--primary-color);
+    color: var(--base-00);
+}
+.tool-button:hover {
+    border: 1px solid var(--base-100);
+    color: var(--primary-color);
+    background-color: var(--base-00);
+}
+
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Add this if not using Tailwind */
+#installAppBtn.animate-pulse {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulseSafe {
+  0%   { transform: scale(1); opacity: 1; }
+  50%  { transform: scale(1.1); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.heart {
+  display: inline-block;
+  animation: pulseSafe 1.8s infinite;
+  will-change: transform, opacity;
+}
+
+/* faq css */
+.faq-item {
+    margin-bottom: 1rem;
+    border: 1px solid var(--primary-color-light, #ddd);
+    border-radius: 6px;
+    background: var(--base-10);
+    overflow: hidden;
+    transition: 0.3s;
+}
+.faq-item[open] .faq-answer {
+    max-height: 500px;
+    padding: 0px 1rem 1rem;
+}
+.faq-item summary {
+    font-weight: var(--font-weight-regular);
+    font-size: var(--cg-font-base);
+    cursor: pointer;
+    position: relative;
+    padding: 1rem;
+    list-style: none;
+}
+.faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 1rem;
+    font-size: 1.2rem;
+    transition: transform 0.3s;
+}
+.faq-item[open] summary::after {
+    content: "-";
+}
+.faq-answer {
+    max-height: 0px;
+    color: var(--cg-text-secondary, #666);
+    overflow: hidden;
+    padding: 0px 1rem;
+    transition: max-height 0.3s, padding 0.3s;
+	color: var(--base-90);
+}
+
+.tab-button.active {
+  border-color: var(--base-100);
+  color: var(--base-100);
+}
+
+.icon-primary {
+  fill: var(--primary-light, #a55aff);
+}   
+.icon-link:hover .icon-primary{
+    fill: revert-layer;
+}

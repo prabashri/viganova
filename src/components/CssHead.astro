@@ -16,34 +16,34 @@ preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc1
 {/* -- ✅ Preload fonts --*/}
 <link rel="preload" href="/fonts/Inter-Regular-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Inter-Bold-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
-{ !isDev && preloadCssFiles[0] && (
+{ preloadCssFiles[0] && (
   <>
     <link rel="preload" as="style" href={preloadCssFiles[0]} />
   </>
 )}
 
 {/* -- ✅ PROD: Inline critical CSS -- */}
-{ !isDev && inlineCss && <style id="inline-css" set:html={inlineCss} />}
+{  inlineCss && <style id="inline-css" set:html={inlineCss} />}
 
 {/* -- ✅ PROD: Preload + load main CSS -- */}
-{ !isDev &&preloadCssFiles[0] && (
+{  preloadCssFiles[0] && (
   <>
     <link rel="stylesheet" href={preloadCssFiles[0]} fetchpriority="high" />
   </>
 )}
 
 {/* -- ✅ PROD: Load non-critical CSS with media="print" + data-swap -- */}
-{ !isDev &&nonCriticalCssFiles[0] && (
+{ nonCriticalCssFiles[0] && (
   <link rel="stylesheet" data-href={nonCriticalCssFiles[0]} data-swap="true" />
 )}
 {isDev && (
   <>
-    <link rel="stylesheet" href="/src/styles-css/preload/utilities.css" />
-    <link rel="stylesheet" href="/src/styles-css/preload/components.css" />
-    <link rel="stylesheet" href="/src/styles-css/preload/form.css" />
-    <link rel="stylesheet" href="/src/styles-css/inline/base.css" />
-    <link rel="stylesheet" href="/src/styles-css/inline/color.css" />
-    <link rel="stylesheet" href="/src/styles-css/inline/header.css" />
-    <link rel="stylesheet" href="/src/styles-css/non-critical/non-critical.css" />
+    <script src="/src/styles-css/preload/utilities.css" />
+    <script src="/src/styles-css/preload/components.css" />
+    <script src="/src/styles-css/preload/form.css" />
+    <script src="/src/styles-css/inline/base.css" />
+    <script src="/src/styles-css/inline/color.css" />
+    <script src="/src/styles-css/inline/header.css" />
+    <script src="/src/styles-css/non-critical/non-critical.css" />
   </>
 )}
