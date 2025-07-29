@@ -1092,6 +1092,9 @@ svg use {
 	.md-display-flex {
 		display: flex !important;
 	}
+	.md-wrap {
+		flex-wrap: wrap;
+	}
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
@@ -1122,6 +1125,10 @@ svg use {
 	.lg-jc-center {
 		justify-content: center;
 	}
+	.lg-wrap {
+		flex-wrap: wrap;
+	}
+	
 }
 
 @media(max-width:920px) {

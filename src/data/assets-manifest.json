@@ -34,6 +34,9 @@
     }
   },
   "icons": {
+    "favicon.ico": {
+      "datetime": "2025-07-29T06:16:45.426Z"
+    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -61,8 +64,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.nvony8.json",
-      "datetime": "2025-07-29T03:58:25.439Z"
+      "file": "/search-index.0910vb.json",
+      "datetime": "2025-07-29T06:16:27.678Z"
     }
   }
 }

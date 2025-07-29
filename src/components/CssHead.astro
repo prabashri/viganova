@@ -2,10 +2,20 @@
 import manifest from '../data/assets-manifest.json';
 import { inlineCss } from '../data/generated-inline-css.ts';
 
+const devCssOrder = [
+  '/src/styles-css/inline/base.css',
+  '/src/styles-css/inline/color.css',
+  '/src/styles-css/inline/header.css',
+  '/src/styles-css/preload/components.css',
+  '/src/styles-css/preload/form.css',
+  '/src/styles-css/preload/utilities.css',
+  '/src/styles-css/non-critical/non-critical.css'
+];
+
+
 
 const isDev = import.meta.env.DEV;
 let cssFiles: string[] = [];
-
 
 let preloadCssFiles: string[] = [];
 let nonCriticalCssFiles: string[] = [];
@@ -36,14 +46,7 @@ preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc1
 { nonCriticalCssFiles[0] && (
   <link rel="stylesheet" data-href={nonCriticalCssFiles[0]} data-swap="true" />
 )}
-{isDev && (
-  <>
-    <script src="/src/styles-css/preload/utilities.css" />
-    <script src="/src/styles-css/preload/components.css" />
-    <script src="/src/styles-css/preload/form.css" />
-    <script src="/src/styles-css/inline/base.css" />
-    <script src="/src/styles-css/inline/color.css" />
-    <script src="/src/styles-css/inline/header.css" />
-    <script src="/src/styles-css/non-critical/non-critical.css" />
-  </>
-)}
+
+{isDev && devCssOrder.map(href => (
+  <link rel="stylesheet" href={`${href}?t=${import.meta.hot?.data?.timestamp ?? Date.now()}`} />
+))}
