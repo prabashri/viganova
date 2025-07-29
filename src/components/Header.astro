@@ -1,9 +1,10 @@
 ---
 import Anchor from "./ui/Anchor.astro";
 import Button from "./ui/Button.astro";
-import { siteNav, primaryCTA, secondaryNavigation, headerStyle } from '../config/navigation'
+import { siteNav, primaryCTA, secondaryNavigation, headerStyle, searchIconEnable } from '../config/navigation'
 import Logo from './navigation/Logo.astro'
 import ThemeLightDark from './navigation/ThemeLightDark.astro';
+import SearchIcon from './navigation/SearchIcon.astro';
 import { Icon } from 'astro-icon/components';
 import NavLinkItem from './navigation/NavLinkItem.astro';
 import NavButton from './navigation/NavButton.astro';
@@ -53,25 +54,11 @@ const navClasses = [
   modeMapNav[headerStyle.mode],
 ].filter(Boolean).join(' ');
 
-const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.length > 0 ) ? "lg-w-full order-2 lg-order-3" : "order-2 lg-order-2";
+const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.length > 0 ) ? "md-w-full lg-w-full order-2 md-order-3 lg-order-3" : "order-2 lg-order-2"; 
 
 ---
-<style id="header-style" is:global>
-  /* Header styles */
-  .header {
-    color: aliceblue;
-  }
-  .main-nav {
-    color: var(--base-100);
-  }
-  .secondary-nav {
-   color: var(--base-100);
-  }
-
-</style>
-
 <header class={headerClasses}>
-  <div class="flex flex-row mx-w-site w-full relative gap-05 mi-auto ai-center jc-space-between lg-wrap md-wrap">
+  <div class="flex flex-col big-flex-row mx-w-site w-full relative gap-05 mi-auto ai-f-start big-ai-center jc-space-between lg-wrap md-wrap">
     {/* LOGO */}
     <div class="flex flex-row wrap gap-05 mx-w-site w-auto sm-w-full mb-0 ai-center jc-space-between">
       <Logo />
@@ -94,9 +81,14 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
 
     {/* NAV ITEMS */}
     {siteNav.length > 0 && (
-    <nav id="main-nav" class={`main-nav sm-bg scroll-container flex flex-row text-small ${navClasses} p-05 gap br-1 sm-br col-base-100 z-1000 big-display-inherit ${navOrder}`} itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Primary site navigation">
+    <nav 
+      id="main-nav" 
+      class={`main-nav sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 full-p-05 gap br full-br-1 col-base-100 z-1000 big-display-inherit ${navOrder}`} 
+      itemscope itemtype="https://schema.org/SiteNavigationElement" 
+      aria-label="Primary site navigation"
+      >
       {/* Logo for Desktop */}
-      <ul class="nav-list flex ai-center lg-w-full lg-jc-center no-bullets gap sm-flex-col sm-ai-start">
+      <ul class="nav-list flex ai-center lg-w-full jc-center no-bullets gap sm-flex-col sm-ai-start">
       {/* Loop through siteNav items */}
       {Array.isArray(siteNav) && siteNav.map((item, navIndex) => (           
           <li
@@ -173,23 +165,35 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     )}
     {/* Primary CTA Button */}
     {primaryCTA.length > 0 && ( 
-      <div id="main-nav-cta" class="flex br sm-bg sm-w-full p-05 ai-center gap-05 order-3 lg-order-2" aria-label="Primary Call to Action">
-        {/* Theme Toggle */}
-        <ThemeLightDark />
-        {/* Loop through primaryCTA items */}
-        {primaryCTA.map((cta) => (
-          <Anchor
-            href={cta.href}
-            title={cta.title || cta.label}
-            variant={cta.variant || 'primary'}
-            ariaLabel={cta.ariaLabel || cta.label}
-            className={cta.icon ? 'flex ai-center ac-center gap-05' : ''}
-          >
-            {cta.icon && <img src={cta.icon} alt={cta.altText || cta.label} width="24" class="w-20 inline" />}
-            {cta.label}
-          </Anchor>
-        ))}
-
+      <div 
+        id="main-nav-cta" 
+        class="flex flex-col big-flex-row br sm-bg w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
+        aria-label="Primary Call to Action"
+      >  
+        <div class="flex flex-row gap ai-center jc-center">
+          {/* Search Icon */}
+          {searchIconEnable && (
+            <SearchIcon />
+          )}
+          {/* Theme Toggle */}
+          <ThemeLightDark />
+        </div>           
+        
+        <div class="flex flex-row gap ai-center jc-center">
+          {/* Loop through primaryCTA items */}
+          {primaryCTA.map((cta) => (
+            <Anchor
+              href={cta.href}
+              title={cta.title || cta.label}
+              variant={cta.variant || 'primary'}
+              ariaLabel={cta.ariaLabel || cta.label}
+              className={cta.icon ? 'flex ai-center ac-center gap-05' : ''}
+            >
+              {cta.icon && <img src={cta.icon} alt={cta.altText || cta.label} width="24" class="w-20 inline" />}
+              {cta.label}
+            </Anchor>
+          ))}
+        </div>
       </div>
     )}
      
@@ -275,141 +279,3 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     </nav>
   )}
 </header>
-<script id="header-script" type="module">
-  'use strict';
-(() => {
-  
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById('menu-toggle');
-	
-    const targetIds = ['main-nav', 'main-nav-cta', 'secondary-nav'];
-
-    const hamburgerIcon = document.getElementById('menu-icon');
-    const closeIcon = document.getElementById('close-icon');
-
-    const selector = toggleBtn.getAttribute('data-targets');
-	
-    const targets = selector
-    ? selector.split(',').map((s) => document.querySelector(s.trim())).filter(Boolean)
-    : [];
-
-    const navItems = document.querySelectorAll('.nav-item.dropdown');
-    const activeClass = 'dropdown-active';
-    let isDesktop = window.matchMedia('(min-width: 768px)').matches;
-
-    // Cache dropdown buttons and menus
-    navItems.forEach(item => {
-      item._button = item.querySelector('button[data-action]');
-      item._menu = item.querySelector('.dropdown-menu');
-    });
-
-    // Toggle mobile menu (hamburger)
-     toggleBtn.addEventListener('click', () => {
-										console.log('Toggle button clicked');
-      const isOpen = targets[0]?.classList.contains('is-open');
-      const willOpen = !isOpen;
-
-      targets.forEach((el) => el.classList.toggle('is-open', willOpen));
-      toggleBtn.setAttribute('aria-expanded', String(willOpen));
-      hamburgerIcon?.classList.toggle('display-none', willOpen);
-      closeIcon?.classList.toggle('display-none', !willOpen);
-    });
-
-
-    // Dropdown open/close logic
-    const openMenu = (item) => {
-      item.classList.add(activeClass);
-      item._menu?.setAttribute('aria-hidden', 'false');
-      item._button?.setAttribute('aria-expanded', 'true');
-    };
-
-    const closeMenu = (item) => {
-      item.classList.remove(activeClass);
-      item._menu?.setAttribute('aria-hidden', 'true');
-      item._button?.setAttribute('aria-expanded', 'false');
-    };
-
-    const closeAllMenusExcept = (exceptItem) => {
-      navItems.forEach(item => {
-        if (item !== exceptItem) closeMenu(item);
-      });
-    };
-
-    const setupNavBehavior = () => {
-      navItems.forEach(item => {
-        const button = item._button;
-        const menu = item._menu;
-        if (!button || !menu) return;
-
-        // Cleanup previous listeners
-        item.removeEventListener('mouseenter', item._hoverIn);
-        item.removeEventListener('mouseleave', item._hoverOut);
-        button.onclick = null;
-
-        if (isDesktop) {
-          // Hover behavior
-          item._hoverIn = () => openMenu(item);
-          item._hoverOut = () => closeMenu(item);
-          item.addEventListener('mouseenter', item._hoverIn);
-          item.addEventListener('mouseleave', item._hoverOut);
-
-          // Click toggles
-          button.onclick = (e) => {
-            e.preventDefault();
-            const isOpen = item.classList.contains(activeClass);
-            if (isOpen) {
-              closeMenu(item);
-            } else {
-              closeAllMenusExcept(item);
-              openMenu(item);
-            }
-          };
-
-          // Focus management
-          button.addEventListener('focusout', (e) => {
-            setTimeout(() => {
-              if (!item.contains(document.activeElement)) closeMenu(item);
-            }, 100);
-          });
-
-        } else {
-          // Mobile click-only toggle
-          button.onclick = (e) => {
-            e.preventDefault();
-            const isOpen = item.classList.contains(activeClass);
-            if (isOpen) {
-              closeMenu(item);
-            } else {
-              closeAllMenusExcept(item);
-              openMenu(item);
-            }
-          };
-        }
-      });
-    };
-
-    // Initial setup
-    setupNavBehavior();
-
-    // Throttled resize listener
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        const newIsDesktop = window.matchMedia('(min-width: 768px)').matches;
-        if (newIsDesktop !== isDesktop) {
-          isDesktop = newIsDesktop;
-          setupNavBehavior();
-        }
-      }, 150);
-    });
-
-    // Close all dropdowns when clicking outside
-    document.addEventListener('click', (e) => {
-      navItems.forEach(item => {
-        if (!item.contains(e.target)) closeMenu(item);
-      });
-    });
-  });
-})();
-</script>

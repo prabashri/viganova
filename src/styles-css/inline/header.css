@@ -107,8 +107,6 @@ svg use {
   .big-absolute{
     position: absolute !important;
   }
-
-
 }
 
 @media (max-width: 768px) {
@@ -140,17 +138,13 @@ svg use {
   #secondary-nav {
     display: none !important;
   }
+#main-nav.is-open, #main-nav-cta.is-open, #secondary-nav.is-open {
+    
+    display: flex!important;
+}
 
-  #main-nav.is-open,
-  #main-nav-cta.is-open,
-  #secondary-nav.is-open {
-    display: flex !important;
-    flex-direction: column;
-  }
 
-  #main-nav-cta.is-open {
-    align-items: flex-start;    
-  }
+
 .scroll-container::-webkit-scrollbar {
   width: 8px;
 }

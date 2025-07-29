@@ -2,41 +2,42 @@
   "css": {
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-07-28T07:49:30.615Z"
+      "datetime": "2025-07-29T16:17:16.402Z",
+      "names": [
+        "base",
+        "color",
+        "header"
+      ]
     },
     "main": {
-      "file": "/styles/main.3vx590.css",
-      "datetime": "2025-07-28T08:47:27.788Z"
+      "file": "/styles/main.x5vbmy.css",
+      "datetime": "2025-07-29T16:17:34.544Z",
+      "names": [
+        "components",
+        "form",
+        "utilities"
+      ]
     },
     "nonCritical": {
-      "file": "/styles/non-critical.m5ntj8.css",
-      "datetime": "2025-07-29T03:37:39.127Z"
-    }
-  },
-  "preload": {
-    "components.css": {
-      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles-css\\preload\\components.css",
-      "datetime": "2025-07-28T08:47:27.723Z"
-    },
-    "form.css": {
-      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles-css\\preload\\form.css",
-      "datetime": "2025-07-28T08:47:27.728Z"
-    },
-    "utilities.css": {
-      "file": "D:\\Onedrive\\websites\\astroweb-template-ssr\\src\\styles-css\\preload\\utilities.css",
-      "datetime": "2025-07-28T08:47:27.756Z"
+      "file": "/styles/non-critical.sz7vef.css",
+      "datetime": "2025-07-29T16:17:42.340Z",
+      "names": [
+        "non-critical",
+        "search-icon"
+      ]
     }
   },
   "js": {
     "search": {
-      "file": "/scripts/search.t9nimk.min.js",
-      "datetime": "2025-07-26T04:35:43.715Z"
+      "file": "/scripts/search.7i7vy1.min.js",
+      "datetime": "2025-07-29T16:24:16.566Z"
+    },
+    "main": {
+      "file": "/scripts/main.ow9o4z.min.js",
+      "datetime": "2025-07-29T16:24:16.464Z"
     }
   },
   "icons": {
-    "favicon.ico": {
-      "datetime": "2025-07-29T06:16:45.426Z"
-    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -64,8 +65,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.0910vb.json",
-      "datetime": "2025-07-29T06:16:27.678Z"
+      "file": "/search-index.2jtfm4.json",
+      "datetime": "2025-07-29T15:19:49.495Z"
     }
   }
 }

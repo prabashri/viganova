@@ -1,4 +1,3 @@
-
 svg use {
 	pointer-events: none
 }
@@ -107,8 +106,6 @@ svg use {
   .big-absolute{
     position: absolute !important;
   }
-
-
 }
 
 @media (max-width: 768px) {
@@ -140,44 +137,35 @@ svg use {
   #secondary-nav {
     display: none !important;
   }
-
-  #main-nav.is-open,
-  #main-nav-cta.is-open,
-  #secondary-nav.is-open {
-    display: flex !important;
-    flex-direction: column;
+  #main-nav.is-open, #main-nav-cta.is-open, #secondary-nav.is-open {
+      
+      display: flex!important;
+  }
+  .scroll-container::-webkit-scrollbar {
+    width: 8px;
   }
 
-  #main-nav-cta.is-open {
-    align-items: flex-start;    
+  .scroll-container::-webkit-scrollbar-thumb {
+    background-color: rgba(100, 100, 100, 0.3);
+    border-radius: 4px;
   }
-.scroll-container::-webkit-scrollbar {
-  width: 8px;
-}
 
-.scroll-container::-webkit-scrollbar-thumb {
-  background-color: rgba(100, 100, 100, 0.3);
-  border-radius: 4px;
+  .scroll-container::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scroll-container {
+    scrollbar-width: thin; /* or 'auto' */
+    scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
+  }
+  .scroll-container {
+    max-height: 60vh;
+    overflow-y: scroll; /* forces scrollbar even if not needed */
+    scrollbar-gutter: stable; /* prevents layout shift when scrolling starts */
+  }
+  .sm-br{
+    border-radius: var(--border-radius);
+  }
 }
-
-.scroll-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scroll-container {
-  scrollbar-width: thin; /* or 'auto' */
-  scrollbar-color: rgba(100, 100, 100, 0.3) transparent;
-}
-.scroll-container {
-  max-height: 60vh;
-  overflow-y: scroll; /* forces scrollbar even if not needed */
-  scrollbar-gutter: stable; /* prevents layout shift when scrolling starts */
-}
-.sm-br{
-  border-radius: var(--border-radius);
-}
-
-}
-
 
 header a{
   text-decoration:none

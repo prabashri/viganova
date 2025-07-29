@@ -3,34 +3,28 @@ let searchData = null;
 
 async function loadSearchAssets() {
   if (fuseInstance) return { fuse: fuseInstance, data: searchData };
-
   if (!window.Fuse) await import('/vendor/fuse.min.js?v=7.1.0');
 
   try {
-    // Get the current <script type="module" data-search-index="...">
-    const currentScript = document.currentScript || [...document.querySelectorAll('script[type="module"]')].find(s => s.dataset.searchIndex);
+    const currentScript =
+      document.currentScript ||
+      [...document.querySelectorAll('script[type="module"]')].find(s => s.dataset.searchIndex);
 
-    if (!currentScript) {
-      throw new Error('No <script> with data-search-index found.');
-    }
-
+    if (!currentScript) throw new Error('No <script> with data-search-index found.');
     const indexUrl = currentScript.dataset.searchIndex;
-    if (!indexUrl) {
-      throw new Error('Missing data-search-index attribute.');
-    }
+    if (!indexUrl) throw new Error('Missing data-search-index attribute.');
 
     const res = await fetch(indexUrl, { cache: 'no-cache' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     searchData = await res.json();
-
     fuseInstance = new Fuse(searchData, {
       keys: ['title', 'description', 'content', 'tags'],
       threshold: 0.2,
       ignoreLocation: true,
       includeMatches: true,
       minMatchCharLength: 2,
-      useExtendedSearch: true,
+      useExtendedSearch: true
     });
 
     return { fuse: fuseInstance, data: searchData };
@@ -91,30 +85,28 @@ function createSnippet(text, query) {
 }
 
 // Modal Mode
+// 🔹 Modal logic
 function initSearchModal(fuse) {
   const modal = document.getElementById('search-modal');
-  const modalContent = modal ? modal.querySelector('.search-modal-content') : null;
-  const input = /** @type {HTMLInputElement|null} */ (document.getElementById('search-modal-input'));
-  const button = /** @type {HTMLButtonElement|null} */ (document.getElementById('global-search-button'));
-  const closeBtn = /** @type {HTMLButtonElement|null} */ (document.getElementById('close-search-modal'));
-  const results = /** @type {HTMLUListElement|null} */ (document.getElementById('search-modal-results'));
+  const modalContent = modal?.querySelector('.search-modal-content');
+  const input = document.getElementById('search-modal-input');
+  const button = document.getElementById('global-search-button');
+  const closeBtn = document.getElementById('close-search-modal');
+  const results = document.getElementById('search-modal-results');
 
   if (!modal || !input || !results || !button || !modalContent) return;
 
-  // 🔹 Trap focus within modal
+  // Trap focus
   let removeTrap = () => {};
   function trapFocus(container) {
     function handleFocusTrap(e) {
       if (e.key !== 'Tab') return;
-
-      const focusable = container.querySelectorAll<HTMLElement>(
+      const focusable = container.querySelectorAll(
         'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])'
       );
-      if (focusable.length === 0) return;
-
+      if (!focusable.length) return;
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
-
       if (e.shiftKey && document.activeElement === first) {
         e.preventDefault();
         last.focus();
@@ -123,83 +115,80 @@ function initSearchModal(fuse) {
         first.focus();
       }
     }
-
     container.addEventListener('keydown', handleFocusTrap);
     return () => container.removeEventListener('keydown', handleFocusTrap);
   }
 
-  // 🔹 Show search results
+  // Show results
   function showResults(query) {
     results.innerHTML = '';
     if (!fuse || query.length < 2) return;
-
     const fuseResults = fuse.search(query);
-    if (fuseResults.length === 0) {
-      const li = document.createElement('li');
-      li.textContent = 'No results found';
-      results.appendChild(li);
+    if (!fuseResults.length) {
+      results.innerHTML = `<li>No results found</li>`;
       return;
     }
-
     for (const { item, matches } of fuseResults.slice(0, 10)) {
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.href = item.url;
-
       const matchMap = Object.fromEntries(matches.map(m => [m.key, m]));
-
       const titleSpan = document.createElement('span');
       titleSpan.className = 'result-title';
       const titleMatch = matchMap.title?.indices;
       titleMatch?.length
         ? titleSpan.appendChild(highlightMatch(item.title, titleMatch))
-        : titleSpan.textContent = item.title;
-
+        : (titleSpan.textContent = item.title);
       a.appendChild(titleSpan);
       a.appendChild(document.createElement('br'));
-
       if (matchMap.content?.value) {
         const snippet = createSnippet(item.content, query);
         if (snippet) a.appendChild(snippet);
       }
-
       li.appendChild(a);
       results.appendChild(li);
     }
   }
 
-  // 🔹 Open & close modal
+  // Open/close modal
   function openModal() {
-    modal.classList.remove('hidden');
+    console.log('Opening search modal');   
+    modal.classList.remove('display-none');
     modal.setAttribute('aria-hidden', 'false');
     input.focus();
     removeTrap = trapFocus(modalContent);
   }
 
   function closeModal() {
-    modal.classList.add('hidden');
+    console.log('Closing search modal');
+    input.blur(); // Fix aria-hidden warning
+    modal.classList.add('display-none');
     modal.setAttribute('aria-hidden', 'true');
+    console.log('modal attribute:', modal.classList.contains('display-none'));
     input.value = '';
     results.innerHTML = '';
     removeTrap();
-    button.focus();
+    setTimeout(() => button.focus(), 50); // prevent instant reopen loop
   }
 
-  // 🔹 Event listeners
-  button.addEventListener('click', openModal);
-  closeBtn?.addEventListener('click', closeModal);
-
-  // Close on outside click
-  document.addEventListener('mousedown', (e) => {
-    if (!modal.classList.contains('hidden') && !modalContent.contains(e.target)) {
-      closeModal();
-    }
-
+  // Event listeners
+  button?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModal();
+  });
+  closeBtn?.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeModal();
   });
 
-  // Keyboard shortcuts
+  document.addEventListener('mousedown', (e) => {
+    if (!modal.classList.contains('display-none') && !modalContent.contains(e.target)) {
+      closeModal();
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+    if (e.key === 'Escape' && !modal.classList.contains('display-none')) {
       e.preventDefault();
       closeModal();
     }
@@ -209,13 +198,8 @@ function initSearchModal(fuse) {
     }
   });
 
-  // Live search input
-  input.addEventListener('input', () => {
-    const query = input.value.trim();
-    showResults(query);
-  });
+  input.addEventListener('input', () => showResults(input.value.trim()));
 }
-
 
 // Page Mode
 function initSearchPage(fuse) {

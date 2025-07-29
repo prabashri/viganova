@@ -132,6 +132,9 @@ export const siteNav: NavItem[] = [
   { label: 'Contact', href: '/contact', title: 'Get in touch with us' }
 ];
 
+/** SEARCH ICON ENABLED */
+export const searchIconEnable = true; // Enable search icon in header
+
 /** PRIMARY CTA BUTTONS */
 export const primaryCTA: CtaButton[] = [  
   {

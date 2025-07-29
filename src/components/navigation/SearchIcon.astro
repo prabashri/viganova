@@ -1,0 +1,38 @@
+---
+// src/components/navigation/Search.astro
+import { Icon } from 'astro-icon/components';
+import manifest from '../../data/assets-manifest.json'; // no destructuring here
+
+const searchIndexPath = manifest.json?.['search-index']?.file || '';
+const searchScriptPath = manifest.js?.['search']?.file || '';
+const isDev = import.meta.env.DEV;
+const date = new Date().toISOString();
+---
+{ (searchIndexPath && searchScriptPath) && (  
+  <div id="global-search-button" class="flex relative m-0 p-0 w-4-0 ai-center jc-center">    
+    <button id="global-search-button" aria-label="Open search" class="search-trigger">
+      __<Icon name="search" class="w-2-0 h-2-0" />
+      <span class="sr-only">Search</span>
+    </button>
+  
+    <div id="search-modal" class="search-modal flex flex-col bg-base-05 br gap-05 fixed top-10vh inset-0 jc-f-start ai-f-start mi-auto p-1 mx-w-content w-90-0 height-fit z-1000 display-none" role="dialog" aria-modal="true" aria-label="Site search dialog">
+      <button id="close-search-modal" aria-label="Close search" class="lh-0">✖</button>
+      <div class="search-modal-content w-full br bg-base-00 p-1" tabindex="-1">        
+        <form id="search-modal-form" role="search">
+          <input id="search-modal-input" type="search" placeholder="Search..." autocomplete="off" />
+        </form>
+        <ul id="search-modal-results" class="search-results no-bullets"></ul>
+      </div>
+    </div>
+  </div>  
+
+  <script
+    type="module"
+    data-src={searchScriptPath}
+    data-search-index={searchIndexPath}
+  ></script>
+)}
+  {isDev && (
+    <script is:inline src={`/scripts/search.js?v=${date}`} />
+  )}
+  

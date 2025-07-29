@@ -1,14 +1,12 @@
+// src/utils/write-manifest.ts
 import fs from 'fs/promises';
 import path from 'path';
 
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
 
 type ManifestType = 'js' | 'css' | 'preload' | 'json';
-type ManifestData = Record<ManifestType, Record<string, { file: string } & Record<string, any>>>;
+type ManifestData = Record<ManifestType, Record<string, any>>;
 
-/**
- * Read the JSON manifest from file.
- */
 export async function readManifest(): Promise<ManifestData> {
   try {
     const content = await fs.readFile(manifestPath, 'utf8');
@@ -18,9 +16,6 @@ export async function readManifest(): Promise<ManifestData> {
   }
 }
 
-/**
- * Write or update a single entry in the manifest.
- */
 export async function writeManifestEntry(
   type: ManifestType,
   key: string,
@@ -28,18 +23,19 @@ export async function writeManifestEntry(
   extra: Record<string, any> = {}
 ): Promise<void> {
   const manifest = await readManifest();
+  if (!manifest[type]) manifest[type] = {};
 
-  if (!manifest[type]) {
-    manifest[type] = {};
+  // 🧹 Sync names (remove deleted files if extra.names is provided)
+  if (extra.names && Array.isArray(extra.names)) {
+    const uniqueNames = [...new Set(extra.names)];
+    extra.names = uniqueNames;
   }
 
-  const entry = {
+  manifest[type][key] = {
     file,
     datetime: new Date().toISOString(),
     ...extra,
   };
-
-  manifest[type][key] = entry;
 
   await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
 }

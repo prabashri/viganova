@@ -70,8 +70,6 @@ svg use {
 	border: 0.5px solid var(--primary-light);
 }
 
-
-
 .backdrop-blur {
 	-webkit-backdrop-filter: blur(12px) saturate(160%);
 	backdrop-filter: blur(12px) saturate(160%);
@@ -484,7 +482,9 @@ svg use {
 	box-shadow: 0px 0px 4px 4px #e3e9ff;
 }
 
-
+.inset-0{
+	inset: 0;
+}
 
 .inherit {
 	display: inherit !important;
@@ -823,6 +823,9 @@ svg use {
 .top-0 {
 	top: 0;
 }
+.top-10vh {
+	top: 10vh;
+}
 
 .top-0-20 {
 	top: -20px;
@@ -871,6 +874,7 @@ svg use {
 .w-1-5 {
 	width: 1.5rem;
 }
+
 
 .w-100 {
 	width: 100px;
@@ -1016,6 +1020,12 @@ svg use {
 	.full-display-none {
 		display: none !important;
 	}
+	.full-br-1 {
+		border-radius: 1rem;
+	}
+	.full-p-05 {
+		padding: 0.5rem;
+	}
 }
 
 
@@ -1057,7 +1067,9 @@ svg use {
 	.big-flex-1 {
 		flex: 1;
 	}
-
+	.big-flex-row{
+		flex-direction: row !important;
+	}
 	.big-jc-between {
 		justify-content: space-between;
 	}
@@ -1092,6 +1104,18 @@ svg use {
 	.md-display-flex {
 		display: flex !important;
 	}
+	.md-wrap {
+		flex-wrap: wrap;
+	}
+	.md-w-full {
+		width: 100% !important;
+	}
+	.md-order-2 {
+		order: 2 !important;
+	}
+	.md-order-3 {
+		order: 3 !important;
+	}
 }
 
 @media (min-width: 1024px) and (max-width: 1279px) {
@@ -1122,6 +1146,10 @@ svg use {
 	.lg-jc-center {
 		justify-content: center;
 	}
+	.lg-wrap {
+		flex-wrap: wrap;
+	}
+	
 }
 
 @media(max-width:920px) {

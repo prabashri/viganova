@@ -6,7 +6,9 @@ import CssHead from './CssHead.astro';
 import type { HeadProps } from '../types/HeadProps';
 import Rss from './Rss.astro';
 import ImagePreload from './ImagePreload.astro';
+import assetsManifest from '../data/assets-manifest.json';
 
+const mainJsFile = assetsManifest.js?.main?.file || '';
 
 const props: HeadProps = {
   ...Astro.props,
@@ -260,7 +262,7 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 {rssEnabled && <Rss />}
 
 
-<!-- JSON-LD Structured Data -->
+{/*-- JSON-LD Structured Data --*/}
 <script is:inline type="application/ld+json" set:html={JSON.stringify(primaryJsonLd)} />
 <script is:inline type="application/ld+json" set:html={JSON.stringify(speakableJsonLd)} />
 <script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
@@ -279,6 +281,47 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
     });
   }
 </script>
-  <!--<script is:inline src="/scripts/headerMenu.js?v=1.0.1" defer /> -->
+
+  
 </>
 )}
+{
+  mainJsFile && (
+    <script id="main-js" type="module" data-src={mainJsFile} async />
+  ) 
+}
+
+<>
+
+<script is:inline>
+  let loaded = !1;
+  const trigger = () => {
+    if (loaded) return;
+    loaded = !0;
+
+    // ✅ Process all link tags in one query
+    document.querySelectorAll('link[rel="stylesheet"]').forEach(e => {
+      if (e.hasAttribute("data-swap")) {
+        e.media = "all";
+        e.removeAttribute("data-swap");
+      }
+      if (e.hasAttribute("data-href")) {
+        const realHref = e.getAttribute("data-href");
+        if (realHref) e.href = realHref;
+        e.removeAttribute("data-href");
+      }
+    });
+
+    // ✅ Load all scripts with data-src
+    document.querySelectorAll("script[data-src]").forEach(e => {
+      const realSrc = e.getAttribute("data-src");
+      if (realSrc) e.src = realSrc;
+      e.removeAttribute("data-src");
+    });
+  };
+
+  window.addEventListener("scroll", trigger, { once: !0 });
+  window.addEventListener("load", () => setTimeout(trigger, 1000));
+</script>
+
+</>

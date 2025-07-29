@@ -1,31 +1,9 @@
 ---
 // src/components/navigation/ThemeLightDark.astro
 import { Icon } from 'astro-icon/components';
-import manifest from '../../data/assets-manifest.json'; // no destructuring here
-
-const searchIndexPath = manifest.json?.['search-index']?.file || '';
-const searchScriptPath = manifest.js?.['search']?.file || '';
-
 ---
-{ (searchIndexPath && searchScriptPath) && (
-  <div id="global-search-button" class="flex flex-row relative h-2-0 w-2-0 mb-1 as-f-start">    
-    <button id="global-search-button" aria-label="Open search" class="search-trigger">
-      __<Icon name="search" class="w-1-5 h-1-5" />
-      <span class="sr-only">Search</span>
-    </button>
-    
-    <div id="search-modal" class="search-modal hidden" role="dialog" aria-modal="true" aria-label="Site search dialog">
-      <div class="search-modal-content" tabindex="-1">
-        <button id="close-search-modal" aria-label="Close search">✖</button>
-        <form id="search-modal-form" role="search">
-          <input id="search-modal-input" type="search" placeholder="Search..." autocomplete="off" />
-        </form>
-        <ul id="search-modal-results" class="search-results"></ul>
-      </div>
-    </div>
-  </div>
-  )}  
-<div class="theme-toggle flex flex-row relative h-2-0 w-2-0 mb-1 as-f-start"> 
+
+<div class="theme-toggle flex relative h-2-0 w-2-0 ai-center jc-center"> 
 
     <!-- Trigger Button -->
     <button id="theme-button" aria-haspopup="true" aria-expanded="false"
@@ -37,7 +15,7 @@ const searchScriptPath = manifest.js?.['search']?.file || '';
 
     <!-- Dropdown -->
     <div id="theme-menu"
-      class="absolute br border bg-base-00 col-base-100 mb-05 box-shadow display-none right-0 p-05 z-1000">
+      class="relative big-absolute br border bg-base-00 col-base-100 mb-05 box-shadow display-none right-0 p-05 z-1000">
       <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
         data-theme="system">
         <Icon name="system" class="w-1-5 h-1-5" />
@@ -55,39 +33,7 @@ const searchScriptPath = manifest.js?.['search']?.file || '';
       </button>
     </div>
   </div>
-  <style>
-    .search-trigger{
-      background: red;
-      border: 1px solid #ccc;
-      cursor: pointer;
-      padding: 0.5rem;
-    }
-    .search-modal {
-  position: fixed;
-  inset: 0;
-  /* background: rgba(0,0,0,0.75); */
-  display: flex;
-  justify-content: center;
-  align-items: start;
-  padding-top: 10vh;
-  z-index: 1000;
-}
-.search-modal.hidden {
-  display: none;
-}
-.search-modal-content {
-  background: white;
-  max-width: 700px;
-  width: 90%;
-  border-radius: 8px;
-  padding: 1rem;
-}
-.search-results li {
-  padding: 0.5rem;
-  border-bottom: 1px solid #eee;
-}
 
-  </style>
  <script id="theme-script" type="module">
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
@@ -186,13 +132,3 @@ const searchScriptPath = manifest.js?.['search']?.file || '';
   });
 })();
 </script>
-
-
-{searchIndexPath && searchScriptPath && (
-  
-  <script
-    type="module"
-    src={searchScriptPath}
-    data-search-index={searchIndexPath}
-  ></script>
-)}
