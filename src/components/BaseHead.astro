@@ -285,8 +285,11 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
   
 </>
 )}
+{isDev &&  (  
+    <script id="main-js" type="module" src="/scripts/main.js?direct" async />  
+)}
 {
-  mainJsFile && (
+  !isDev && mainJsFile && (
     <script id="main-js" type="module" data-src={mainJsFile} async />
   ) 
 }

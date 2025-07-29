@@ -22,6 +22,7 @@
 
     // Toggle mobile menu (hamburger)
      toggleBtn.addEventListener('click', () => {
+        console.log('Menu toggle clicked');
       const isOpen = targets[0]?.classList.contains('is-open');
       const willOpen = !isOpen;
 

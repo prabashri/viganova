@@ -97,5 +97,5 @@ const preloadLinks = images.flatMap(generatePreloadLinks);
 
 {preloadLinks.length > 0 &&
   preloadLinks.map(({ src, media }) => (
-    <link rel="preload" as="image" href={src} media={media} />
+    <link rel="preload" fetchpriority="high" as="image" href={src} media={media} />
   ))}

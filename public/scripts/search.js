@@ -152,7 +152,7 @@ function initSearchModal(fuse) {
 
   // Open/close modal
   function openModal() {
-    console.log('Opening search modal');   
+      
     modal.classList.remove('display-none');
     modal.setAttribute('aria-hidden', 'false');
     input.focus();
@@ -160,11 +160,11 @@ function initSearchModal(fuse) {
   }
 
   function closeModal() {
-    console.log('Closing search modal');
+    
     input.blur(); // Fix aria-hidden warning
     modal.classList.add('display-none');
     modal.setAttribute('aria-hidden', 'true');
-    console.log('modal attribute:', modal.classList.contains('display-none'));
+    
     input.value = '';
     results.innerHTML = '';
     removeTrap();
