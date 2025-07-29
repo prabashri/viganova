@@ -1,4 +1,4 @@
- document.addEventListener('DOMContentLoaded', () => {
+
     const toggleBtn = document.getElementById('menu-toggle');
 
     const hamburgerIcon = document.getElementById('menu-icon');
@@ -127,4 +127,4 @@
         if (!item.contains(e.target)) closeMenu(item);
       });
     });
-  });
+  
