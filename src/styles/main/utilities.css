@@ -639,7 +639,9 @@ svg use {
 .mx-w-960 {
 	max-width: 960px;
 }
-
+.mx-w-featured {
+	max-width: var(--featured-image-width);
+}
 .mx-w-content {
 	max-width: var(--content-width);
 }

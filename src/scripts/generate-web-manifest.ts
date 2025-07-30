@@ -3,7 +3,8 @@ import path from 'path';
 import sharp from 'sharp';
 import { encode as encodeIco } from 'sharp-ico';
 
-
+import { siteLogo } from '../config/siteLogo';
+import { siteColors } from '../config/siteColors';
 
 import { siteDefaults } from '../config/siteDefaults';
 type AssetsManifest = {
@@ -22,8 +23,6 @@ const manifestPath = path.join(publicDir, 'manifest.webmanifest');
 
 const siteDefaultsPath = path.resolve('src/config/siteDefaults.ts');
 const recordedSiteDefaultsTime = assetsManifest?.siteDefaults?.datetime;
-
-const faviconIcoSizes = [16, 32, 48];
 
 const iconSizes = [
   { name: 'android-chrome-192x192.png', size: 192 },
@@ -45,7 +44,7 @@ function needsUpdate(filePath: string, recordedTime?: string) {
 
 // --- Resolve favicon source
 function resolveFaviconSource(): string | null {
-  const favIconPath = path.resolve(siteDefaults.favIconPng ?? '');
+  const favIconPath = path.resolve(siteLogo.favIcon ?? '');
   return fs.existsSync(favIconPath) ? favIconPath : null;
 }
 function getSharpPipelineByFormat(sourcePath: string, size: number) {
@@ -87,7 +86,7 @@ async function generateIcons(source: string) {
 
 // --- Handle favicon.svg
 function handleSvgIcon() {
-  const svgSrcPath = path.resolve(siteDefaults.favIconSvg ?? '');
+  const svgSrcPath = path.resolve(siteLogo.favIconSvg ?? '');
   const svgDestPath = path.join(publicDir, 'favicon.svg');
 
   if (!fs.existsSync(svgSrcPath)) {
@@ -108,8 +107,8 @@ function writeWebManifest() {
     short_name: trimTo(siteDefaults.shortName ?? siteDefaults.siteName ?? 'astroweb', 15),
     start_url: '/',
     display: 'standalone',
-    background_color: siteDefaults.backgroundColor ?? '#ffffff',
-    theme_color: siteDefaults.primaryColor ?? '#0d9488',
+    background_color: siteColors.backgroundColor ?? '#ffffff',
+    theme_color: siteColors.primaryColor ?? '#0d9488',
     description: trimTo(
       siteDefaults.description ??
         'Minimal, performance-first Astro theme by NViewsWeb.',

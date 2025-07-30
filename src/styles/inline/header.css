@@ -167,6 +167,6 @@ svg use {
   }
 }
 
-header a{
+header, footer a{
   text-decoration:none
 }

@@ -1,8 +1,17 @@
-// src/utils/buildCssBundle.ts
 import fs from 'fs/promises';
 import path from 'path';
 import { transform } from 'lightningcss';
 import { writeManifestEntry, readManifest } from './write-manifest.ts';
+
+function getErrorSnippet(content: string, errorLine: number, context = 5) {
+  const lines = content.split('\n');
+  const start = Math.max(errorLine - context, 0);
+  const end = Math.min(errorLine + context, lines.length);
+  return lines
+    .slice(start, end)
+    .map((l, i) => `${start + i + 1}: ${l}`)
+    .join('\n');
+}
 
 export async function buildCssBundle({
   type,
@@ -12,7 +21,7 @@ export async function buildCssBundle({
   publicBase,
   hashed = false,
   outputType = 'css'
-}: {
+}:{
   type: string;
   inputDir: string;
   outputDir: string;
@@ -35,7 +44,7 @@ export async function buildCssBundle({
 
   const oldNames = manifest?.css?.[type]?.names ?? [];
   const added = cssNames.filter(n => !oldNames.includes(n));
-const removed: string[] = oldNames.filter((n: string) => !cssNames.includes(n));
+  const removed = oldNames.filter((n: string) => !cssNames.includes(n));
 
   const lastBuild = manifest?.css?.[type]?.datetime
     ? new Date(manifest.css[type].datetime)
@@ -43,12 +52,25 @@ const removed: string[] = oldNames.filter((n: string) => !cssNames.includes(n));
 
   let shouldRebuild = added.length > 0 || removed.length > 0;
 
-  // Check updated files
+  // Check updated files individually
   for (const file of cssFiles) {
-    const stat = await fs.stat(path.join(inputDir, file));
-    if (stat.mtime > lastBuild) {
-      shouldRebuild = true;
-      break;
+    const filePath = path.join(inputDir, file);
+    const stat = await fs.stat(filePath);
+    if (stat.mtime > lastBuild) shouldRebuild = true;
+
+    // Validate each CSS file
+    const content = await fs.readFile(filePath, 'utf8');
+    try {
+      transform({
+        filename: file,
+        code: Buffer.from(content),
+        minify: false
+      });
+    } catch (err: any) {
+      console.error(`❌ CSS Parse Error in ${filePath}`);
+      console.error(`Line ${err?.loc?.line}, Column ${err?.loc?.column}`);
+      console.error(getErrorSnippet(content, err?.loc?.line ?? 1, 5));
+      throw err;
     }
   }
 
@@ -57,32 +79,28 @@ const removed: string[] = oldNames.filter((n: string) => !cssNames.includes(n));
     return;
   }
 
-  // 🔄 Merge all CSS
+  // 🔄 Merge CSS
   let combinedCss = '';
   for (const file of cssFiles) {
     const content = await fs.readFile(path.join(inputDir, file), 'utf8');
     combinedCss += `\n/* ${file} */\n${content}`;
   }
 
-  // 🎯 Transform once (dedupe + minify)
+  // 🎯 Transform merged CSS
   const { code } = transform({
     filename: `${type}.css`,
     code: Buffer.from(combinedCss),
-    minify: true,
-    targets: { chrome: 100, firefox: 100, safari: 15, edge: 100 }
+    minify: true
   });
 
   const finalCss = code.toString();
-
   await fs.mkdir(outputDir, { recursive: true });
 
-  // 🔑 Handle hashed vs non-hashed filenames
   let outputFileName = `${outputFileBase}.${outputType}`;
   if (hashed && outputType === 'css') {
     const hash = Math.random().toString(36).slice(2, 8);
     outputFileName = `${outputFileBase}.${hash}.css`;
 
-    // Delete old hashed versions
     const existingFiles = await fs.readdir(outputDir);
     const regex = new RegExp(`^${outputFileBase}\\.[a-z0-9]{6}\\.css$`, 'i');
     await Promise.allSettled(existingFiles.filter(f => regex.test(f))
@@ -91,7 +109,6 @@ const removed: string[] = oldNames.filter((n: string) => !cssNames.includes(n));
 
   const finalOutputPath = path.join(outputDir, outputFileName);
 
-  // ✍️ Write output
   if (outputType === 'ts') {
     const tsExport = `export const ${type}Css = ${JSON.stringify(finalCss)};\n`;
     await fs.writeFile(finalOutputPath, tsExport, 'utf8');
@@ -99,10 +116,9 @@ const removed: string[] = oldNames.filter((n: string) => !cssNames.includes(n));
     await fs.writeFile(finalOutputPath, finalCss, 'utf8');
   }
 
-  // 📌 Update manifest
- const publicPath = path.posix.join(publicBase, outputFileName); // Always forward slashes
- await writeManifestEntry('css', type, publicPath, { names: cssNames });
-
+  const publicPath = path.posix.join(publicBase, outputFileName);
+  await writeManifestEntry('css', type, publicPath, { names: cssNames });
 
   console.log(`✅ ${type} built → ${outputFileName} (${cssNames.length} files)`);
 }
+

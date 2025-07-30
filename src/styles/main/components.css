@@ -156,7 +156,7 @@
 }
 
 .icon-primary {
-  fill: var(--primary-light, #a55aff);
+  fill: var(--primary);
 }   
 .icon-link:hover .icon-primary{
     fill: revert-layer;

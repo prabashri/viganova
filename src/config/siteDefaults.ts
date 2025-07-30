@@ -12,17 +12,6 @@ export const siteDefaults = {
   description: "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
   keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],
 
-
-  primaryColor: "#a55aff",
-  secondaryColor: "#081ea6",
-  backgroundColor: "#ffffff",  
-  
-  logo: "public/logos/AstroWEB-logo.png",
-  mobileLogo: "public/logos/AstroWEB-icon-white-background.png",
-  icon: "public/logos/AstroWEB-icon.png",
-  favIconPng: "public/logos/AstroWEB-icon.png",
-  favIconSvg: "public/logos/AstroWEB-icon.svg",
-
   socialLinks: {
     x: "@nviewsweb", // twitter handle without @
     github: "https://github.com/nviewsweb",

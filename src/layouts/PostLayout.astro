@@ -102,44 +102,59 @@ const headProps: HeadProps = {
   <Fragment slot="headContent-top" />
   <Fragment slot="headContent-bottom" />
 
-  <article class="post-layout">
-    <div class="hero-image">
-      {heroImage && (
-        <ResponsiveImage
-          src={heroImage}
-          alt={heroImageAlt || ''}
-          title={heroImageTitle || ''}
-          caption={heroImageCaption || ''}
-          width="1020"
-          loading="eager"
-        />
-      )}
-    </div>
-
-    <header class="post-header">
+  <article id="post-layout">
+    <header id="post-header" class="mx-w-site mi-auto ta-center">
       <h1 class="post-title">{title}</h1>
       {description && <p class="post-desc">{description}</p>}
 
-      <div class="post-meta">
-        {resolvedAuthors.length > 0 && (
-          <span>
+      <div class="post-meta text-s mb-1">
+       {resolvedAuthors.length > 0 && (
+          <div class="post-authors">
             ✍️ By{' '}
-            {resolvedAuthors.map((a, i) => (
-              <>
-                <a href={a!.url} class="author-link">{a!.name}</a>
-                {i < resolvedAuthors.length - 1 && ', '}
-              </>
-            ))}
-          </span>
+            {resolvedAuthors.map((a, i) => {
+              const isLast = i === resolvedAuthors.length - 1;
+              const isSecondLast = i === resolvedAuthors.length - 2;
+
+              return (
+                <>
+                  <a href={a!.url} class="author-link">{a!.name}</a>
+                  {!isLast && (
+                    resolvedAuthors.length === 2
+                      ? ' and '
+                      : isSecondLast
+                        ? ', and '
+                        : ', '
+                  )}
+                </>
+              );
+            })}
+          </div>
         )}
-        {publishedDate && (
-          <time datetime={publishedDate}> 📅 {new Date(publishedDate).toLocaleDateString() }</time>
-        )}
-        {lastModified && (
-          <span> 🔄 Updated: {new Date(lastModified).toLocaleDateString() }</span>
+
+        { publishedDate || lastModified ? (
+          <div class="post-dates">
+            {publishedDate && <time datetime={publishedDate}>📅 on {new Date(publishedDate).toLocaleDateString()}</time>}
+            {lastModified && (
+              <span class="last-updated-on"> Updated: {new Date(lastModified).toLocaleDateString()}</span>
+            )}
+          </div>
+        ) : null}
+      </div>
+      <div id="hero-image" class="mx-w-960 w-full mi-auto">
+        {heroImage && (
+          <ResponsiveImage
+            src={heroImage}
+            alt={heroImageAlt || ''}
+            title={heroImageTitle || ''}
+            caption={heroImageCaption || ''}
+            width="960"
+            loading="eager"
+            
+          />
         )}
       </div>
     </header>
+    
 
     {toc.length > 0 && (
       <aside class="post-toc">
@@ -152,7 +167,7 @@ const headProps: HeadProps = {
       </aside>
     )}
     <TableOfContents toc={toc} heading="On This Page" depth="h2,h3" />
-    <div class="post-content">
+    <div class="post-content mx-w-content mi-auto mb-2">
       <slot />
     </div>
 

@@ -1,0 +1,66 @@
+---
+import assetsManifest from '../data/assets-manifest.json';
+
+const mainJsFile = assetsManifest.js?.main?.file || '';
+
+const isDev = import.meta.env.DEV;
+
+---
+{ !isDev &&(
+<>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+            .catch(err => {
+                // Log only errors if absolutely necessary
+                if (location.hostname === 'localhost') {
+                console.warn('❌ Service Worker Failed:', err);
+                }
+            });
+        }
+    </script>  
+</>
+)}
+{isDev &&  (  
+    <script id="main-js" type="module" src="/scripts/main.js?direct" async />  
+)}
+{
+  !isDev && mainJsFile && (
+    <script id="main-js" type="module" data-src={mainJsFile} async />
+  ) 
+}
+
+<>
+    <script id="lazy-load-scripts">
+        let loaded = !1;
+        const trigger = () => {
+            if (loaded) return;
+            loaded = !0;
+
+            // ✅ Process all link tags in one query
+            document.querySelectorAll('link[rel="stylesheet"]').forEach(e => {
+            if (e.hasAttribute("data-swap")) {
+                /** @type {HTMLLinkElement} */
+                const link = e;
+                link.media = "all";
+                link.removeAttribute("data-swap");
+            }
+            if (e.hasAttribute("data-href")) {
+                const realHref = e.getAttribute("data-href");
+                if (realHref) e.href = realHref;
+                e.removeAttribute("data-href");
+            }
+            });
+
+            // ✅ Load all scripts with data-src
+            document.querySelectorAll("script[data-src]").forEach(e => {
+            const realSrc = e.getAttribute("data-src");
+            if (realSrc) e.src = realSrc;
+            e.removeAttribute("data-src");
+            });
+        };
+
+        window.addEventListener("scroll", trigger, { once: !0 });
+        window.addEventListener("load", () => setTimeout(trigger, 1000));
+    </script>
+</>

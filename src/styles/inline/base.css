@@ -18,6 +18,43 @@
   font-style: normal;
   font-display: swap;
 }
+
+/* ================================
+   🌈 CSS VARIABLES
+================================ */
+:root {
+  /* Fonts */
+  --font-family-base: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-family-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-family-mono: 'Roboto Mono', monospace;
+
+  --font-weight-regular: 400;
+  --font-weight-bold: 700;
+
+  /* Layout sizing */
+  --border-radius: 5px;
+  --max-width: 1280px;
+  --featured-image-width: 960px
+  --site-width: 1280px;
+  --content-width: 640px;
+  --sidebar-width: 320px;
+
+  /* Shadows */
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-base: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --shadow-strong: 0 0 10px 2px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px 4px rgba(0, 0, 0, 0.1);
+  --shadow-bottom: 0 1px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 🌙 Dark mode overrides via [data-theme="dark"] */
+[data-theme="dark"] {
+  --shadow-light: 0 1px 3px rgba(255, 255, 255, 0.05);
+  --shadow-base: 0 8px 24px rgba(255, 255, 255, 0.08);
+  --shadow-strong: 0 0 10px 2px rgba(255, 255, 255, 0.2);
+  --shadow-glow: 0 0 20px 4px rgba(255, 255, 255, 0.5);
+  --shadow-bottom: 0 1px 10px rgba(0, 0, 0, 0.1); 
+}
 /* ================================
    🧩 CSS RESET + Box Model
 ================================ */

@@ -83,6 +83,7 @@ blockquote {
 hr {
   border: none;
   border-top: 1px solid var(--base-40);
+  margin-block: 1rem;
 }
  
 code {

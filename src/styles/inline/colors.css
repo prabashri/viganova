@@ -1,0 +1,79 @@
+/* ================================
+   🌈 CSS VARIABLES
+================================ */
+:root {
+  color-scheme: light dark;
+
+  /* Primary Shades */
+  --primary-darker-x: #40047cff;
+  --primary-darker: #7321d7ff;
+  --primary-dark: hsla(267, 100%, 58%);
+  --primary: hsla(267, 100%, 68%); 
+  --primary-light: #be7dffff;
+  --primary-lighter: #edd6ffff;
+  --primary-lighter-x: #faebffff;
+
+  /* Secondary Shades */
+  --secondary-darker-x: hsla(232, 91%, 4%);
+  --secondary-darker: hsla(232, 91%, 14%);
+  --secondary-dark: hsla(232, 91%, 24%);
+  --secondary: hsla(232, 91%, 34%);
+  --secondary-light: #be7dff;
+  --secondary-lighter: #edd6ff;
+  --secondary-lighter-x: hsla(232, 91%, 64%);
+
+  --background-color: #ffffff;
+  --text-color: #000000;
+
+  --base-00: hsla(0, 0%, 100%, 1);
+  --base-05: hsla(0, 0%, 95%, 1);
+  --base-10: hsla(0, 0%, 90%, 1);
+  --base-20: hsla(0, 0%, 80%, 1);
+  --base-30: hsla(0, 0%, 70%, 1);
+  --base-40: hsla(0, 0%, 60%, 1);
+  --base-50: hsla(0, 0%, 50%, 1);
+  --base-60: hsla(0, 0%, 40%, 1);
+  --base-70: hsla(0, 0%, 30%, 1);
+  --base-80: hsla(0, 0%, 20%, 1);
+  --base-90: hsla(0, 0%, 10%, 1);
+  --base-95: hsla(0, 0%, 5%, 1);
+  --base-100: hsla(0, 0%, 0%, 1);
+}
+
+/* 🌙 Dark mode overrides */
+[data-theme="dark"] {
+  /* Primary Shades */
+  --primary-darker-x: hsla(275, 100%, 59%, 1);
+  --primary-darker: hsla(275, 100%, 69%, 1);
+  --primary-dark: hsla(275, 100%, 79%, 1);
+  --primary: hsla(275, 100%, 89%, 1);
+  --primary-light: hsla(275, 100%, 99%, 1);
+  --primary-lighter: hsla(275, 100%, 100%, 1);
+  --primary-lighter-x: hsla(275, 100%, 100%, 1);
+
+  /* Secondary Shades */
+  --secondary-darker-x: hsla(235, 100%, 58%, 1);
+  --secondary-darker: hsla(235, 100%, 68%, 1);
+  --secondary-dark: hsla(235, 100%, 78%, 1);
+  --secondary: hsla(235, 100%, 88%, 1);
+  --secondary-light: hsla(235, 100%, 98%, 1);
+  --secondary-lighter: hsla(235, 100%, 100%, 1);
+  --secondary-lighter-x: hsla(235, 100%, 100%, 1);
+
+  --background-color: #131313ff;
+  --text-color: #ffffff;
+
+  --base-00: hsla(0, 0%, 0%, 1);
+  --base-05: hsla(0, 0%, 5%, 1);
+  --base-10: hsla(0, 0%, 10%, 1);
+  --base-20: hsla(0, 0%, 20%, 1);
+  --base-30: hsla(0, 0%, 30%, 1);
+  --base-40: hsla(0, 0%, 40%, 1);
+  --base-50: hsla(0, 0%, 50%, 1);
+  --base-60: hsla(0, 0%, 60%, 1);
+  --base-70: hsla(0, 0%, 70%, 1);
+  --base-80: hsla(0, 0%, 80%, 1);
+  --base-90: hsla(0, 0%, 90%, 1);
+  --base-95: hsla(0, 0%, 95%, 1);
+  --base-100: hsla(0, 0%, 100%, 1);
+}
