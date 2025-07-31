@@ -31,5 +31,20 @@
     ],
     "aspect": "16x9",
     "thumbnail": "120"
+  },
+  "tags/astroweb.png": {
+    "lastModified": 1753957094386.243,
+    "path": "/2025/07/",
+    "variants": [
+      "320",
+      "640",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9"
   }
 }

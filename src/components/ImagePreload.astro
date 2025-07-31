@@ -1,101 +1,18 @@
 ---
-// src/components/ImagePreload.astro
-
-/**
- * <ImagePreload />
- * 
- * ✅ Purpose:
- * Preloads responsive image sources to improve Largest Contentful Paint (LCP).
- * Generates <link rel="preload" as="image" /> tags based on available metadata.
- * 
- * ✅ Props:
- * - images (string[]) – List of image paths from `image-format-details.json`
- * - type ('default' | 'collection') – Behavior toggle:
- *   • 'default': Loads `320px` and `featuredSize` (or best fallback ≥ 640px)
- *   • 'collection': Loads `thumbnailSize` for mobile and 320px for desktop
- * 
- * ✅ Behavior:
- * - Uses WebP if available, otherwise uses the first listed format.
- * - For mobile, always tries to load 320px width.
- * - For desktop:
- *   • Uses `siteDefaults.featuredImageSize` if present in metadata.
- *   • Falls back to the next best size ≥ 640px, or the largest available.
- * 
- * ✅ Example:
- * ```astro
- * <ImagePreload images={['/featured/some-image.png']} />
- * ```
- * 
- * ✅ Integration:
- * Typically used in <BaseHead /> via props like:
- * ```ts
- * preloadImages: ['/featured/example-image.png']
- * ```
- */
-
- 
-import imageMetadataJson from '../data/image-format-details.json';
-import { siteDefaults } from '../config/siteDefaults';
-
-interface Props {
-  images: string[];
-  type?: 'default' | 'collection';
+interface PreloadItem {
+  src: string;
+  media?: string;
 }
+interface Props {
+  images: PreloadItem[];
+}
+const { images = [] } = Astro.props;
 
-const { images = [], type = 'default' } = Astro.props;
-const metadata = imageMetadataJson as Record<string, any>;
-
-const generatePreloadLinks = (imgPath: string) => {
-  const data = metadata[imgPath];
-  if (!data) return [];
-
-  const base = `/images${data.path}`;
-  const name = imgPath.split('/').pop()?.replace(/\.[^.]+$/, '') ?? '';
-  const webpAvailable = data.format.includes('webp');
-  const format = webpAvailable ? 'webp' : data.format[0];
-
-  const widths = data.variants.map(Number).sort((a: number, b: number) => a - b);
-  const thumbnailSize = siteDefaults.thumbnailSize ?? 120;
-  const featuredSize = siteDefaults.featuredImageSize ?? 960;
-
-  const srcForWidth = (w: number) => `${base}${name}-w${w}-a${data.aspect}.${format}`;
-
-  if (type === 'collection') {
-    return [
-      widths.includes(thumbnailSize) && {
-        src: srcForWidth(thumbnailSize),
-        media: '(max-width: 768px)'
-      },
-      widths.includes(320) && {
-        src: srcForWidth(320),
-        media: '(min-width: 768px)'
-      }
-    ].filter(Boolean);
-  }
-
-  // Default logic
-  const mobile = widths.includes(320) ? 320 : widths[0];
-  const desktop =
-    widths.includes(featuredSize)
-      ? featuredSize
-      : widths.find((w: number) => w >= 640) ?? widths.at(-1); // fallback to last available
-
-  return [
-    mobile && {
-      src: srcForWidth(mobile),
-      media: '(max-width: 768px)'
-    },
-    desktop && {
-      src: srcForWidth(desktop),
-      media: '(min-width: 768px)'
-    }
-  ].filter(Boolean);
-};
-
-const preloadLinks = images.flatMap(generatePreloadLinks);
+const uniqueImages = Array.from(
+  new Map(images.map(i => [i.src + (i.media ?? ''), i])).values()
+);
 ---
 
-{preloadLinks.length > 0 &&
-  preloadLinks.map(({ src, media }) => (
-    <link rel="preload" fetchpriority="high" as="image" href={src} media={media} />
-  ))}
+{uniqueImages.map(({ src, media }) => (
+  <link rel="preload" as="image" href={src} fetchpriority="high" {...(media ? { media } : {})} />
+))}

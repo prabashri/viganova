@@ -2,7 +2,7 @@
   "css": {
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-07-30T13:40:55.627Z",
+      "datetime": "2025-07-31T10:33:25.855Z",
       "names": [
         "base",
         "colors",
@@ -10,8 +10,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.x5vbmy.css",
-      "datetime": "2025-07-29T16:17:34.544Z",
+      "file": "/styles/main.k5sffa.css",
+      "datetime": "2025-07-31T08:53:29.363Z",
       "names": [
         "components",
         "form",
@@ -19,16 +19,17 @@
       ]
     },
     "nonCritical": {
-      "file": "/styles/non-critical.sz7vef.css",
-      "datetime": "2025-07-29T16:17:42.340Z",
+      "file": "/styles/non-critical.q0nove.css",
+      "datetime": "2025-07-31T08:53:31.824Z",
       "names": [
+        "footer",
         "non-critical",
         "search-icon"
       ]
     },
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-07-30T13:40:13.372Z",
+      "datetime": "2025-07-31T10:32:55.350Z",
       "names": [
         "colors"
       ]
@@ -46,7 +47,7 @@
   },
   "icons": {
     "favicon.ico": {
-      "datetime": "2025-07-30T13:41:10.652Z"
+      "datetime": "2025-07-31T10:33:35.882Z"
     },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
@@ -64,28 +65,28 @@
       "datetime": "2025-07-26T08:39:30.340Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-07-30T13:41:10.142Z"
+      "datetime": "2025-07-31T10:33:35.487Z"
     },
     "favicon-16x16.png": {
       "datetime": "2025-06-27T05:12:16.114Z"
     }
   },
   "siteDefaults": {
-    "datetime": "2025-07-30T12:33:45.031Z"
+    "datetime": "2025-07-31T10:23:22.744Z"
   },
   "json": {
     "search-index": {
-      "file": "/search-index.3xhe2b.json",
-      "datetime": "2025-07-30T13:40:46.024Z"
+      "file": "/search-index.pdyicj.json",
+      "datetime": "2025-07-31T10:33:18.164Z"
     }
   },
   "logos": {
     "file": "/src/icons/",
     "datetime": "2025-07-30T13:04:47.759Z",
     "files": {
-      "desktopLogoSvg": "/src/icons/DesktopLogo.svg",      
-      "mobileLogoSvg": "/src/icons/MobileLogo.svg",     
-      "siteIconSvg": "/src/icons/SiteIcon.svg"     
+      "desktopLogoSvg": "/src/icons/DesktopLogo.svg",
+      "mobileLogoSvg": "/src/icons/MobileLogo.svg",
+      "siteIconSvg": "/src/icons/SiteIcon.svg"
     }
   }
 }

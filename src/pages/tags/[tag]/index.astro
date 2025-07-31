@@ -8,106 +8,114 @@ import PaginationSeo from '../../../components/PaginationSeo.astro';
 import PaginationRedirect from '../../../components/PaginationRedirect.astro';
 import { siteDefaults } from '../../../config/siteDefaults';
 import type { HeadProps } from '../../../types/HeadProps';
+import { tagMeta } from '../../../config/tagMeta';
+import modifiedDatesJson from '../../../data/modified-dates.json';
+import { getCollectionUrl } from '../../../utils/getCollectionUrl';
+
+// 🔢 Posts per page (can be set in siteDefaults)
+const POSTS_PER_TAG_PAGE = siteDefaults.postsPerCollectionsPage ?? 10;
 
 const tag = Astro.params.tag?.toLowerCase() ?? 'unknown';
 const url = new URL(Astro.request.url);
 const currentPage = parseInt(url.searchParams.get('page') ?? '1', 10);
 
-// Tag meta
-const tagMetaMap: Record<string, { name: string; title?: string; description?: string; image?: string; url?: string }> = {};
-(siteDefaults.tagMeta ?? []).forEach((item) => {
-  tagMetaMap[item.name.toLowerCase()] = item;
-});
+// Build tag meta map
+const tagMetaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
+  Object.entries(tagMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
+);
 
 function hasTag(post: any, tag: string): boolean {
-  return Array.isArray(post.data?.tags) &&
-    post.data.tags.some((t: string) => t.toLowerCase() === tag.toLowerCase());
+  return Array.isArray(post.data?.tags) && post.data.tags.some((t: string) => t.toLowerCase() === tag.toLowerCase());
 }
 
-// Filter all collections that allow tags
+function getModifiedDateKey(entry: any) {
+  const key = `${entry.collection}/${entry.slug ?? entry.id}`;
+  return (modifiedDatesJson as Record<string, string>)[key] 
+    ?? entry.data.lastModified 
+    ?? entry.data.publishedDate 
+    ?? entry.data.date;
+}
+
+// Collect tagged entries
 const taggedCollections = Object.entries(siteDefaults.collections)
   .filter(([_, config]) => config?.tags === true)
   .map(([key]) => key as keyof typeof siteDefaults.collections);
 
-const matchedEntries: any[] = [];
+let matchedEntries: any[] = [];
 for (const coll of taggedCollections) {
   const posts = await getCollection(coll);
-  matchedEntries.push(...posts.filter((entry) => hasTag(entry, tag)));
+  matchedEntries.push(...posts.filter((entry: any) => hasTag(entry, tag)));
 }
 
-const { pageItems: paginatedEntries, totalPages, totalItems } = paginate(matchedEntries, currentPage, 1);
-const isKnownTag = tagMetaMap.hasOwnProperty(tag);
-const meta = tagMetaMap[tag];
+// Sort by modified date
+matchedEntries = matchedEntries.sort((a, b) => {
+  const dateB = new Date(getModifiedDateKey(b)).getTime();
+  const dateA = new Date(getModifiedDateKey(a)).getTime();
+  return dateB - dateA; // Descending
+});
 
-const seoTitle = isKnownTag
-  ? `${meta.title ?? meta.name} | ${siteDefaults.siteName}`
-  : `Posts tagged with "${tag}" | ${siteDefaults.siteName}`;
+// Pagination
+const { pageItems: paginatedEntries, totalPages } = paginate(matchedEntries, currentPage, POSTS_PER_TAG_PAGE);
 
-const seoDescription = isKnownTag
-  ? meta.description ?? `Explore posts tagged "${tag}".`
-  : `Explore posts related to "${tag}" on ${siteDefaults.siteName}.`;
+// Tag meta or default
+const isKnownTag = tagMetaMap.has(tag);
+const meta = tagMetaMap.get(tag) ?? {
+  name: tag,
+  title: tag.charAt(0).toUpperCase() + tag.slice(1),
+  description: `Explore posts tagged "${tag}" on ${siteDefaults.siteName}.`,
+  image: `/tags/default-image.png`,
+  url: `/tags/${tag}/`
+};
 
-const seoImage = isKnownTag && meta?.image ? meta.image : siteDefaults.image;
-const shouldIndex = paginatedEntries.length > 0;
 
+
+// SEO props
 const pageSeo: HeadProps = {
-  title: seoTitle,
-  description: seoDescription,
-  image: seoImage,
-  preloadImages: paginatedEntries
-    .filter((p) => typeof p.data.heroImage === 'string')
-    .slice(0, 3)
-    .map((p) => ({
-      src: p.data.heroImage,
-      width: 'auto',
-      aspect: 'auto',
-    })),
-  listItems: paginatedEntries.map((p) => ({
-    name: p.data.title ?? 'Untitled',
-    url: `/${p.collection}/${p.slug ?? p.data.slug ?? p.id}/`,
+  title: `${meta.title} | ${siteDefaults.siteName}`,
+  description: meta.description,
+  image: meta.image || siteDefaults.image,
+ 
+  listItems: paginatedEntries.map(p => ({
+    name: "title" in p.data ? p.data.title : 'Untitled',
+    url: getCollectionUrl(p.collection, "slug" in p.data && typeof p.data.slug === "string" ? p.data.slug : String(p.id)) // ✅ Use helper
   })),
   type: 'collection',
   breadcrumb: [
     { name: 'Home', url: '/' },
     { name: 'Tags', url: '/tags/' },
-    { name: isKnownTag ? meta.title ?? tag : tag, url: `/tags/${tag}/` },
+    { name: meta.title ?? tag, url: `/tags/${tag}/` }
   ],
-  index: shouldIndex,
+  index: paginatedEntries.length > 0,
   authors: [
     {
       id: 'tag',
       slug: tag,
       url: `/tags/${tag}/`,
-      name: isKnownTag ? meta.title ?? tag : tag,
-      data: { name: isKnownTag ? meta.title ?? tag : tag, description: seoDescription }
+      name: meta.title ?? tag,
+      data: { name: meta.title ?? tag, description: meta.description }
     }
-  ],
+  ]
 };
 ---
+
 <BaseLayout headProps={pageSeo}>
   <PaginationRedirect basePath={`/tags/${tag}`} currentPage={currentPage} />
   <PaginationSeo basePath={`/tags/${tag}`} currentPage={currentPage} totalPages={totalPages} />
 
-  <Fragment slot="headContent-top" />
-  <Fragment slot="headContent-bottom" />
-
   <header class="mx-w-840 mi-auto ta-center">
-    <h1>{seoTitle}</h1>
-    <p>{seoDescription}</p>
+    <h1>{pageSeo.title}</h1>
+    <p>{pageSeo.description}</p>
   </header>
 
   {paginatedEntries.length === 0 ? (
     <p class="text-gray-600 ta-center mt-8">No posts found for this tag.</p>
   ) : (
     <div class="mx-w-width mi-auto flex wrap pc-center gap mt-6">
-      {paginatedEntries.map((item) => (
-        <a
-          href={`/${item.collection}/${item.data.slug}/`}
-          class="block mx-w-320 full-width no-bb"
-        >
+      {paginatedEntries.map(item => (
+        <a href={getCollectionUrl(item.collection, typeof item.data.slug === "string" ? item.data.slug : String(item.id))} class="block mx-w-320 full-width no-bb">
           <img
-            src={item.data.heroImage || siteDefaults.image}
-            alt={item.data.heroImageAlt || item.data.title}
+            src={"heroImage" in item.data ? item.data.heroImage : siteDefaults.image}
+            alt={"heroImageAlt" in item.data ? item.data.heroImageAlt : "title" in item.data ? item.data.title : 'Post image'}
             width="320"
             height="180"
             class="aspect-16x9 full-width br"
@@ -117,37 +125,32 @@ const pageSeo: HeadProps = {
             <span class="inline-block text-xs text-white bg-blue-600 px-2 py-1 rounded mb-2 uppercase tracking-wide">
               {item.collection}
             </span>
-            <h2 class="cg-base no-margin">{item.data.title}</h2>
-            <p class="text-sm text-gray-600">{item.data.description}</p>
+            <h2 class="cg-base no-margin">{ "title" in item.data ? item.data.title : 'Untitled'}</h2>
+            <p class="text-sm text-gray-600">{ "description" in item.data ? item.data.description : 'No description available.'}</p>
           </div>
         </a>
       ))}
     </div>
   )}
 
-  <Pagination currentPage={currentPage} totalPages={totalPages} basePath={`/tags/${tag}`} />
-
   {!isKnownTag && (
     <section class="mx-w-840 mi-auto mt-8">
       <h2 class="text-xl font-semibold mb-4">Popular Tags</h2>
       <ul class="flex flex-wrap gap-3 text-sm">
-        {(siteDefaults.tagMeta ?? []).map((meta) => {
-          const slug = meta.name.toLowerCase();
-          return (
-            <li>
-              <a
-                href={`/tags/${slug}`}
-                class="inline-block px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 border"
-                title={meta.description}
-              >
-                {meta.title ?? meta.name}
-              </a>
-            </li>
-          );
-        })}
+        {Object.entries(tagMeta).map(([slug, meta]) => (
+          <li>
+            <a
+              href={`/tags/${slug.toLowerCase()}`}
+              class="inline-block px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 border"
+              title={meta.description}
+            >
+              {meta.title ?? slug}
+            </a>
+          </li>
+        ))}
       </ul>
     </section>
   )}
 
-  <Fragment slot="extraScripts" />
+  <Pagination currentPage={currentPage} totalPages={totalPages} basePath={`/tags/${tag}`} />
 </BaseLayout>

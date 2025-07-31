@@ -62,9 +62,35 @@ export const siteDefaults = {
   featuredImageFolder: './src/assets/featured', // featured images only
   featuredImageSize: 960, // larger size for SEO & cards
 
+  // ✅ Breakpoint config for responsive images
+  breakpoints: {
+    mobileMax: 768,   // `(max-width: 768px)`
+    desktopMin: 769   // `(min-width: 769px)`
+  },
   // General thumbnail settings
   thumbnail: true,
   thumbnailSize: 120,
+
+  postsPerCollectionsPage: 10, // Number of posts per page in collections like blog, post, etc.
+
+  fieldCollections: {
+    tags: {
+      label: "Tags",
+      title: "Tags Collection",
+      description: "Tags are used to categorize content across the site.",
+      meta: "tagMeta",
+      defaultImage: "tags/astroweb.png",
+      maxPerEntry: 5
+    },
+    categories: {
+      label: "Categories",
+      title: "Categories Collection",
+      description: "Categories are used to group related content.",
+      meta: "categoryMeta",
+      defaultImage: "tags/astroweb.png",
+      maxPerEntry: 3
+    }
+  },
 
   collections: {
     blog: {
@@ -102,48 +128,9 @@ export const siteDefaults = {
   searchIndexPath: "/search-index.json",
 
   serviceWorkerPaths: [ // paths including fonts, css, js to cache in service worker
-    '/fonts/Inter-Regular-Subset.woff2',
-    '/fonts/Inter-Bold-Subset.woff2',
+    //'/fonts/Inter-Regular-Subset.woff2',
+    //'/fonts/Inter-Bold-Subset.woff2',
   ],
 
-  tagMeta: [
-    {
-      name: "blog",
-      title: "Blog Articles",
-      image: "/tags/blog-image.png",
-      url: "/tags/blog/",
-      description: "Articles and guides related to responsive design techniques."
-    },
-    {
-      name: "typography",
-      title: "Typography Resources",
-      image: "/tags/typography-image.png",
-      url: "/tags/typography/",
-      description: "Resources and tutorials on fluid and modern typography."
-    },
-    {
-      name: "layout",
-      title: "Layout Techniques",
-      image: "/tags/layout-image.png",
-      url: "/tags/layout/",
-      description: "Discussions and tools for layout spacing, sizing, and CSS structure."
-    }
-  ],
-
-  categoryMeta: [
-    {
-      name: "CSS Techniques",
-      title: "CSS Techniques",
-      image: "/categories/css-image.png",
-      url: "/categories/css/",
-      description: "Grouped tutorials and tools for mastering CSS layout, spacing, and typography."
-    },
-    {
-      name: "Performance",
-      title: "Performance",
-      image: "/categories/performance-image.png",
-      url: "/categories/performance/",
-      description: "Articles focused on improving frontend and build performance."
-    }
-  ]
+  
 };

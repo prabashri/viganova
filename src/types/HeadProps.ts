@@ -19,8 +19,6 @@ export interface HeadProps {
   title: string;
   description?: string;
   image?: string;
-  preloadImages?: string [];
-  // preloadImages?: { src: string; width: string; aspect: string }[];
   type?: 'webpage' | 'article' | 'collection';
   url?: string;
   canonicalUrl?: string;

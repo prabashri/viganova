@@ -15,7 +15,7 @@ heroImageCaption:  "Optional caption text"
 slug: 'first-post'
 canonicalUrl: 'https://example.com/first-post'
 tags: ['blog', 'example', 'reference']
-category: 'Reference'  
+categories: ['Reference']
 keywords: ['Astro blog post', 'static content']
 featured: true
 draft: false

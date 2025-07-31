@@ -274,7 +274,9 @@ svg use {
 .col-base-00, .focus-col-base-00:focus, .focus-vis-col-base-00:focus-visible, .hover-col-base-00:hover {
 	color: var(--base-00);
 }
-
+.col-base-80, .focus-col-base-80:focus, .focus-vis-col-base-80:focus-visible, .hover-col-base-80:hover {
+	color: var(--base-80);
+}
 .col-base-100, .focus-col-base-100:focus, .focus-vis-col-base-100:focus-visible, .hover-col-base-100:hover {
 	color: var(--base-100);
 }
@@ -561,6 +563,9 @@ svg use {
 .mb-2 {
 	margin-block: 2rem;
 }
+.mt-1 {
+	margin-top: 1rem;
+}
 
 .big-display-block {
 	display: none;
@@ -821,7 +826,9 @@ svg use {
 .text-x-small {
 	font-size: 0.8rem;
 }
-
+.td-none{
+	text-decoration: none;
+}
 .top-0 {
 	top: 0;
 }

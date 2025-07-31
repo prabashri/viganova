@@ -17,7 +17,6 @@ const headProps: HeadProps = {
   title: `Modern flexible Astro theme by Astroweb.dev`,
   description: "Astroweb.dev is a modern flexible Astro theme for building fast, secure, and SEO-optimized websites. It includes features like a mega menu, schema for SEO, and strict content security policies.",
   image: siteDefaults.image,
-  preloadImages: ['astroweb-theme-features-listed-by-user-hero-image.png'],
   type: 'article',
   // canonicalUrl: fullCanonical,
   keywords: siteDefaults.keywords,
@@ -31,14 +30,21 @@ const headProps: HeadProps = {
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top" />
   <Fragment slot="headContent-bottom" />
-			<h1>Hello, Astronaut!</h1>
-			<ResponsiveImage
-				src="astroweb-theme-features-listed-by-user-hero-image.png"
-				alt="A beautiful view of the cosmos with stars and galaxies"
-				title="Astro Hero Image"
-				width="100%"
-				loading="eager"
-			/>
+	<article id="post-layout">
+		<header id="post-header" class="mx-w-site mi-auto ta-center">
+			<h1 class="post-title">Modern flexible theme "AstroWEB" for Astro Framework by nViewsWEB</h1>
+			<p class="post-desc">A theme to support and promote your digital presence with modern design, features, seo, security, and so on.</p>			
+			<div id="hero-image" class="mx-w-content w-full mi-auto">				
+				<ResponsiveImage
+					src="astroweb-theme-features-listed-by-user-hero-image.png"
+					alt="A beautiful view of the cosmos with stars and galaxies"
+					title="Astro Hero Image"
+					width="640"
+					loading="eager" breakpoints={{ mobile: 320, desktop: 640 }}
+				/>
+			</div>
+		</header>
+		<div class="post-content mx-w-content mi-auto mb-2">
 			<p>
 				we have the theme for astro framework to build modern websites with full strict content security policies, speed 100%, google analytics, and all necessary features like mega menu, schema for generative engine optimization, semantic html5 seo optimized static (free theme) and server side generation, ssr (for 69 USD unlimited usage) - theme name is astroweb.dev. 
 
@@ -75,7 +81,8 @@ we not only sell theme, we are here to promote you.
 				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
 				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
 			</p>
-		
+		</div>
+	</article>			
 
   <Fragment slot="extraScripts" />
 </BaseLayout>

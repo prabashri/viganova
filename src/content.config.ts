@@ -18,7 +18,7 @@ const baseSchema = ({ image }: SchemaContext) =>
     // Use astro: assets for image optimization
     
     tags: z.array(z.string()).optional(),
-    category: z.string().optional(),
+    categories: z.array(z.string()).optional(), // maximum 3 categories
     keywords: z.array(z.string()).optional(),
     featured: z.boolean().optional(),
     draft: z.boolean().optional(),

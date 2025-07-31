@@ -10,7 +10,13 @@ import assetsManifest from '../data/assets-manifest.json';
 import InlineScript from './InlineScript.astro';
 import { siteLogo } from '../config/siteLogo';
 
-const mainJsFile = assetsManifest.js?.main?.file || '';
+import { getPreloadImages, clearPreloadImages } from '../utils/preloadRegistry';
+
+const preloadImagesAuto = getPreloadImages();
+// Clear registry after reading to avoid leakage between pages
+clearPreloadImages();
+
+const isDev = import.meta.env.DEV; 
 
 const props: HeadProps = {
   ...Astro.props,
@@ -24,7 +30,6 @@ const {
   title,
   description = '',
   image,
-  preloadImages = [], // Expected format: [{ src, width, aspect }]
   type = 'webpage',
   url = Astro.url.toString(),
   siteName = siteDefaults.title,
@@ -157,6 +162,10 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 <!-- css tags -->
 <CssHead />
+{ preloadImagesAuto.length > 0 && (
+  <ImagePreload images={preloadImagesAuto} />
+)}
+
 <!-- global metadata others -->
 <meta name="preview-image" content="true" />
 <link rel="sitemap" href="/sitemap.xml" />
@@ -166,7 +175,7 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 	title={siteDefaults.title}
 	href={new URL('rss.xml', Astro.site)}
 />
-<meta name="generator" content={Astro.generator} />
+{isDev && <meta name="generator" content={Astro.generator} />}
 
 <!-- Web App Manifest -->
 <link rel="manifest" href="/manifest.webmanifest" />
@@ -194,35 +203,6 @@ const breadcrumbJsonLd = breadcrumb.length > 0 ? {
 <!-- ✅ Responsive Image Preload -->
 {/* ✅ Responsive Image Preload */}
 
-{preloadImages?.length > 0 && (
-  <ImagePreload images={preloadImages} type={type === 'collection' ? 'collection' : 'default'} />
-  /*
-  <>
-    {preloadImages.map((img) => {
-      if (!img.src.includes('w320') && !img.src.includes('w640') && !img.src.includes('w960')) {
-        return null;
-      }
-
-      let media = '';
-      if (img.src.includes('w320')) {
-        media = '(max-width: 600px)';
-      } else if (img.src.includes('w640')) {
-        media = '(max-width: 1024px)';
-      } else if (img.src.includes('w960')) {
-        media = '(min-width: 1280px)';
-      }
-
-      return (
-        <link
-          rel="preload"
-          as="image"
-          href={img.src}
-          media={media || undefined}
-        />
-      );
-    })}
-  </>*/
-  )}
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL} />
