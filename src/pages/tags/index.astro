@@ -5,9 +5,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
 import type { HeadProps } from '../../types/HeadProps';
 import { tagMeta } from '../../config/tagMeta';
-import ResponsiveImage from '../../components/ResponsiveImage.astro';
 
 import { collectFieldCounts } from "../../utils/collectFieldCounts";
+import CardCollections from '../../components/ui/CardCollections.astro';
+import type { CardProps } from '../../types/CardProps';
 
 // Type definitions
 type TagMetaItem = {
@@ -32,7 +33,7 @@ const entry = "tags";
 // Get tag counts (first 3 per post max)
 const tagCountsArray = await collectFieldCounts(entry, 3);
 
-// Known vs unknown arrays
+// Arrays for known & unknown tags
 const knownTags: TagWithCount[] = [];
 const unknownTags: TagWithCount[] = [];
 
@@ -44,7 +45,7 @@ function formatTitle(tag: string): string {
     .join(' ');
 }
 
-// Loop tagCountsArray directly
+// Separate tags into known vs unknown
 for (const { name, count } of tagCountsArray) {
   const tagEntry = tagMetaMap.get(name);
   if (tagEntry) {
@@ -61,6 +62,8 @@ for (const { name, count } of tagCountsArray) {
   }
 }
 
+// Merge tags: Known first, then Unknown
+const mergedTags: TagWithCount[] = [...knownTags, ...unknownTags];
 
 // SEO setup
 const headProps: HeadProps = {
@@ -69,13 +72,34 @@ const headProps: HeadProps = {
   image: siteDefaults.image,
   canonicalUrl: `${siteDefaults.siteUrl}/${entry}/`,
   index: true,
-  keywords: [...knownTags.map(t => t.name), ...unknownTags.map(t => t.name)],
+  keywords: mergedTags.map(t => t.name),
   type: 'collection',
   url: `${siteDefaults.siteUrl}/${entry}/`,
   authors: [],
   authorName: siteDefaults.authorName,
   authorUrl: siteDefaults.authorUrl,
 };
+
+// Map tags to CardProps
+function mapToCardProps(tag: TagWithCount, index: number): CardProps {
+  return {
+    link: tag.url ?? `/${entry}/${tag.name}/`,
+    linkAriaLabel: `View all posts tagged ${tag.title ?? tag.name}`,
+    image: tag.image ?? '',
+    imageAlt: tag.title ?? tag.name,
+    title: tag.title ?? tag.name,
+    description: tag.description ?? '',
+    afterDescription: `${tag.count} posts`,
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy' // First 3 tags eager
+  };
+}
+
+// Final merged cards
+const mergedTagCards: CardProps[] = mergedTags.map((tag, index) => mapToCardProps(tag, index));
+
 ---
 
 <BaseLayout headProps={headProps}>
@@ -83,71 +107,10 @@ const headProps: HeadProps = {
     <h1>{siteDefaults.fieldCollections[entry].title}</h1>
     <p>{siteDefaults.fieldCollections[entry].description}</p>
   </div>
-  
-  <!-- Primary Tags -->
-  {knownTags.length > 0 && (
+
+  {mergedTagCards.length > 0 && (
     <section class="mx-w-site mi-auto mb-2">
-      <h2 class="text-xl bold mb-2">{`Primary ${siteDefaults.fieldCollections[entry].title}`}</h2>
-      <ul class="flex wrap gap-2 no-bullets">
-        {knownTags.map((tag, index) => (
-          <li class="w-320 border p-1 br bg-base-00 box-shadow">
-            <a href={tag.url ?? `/${entry}/${tag.name}/`} class="block td-none">
-              {tag.image && (
-                <ResponsiveImage
-                  src={tag.image}
-                  alt={tag.title ?? tag.name}
-                  sizes="320px"
-                  width={320}
-                  height={180}
-                  breakpoints={{ mobile: 320, desktop: 320 }}
-                  loading={index < 3 ? 'eager' : 'lazy'}
-                />
-              )}
-              <div class="p-02">
-                <h3 class="text-base bold mt-1">{tag.title}</h3>
-                <p class="text-s col-base-80">{tag.description}</p>
-                <span class="inline-block mt-1 text-xs col-base-80">
-                  {tag.count} posts to explore
-                </span>
-              </div>              
-            </a>
-          </li>
-        ))}
-      </ul>
+      <CardCollections cards={mergedTagCards} wrapper="ul" roleType='list' entry={entry}/>
     </section>
   )}
-
-  <!-- Other Tags -->
-  {unknownTags.length > 0 && (
-    <section>
-      <h2 class="text-xl font-bold mb-2">{`Other ${siteDefaults.fieldCollections[entry].title}`}</h2>
-      <ul class="flex wrap gap-2 no-bullets">
-        {unknownTags.map(tag => (
-          <li class="mx-w-320 w-full border p-1 br bg-base-00 box-shadow">
-            <a href={tag.url} class="block no-bb">
-              {tag.image && (
-                <ResponsiveImage
-                  src={tag.image}
-                  alt={tag.title ?? tag.name}
-                  sizes="320px"
-                  width={320}
-                  height={180}
-                  breakpoints={{ mobile: 320, desktop: 320 }}
-                />
-              )}
-              <div class="p-02">
-                <h3 class="text-base bold mt-1">{tag.title}</h3>
-                <p class="text-s col-base-80">{tag.description}</p>
-                <span class="inline-block mt-1 text-xs col-base-80">
-                  {tag.count} posts to explore
-                </span>
-              </div>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
-
-  <Fragment slot="extraScripts" />
 </BaseLayout>

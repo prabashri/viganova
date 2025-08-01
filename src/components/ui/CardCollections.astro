@@ -1,0 +1,38 @@
+---
+import Card from './Card.astro';
+import type { CardProps } from '../../types/CardProps';
+
+interface Props {
+  cards: CardProps[];
+  wrapper?: 'div' | 'ul';
+  roleType?: 'article' | 'list' | 'none';
+  entry?: string;
+}
+
+const { cards, wrapper = 'div', roleType = 'none', entry } = Astro.props;
+const WrapperTag = wrapper;
+const InnerTag = wrapper === 'ul' ? 'li' : 'div';
+
+// Accessibility roles
+const wrapperRole = wrapper === 'ul' && roleType === 'list' ? 'list' : undefined;
+const wrapperLabel = wrapper === 'ul' && entry ? `${entry} list` : undefined;
+const itemRole = wrapper === 'ul' && roleType === 'list' ? 'listitem' : undefined;
+---
+
+<WrapperTag class="card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-center" role={wrapperRole} aria-label={wrapperLabel}>
+  {cards.map((card) => (
+    roleType === 'article'
+      ? (
+        <InnerTag class="card-item" role={itemRole}>
+          <article>
+            <Card {...card} />
+          </article>
+        </InnerTag>
+      )
+      : (
+        <InnerTag class="card-item" role={itemRole}>
+          <Card {...card} />
+        </InnerTag>
+      )
+  ))}
+</WrapperTag>

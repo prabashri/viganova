@@ -110,46 +110,6 @@
   will-change: transform, opacity;
 }
 
-/* faq css */
-.faq-item {
-    margin-bottom: 1rem;
-    border: 1px solid var(--primary-color-light, #ddd);
-    border-radius: 6px;
-    background: var(--base-10);
-    overflow: hidden;
-    transition: 0.3s;
-}
-.faq-item[open] .faq-answer {
-    max-height: 500px;
-    padding: 0px 1rem 1rem;
-}
-.faq-item summary {
-    font-weight: var(--font-weight-regular);
-    font-size: var(--cg-font-base);
-    cursor: pointer;
-    position: relative;
-    padding: 1rem;
-    list-style: none;
-}
-.faq-item summary::after {
-    content: "+";
-    position: absolute;
-    right: 1rem;
-    font-size: 1.2rem;
-    transition: transform 0.3s;
-}
-.faq-item[open] summary::after {
-    content: "-";
-}
-.faq-answer {
-    max-height: 0px;
-    color: var(--cg-text-secondary, #666);
-    overflow: hidden;
-    padding: 0px 1rem;
-    transition: max-height 0.3s, padding 0.3s;
-	color: var(--base-90);
-}
-
 .tab-button.active {
   border-color: var(--base-100);
   color: var(--base-100);
@@ -160,4 +120,11 @@
 }   
 .icon-link:hover .icon-primary{
     fill: revert-layer;
+}
+/* 3-line clamp utility */
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

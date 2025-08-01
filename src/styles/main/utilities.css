@@ -1,6 +1,26 @@
 svg use {
 	pointer-events: none;
 }
+.a-16x9 {
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	height: auto;
+}
+.a-1x1 {
+	aspect-ratio: 1 / 1;
+	object-fit: cover;
+	height: auto;
+}
+.a-3x4 {
+	aspect-ratio: 3 / 4;
+	object-fit: cover;
+	height: auto;
+}
+.a-4x3 {
+	aspect-ratio: 4 / 3;
+	object-fit: cover;
+	height: auto;
+}
 
 .absolute {
 	position: absolute;
@@ -164,8 +184,12 @@ svg use {
 	font-weight: var(--font-weight-bold);
 }
 
-.border, .hover-border:hover {
+.border-primary, .hover-border:hover {
 	border: 1px solid var(--primary);
+}
+
+.border-primary-light, .hover-border-primary-light:hover {
+	border: 1px solid var(--primary-light);
 }
 
 .border-0, .hover-border-0:hover {
@@ -218,8 +242,11 @@ svg use {
 
 .br {
 	border-radius: var(--border-radius);
+	overflow: hidden;
 }
-
+.br-unset {
+	border-radius: unset;
+}
 .br-05-col {
 	border: 0.5px solid var(--secondary);
 }
@@ -551,9 +578,14 @@ svg use {
 .mb-0 {
 	margin-block: 0;
 }
-
+.mb-02{
+	margin-block: 0.2rem;
+}
 .mb-05 {
 	margin-block: 0.5rem;
+}
+.mb-05-0 {
+	margin-block: 0.5rem 0;
 }
 
 .mb-1 {
@@ -940,7 +972,18 @@ svg use {
 .w-90-0 {
 	width: 90%;
 }
-
+.w-site {
+	width: var(--site-width);
+}
+.w-content{
+	width: var(--content-width);
+}
+.w-sidebar {
+	width: var(--sidebar-width);
+}
+.w-featured {
+	width: var(--featured-image-width);
+}	
 .w-auto {
 	width: auto;
 }
@@ -1097,6 +1140,9 @@ svg use {
 
 	.md-display-flex {
 		display: flex !important;
+	}
+	.big-w-full {
+		width: 100% !important;
 	}
 }
 

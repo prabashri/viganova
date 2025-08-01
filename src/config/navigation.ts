@@ -170,7 +170,7 @@ export const secondaryNavigation: NavItem[] = [
 /** NAVIGATION BAR STYLE OPTIONS */
 export const headerStyle: NavStyleConfig = {
   mode: 'glassy',               // 'default' | 'glassy' | 'transparent' | 'primary-light' | 'primary-dark' | 'custom'
-  width: 'sitewidth',          // fullwidth | sitewidth
+  width: 'fullwidth',          // fullwidth | sitewidth
   position: 'sticky',          // static | sticky | fixed
   scrollBehavior: 'none',      // none | hide-on-scroll | show-on-scroll-up
   separator: 'none'          // none | border | shadow (adds bottom split)

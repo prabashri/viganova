@@ -34,7 +34,7 @@
   /* Layout sizing */
   --border-radius: 5px;
   --max-width: 1280px;
-  --featured-image-width: 960px
+  --featured-image-width: 960px;
   --site-width: 1280px;
   --content-width: 640px;
   --sidebar-width: 320px;
@@ -186,8 +186,8 @@ ul, ol {
 }
 
 img {
-  max-width: 100%;
-  height: auto;
+  max-width: 100%; width: 100%; object-fit: cover;
+  height: 100%;
   border-radius: var(--border-radius);
 }
 

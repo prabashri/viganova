@@ -3,6 +3,8 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PaginationSeo from '../../../components/PaginationSeo.astro';
 import PaginationRedirect from '../../../components/PaginationRedirect.astro';
 import Pagination from '../../../components/Pagination.astro';
+import CardCollections from '../../../components/ui/CardCollections.astro';
+
 import { getCollection } from 'astro:content';
 import { siteDefaults } from '../../../config/siteDefaults';
 import { paginate } from '../../../utils/paginate';
@@ -10,12 +12,13 @@ import type { HeadProps } from '../../../types/HeadProps';
 import { tagMeta } from '../../../config/tagMeta';
 import modifiedDatesJson from '../../../data/modified-dates.json';
 import { getCollectionUrl } from '../../../utils/getCollectionUrl';
+import type { CardProps } from '../../../types/CardProps';
 
-const tag = Astro.params.tag?.toLowerCase() ?? 'unknown';
+const entryType = "tags";
+const currentTag = Astro.params.tag?.toLowerCase() ?? 'unknown';
 const currentPage = Number(Astro.params.page ?? '1');
 const POSTS_PER_PAGE = siteDefaults.postsPerCollectionsPage ?? 10;
 
-// Modified dates mapping
 const modifiedDates = modifiedDatesJson as Record<string, string>;
 
 function getModifiedDateKey(entry: any) {
@@ -23,7 +26,6 @@ function getModifiedDateKey(entry: any) {
   return modifiedDates[key] ?? entry.data.lastModified ?? entry.data.publishedDate ?? entry.data.date;
 }
 
-// Build tag meta map
 const tagMetaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
   Object.entries(tagMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
 );
@@ -33,7 +35,7 @@ function hasTag(post: any, tag: string): boolean {
     post.data.tags.some((t: string) => t.toLowerCase() === tag.toLowerCase());
 }
 
-// Gather tagged entries from collections
+// Collect tagged posts
 const taggedCollections = Object.entries(siteDefaults.collections)
   .filter(([_, config]) => config?.tags === true)
   .map(([key]) => key as keyof typeof siteDefaults.collections);
@@ -41,28 +43,36 @@ const taggedCollections = Object.entries(siteDefaults.collections)
 let matchedEntries: any[] = [];
 for (const coll of taggedCollections) {
   const posts = await getCollection(coll);
-  matchedEntries.push(...posts.filter(entry => hasTag(entry, tag)));
+  matchedEntries.push(...posts.filter(entry => hasTag(entry, currentTag)));
 }
 
 // Sort entries by modified date
-const sortedEntries = matchedEntries.sort((a, b) => {
-  const dateB = new Date(getModifiedDateKey(b)).getTime();
-  const dateA = new Date(getModifiedDateKey(a)).getTime();
-  return dateB - dateA;
-});
+matchedEntries.sort((a, b) => new Date(getModifiedDateKey(b)).getTime() - new Date(getModifiedDateKey(a)).getTime());
 
-const { pageItems: paginatedEntries, totalPages } = paginate(sortedEntries, currentPage, POSTS_PER_PAGE);
+// Pagination
+const { pageItems: paginatedEntries, totalPages } = paginate(matchedEntries, currentPage, POSTS_PER_PAGE);
 
-// Tag meta or fallback
-const isKnownTag = tagMetaMap.has(tag);
-const meta = tagMetaMap.get(tag) ?? {
-  name: tag,
-  title: tag.charAt(0).toUpperCase() + tag.slice(1),
-  description: `Explore posts tagged "${tag}" on ${siteDefaults.siteName}.`,
-  image: `/tags/default-image.png`,
-  url: `/tags/${tag}/`
+// Meta
+const meta = tagMetaMap.get(currentTag) ?? {
+  name: currentTag,
+  title: currentTag.charAt(0).toUpperCase() + currentTag.slice(1),
+  description: `Explore posts tagged "${currentTag}" on ${siteDefaults.siteName}.`,
+  image: `/${siteDefaults.fieldCollections[entryType].defaultImage}`,
+  url: `/${entryType}/${currentTag}/`
 };
-const baseUrl = `/tags/${tag}`;
+
+const baseUrl = `/${entryType}/${currentTag}`;
+
+// Other tags from posts
+let otherTagsSet = new Set<string>();
+for (const post of matchedEntries) {
+  if (Array.isArray(post.data?.tags)) {
+    post.data.tags.forEach((t: string) => {
+      if (t.toLowerCase() !== currentTag) otherTagsSet.add(t.toLowerCase());
+    });
+  }
+}
+const otherTagsEntries = Array.from(otherTagsSet).sort();
 
 // SEO props
 const pageSeo: HeadProps = {
@@ -71,80 +81,88 @@ const pageSeo: HeadProps = {
   image: meta.image || siteDefaults.image,
   breadcrumb: [
     { name: 'Home', url: '/' },
-    { name: 'Tags', url: '/tags/' },
-    { name: meta.title ?? tag, url: `${baseUrl}/` },
+    { name: siteDefaults.fieldCollections[entryType].title, url: `/${entryType}/` },
+    { name: meta.title ?? currentTag, url: `${baseUrl}/` },
   ],
   listItems: paginatedEntries.map(p => ({
     name: "title" in p.data ? p.data.title : 'Untitled',
-    url: getCollectionUrl(p.collection, "slug" in p.data && typeof p.data.slug === "string" ? p.data.slug : String(p.id)) // ✅ Use helper
+    url: getCollectionUrl(p.collection, "slug" in p.data && typeof p.data.slug === "string" ? p.data.slug : String(p.id))
   })),
   type: 'collection',
   index: paginatedEntries.length > 0,
-  authors: [
-    {
-      id: 'tag',
-      slug: tag,
-      url: baseUrl,
-      name: meta.title ?? tag,
-      data: { name: meta.title ?? tag, description: meta.description }
-    }
-  ],
+  authors: [] // ✅ No authors needed for collection pages
 };
+
+// Map entries to CardProps
+function mapEntryToCard(entry: any, index: number): CardProps {
+  const postDate = getModifiedDateKey(entry);
+
+  const otherTags = entry.data?.tags?.filter(
+    (t: string) => t.toLowerCase() !== currentTag
+  ) || [];
+
+  const otherEntries = otherTags
+    .map((tagName: string) => {
+      const formatted = tagName.charAt(0).toUpperCase() + tagName.slice(1);
+      return {
+        name: tagName.toLowerCase(),
+        label: formatted,
+        url: `/${entryType}/${tagName.toLowerCase()}/`
+      };
+    })
+    .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label));
+
+  return {
+    link: getCollectionUrl(
+      entry.collection,
+      typeof entry.data.slug === "string" ? entry.data.slug : String(entry.id)
+    ),
+    linkAriaLabel: `View post: ${"title" in entry.data ? entry.data.title : "Untitled"}`,
+    image: "heroImage" in entry.data ? entry.data.heroImage : siteDefaults.image,
+    imageAlt:
+      "heroImageAlt" in entry.data
+        ? entry.data.heroImageAlt
+        : "title" in entry.data
+        ? entry.data.title
+        : 'Post image',
+    otherEntries,
+    title: "title" in entry.data ? entry.data.title : 'Untitled',
+    description: "description" in entry.data ? entry.data.description : '',
+    date: postDate
+      ? new Date(postDate).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit'
+        })
+      : '',
+
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy'
+  };
+}
+
+const postCards: CardProps[] = paginatedEntries.map((entry, idx) => mapEntryToCard(entry, idx));
 ---
 
 <BaseLayout headProps={pageSeo}>
   <PaginationRedirect basePath={baseUrl} currentPage={currentPage} />
   <PaginationSeo basePath={baseUrl} currentPage={currentPage} totalPages={totalPages} />
 
-  <header class="mx-w-featured mi-auto ta-center">
-    <h1>{pageSeo.title}</h1>
-    <p>{pageSeo.description}</p>
+  <header class="mx-w-site mi-auto ta-center">
+    <h1>{meta.title}</h1>
+    <p>{meta.description}</p>
   </header>
 
   {paginatedEntries.length === 0 ? (
-    <p class="col-base-80 ta-center mb-2">No posts found for this tag.</p>
+    <p class="ta-center mt-2">No posts found for this tag.</p>
   ) : (
-    <div class="mx-w-site mi-auto flex wrap pc-center gap mb-2">
-      {paginatedEntries.map(item => (
-        <a href={getCollectionUrl(item.collection, typeof item.data.slug === "string" ? item.data.slug : String(item.id))} class="block mx-w-320 full-width no-bb">
-          <img
-            src={"heroImage" in item.data ? item.data.heroImage : siteDefaults.image}
-            alt={"heroImageAlt" in item.data ? item.data.heroImageAlt : "title" in item.data ? item.data.title : 'Post image'}
-            width="320"
-            height="180"
-            class="aspect-16x9 full-width br"
-            loading="lazy"
-          />
-          <div class="p-4">
-            <span class="inline-block text-xs text-white bg-blue-600 px-2 py-1 rounded mb-2 uppercase tracking-wide">
-              {item.collection}
-            </span>
-            <h2 class="cg-base no-margin">{ "title" in item.data ? item.data.title : 'Untitled'}</h2>
-            <p class="text-sm text-gray-600">{ "description" in item.data ? item.data.description : 'No description available.'}</p>
-          </div>
-        </a>
-      ))}
-    </div>
-  )}
-
-  <Pagination currentPage={currentPage} totalPages={totalPages} basePath={baseUrl} />
-
-  {!isKnownTag && (
-    <section class="mx-w-840 mi-auto mt-8">
-      <h2 class="text-xl font-semibold mb-4">Popular Tags</h2>
-      <ul class="flex flex-wrap gap-3 text-sm">
-        {Object.entries(tagMeta).map(([slug, meta]) => (
-          <li>
-            <a
-              href={`/tags/${slug.toLowerCase()}`}
-              class="inline-block px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 border"
-              title={meta.description}
-            >
-              {meta.title ?? slug}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <section class="mx-w-site mi-auto mt-2">
+      <CardCollections cards={postCards} wrapper="ul" roleType="list" entry={entryType}/>
     </section>
   )}
+
+
+  <Pagination currentPage={currentPage} totalPages={totalPages} basePath={baseUrl} />
 </BaseLayout>

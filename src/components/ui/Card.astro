@@ -1,0 +1,119 @@
+---
+import ResponsiveImage from '../ResponsiveImage.astro';
+import { Icon } from 'astro-icon/components';
+import type { CardProps } from '../../types/CardProps';
+
+const {
+  link,
+  linkAriaLabel,
+  image,
+  imageAlt,
+  icon,
+  iconTitle,
+  iconAriaLabel,
+  afterImage,
+  title,
+  afterTitle,
+  date,
+  afterDate,
+  description,
+  afterDescription,
+  author,
+  afterAuthor,
+  lastRow,
+  orientation = 'horizontal',
+  imageSize = 320,
+  roleType = 'none',
+  loading = 'lazy', // default lazy
+  className = '', // ✅ new prop
+  imageClassName = '', // ✅ new prop
+  otherEntries = [] // ✅ fixed destructuring
+} = Astro.props as CardProps;
+
+// Orientation classes
+const baseClasses = `card border-primary-light hover-border-primary br bg-base-00 box-shadow p-0 ${className}`;
+const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap mx-w-content w-320 big-w-full';
+const verticalClass = 'flex flex-col w-320';
+const orientationClass = orientation === 'horizontal' ? horizontalClass : verticalClass;
+
+// Content wrapper classes
+const contentWrapperClass =
+  orientation === 'horizontal'
+    ? 'flex flex-col flex-1 p-05'
+    : 'flex flex-col pi-05 pb-0-1';
+
+// Wrapper element
+const WrapperTag = link ? 'a' : 'div';
+
+// ARIA role
+const roleAttr = roleType === 'article' ? 'article' : undefined;
+const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
+---
+
+<WrapperTag
+  href={link}
+  aria-label={linkAriaLabel ?? title}
+  role={roleAttr}
+  aria-labelledby={roleAttr === 'article' ? labelledById : undefined}
+  class={`${baseClasses} ${orientationClass} td-none`}
+>
+  {icon
+    ? (
+      <Icon
+        name={icon}
+        title={iconTitle ?? title}
+        aria-label={iconAriaLabel ?? title}
+        class="block w-1-5 h-1-5"
+      />
+    )
+    : image && (
+      <ResponsiveImage
+        src={image}
+        alt={imageAlt ?? title}
+        sizes={`${imageSize}px`}
+        width={imageSize}
+        height={Math.round(imageSize * 0.56)}
+        className={className}
+        imageClassName={`b-thin-base05 br-unset ${imageClassName}`}
+        breakpoints={{ mobile: imageSize, desktop: imageSize }}
+        loading={loading}
+      />
+    )
+  }
+
+  <div class={`${contentWrapperClass}`}>
+    {afterImage && <div class="after-image mt-05">{afterImage}</div>}
+
+    {otherEntries.length > 0 && (
+      <ul class="tag-list flex wrap gap-05 mb-05 no-bullets">
+        {otherEntries.map((entry: { url: string; label: string }) => (
+          <li class="tag-link bg-primary-lighter col-base-100 br text-xs pi-05 pb-02" aria-label={`View tag: ${entry.label}`}>
+            <span class="tag">{entry.label}</span>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <h3 id={labelledById} class="text-base bold mb-02">{title}</h3>
+    {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
+
+    {date && (
+        <time 
+            datetime={new Date(date).toISOString()} 
+            class="inline-block mt-05 text-xs"
+        >
+            {date}
+        </time>
+    )}
+
+    {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
+
+    {description && <p class="text-s mb-05-0 clamp-3">{description}</p>}
+    {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
+
+    {author && <span class="inline-block mt-05 text-xs">By {author}</span>}
+    {afterAuthor && <span class="inline-block mt-05 text-xs">By {afterAuthor}</span>}
+
+    {lastRow && <span class="inline-block mt-05 text-xs">{lastRow}</span>}
+  </div>
+</WrapperTag>
