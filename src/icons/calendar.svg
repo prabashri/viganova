@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path class="icon-background" fill="none" d="M0 0h512v512H0Z"/>
+  <path class="icon-primary" fill-rule="evenodd" d="M392.8 187.6v-51.3h-34.2v17.1h-34.2v-17.1H187.6v17.1h-34.2v-17.1h-34.2v51.3zm0 34.2H119.2v171h273.6Zm-34.2-119.7h34.2a34.2 34.2 0 0 1 34.2 34.2v256.5a34.2 34.2 0 0 1-34.2 34.2H119.2A34.2 34.2 0 0 1 85 392.8V136.3a34.2 34.2 0 0 1 34.2-34.2h34.2V85h34.2v17.1h136.8V85h34.2z"/>
+</svg>

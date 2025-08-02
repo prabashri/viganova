@@ -3,7 +3,7 @@ svg use {
 }
 .active-page {
     /* background-color: var(--primary-lighter); */
-    color: var(--primary);
+    color: var(--primary-base);
     /*text-underline-offset: 5px;*/
     /*text-underline-position: under;*/
     /*text-decoration: underline;*/
@@ -74,18 +74,14 @@ svg use {
   flex-direction: column;
   background-color: var(--bg); /* optional styling */
 }
-.sm-bg{
-  background-color: var(--background-color);
-}
+
 .sm-display-inherit, .full-display-none, .display {
   display: inherit 
 }
 .big-display-inherit, .sm-display-none, .display-none {
   display: none 
 }
-.logo-bg{
-  fill:#fefaff
-}
+
 @media (min-width: 768px) {
 	.md-ai-center {
 	    align-items:center;	

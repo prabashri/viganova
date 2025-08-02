@@ -1,85 +1,95 @@
 ---
-// src/pages/categories/[category]/[page].astro
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PaginationSeo from '../../../components/PaginationSeo.astro';
 import PaginationRedirect from '../../../components/PaginationRedirect.astro';
 import Pagination from '../../../components/Pagination.astro';
+import CardCollections from '../../../components/ui/CardCollections.astro';
+import HeroCollections from '../../../components/ui/HeroCollections.astro';
+
 import { getCollection } from 'astro:content';
 import { siteDefaults } from '../../../config/siteDefaults';
 import { paginate } from '../../../utils/paginate';
 import type { HeadProps } from '../../../types/HeadProps';
-import { categoryMeta } from '../../../config/categoryMeta';
+
 import modifiedDatesJson from '../../../data/modified-dates.json';
 import { getCollectionUrl } from '../../../utils/getCollectionUrl';
+import { mapEntryToCard } from '../../../utils/mapEntryToCard';
+import type { CardProps } from '../../../types/CardProps';
 
-const category = Astro.params.category?.toLowerCase() ?? 'unknown';
-const currentPage = Number(Astro.params.page ?? '1');
+// 🔄 🔄 🔄 CHANGEABLE VARIABLES 🔄 🔄 🔄
+const entryType = "categories"; // "tags" or "categories"
+const currentEntryParam = Astro.params.category?.toLowerCase() ?? 'unknown';
+import { categoryMeta as entryMeta } from '../../../config/categoryMeta'; 
+const fieldName = 'categories';
+const metaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
+  Object.entries(entryMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
+);
+// 🔄 🔄 🔄 END CHANGEABLE VARIABLES 🔄 🔄 🔄
+
+// Constants
 const POSTS_PER_PAGE = siteDefaults.postsPerCollectionsPage ?? 10;
+const currentPage = Number(Astro.params.page ?? '1');
 
-const modifiedDates = modifiedDatesJson as Record<string, string>;
+function hasEntry(post: any, entryValue: string): boolean {
+  return Array.isArray(post.data?.[fieldName]) &&
+    post.data[fieldName].some((v: string) => typeof v === 'string' && v.toLowerCase() === entryValue.toLowerCase());
+}
 
 function getModifiedDateKey(entry: any) {
-  const slugKey = `${entry.collection}/${entry.slug ?? entry.id}`;
-  return modifiedDates[slugKey] ?? entry.data.lastModified ?? entry.data.publishedDate ?? entry.data.date;
+  const key = `${entry.collection}/${entry.slug ?? entry.id}`;
+  return (modifiedDatesJson as Record<string, string>)[key]
+    ?? entry.data.lastModified
+    ?? entry.data.publishedDate
+    ?? entry.data.date;
 }
 
-// Build category meta map
-const categoryMetaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
-  Object.entries(categoryMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
-);
-
-function hasCategory(post: any, category: string): boolean {
-  return Array.isArray(post.data?.categories) && post.data.categories.some((c: string) => c.toLowerCase() === category.toLowerCase());
-}
-
-// Gather category-matching entries
-const categoryCollections = Object.entries(siteDefaults.collections)
-  .filter(([_, config]) => config?.categories === true)
+// Collect matching posts
+const collectionsWithField = Object.entries(siteDefaults.collections)
+  .filter(([_, config]) => config?.tags === true) // works for categories too
   .map(([key]) => key as keyof typeof siteDefaults.collections);
 
-const matchedEntries = [];
-for (const coll of categoryCollections) {
+let matchedEntries: any[] = [];
+for (const coll of collectionsWithField) {
   const posts = await getCollection(coll);
-  matchedEntries.push(...posts.filter(entry => hasCategory(entry, category)));
+  matchedEntries.push(
+    ...posts.filter((entry: any) => {
+      const slug = typeof entry.slug === 'string' ? entry.slug : '';
+      return (
+        hasEntry(entry, currentEntryParam) &&
+        !slug.startsWith('_') &&
+        entry.data?.draft !== true
+      );
+    })
+  );
 }
 
-// Sort entries by modified date
-const sortedEntries = matchedEntries.sort((a, b) => {
-  const dateB = new Date(getModifiedDateKey(b)).getTime();
-  const dateA = new Date(getModifiedDateKey(a)).getTime();
-  return dateB - dateA; // Descending
-});
+// Sort by modified date
+matchedEntries.sort((a, b) => new Date(getModifiedDateKey(b)).getTime() - new Date(getModifiedDateKey(a)).getTime());
 
-const { pageItems: paginatedEntries, totalPages } = paginate(sortedEntries, currentPage, POSTS_PER_PAGE);
+// Pagination
+const { pageItems: paginatedEntries, totalPages } = paginate(matchedEntries, currentPage, POSTS_PER_PAGE);
 
-// Category meta or default
-const isKnownCategory = categoryMetaMap.has(category);
-const meta = categoryMetaMap.get(category) ?? {
-  name: category,
-  title: category.charAt(0).toUpperCase() + category.slice(1),
-  description: `Explore posts in category "${category}" on ${siteDefaults.siteName}.`,
-  image: `/categories/default-image.png`,
-  url: `/categories/${category}/`
+// Meta
+const isKnownEntry = metaMap.has(currentEntryParam);
+const meta = metaMap.get(currentEntryParam) ?? {
+  name: currentEntryParam,
+  title: currentEntryParam.charAt(0).toUpperCase() + currentEntryParam.slice(1),
+  description: `Explore posts in "${currentEntryParam}" on ${siteDefaults.siteName}.`,
+  image: `/${siteDefaults.fieldCollections[entryType].defaultImage}`,
+  url: `/${entryType}/${currentEntryParam}/`
 };
-const baseUrl = `/categories/${category}`;
 
-// Preload images — only pass src
-const preloadImages = paginatedEntries
-  .filter(p => "heroImage" in p.data && typeof p.data.heroImage === 'string')
-  .slice(0, 3)
-  .map(p => "heroImage" in p.data ? p.data.heroImage : '')
-  .filter((src): src is string => typeof src === 'string' && !!src);
+const baseUrl = `/${entryType}/${currentEntryParam}`;
 
-// SEO props
+// SEO
 const pageSeo: HeadProps = {
   title: `${meta.title} | ${siteDefaults.siteName}`,
   description: meta.description,
   image: meta.image || siteDefaults.image,
-  preloadImages,
   breadcrumb: [
     { name: 'Home', url: '/' },
-    { name: 'Categories', url: '/categories/' },
-    { name: meta.title ?? category, url: `${baseUrl}/` },
+    { name: siteDefaults.fieldCollections[entryType].title, url: `/${entryType}/` },
+    { name: meta.title ?? currentEntryParam, url: `${baseUrl}/` }
   ],
   listItems: paginatedEntries.map(p => ({
     name: "title" in p.data ? p.data.title : 'Untitled',
@@ -87,71 +97,32 @@ const pageSeo: HeadProps = {
   })),
   type: 'collection',
   index: paginatedEntries.length > 0,
-  authors: [
-    {
-      id: 'category',
-      slug: category,
-      url: baseUrl,
-      name: meta.title ?? category,
-      data: { name: meta.title ?? category, description: meta.description }
-    }
-  ],
+  authors: []
 };
+
+const postCards: CardProps[] = paginatedEntries.map((entry, idx) =>
+  mapEntryToCard(entry, idx, { currentEntryParam, entryType, fieldName, metaMap })
+);
 ---
 
 <BaseLayout headProps={pageSeo}>
   <PaginationRedirect basePath={baseUrl} currentPage={currentPage} />
   <PaginationSeo basePath={baseUrl} currentPage={currentPage} totalPages={totalPages} />
 
-  <header class="mx-w-featured mi-auto ta-center">
-    <h1>{pageSeo.title}</h1>
-    <p>{pageSeo.description}</p>
-  </header>
+   <HeroCollections
+    title={meta.title ?? currentEntryParam}
+    description={meta.description}
+    bgColorClass="bg-secondary-lighter-x"
+    textColorClass="col-base-00"
+  />
 
-  {paginatedEntries.length === 0 ? (
-    <p class="col-base-80 ta-center mb-2">No posts found in this category.</p>
-  ) : (
-    <div class="mx-w-site mi-auto flex wrap pc-center gap mb-2">
-      {paginatedEntries.map(item => (
-        <a href={getCollectionUrl(item.collection, typeof item.data.slug === "string" ? item.data.slug : String(item.id))} class="block mx-w-320">
-          <img
-            src={"heroImage" in item.data ? item.data.heroImage : siteDefaults.image}
-            alt={"heroImageAlt" in item.data ? item.data.heroImageAlt : "title" in item.data ? item.data.title : 'Post image'}
-            width="320"
-            height="180"
-            class="aspect-16x9 full-width br"
-            loading="lazy"
-          />
-          <div class="p-4">
-            <span class="inline-block text-xs text-white bg-blue-600 px-2 py-1 rounded mb-2 uppercase tracking-wide">
-              {item.collection}
-            </span>
-            <h2 class="cg-base no-margin">{ "title" in item.data ? item.data.title : 'Untitled'}</h2>
-            <p class="text-sm text-gray-600">{ "description" in item.data ? item.data.description : 'No description available.'}</p>
-          </div>
-        </a>
-      ))}
-    </div>
-  )}
+  <section class="mx-w-site mi-auto mb-2 pb-2">
+    {paginatedEntries.length === 0 ? (
+      <p class="ta-center mt-2">No posts found for this {entryType.slice(0, -1)}.</p>
+    ) : (
+      <CardCollections cards={postCards} wrapper="ul" roleType="list" entry={entryType} />
+    )}
+  </section>
 
   <Pagination currentPage={currentPage} totalPages={totalPages} basePath={baseUrl} />
-
-  {!isKnownCategory && (
-    <section class="mx-w-840 mi-auto mt-8">
-      <h2 class="text-xl font-semibold mb-4">Popular Categories</h2>
-      <ul class="flex flex-wrap gap-3 text-sm">
-        {Object.entries(categoryMeta).map(([slug, meta]) => (
-          <li>
-            <a
-              href={`/categories/${slug.toLowerCase()}`}
-              class="inline-block px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 border"
-              title={meta.description}
-            >
-              {meta.title ?? slug}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
 </BaseLayout>

@@ -28,24 +28,24 @@ const allowedLevels = depth === 'h2' ? [2] : [2, 3];
 
 {toc.length > 0 && (
     <div class="sticky top-20">
-  <details class="toc group block lg:[open]" open>
-    <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
-      <h2 class="cg-base no-bold no-margin">{heading}</h2>      
-      <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
-    </summary>
-    <nav class="text-sm px-2 py-2 overflow-y-auto max-h-[80vh]">
-        <ul id="toc" class="toc-list cg-small no-bullets">
-            {props.toc
-                .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
-                .map(item => (
-                <li class={item.level === 3 ? 'ml-4' : 'ml-0'}>
-                    <a class="block no-bb pi-05 pb-02" href={`#${item.id}`}>{item.text}</a>
-                </li>
-            ))}
-        </ul>
-    </nav>
-  </details>
-  </div>
+      <details class="toc group block lg:[open]" open>
+        <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
+          <h2 class="cg-base no-bold no-margin">{heading}</h2>      
+          <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
+        </summary>
+        <nav class="text-sm px-2 py-2 overflow-y-auto max-h-[80vh]">
+            <ul id="toc" class="toc-list cg-small no-bullets">
+                {props.toc
+                    .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
+                    .map(item => (
+                    <li class={item.level === 3 ? 'ml-4' : 'ml-0'}>
+                        <a class="block no-bb pi-05 pb-02" href={`#${item.id}`}>{item.text}</a>
+                    </li>
+                ))}
+            </ul>
+        </nav>
+      </details>
+    </div>
 )}
 
 

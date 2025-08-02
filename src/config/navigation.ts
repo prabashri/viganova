@@ -39,7 +39,7 @@ export const siteNav: NavItem[] = [
     label: 'Tools',
     href: '/tools/',
     type: 'dropdown',
-    iconName: 'clamp',
+    iconName: '',
     menuId: 'dropdown-tools',
     content: [
       {

@@ -86,7 +86,7 @@ const sortedPosts = allPosts
   lastModified={lastModified}
   authors={authors.filter(Boolean).map(a => ({ id: a!.id }))}
   tags={post.data.tags}
-  category={post.data.category}
+  categories={post.data.categories}
   keywords={post.data.keywords}
   featured={post.data.featured ?? false}
   draft={post.data.draft ?? false}

@@ -1,4 +1,4 @@
-<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path fill="currentColor" d="M11.672 15.209a.38.257 0 0 0 .656 0l5.31-6.16a.38.257 0 0 0-.327-.385H6.689a.38.257 0 0 0-.327.386Z"/>
-  <path fill="#ffffff00" d="M0 0h24v24H0Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path class="icon-background" fill="none" d="M0 0h512v512H0Z"/>
+  <path class="icon-primary" fill="currentColor" d="M246.154 352.454a11.422 7.725 0 0 0 19.718 0l159.61-185.16a11.422 7.725 0 0 0-9.829-11.573H96.373a11.422 7.725 0 0 0-9.83 11.603z"/>
 </svg>

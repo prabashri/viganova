@@ -2,16 +2,17 @@
   "css": {
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-07-31T10:33:25.855Z",
+      "datetime": "2025-08-02T13:00:42.745Z",
       "names": [
         "base",
         "colors",
-        "header"
+        "header",
+        "size"
       ]
     },
     "main": {
-      "file": "/styles/main.k5sffa.css",
-      "datetime": "2025-07-31T08:53:29.363Z",
+      "file": "/styles/main.7pw5x2.css",
+      "datetime": "2025-08-02T13:00:45.230Z",
       "names": [
         "components",
         "form",
@@ -19,9 +20,10 @@
       ]
     },
     "nonCritical": {
-      "file": "/styles/non-critical.q0nove.css",
-      "datetime": "2025-07-31T08:53:31.824Z",
+      "file": "/styles/non-critical.elsvnr.css",
+      "datetime": "2025-08-02T11:04:38.045Z",
       "names": [
+        "faq",
         "footer",
         "non-critical",
         "search-icon"
@@ -29,7 +31,7 @@
     },
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-07-31T10:32:55.350Z",
+      "datetime": "2025-08-02T12:59:54.678Z",
       "names": [
         "colors"
       ]
@@ -47,7 +49,7 @@
   },
   "icons": {
     "favicon.ico": {
-      "datetime": "2025-07-31T10:33:35.882Z"
+      "datetime": "2025-08-02T13:00:54.290Z"
     },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
@@ -65,19 +67,19 @@
       "datetime": "2025-07-26T08:39:30.340Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-07-31T10:33:35.487Z"
+      "datetime": "2025-08-02T11:04:45.174Z"
     },
     "favicon-16x16.png": {
       "datetime": "2025-06-27T05:12:16.114Z"
     }
   },
   "siteDefaults": {
-    "datetime": "2025-07-31T10:23:22.744Z"
+    "datetime": "2025-08-02T10:29:53.294Z"
   },
   "json": {
     "search-index": {
-      "file": "/search-index.pdyicj.json",
-      "datetime": "2025-07-31T10:33:18.164Z"
+      "file": "/search-index.szzzxr.json",
+      "datetime": "2025-08-02T13:00:33.904Z"
     }
   },
   "logos": {

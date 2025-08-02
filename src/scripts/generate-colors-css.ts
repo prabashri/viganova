@@ -1,3 +1,4 @@
+// src/scripts/generate-colors-css.ts
 import fs from 'fs/promises';
 import path from 'path';
 import { siteColors } from '../config/siteColors';
@@ -5,41 +6,69 @@ import { readManifest, writeManifestEntry } from '../utils/write-manifest';
 
 const cssPath = path.resolve('./src/styles/inline/colors.css');
 
-// --- Helpers ---
-function parseColorToHSLA(color: string): { h: number, s: number, l: number, a?: number } {
+/* -------------------------
+   🎨 Helpers
+------------------------- */
+function clampLightness(l: number, userProvided?: boolean): number {
+  if (userProvided) return Math.round(l); // respect user exact value
+  return Math.min(Math.max(Math.round(l), 5), 95); // clamp auto-generated
+}
+
+function normalizeHsla(h: number, s: number, l: number, a?: number, userProvided?: boolean) {
+  return {
+    h: Math.round(h),
+    s: Math.round(s),
+    l: clampLightness(l, userProvided),
+    a: a !== undefined ? +(a.toFixed(2)) : 1
+  };
+}
+
+function hslaToCss(hsla: { h: number, s: number, l: number, a?: number }) {
+  const alpha = hsla.a !== undefined ? hsla.a : 1;
+  return `hsla(${hsla.h}, ${hsla.s}%, ${hsla.l}%, ${alpha})`;
+}
+
+function parseColorToHSLA(color: string, userProvided = true): { h: number, s: number, l: number, a?: number } {
+  if (!color) throw new Error(`Empty color cannot be parsed`);
   color = color.trim().toLowerCase();
 
-  // HEX / HEX8
+  const adjustIfExtreme = (obj: { h: number, s: number, l: number, a?: number }) => {
+    if (!userProvided) {
+      if (obj.l === 100) obj.l = 95;
+      if (obj.l === 0) obj.l = 5;
+    }
+    return obj;
+  };
+
+  // HEX / HEXA
   if (color.startsWith('#')) {
     let hex = color.replace('#', '');
-    if (hex.length === 3) {
-      hex = hex.split('').map(c => c + c).join('');
-    }
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
     if (hex.length === 6 || hex.length === 8) {
       const r = parseInt(hex.substring(0, 2), 16);
       const g = parseInt(hex.substring(2, 4), 16);
       const b = parseInt(hex.substring(4, 6), 16);
       const a = hex.length === 8 ? parseInt(hex.substring(6, 8), 16) / 255 : undefined;
-      return rgbToHsla(r, g, b, a);
+      return adjustIfExtreme(rgbToHsla(r, g, b, a));
     }
   }
 
   // RGB / RGBA
   if (color.startsWith('rgb')) {
     const values = color.match(/[\d.]+/g)?.map(Number) ?? [];
-    return rgbToHsla(values[0], values[1], values[2], values[3]);
+    return adjustIfExtreme(rgbToHsla(values[0], values[1], values[2], values[3]));
   }
 
   // HSL / HSLA
   if (color.startsWith('hsl')) {
     const values = color.match(/[\d.]+/g)?.map(Number) ?? [];
-    return { h: values[0], s: values[1], l: values[2], a: values[3] };
+    return adjustIfExtreme(normalizeHsla(values[0], values[1], values[2], values[3], userProvided));
   }
 
   throw new Error(`Unsupported color format: ${color}`);
 }
 
-function rgbToHsla(r: number, g: number, b: number, a?: number): { h: number, s: number, l: number, a?: number } {
+function rgbToHsla(r: number, g: number, b: number, a?: number) {
   r /= 255; g /= 255; b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
   let h = 0, s = 0, l = (max + min) / 2;
@@ -54,147 +83,151 @@ function rgbToHsla(r: number, g: number, b: number, a?: number): { h: number, s:
     }
     h /= 6;
   }
-  return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100), a };
+  return normalizeHsla(h * 360, s * 100, l * 100, a);
 }
 
-function hslaToCss(hsla: { h: number, s: number, l: number, a?: number }): string {
-  const alpha = hsla.a !== undefined ? `, ${Math.round(hsla.a * 100) / 100}` : '';
-  return `hsla(${hsla.h}, ${hsla.s}%, ${hsla.l}%${alpha})`;
-}
+/* -------------------------
+   🔄 Shade Generator (Exact 7 Keys)
+------------------------- */
+type ShadeKey =
+  | 'darker-x'
+  | 'darker'
+  | 'dark'
+  | 'base'
+  | 'light'
+  | 'lighter'
+  | 'lighter-x';
 
-function generateShadeVariants(baseColor: string) {
-  const hsla = parseColorToHSLA(baseColor);
-  const { h, s, l, a } = hsla;
-  const make = (adj: number) => hslaToCss({ h, s, l: Math.min(Math.max(l + adj, 0), 100), a });
+function generateColorSet(baseColor: string, userValues: Record<ShadeKey, string>) {
+  const baseHSLA = parseColorToHSLA(baseColor, true);
 
-  return {
-    darkerX: make(-30),
-    darker: make(-20),
-    dark: make(-10),
-    base: hslaToCss(hsla),
-    light: make(10),
-    lighter: make(20),
-    lighterX: make(30)
+  const shadeAdjustments: Record<ShadeKey, number> = {
+    'darker-x': -35,
+    'darker': -25,
+    'dark': -10,
+    'base': 0,
+    'light': 10,
+    'lighter': 20,
+    'lighter-x': 30
   };
+
+  const shades: Record<ShadeKey, string> = {} as any;
+
+  (Object.keys(shadeAdjustments) as ShadeKey[]).forEach(key => {
+    if (userValues[key] && userValues[key].trim() !== '') {
+      shades[key] = hslaToCss(parseColorToHSLA(userValues[key], true));
+    } else {
+      const adjL = clampLightness(baseHSLA.l + shadeAdjustments[key], false);
+      shades[key] = hslaToCss({ ...baseHSLA, l: adjL, a: 1 });
+    }
+  });
+
+  return shades;
 }
 
-function generateBaseScale(lightMode = true) {
+/* -------------------------
+   ⚪ Base Scale
+------------------------- */
+function generateBaseScale() {
   const base: Record<string, string> = {};
   const steps = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100];
+
   for (let step of steps) {
-    const val = lightMode ? (100 - step) : step;
-    base[`base-${step.toString().padStart(2, '0')}`] = `hsla(0, 0%, ${val}%, 1)`;
+    let val = 100 - step; // White at base-00, black at base-100
+
+    // Format key: base-00, base-05, ..., base-100
+    const key =
+      step === 100
+        ? 'base-100'
+        : `base-${step.toString().padStart(2, '0')}`;
+
+    base[key] = `hsla(0, 0%, ${val}%, 1)`;
   }
+
   return base;
 }
 
-function safeColor(input: string | undefined, fallback: string) {
-  return input ?? fallback;
-}
 
-function resolveSecondaryBase(colors: typeof siteColors, darkMode = false) {
-  if (darkMode) {
-    return colors.darkSecondaryColor
-      ?? colors.secondaryColor
-      ?? '#ffffff';
-  }
-  return colors.secondaryColor ?? '#000000';
-}
 
-// --- CSS Builder ---
-function generateCSS(colors: typeof siteColors): string {
-  // Light mode primary/secondary
-  const primaryLight = generateShadeVariants(colors.primaryColor);
-  const secondaryLightBase = resolveSecondaryBase(colors, false);
-  const secondaryLight = generateShadeVariants(secondaryLightBase);
+/* -------------------------
+   🎨 CSS Builder
+------------------------- */
+function generateCSS(colors: typeof siteColors) {
+  const primaryShades = generateColorSet(colors.primaryColor, {
+    'darker-x': colors.primaryColorDarkerX,
+    'darker': colors.primaryColorDarker,
+    'dark': colors.primaryColorDark,
+    'base': colors.primaryColor,
+    'light': colors.primaryColorLight,
+    'lighter': colors.primaryColorLighter,
+    'lighter-x': colors.primaryColorLighterX
+  });
 
-  // Dark mode primary/secondary
-  const primaryDarkBase = colors.darkPrimaryColor ?? colors.primaryColor;
-  const secondaryDarkBase = resolveSecondaryBase(colors, true);
+  const secondaryShades = generateColorSet(colors.secondaryColor, {
+    'darker-x': colors.secondaryColorDarkerX,
+    'darker': colors.secondaryColorDarker,
+    'dark': colors.secondaryColorDark,
+    'base': colors.secondaryColor,
+    'light': colors.secondaryColorLight,
+    'lighter': colors.secondaryColorLighter,
+    'lighter-x': colors.secondaryColorLighterX
+  });
 
-  const primaryDark = generateShadeVariants(primaryDarkBase);
-  const secondaryDark = generateShadeVariants(secondaryDarkBase);
+  const primaryDarkShades = generateColorSet(colors.darkPrimaryColor ?? colors.primaryColor, {} as any);
+  const secondaryDarkShades = generateColorSet(colors.darkSecondaryColor ?? colors.secondaryColor, {} as any);
 
-  // Base scales
-  const baseLight = generateBaseScale(true);
-  const baseDark = generateBaseScale(false);
+  const baseLight = generateBaseScale();
+  const baseDark = generateBaseScale();
 
   return `/* ================================
    🌈 CSS VARIABLES
 ================================ */
 :root {
   color-scheme: light dark;
+  ${Object.entries(primaryShades).map(([k,v]) => `--primary-${k}: ${v};`).join("\n  ")}
 
-  /* Primary Shades */
-  --primary-darker-x: ${safeColor(colors.primaryColorDarker, primaryLight.darkerX)};
-  --primary-darker: ${safeColor(colors.primaryColorDark, primaryLight.darker)};
-  --primary-dark: ${primaryLight.dark};
-  --primary: ${primaryLight.base};
-  --primary-light: ${safeColor(colors.primaryColorLight, primaryLight.light)};
-  --primary-lighter: ${safeColor(colors.primaryColorLighter, primaryLight.lighter)};
-  --primary-lighter-x: ${safeColor(colors.primaryColorLighterX, primaryLight.lighterX)};
+  ${Object.entries(secondaryShades).map(([k,v]) => `--secondary-${k}: ${v};`).join("\n  ")}
 
-  /* Secondary Shades */
-  --secondary-darker-x: ${secondaryLight.darkerX};
-  --secondary-darker: ${secondaryLight.darker};
-  --secondary-dark: ${secondaryLight.dark};
-  --secondary: ${secondaryLight.base};
-  --secondary-light: ${safeColor(colors.secondaryColorLight, secondaryLight.light)};
-  --secondary-lighter: ${safeColor(colors.secondaryColorLighter, secondaryLight.lighter)};
-  --secondary-lighter-x: ${secondaryLight.lighterX};
-
-  --background-color: ${colors.backgroundColor};
-  --text-color: ${colors.textColor};
+  --background-color: ${hslaToCss(parseColorToHSLA(colors.backgroundColor, true))};
+  --text-color: ${hslaToCss(parseColorToHSLA(colors.textColor, true))};
 
   ${Object.entries(baseLight).map(([k,v]) => `--${k}: ${v};`).join("\n  ")}
 }
 
-/* 🌙 Dark mode overrides */
 [data-theme="dark"] {
-  /* Primary Shades */
-  --primary-darker-x: ${primaryDark.darkerX};
-  --primary-darker: ${primaryDark.darker};
-  --primary-dark: ${primaryDark.dark};
-  --primary: ${primaryDark.base};
-  --primary-light: ${primaryDark.light};
-  --primary-lighter: ${primaryDark.lighter};
-  --primary-lighter-x: ${primaryDark.lighterX};
+  ${Object.entries(primaryDarkShades).map(([k,v]) => `--primary-${k}: ${v};`).join("\n  ")}
 
-  /* Secondary Shades */
-  --secondary-darker-x: ${secondaryDark.darkerX};
-  --secondary-darker: ${secondaryDark.darker};
-  --secondary-dark: ${secondaryDark.dark};
-  --secondary: ${secondaryDark.base};
-  --secondary-light: ${secondaryDark.light};
-  --secondary-lighter: ${secondaryDark.lighter};
-  --secondary-lighter-x: ${secondaryDark.lighterX};
+  ${Object.entries(secondaryDarkShades).map(([k,v]) => `--secondary-${k}: ${v};`).join("\n  ")}
 
-  --background-color: ${colors.darkBackgroundColor ?? '#131313'};
-  --text-color: ${colors.darkTextColor ?? '#ffffff'};
+  --background-color: ${hslaToCss(parseColorToHSLA(colors.darkBackgroundColor, true))};
+  --text-color: ${hslaToCss(parseColorToHSLA(colors.darkTextColor, true))};
 
   ${Object.entries(baseDark).map(([k,v]) => `--${k}: ${v};`).join("\n  ")}
-}
-`;
+}`;
 }
 
-// --- Change Detector ---
+/* -------------------------
+   🛠 Change Detector
+------------------------- */
 async function colorsChangedSinceLastBuild(): Promise<boolean> {
   const manifest = await readManifest();
   const manifestEntry = manifest.css?.colors;
 
   try {
-    const colorsStat = await fs.stat(path.resolve('./src/config/colors.ts'));
+    const colorsStat = await fs.stat(path.resolve('./src/config/siteColors.ts'));
     if (!manifestEntry?.datetime) return true;
 
     const manifestTime = new Date(manifestEntry.datetime).getTime();
     const fileTime = colorsStat.mtime.getTime();
     return fileTime > manifestTime;
   } catch {
-    return true; // No manifest entry or missing file → regenerate
+    return true;
   }
 }
 
-// --- Main ---
+/* -------------------------
+   🚀 Main
+------------------------- */
 async function main() {
   const shouldRebuild = await colorsChangedSinceLastBuild();
   if (!shouldRebuild) {
@@ -209,6 +242,5 @@ async function main() {
   const normalizedPath = '/' + path.relative(process.cwd(), cssPath).replace(/\\/g, '/');
   await writeManifestEntry('css', 'colors', normalizedPath, { names: ['colors'] });
 }
-
 
 main();

@@ -40,8 +40,8 @@ function getPageRange(current: number, total: number): (number | string)[] {
 ---
 
 {totalPages > 1 && (
-  <nav class="pagination ta-center mt-8">
-    <ul class="flex wrap gap justify-center">
+  <nav class="pagination mx-w-content mi-auto ta-center mb-1">
+    <ul class="flex wrap gap no-bullets jc-center mb-05">
       {currentPage > 1 && (
         <li>
           <a href={getPageUrl(currentPage - 1)} class="pagination-link">Previous</a>
@@ -53,19 +53,19 @@ function getPageRange(current: number, total: number): (number | string)[] {
           {item === '…' ? (
             <span class="pagination-link">…</span>
           ) : item === currentPage ? (
-            <span class="pagination-link active">{item}</span>
+            <span class="pagination-link active col-base-50">{item}</span>
           ) : (
-            <a href={getPageUrl(item as number)} class="pagination-link">{item}</a>
+            <a href={getPageUrl(item as number)} class="pagination-link pi-05 br">{item}</a>
           )}
         </li>
       ))}
 
       {currentPage < totalPages && (
         <li>
-          <a href={getPageUrl(currentPage + 1)} class="pagination-link">Next</a>
+          <a href={getPageUrl(currentPage + 1)} class="pagination-link page-next">Next</a>
         </li>
       )}
     </ul>
-    <p class="mt-2 text-sm text-gray-500">Page {currentPage} of {totalPages}</p>
+    <p class="mb-05 text-xs col-base-50">Page {currentPage} of {totalPages}</p>
   </nav>
 )}

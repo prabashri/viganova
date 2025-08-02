@@ -12,7 +12,7 @@ interface Props {
   className?: string;
   imageClassName?: string;
   caption?: string;
-  loading?: 'lazy' | 'eager';
+  loading?: 'lazy' | 'eager' | 'delay';
   sizes?: string;
   breakpoints?: { mobile?: number; desktop?: number };
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
@@ -36,7 +36,6 @@ const {
 const mobileMax = siteDefaults.breakpoints.mobileMax ?? 768;
 const desktopMin = siteDefaults.breakpoints.desktopMin ?? 769;
 
-const fetchPriority = loading === 'eager' ? 'high' : undefined;
 const metadata = imageMetadataJson as Record<string, any>;
 const data = metadata[src];
 
@@ -57,7 +56,6 @@ let aspectClass = '';
 let widthClassMobile = '';
 let widthClassDesktop = '';
 let objectFitClass = '';
-
 if (hasData) {
   basePath = `/images${data.path}`;
   availableWidths = data.variants.map(Number).sort((a: number, b: number) => a - b);
@@ -66,7 +64,6 @@ if (hasData) {
 
   formats = [...data.format].sort((a, b) => (a === 'webp' ? -1 : b === 'webp' ? 1 : 0));
 
-  // Sizes attribute
   if (!sizesAttr && breakpoints) {
     const { mobile = 320, desktop = 640 } = breakpoints;
     sizesAttr = `(max-width: ${mobileMax}px) ${mobile}px, ${desktop}px`;
@@ -75,37 +72,49 @@ if (hasData) {
     sizesAttr = `(max-width: ${mobileMax}px) 320px, 640px`;
   }
 
-  // Pick width variants
   width1x = availableWidths.find(w => w >= targetWidth) ?? availableWidths[0];
   width2x = availableWidths.find(w => w >= width1x * 2) ?? width1x;
 
   imageBaseName = src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '');
   fallbackSrc = `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]}`;
 
-  // Auto classes
   aspectClass = `a-${defaultAspect}`;
   widthClassMobile = `w-${breakpoints?.mobile ?? 320}`;
-  widthClassDesktop = `big-w-${breakpoints?.desktop ?? 640}`;
-  objectFitClass = `of-${objectFit}`;
-}
 
-// Preload
-if (loading === 'eager' && hasData) {
+  // ✅ Replace magic widths with semantic classes
+  widthClassDesktop = breakpoints?.desktop && breakpoints.desktop > 640
+    ? `mx-w-featured big-w-full`
+    : `mx-w-content big-w-full`;
+
+  objectFitClass = `object-${objectFit}`;
+
   const format = formats[0];
   const buildSrc = (w: number) => `${basePath}${imageBaseName}-w${w}-a${defaultAspect}.${format}`;
   const mobileBP = breakpoints?.mobile ?? 320;
   const desktopBP = breakpoints?.desktop ?? mobileBP;
   const mWidth = availableWidths.find(w => w >= mobileBP) ?? availableWidths[0];
   const dWidth = availableWidths.find(w => w >= desktopBP) ?? mWidth;
-  registerPreloadImage({ src: buildSrc(mWidth), media: `(max-width: ${mobileMax}px)` });
-  if (dWidth !== mWidth) {
-    registerPreloadImage({ src: buildSrc(dWidth), media: `(min-width: ${desktopMin}px)` });
+
+  if (loading === 'eager') {
+    registerPreloadImage({ src: buildSrc(mWidth), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'high' });
+    if (dWidth !== mWidth) {
+      registerPreloadImage({ src: buildSrc(dWidth), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'high' });
+    }
+  }
+
+  if (loading === 'delay') {
+    registerPreloadImage({ src: buildSrc(mWidth), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'low' });
+    if (dWidth !== mWidth) {
+      registerPreloadImage({ src: buildSrc(dWidth), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'low' });
+    }
   }
 }
+
+
 ---
 
 {!hasData ? (
-  <div class={`flex ai-center jc-center bg-base-20 ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} h-fit`}>
+  <div class={`flex ai-center jc-center bg-base-20 ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit`}>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" id="svg-placeholder" class={`w-full h-auto ${imageClassName} ${objectFitClass}`}>
       <path fill="red" d="M0 0h400v225H0Z" class="icon-background fill-primary-lighter"></path>
     </svg>
@@ -119,45 +128,53 @@ if (loading === 'eager' && hasData) {
           {formats.filter(f => f !== formats[0]).map(format => (
             <source
               type={`image/${format === 'jpg' ? 'jpeg' : format}`}
-              srcset={`${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x`}
+              srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x`}
+              data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x` : undefined}
+              delay-image={loading === 'delay' ? "true" : undefined}
             />
           ))}
           <img
-            src={fallbackSrc}
-            srcset={`${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x`}
+            src={loading === 'delay' ? undefined : fallbackSrc}
+            data-src={loading === 'delay' ? fallbackSrc : undefined}
+            srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x`}
+            data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x` : undefined}
             sizes={sizesAttr}
             width={width ?? width1x}
             height={height}
             alt={alt}
             title={title}
-            loading={loading}
+            loading={loading === 'delay' ? 'lazy' : loading}
             decoding="async"
-            fetchpriority={fetchPriority}
-            class={`block w-full h-auto br ${imageClassName} ${objectFitClass}`}
+            fetchpriority={loading === 'eager' ? 'high' : undefined}
+            class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
           />
         </picture>
-        <figcaption class="cg-small">{caption}</figcaption>
+        <figcaption class="text-s">{caption}</figcaption>
       </figure>
     ) : (
       <picture class={`block image-wrapper ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} h-fit`}>
         {formats.filter(f => f !== formats[0]).map(format => (
           <source
             type={`image/${format === 'jpg' ? 'jpeg' : format}`}
-            srcset={`${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x`}
+            srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x`}
+            data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x` : undefined}
+            delay-image={loading === 'delay' ? "true" : undefined}
           />
         ))}
         <img
-          src={fallbackSrc}
-          srcset={`${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x`}
+          src={loading === 'delay' ? undefined : fallbackSrc}
+          data-src={loading === 'delay' ? fallbackSrc : undefined}
+          srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x`}
+          data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x` : undefined}
           sizes={sizesAttr}
           width={width ?? width1x}
           height={height}
           alt={alt}
           title={title}
-          loading={loading}
+          loading={loading === 'delay' ? 'lazy' : loading}
           decoding="async"
-          fetchpriority={fetchPriority}
-          class={`block w-full h-auto br ${imageClassName} ${objectFitClass}`}
+          fetchpriority={loading === 'eager' ? 'high' : undefined}
+          class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
         />
       </picture>
     )}

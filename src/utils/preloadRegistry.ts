@@ -2,12 +2,13 @@
 type PreloadItem = {
   src: string;
   media?: string;
+  fetchPriority?: 'high' | 'low' | 'auto';
 };
 
 const preloadSet = new Map<string, PreloadItem>();
 
 export function registerPreloadImage(item: PreloadItem) {
-  const key = `${item.src}|${item.media ?? ''}`;
+  const key = `${item.src}|${item.media ?? ''}|${item.fetchPriority ?? 'auto'}`;
   preloadSet.set(key, item);
 }
 

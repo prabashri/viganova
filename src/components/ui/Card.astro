@@ -100,8 +100,14 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
     {date && (
         <time 
             datetime={new Date(date).toISOString()} 
-            class="inline-block mt-05 text-xs"
+            class="inline-flex flex-row gap-05 mt-05 text-xs"
         >
+            <Icon
+                name="calendar"
+                title={iconTitle ?? title}
+                aria-label={iconAriaLabel ?? title}
+                class="block w-1-0 h-1-0"
+            />
             {date}
         </time>
     )}

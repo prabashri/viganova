@@ -109,3 +109,9 @@ pre {
   outline: 2px dashed var(--primary-color-light);
   outline-offset: 2px;
 }
+
+.pagination-link.page-next {
+  background-color: var(--primary-lighter);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+}

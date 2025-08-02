@@ -19,7 +19,7 @@ const wrapperLabel = wrapper === 'ul' && entry ? `${entry} list` : undefined;
 const itemRole = wrapper === 'ul' && roleType === 'list' ? 'listitem' : undefined;
 ---
 
-<WrapperTag class="card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-center" role={wrapperRole} aria-label={wrapperLabel}>
+<WrapperTag class="card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-f-start" role={wrapperRole} aria-label={wrapperLabel}>
   {cards.map((card) => (
     roleType === 'article'
       ? (

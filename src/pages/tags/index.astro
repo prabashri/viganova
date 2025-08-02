@@ -1,78 +1,69 @@
 ---
-// src/pages/tags/index.astro
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
 import type { HeadProps } from '../../types/HeadProps';
-import { tagMeta } from '../../config/tagMeta';
+
+import type { EntryMetaProps } from '../../types/EntryMetaProps';
+import HeroCollections from '../../components/ui/HeroCollections.astro';
 
 import { collectFieldCounts } from "../../utils/collectFieldCounts";
 import CardCollections from '../../components/ui/CardCollections.astro';
 import type { CardProps } from '../../types/CardProps';
 
-// Type definitions
-type TagMetaItem = {
-  name: string;
-  title?: string;
-  description?: string;
-  image?: string;
-  url?: string;
-};
-type TagWithCount = TagMetaItem & { count: number };
+const entry = "tags";
+import { tagMeta as entryMeta } from '../../config/tagMeta'; 
 
-// Map tagMeta for quick lookup
-const tagMetaMap = new Map<string, TagMetaItem>(
-  Object.entries(tagMeta).map(([name, meta]) => [
+// Map entryMeta for quick lookup
+const entryMetaMap = new Map<string, EntryMetaProps>(
+  Object.entries(entryMeta ?? {}).map(([name, meta]) => [
     name.toLowerCase(),
     { name, ...meta }
   ])
 );
 
-const entry = "tags";
+// Get counts
+const countsArray = await collectFieldCounts(entry, 3);
 
-// Get tag counts (first 3 per post max)
-const tagCountsArray = await collectFieldCounts(entry, 3);
+const knownEntries: (EntryMetaProps & { count: number })[] = [];
+const unknownEntries: (EntryMetaProps & { count: number })[] = [];
 
-// Arrays for known & unknown tags
-const knownTags: TagWithCount[] = [];
-const unknownTags: TagWithCount[] = [];
-
-// Helper to format unknown tag titles
-function formatTitle(tag: string): string {
-  return tag
+// Format unknown titles
+function formatTitle(slug: string) {
+  return slug
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
 
-// Separate tags into known vs unknown
-for (const { name, count } of tagCountsArray) {
-  const tagEntry = tagMetaMap.get(name);
-  if (tagEntry) {
-    knownTags.push({ ...tagEntry, count });
+// Separate into known vs unknown
+for (const { name, count } of countsArray) {
+  const metaItem = entryMetaMap.get(name);
+  if (metaItem) {
+    knownEntries.push({ ...metaItem, count });
   } else {
-    unknownTags.push({
+    unknownEntries.push({
       name,
       title: formatTitle(name),
       description: `Posts related to ${formatTitle(name)}.`,
       image: `/${entry}/default-image.png`,
+      imageAlt: `${formatTitle(name)} image`,
       url: `/${entry}/${name}/`,
       count
     });
   }
 }
 
-// Merge tags: Known first, then Unknown
-const mergedTags: TagWithCount[] = [...knownTags, ...unknownTags];
+// Merge
+const mergedEntries = [...knownEntries, ...unknownEntries];
 
-// SEO setup
+// SEO
 const headProps: HeadProps = {
-  title: `All | ${siteDefaults.siteName}`,
-  description: `Explore all tags used across tools, guides, and blog posts on ${siteDefaults.siteName}.`,
+  title: `All ${entry.charAt(0).toUpperCase() + entry.slice(1)} | ${siteDefaults.siteName}`,
+  description: `Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`,
   image: siteDefaults.image,
   canonicalUrl: `${siteDefaults.siteUrl}/${entry}/`,
   index: true,
-  keywords: mergedTags.map(t => t.name),
+  keywords: mergedEntries.map(c => c.name),
   type: 'collection',
   url: `${siteDefaults.siteUrl}/${entry}/`,
   authors: [],
@@ -80,37 +71,45 @@ const headProps: HeadProps = {
   authorUrl: siteDefaults.authorUrl,
 };
 
-// Map tags to CardProps
-function mapToCardProps(tag: TagWithCount, index: number): CardProps {
+// Map to cards
+function mapToCardProps(item: EntryMetaProps & { count: number }, index: number): CardProps {
   return {
-    link: tag.url ?? `/${entry}/${tag.name}/`,
-    linkAriaLabel: `View all posts tagged ${tag.title ?? tag.name}`,
-    image: tag.image ?? '',
-    imageAlt: tag.title ?? tag.name,
-    title: tag.title ?? tag.name,
-    description: tag.description ?? '',
-    afterDescription: `${tag.count} posts`,
+    link: item.url ?? `/${entry}/${item.name}/`,
+    linkAriaLabel: `View all posts in ${entry.slice(0, -1)} ${item.title ?? item.name}`,
+    image: item.image ?? '',
+    imageAlt: item.imageAlt ?? item.title ?? item.name,
+    title: item.title ?? item.name,
+    description: item.description ?? '',
+    afterDescription: `${item.count} posts`,
     orientation: 'vertical',
     imageSize: 320,
     roleType: 'list',
-    loading: index < 3 ? 'eager' : 'lazy' // First 3 tags eager
+    loading: index < 3 ? 'eager' : 'lazy'
   };
 }
 
-// Final merged cards
-const mergedTagCards: CardProps[] = mergedTags.map((tag, index) => mapToCardProps(tag, index));
+const mergedCards: CardProps[] = mergedEntries.map((item, index) => mapToCardProps(item, index));
+/*
+    image={siteDefaults.image}
+    imageAlt={`${entry} Hero Image`}
+    imageLoading="delay"
+  */
+
 
 ---
 
 <BaseLayout headProps={headProps}>
-  <div id="collections-header" class="mx-w-site mi-auto ta-center">
-    <h1>{siteDefaults.fieldCollections[entry].title}</h1>
-    <p>{siteDefaults.fieldCollections[entry].description}</p>
-  </div>
+  <HeroCollections
+    title={`All ${entry.charAt(0).toUpperCase() + entry.slice(1)}`}
+    description={`Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`}
+    bgColorClass="bg-secondary-lighter-x"
+    textColorClass="col-base-00"
 
-  {mergedTagCards.length > 0 && (
+  />
+
+  {mergedCards.length > 0 && (
     <section class="mx-w-site mi-auto mb-2">
-      <CardCollections cards={mergedTagCards} wrapper="ul" roleType='list' entry={entry}/>
+      <CardCollections cards={mergedCards} wrapper="ul" roleType="list" entry={entry} />
     </section>
   )}
 </BaseLayout>

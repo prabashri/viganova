@@ -18,7 +18,7 @@ tags: ['blog', 'example', 'reference']
 keywords: ['Astro blog post', 'static content']
 featured: true
 draft: false
-categories: ['Reference']
+categories: ['reference', 'css']
 index: true # Whether to include this post in search indexing (default is true)
 ---
 

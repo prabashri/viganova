@@ -71,7 +71,7 @@ export const siteDefaults = {
   thumbnail: true,
   thumbnailSize: 120,
 
-  postsPerCollectionsPage: 10, // Number of posts per page in collections like blog, post, etc.
+  postsPerCollectionsPage: 2, // Number of posts per page in collections like blog, post, etc.
 
   fieldCollections: {
     tags: {

@@ -147,9 +147,9 @@ body, .regular {
 a {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: var(--primary);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.2em;
+  text-decoration-color: var(--primary-base);
+  /* text-decoration-thickness: 2px; */
+  /* text-underline-offset: 0.2em; */
   text-underline-position: under;
   /* border-bottom: 3px solid var(--primary-light); */
   padding-inline: 0.1em;
@@ -162,9 +162,10 @@ a {
 }
 
 a:hover {
-  background-color: var(--primary);
+  background-color: var(--primary-base) !important;
   color: var(--base-00);
-  text-decoration: none;
+  text-decoration: none !important;
+  border-radius: var(--border-radius);
 }
 
 /* Keyboard accessibility: visible focus */
@@ -228,7 +229,7 @@ button:focus-visible,
 
 button:focus-visible,
 .button:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--primary-base);
   outline-offset: 2px;
 }
 

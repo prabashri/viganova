@@ -1,9 +1,4 @@
-<svg class="w-3 h-3 text-gradient" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-  <path d="M6 9l6 6 6-6" stroke="url(#gradient)" />
-  <defs>
-    <linearGradient id="gradient" x1="0" x2="100%" y1="0" y2="100%">
-      <stop offset="0%" stop-color="#6D28D9" />
-      <stop offset="100%" stop-color="#9333EA" />
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <path class="icon-background" fill="none" d="M0 0h512v512H0Z"/>
+  <path class="icon-primary" fill="currentcolor" d="m94.986 151.254-18.912 15.254L256 360.666l179.926-194.158-18.912-15.254L256 325.003Z"/>
 </svg>

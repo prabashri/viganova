@@ -8,7 +8,7 @@ import { Icon } from 'astro-icon/components';
     <!-- Trigger Button -->
     <button id="theme-button" aria-haspopup="true" aria-expanded="false"
       class="round box-shadow-glow transition p-02">
-      <Icon name="system" class="w-1-5 h-1-5" />
+      <Icon name="bw" class="w-1-5 h-1-5" />
       <Icon name="light" class="w-1-5 h-1-5 display-none" />
       <Icon name="moon" class="w-1-5 h-1-5 display-none" />
     </button>
@@ -18,7 +18,7 @@ import { Icon } from 'astro-icon/components';
       class="relative big-absolute br border-primary bg-base-00 col-base-100 mb-05 box-shadow display-none right-0 top-100 p-05 z-1000">
       <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
         data-theme="system">
-        <Icon name="system" class="w-1-5 h-1-5" />
+        <Icon name="bw" class="w-1-5 h-1-5" />
         <span>OS Default</span>
       </button>
       <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
@@ -41,7 +41,7 @@ import { Icon } from 'astro-icon/components';
     const menu = document.getElementById('theme-menu');
     const options = document.querySelectorAll('.theme-option');
 
-    const iconSystem = document.querySelector('svg[data-icon="system"]');
+    const iconSystem = document.querySelector('svg[data-icon="bw"]');
     const iconLight = document.querySelector('svg[data-icon="light"]');
     const iconDark = document.querySelector('svg[data-icon="moon"]');
 

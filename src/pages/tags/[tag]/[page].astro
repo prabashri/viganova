@@ -4,77 +4,84 @@ import PaginationSeo from '../../../components/PaginationSeo.astro';
 import PaginationRedirect from '../../../components/PaginationRedirect.astro';
 import Pagination from '../../../components/Pagination.astro';
 import CardCollections from '../../../components/ui/CardCollections.astro';
+import HeroCollections from '../../../components/ui/HeroCollections.astro';
 
 import { getCollection } from 'astro:content';
 import { siteDefaults } from '../../../config/siteDefaults';
 import { paginate } from '../../../utils/paginate';
 import type { HeadProps } from '../../../types/HeadProps';
-import { tagMeta } from '../../../config/tagMeta';
+
 import modifiedDatesJson from '../../../data/modified-dates.json';
 import { getCollectionUrl } from '../../../utils/getCollectionUrl';
+import { mapEntryToCard } from '../../../utils/mapEntryToCard';
 import type { CardProps } from '../../../types/CardProps';
 
-const entryType = "tags";
-const currentTag = Astro.params.tag?.toLowerCase() ?? 'unknown';
-const currentPage = Number(Astro.params.page ?? '1');
-const POSTS_PER_PAGE = siteDefaults.postsPerCollectionsPage ?? 10;
+// 🔄 🔄 🔄 CHANGEABLE VARIABLES 🔄 🔄 🔄
+const entryType = "tags"; // "tags" or "categories"
+const currentEntryParam = Astro.params.tag?.toLowerCase() ?? 'unknown';
+import { tagMeta as entryMeta } from '../../../config/tagMeta'; 
+const fieldName = 'tags';
+const metaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
+  Object.entries(entryMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
+);
+// 🔄 🔄 🔄 END CHANGEABLE VARIABLES 🔄 🔄 🔄
 
-const modifiedDates = modifiedDatesJson as Record<string, string>;
+// Constants
+const POSTS_PER_PAGE = siteDefaults.postsPerCollectionsPage ?? 10;
+const currentPage = Number(Astro.params.page ?? '1');
+
+function hasEntry(post: any, entryValue: string): boolean {
+  return Array.isArray(post.data?.[fieldName]) &&
+    post.data[fieldName].some((v: string) => typeof v === 'string' && v.toLowerCase() === entryValue.toLowerCase());
+}
 
 function getModifiedDateKey(entry: any) {
   const key = `${entry.collection}/${entry.slug ?? entry.id}`;
-  return modifiedDates[key] ?? entry.data.lastModified ?? entry.data.publishedDate ?? entry.data.date;
+  return (modifiedDatesJson as Record<string, string>)[key]
+    ?? entry.data.lastModified
+    ?? entry.data.publishedDate
+    ?? entry.data.date;
 }
 
-const tagMetaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
-  Object.entries(tagMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
-);
-
-function hasTag(post: any, tag: string): boolean {
-  return Array.isArray(post.data?.tags) &&
-    post.data.tags.some((t: string) => t.toLowerCase() === tag.toLowerCase());
-}
-
-// Collect tagged posts
-const taggedCollections = Object.entries(siteDefaults.collections)
-  .filter(([_, config]) => config?.tags === true)
+// Collect matching posts
+const collectionsWithField = Object.entries(siteDefaults.collections)
+  .filter(([_, config]) => config?.tags === true) // works for categories too
   .map(([key]) => key as keyof typeof siteDefaults.collections);
 
 let matchedEntries: any[] = [];
-for (const coll of taggedCollections) {
+for (const coll of collectionsWithField) {
   const posts = await getCollection(coll);
-  matchedEntries.push(...posts.filter(entry => hasTag(entry, currentTag)));
+  matchedEntries.push(
+    ...posts.filter((entry: any) => {
+      const slug = typeof entry.slug === 'string' ? entry.slug : '';
+      return (
+        hasEntry(entry, currentEntryParam) &&
+        !slug.startsWith('_') &&
+        entry.data?.draft !== true
+      );
+    })
+  );
 }
 
-// Sort entries by modified date
+// Sort by modified date
 matchedEntries.sort((a, b) => new Date(getModifiedDateKey(b)).getTime() - new Date(getModifiedDateKey(a)).getTime());
 
 // Pagination
 const { pageItems: paginatedEntries, totalPages } = paginate(matchedEntries, currentPage, POSTS_PER_PAGE);
 
 // Meta
-const meta = tagMetaMap.get(currentTag) ?? {
-  name: currentTag,
-  title: currentTag.charAt(0).toUpperCase() + currentTag.slice(1),
-  description: `Explore posts tagged "${currentTag}" on ${siteDefaults.siteName}.`,
+const isKnownEntry = metaMap.has(currentEntryParam);
+const meta = metaMap.get(currentEntryParam) ?? {
+  name: currentEntryParam,
+  title: currentEntryParam.charAt(0).toUpperCase() + currentEntryParam.slice(1),
+  description: `Explore posts in "${currentEntryParam}" on ${siteDefaults.siteName}.`,
   image: `/${siteDefaults.fieldCollections[entryType].defaultImage}`,
-  url: `/${entryType}/${currentTag}/`
+  url: `/${entryType}/${currentEntryParam}/`
 };
 
-const baseUrl = `/${entryType}/${currentTag}`;
+const baseUrl = `/${entryType}/${currentEntryParam}`;
 
-// Other tags from posts
-let otherTagsSet = new Set<string>();
-for (const post of matchedEntries) {
-  if (Array.isArray(post.data?.tags)) {
-    post.data.tags.forEach((t: string) => {
-      if (t.toLowerCase() !== currentTag) otherTagsSet.add(t.toLowerCase());
-    });
-  }
-}
-const otherTagsEntries = Array.from(otherTagsSet).sort();
-
-// SEO props
+// SEO
 const pageSeo: HeadProps = {
   title: `${meta.title} | ${siteDefaults.siteName}`,
   description: meta.description,
@@ -82,7 +89,7 @@ const pageSeo: HeadProps = {
   breadcrumb: [
     { name: 'Home', url: '/' },
     { name: siteDefaults.fieldCollections[entryType].title, url: `/${entryType}/` },
-    { name: meta.title ?? currentTag, url: `${baseUrl}/` },
+    { name: meta.title ?? currentEntryParam, url: `${baseUrl}/` }
   ],
   listItems: paginatedEntries.map(p => ({
     name: "title" in p.data ? p.data.title : 'Untitled',
@@ -90,79 +97,32 @@ const pageSeo: HeadProps = {
   })),
   type: 'collection',
   index: paginatedEntries.length > 0,
-  authors: [] // ✅ No authors needed for collection pages
+  authors: []
 };
 
-// Map entries to CardProps
-function mapEntryToCard(entry: any, index: number): CardProps {
-  const postDate = getModifiedDateKey(entry);
-
-  const otherTags = entry.data?.tags?.filter(
-    (t: string) => t.toLowerCase() !== currentTag
-  ) || [];
-
-  const otherEntries = otherTags
-    .map((tagName: string) => {
-      const formatted = tagName.charAt(0).toUpperCase() + tagName.slice(1);
-      return {
-        name: tagName.toLowerCase(),
-        label: formatted,
-        url: `/${entryType}/${tagName.toLowerCase()}/`
-      };
-    })
-    .sort((a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label));
-
-  return {
-    link: getCollectionUrl(
-      entry.collection,
-      typeof entry.data.slug === "string" ? entry.data.slug : String(entry.id)
-    ),
-    linkAriaLabel: `View post: ${"title" in entry.data ? entry.data.title : "Untitled"}`,
-    image: "heroImage" in entry.data ? entry.data.heroImage : siteDefaults.image,
-    imageAlt:
-      "heroImageAlt" in entry.data
-        ? entry.data.heroImageAlt
-        : "title" in entry.data
-        ? entry.data.title
-        : 'Post image',
-    otherEntries,
-    title: "title" in entry.data ? entry.data.title : 'Untitled',
-    description: "description" in entry.data ? entry.data.description : '',
-    date: postDate
-      ? new Date(postDate).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'short',
-          day: '2-digit'
-        })
-      : '',
-
-    orientation: 'vertical',
-    imageSize: 320,
-    roleType: 'list',
-    loading: index < 3 ? 'eager' : 'lazy'
-  };
-}
-
-const postCards: CardProps[] = paginatedEntries.map((entry, idx) => mapEntryToCard(entry, idx));
+const postCards: CardProps[] = paginatedEntries.map((entry, idx) =>
+  mapEntryToCard(entry, idx, { currentEntryParam, entryType, fieldName, metaMap })
+);
 ---
 
 <BaseLayout headProps={pageSeo}>
   <PaginationRedirect basePath={baseUrl} currentPage={currentPage} />
   <PaginationSeo basePath={baseUrl} currentPage={currentPage} totalPages={totalPages} />
 
-  <header class="mx-w-site mi-auto ta-center">
-    <h1>{meta.title}</h1>
-    <p>{meta.description}</p>
-  </header>
+   <HeroCollections
+    title={meta.title ?? currentEntryParam}
+    description={meta.description}
+    bgColorClass="bg-secondary-lighter-x"
+    textColorClass="col-base-00"
+  />
 
-  {paginatedEntries.length === 0 ? (
-    <p class="ta-center mt-2">No posts found for this tag.</p>
-  ) : (
-    <section class="mx-w-site mi-auto mt-2">
-      <CardCollections cards={postCards} wrapper="ul" roleType="list" entry={entryType}/>
-    </section>
-  )}
-
+  <section class="mx-w-site mi-auto mb-2 pb-2">
+    {paginatedEntries.length === 0 ? (
+      <p class="ta-center mt-2">No posts found for this {entryType.slice(0, -1)}.</p>
+    ) : (
+      <CardCollections cards={postCards} wrapper="ul" roleType="list" entry={entryType} />
+    )}
+  </section>
 
   <Pagination currentPage={currentPage} totalPages={totalPages} basePath={baseUrl} />
 </BaseLayout>

@@ -17,7 +17,7 @@ interface Props {
   lastModified?: string | null;
   authors?: { id: string }[]; // Simplified for team-only assumption
   tags?: string[];
-  category?: string;
+  categories?: string[];
   keywords?: string[];
   featured?: boolean;
   draft?: boolean;
@@ -43,7 +43,7 @@ const {
   lastModified,
   authors = [],
   tags = [],
-  category,
+  categories = [],
   keywords = [],
   collection = '',  
   collectionBase = '',
@@ -102,44 +102,47 @@ const headProps: HeadProps = {
   <Fragment slot="headContent-bottom" />
 
   <article id="post-layout">
-    <header id="post-header" class="mx-w-site mi-auto ta-center">
-      <h1 class="post-title">{title}</h1>
-      {description && <p class="post-desc">{description}</p>}
+    <header id="post-header" class="bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
+      <div id="post-header-content" class="mx-w-site mi-auto ta-center mb-2">
+        <h1 class="post-title">{title}</h1>
+        {description && <p class="post-desc">{description}</p>}
 
-      <div class="post-meta text-s mb-1">
-       {resolvedAuthors.length > 0 && (
-          <div class="post-authors">
-            ✍️ By{' '}
-            {resolvedAuthors.map((a, i) => {
-              const isLast = i === resolvedAuthors.length - 1;
-              const isSecondLast = i === resolvedAuthors.length - 2;
+        <div class="post-meta text-s mb-1">
+        {resolvedAuthors.length > 0 && (
+            <div class="post-authors">
+              ✍️ By{' '}
+              {resolvedAuthors.map((a, i) => {
+                const isLast = i === resolvedAuthors.length - 1;
+                const isSecondLast = i === resolvedAuthors.length - 2;
 
-              return (
-                <>
-                  <a href={a!.url} class="author-link">{a!.name}</a>
-                  {!isLast && (
-                    resolvedAuthors.length === 2
-                      ? ' and '
-                      : isSecondLast
-                        ? ', and '
-                        : ', '
-                  )}
-                </>
-              );
-            })}
-          </div>
-        )}
+                return (
+                  <>
+                    <a href={a!.url} class="author-link td-underline">{a!.name}</a>
+                    {!isLast && (
+                      resolvedAuthors.length === 2
+                        ? ' and '
+                        : isSecondLast
+                          ? ', and '
+                          : ', '
+                    )}
+                  </>
+                );
+              })}
+            </div>
+          )}
 
-        { publishedDate || lastModified ? (
-          <div class="post-dates">
-            {publishedDate && <time datetime={publishedDate}>📅 on {new Date(publishedDate).toLocaleDateString()}</time>}
-            {lastModified && (
-              <span class="last-updated-on"> Updated: {new Date(lastModified).toLocaleDateString()}</span>
-            )}
-          </div>
-        ) : null}
-      </div>
-      <div id="hero-image" class="mx-w-960 w-full mi-auto">
+          { publishedDate || lastModified ? (
+            <div class="post-dates">
+              {publishedDate && <time datetime={publishedDate}>📅 on {new Date(publishedDate).toLocaleDateString()}</time>}
+              {lastModified && (
+                <span class="last-updated-on"> Updated: {new Date(lastModified).toLocaleDateString()}</span>
+              )}
+            </div>
+          ) : null}
+        </div>
+      </div>      
+    </header>
+    <div id="hero-image" class="mx-w-featured w-full mi-auto mt-0-2">
         {heroImage && (
           <ResponsiveImage
             src={heroImage}
@@ -147,24 +150,12 @@ const headProps: HeadProps = {
             title={heroImageTitle || ''}
             caption={heroImageCaption || ''}
             width="960"
-            loading="eager"
+            loading="eager" breakpoints={{ mobile: 320, desktop: 960 }}
             
           />
         )}
       </div>
-    </header>
-    
-
-    {toc.length > 0 && (
-      <aside class="post-toc">
-        <h2>Contents</h2>
-        <ul>
-          {toc.map((item) => (
-            <li><a href={`#${item.id}`}>{item.text}</a></li>
-          ))}
-        </ul>
-      </aside>
-    )}
+  
     <TableOfContents toc={toc} heading="On This Page" depth="h2,h3" />
     <div class="post-content mx-w-content mi-auto mb-2">
       <slot />

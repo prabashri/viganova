@@ -1,6 +1,7 @@
 svg use {
 	pointer-events: none;
 }
+
 .a-16x9 {
 	aspect-ratio: 16 / 9;
 	object-fit: cover;
@@ -62,26 +63,6 @@ svg use {
 	align-self: flex-start;
 }
 
-.aspect-16x9 {
-	aspect-ratio: 16 / 9;
-	object-fit: cover;
-}
-
-.aspect-1x1 {
-	aspect-ratio: 1 / 1;
-	object-fit: cover;
-}
-
-.aspect-3x4 {
-	aspect-ratio: 3 / 4;
-	object-fit: cover;
-}
-
-.aspect-4x3 {
-	aspect-ratio: 4 / 3;
-	object-fit: cover;
-}
-
 .b-bottom-base-00 {
 	border-bottom: 1px solid var(--base-00);
 }
@@ -140,9 +121,14 @@ svg use {
 .bg-col-ff, .hover-bg-col-ff:hover {
 	background-color: transparent;
 }
-
+.bg-primary-darker, .focus-bg-primary-darker:focus, .focus-vis-bg-primary-darker:focus-visible, .hover-bg-primary-darker:hover {
+	background-color: var(--primary-darker);
+}
+.bg-primary-dark, .focus-bg-primary-dark:focus, .focus-vis-bg-primary-dark:focus-visible, .hover-bg-primary-dark:hover {
+	background-color: var(--primary-dark);
+}
 .bg-primary, .focus-bg-primary:focus, .focus-vis-bg-primary:focus-visible, .hover-bg-primary:hover {
-	background-color: var(--primary);
+	background-color: var(--primary-base);
 }
 
 .bg-primary-light {
@@ -153,12 +139,12 @@ svg use {
 	background-color: var(--primary-light);
 }
 
-.bg-primary-lighter {
-	background-color: var(--primary-lighter) !important;
-}
-
 .bg-primary-lighter, .focus-bg-primary-lighter:focus, .focus-vis-bg-primary-lighter:focus-visible, .hover-bg-primary-lighter:hover {
 	background-color: var(--primary-lighter);
+}
+
+.bg-primary-lighter-x, .focus-bg-primary-lighter-x:focus, .focus-vis-bg-primary-lighter-x:focus-visible, .hover-bg-primary-lighter-x:hover {
+	background-color: var(--primary-lighter-x);
 }
 
 .bg-secondary {
@@ -168,12 +154,18 @@ svg use {
 .bg-secondary-light, .hover-bg-secondary-light:hover {
 	background-color: var(--secondary-light);
 }
+.bg-secondary-lighter, .hover-bg-secondary-lighter:hover {
+	background-color: var(--secondary-lighter);
+}
+.bg-secondary-lighter-x, .hover-bg-secondary-lighter-x:hover {
+	background-color: var(--secondary-lighter-x);
+}
 
 .bg-transparent, .hover-bg-transparent:hover {
 	background-color: transparent;
 }
 .focus-visible:focus-visible {
-	outline: 2px solid var(--primary); /* Optional: fallback color */
+	outline: 2px solid var(--primary-base); /* Optional: fallback color */
 	outline-offset: 2px;
 }
 .block {
@@ -185,7 +177,7 @@ svg use {
 }
 
 .border-primary, .hover-border:hover {
-	border: 1px solid var(--primary);
+	border: 1px solid var(--primary-base);
 }
 
 .border-primary-light, .hover-border-primary-light:hover {
@@ -197,7 +189,7 @@ svg use {
 }
 
 .border-2, .hover-border-2:hover {
-	border: 2px solid var(--primary);
+	border: 2px solid var(--primary-base);
 }
 
 .border-base-10, .hover-border-base-10:hover {
@@ -209,7 +201,7 @@ svg use {
 }
 
 .border-left-4-primary-color {
-	border-left: 4px solid var(--primary);
+	border-left: 4px solid var(--primary-base);
 }
 
 .border-transparent, .hover-border-transparent:hover {
@@ -301,6 +293,9 @@ svg use {
 .col-base-00, .focus-col-base-00:focus, .focus-vis-col-base-00:focus-visible, .hover-col-base-00:hover {
 	color: var(--base-00);
 }
+.col-base-50, .focus-col-base-50:focus, .focus-vis-col-base-50:focus-visible, .hover-col-base-50:hover {
+	color: var(--base-50);
+}
 .col-base-80, .focus-col-base-80:focus, .focus-vis-col-base-80:focus-visible, .hover-col-base-80:hover {
 	color: var(--base-80);
 }
@@ -321,7 +316,7 @@ svg use {
 }
 
 .col-primary, .focus-col-primary:focus, .focus-vis-col-primary:focus-visible, .hover-col-primary:hover {
-	color: var(--primary);
+	color: var(--primary-base);
 }
 
 .col-primary-light, .focus-col-primary-light:focus, .focus-vis-col-primary-light:focus-visible, .hover-col-primary-light:hover {
@@ -374,7 +369,7 @@ svg use {
 }
 
 .fill-primary, .hover-fill-primary:hover {
-	fill: var(--primary);
+	fill: var(--primary-base);
 }
 
 .fill-primary-lighter, .hover-fill-primary-lighter:hover {
@@ -738,9 +733,29 @@ svg use {
 .no-width {
 	width: unset;
 }
-
-.of-wrap-anywhere {
+.object-cover{
+	object-fit: cover;
+}
+.object-contain{
+	object-fit: contain;
+}
+.overflow-wrap-anywhere {
 	overflow-wrap: anywhere;
+}
+.overflow-hidden {
+	overflow: hidden;
+}
+.opacity-0 {
+	opacity: 0;
+}	
+.opacity-02{
+	opacity: 0.2;
+}
+.opacity-05 {
+	opacity: 0.5;
+}
+.opacity-15 {
+	opacity: 0.15;
 }
 
 .order-1 {
@@ -858,8 +873,11 @@ svg use {
 .text-x-small {
 	font-size: 0.8rem;
 }
+.td-underline {
+	text-decoration: underline !important;
+}
 .td-none{
-	text-decoration: none;
+	text-decoration: none !important;
 }
 .top-0 {
 	top: 0;
@@ -1065,6 +1083,9 @@ svg use {
 	.sm-wrap {
 		flex-wrap: wrap;
 	}
+	.sm-bg{
+		background-color: var(--background-color);
+	}
 }
 
 @media (min-width: 1280px) {
@@ -1140,6 +1161,9 @@ svg use {
 
 	.md-display-flex {
 		display: flex !important;
+	}
+	.big-w-featured {
+		width: var(--featured-image-width);
 	}
 	.big-w-full {
 		width: 100% !important;

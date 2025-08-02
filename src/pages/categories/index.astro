@@ -1,123 +1,115 @@
 ---
-// src/pages/categories/index.astro
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
 import type { HeadProps } from '../../types/HeadProps';
-import { categoryMeta } from '../../config/categoryMeta'; // Optional: create this like tagMeta
+
+import type { EntryMetaProps } from '../../types/EntryMetaProps';
+import HeroCollections from '../../components/ui/HeroCollections.astro';
 
 import { collectFieldCounts } from "../../utils/collectFieldCounts";
+import CardCollections from '../../components/ui/CardCollections.astro';
+import type { CardProps } from '../../types/CardProps';
 
-// Types
-type CategoryMetaItem = {
-  name: string;
-  title?: string;
-  description?: string;
-  image?: string;
-  url?: string;
-};
-type CategoryWithCount = CategoryMetaItem & { count: number };
+const entry = "categories";
+import { categoryMeta as entryMeta } from '../../config/categoryMeta'; 
 
-// Map categoryMeta for quick lookup
-const categoryMetaMap = new Map<string, CategoryMetaItem>(
-  Object.entries(categoryMeta ?? {}).map(([name, meta]) => [
+// Map entryMeta for quick lookup
+const entryMetaMap = new Map<string, EntryMetaProps>(
+  Object.entries(entryMeta ?? {}).map(([name, meta]) => [
     name.toLowerCase(),
     { name, ...meta }
   ])
 );
 
-// Get category counts (first 3 categories max per post)
-const categoryCountsArray = await collectFieldCounts("categories", 3);
+// Get counts
+const countsArray = await collectFieldCounts(entry, 3);
 
-// Known vs unknown
-const knownCategories: CategoryWithCount[] = [];
-const unknownCategories: CategoryWithCount[] = [];
+const knownEntries: (EntryMetaProps & { count: number })[] = [];
+const unknownEntries: (EntryMetaProps & { count: number })[] = [];
 
-// Helper to format titles
-function formatTitle(cat: string): string {
-  return cat
+// Format unknown titles
+function formatTitle(slug: string) {
+  return slug
     .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
 
-// Separate into known and unknown lists
-for (const { name, count } of categoryCountsArray) {
-  const catEntry = categoryMetaMap.get(name);
-  if (catEntry) {
-    knownCategories.push({ ...catEntry, count });
+// Separate into known vs unknown
+for (const { name, count } of countsArray) {
+  const metaItem = entryMetaMap.get(name);
+  if (metaItem) {
+    knownEntries.push({ ...metaItem, count });
   } else {
-    unknownCategories.push({
+    unknownEntries.push({
       name,
       title: formatTitle(name),
       description: `Posts related to ${formatTitle(name)}.`,
-      image: `/categories/default-image.png`,
-      url: `/categories/${name}/`,
+      image: `/${entry}/default-image.png`,
+      imageAlt: `${formatTitle(name)} image`,
+      url: `/${entry}/${name}/`,
       count
     });
   }
 }
 
-// SEO Head props
+// Merge
+const mergedEntries = [...knownEntries, ...unknownEntries];
+
+// SEO
 const headProps: HeadProps = {
-  title: `All Categories | ${siteDefaults.siteName}`,
-  description: `Browse all categories for tools, guides, and blog posts on ${siteDefaults.siteName}.`,
+  title: `All ${entry.charAt(0).toUpperCase() + entry.slice(1)} | ${siteDefaults.siteName}`,
+  description: `Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`,
   image: siteDefaults.image,
-  canonicalUrl: `${siteDefaults.siteUrl}/categories/`,
+  canonicalUrl: `${siteDefaults.siteUrl}/${entry}/`,
   index: true,
-  keywords: [...knownCategories.map(c => c.name), ...unknownCategories.map(c => c.name)],
+  keywords: mergedEntries.map(c => c.name),
   type: 'collection',
-  url: `${siteDefaults.siteUrl}/categories/`,
+  url: `${siteDefaults.siteUrl}/${entry}/`,
   authors: [],
   authorName: siteDefaults.authorName,
   authorUrl: siteDefaults.authorUrl,
 };
+
+// Map to cards
+function mapToCardProps(item: EntryMetaProps & { count: number }, index: number): CardProps {
+  return {
+    link: item.url ?? `/${entry}/${item.name}/`,
+    linkAriaLabel: `View all posts in ${entry.slice(0, -1)} ${item.title ?? item.name}`,
+    image: item.image ?? '',
+    imageAlt: item.imageAlt ?? item.title ?? item.name,
+    title: item.title ?? item.name,
+    description: item.description ?? '',
+    afterDescription: `${item.count} posts`,
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy'
+  };
+}
+
+const mergedCards: CardProps[] = mergedEntries.map((item, index) => mapToCardProps(item, index));
+/*
+    image={siteDefaults.image}
+    imageAlt={`${entry} Hero Image`}
+    imageLoading="delay"
+  */
+
+
 ---
 
 <BaseLayout headProps={headProps}>
-  <h1>All Categories</h1>
+  <HeroCollections
+    title={`All ${entry.charAt(0).toUpperCase() + entry.slice(1)}`}
+    description={`Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`}
+    bgColorClass="bg-secondary-lighter-x"
+    textColorClass="col-base-00"
 
-  <!-- Primary Categories -->
-  {knownCategories.length > 0 && (
-    <section class="mb-4">
-      <h2 class="text-xl font-bold mb-2">📂 Primary Categories</h2>
-      <ul class="grid gap-4 md:grid-cols-2">
-        {knownCategories.map(cat => (
-          <li class="border p-4 rounded bg-white shadow-sm">
-            <a href={cat.url ?? `/categories/${cat.name}/`} class="block no-bb">
-              {cat.image && (
-                <img src={cat.image} alt={cat.title} class="mb-2 h-32 w-full object-cover rounded" />
-              )}
-              <h3 class="text-lg font-semibold mb-1">{cat.title}</h3>
-              <p class="text-sm text-gray-600">{cat.description}</p>
-              <span class="inline-block mt-2 text-xs text-gray-500">{cat.count} posts</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+  />
+
+  {mergedCards.length > 0 && (
+    <section class="mx-w-site mi-auto mb-2">
+      <CardCollections cards={mergedCards} wrapper="ul" roleType="list" entry={entry} />
     </section>
   )}
-
-  <!-- Other Categories -->
-  {unknownCategories.length > 0 && (
-    <section>
-      <h2 class="text-xl font-bold mb-2">🗂 Other Categories</h2>
-      <ul class="grid gap-4 md:grid-cols-2 no-bullets">
-        {unknownCategories.map(cat => (
-          <li class="border p-4 rounded bg-white shadow-sm">
-            <a href={cat.url} class="block no-bb">
-              {cat.image && (
-                <img src={cat.image} alt={cat.title} class="mb-2 h-32 w-full object-cover rounded" />
-              )}
-              <h3 class="text-lg font-semibold mb-1">{cat.title}</h3>
-              <p class="text-sm text-gray-600">{cat.description}</p>
-              <span class="inline-block mt-2 text-xs text-gray-500">{cat.count} posts</span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </section>
-  )}
-
-  <Fragment slot="extraScripts" />
 </BaseLayout>
