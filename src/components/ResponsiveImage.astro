@@ -115,18 +115,21 @@ if (hasData) {
 
 ---
 {addSchema && hasData && (
-  <script type="application/ld+json">
-    {JSON.stringify({
+  <script 
+    is:inline 
+    type="application/ld+json" 
+    set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'ImageObject',
-      contentUrl: imageUrl,
-      url: imageUrl,
-      caption: caption || alt,
+      contentUrl: `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.webp`,
+      url: `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.webp`,
+      caption: caption || title || alt,
       description: alt,
       representativeOfPage: true
     })}
-  </script>
+  />
 )}
+
 {!hasData ? (
   <div class={`flex ai-center jc-center bg-base-20 ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit`}>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" id="svg-placeholder" class={`w-full h-auto ${imageClassName} ${objectFitClass}`}>
@@ -148,10 +151,8 @@ if (hasData) {
             />
           ))}
           <img
-            src={loading === 'delay' ? undefined : fallbackSrc}
-            data-src={loading === 'delay' ? fallbackSrc : undefined}
-            srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x`}
-            data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x` : undefined}
+            src={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}`}
+            data-src={loading === 'delay' ? `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}` : undefined}
             sizes={sizesAttr}
             width={width ?? width1x}
             height={height}
@@ -176,10 +177,8 @@ if (hasData) {
           />
         ))}
         <img
-          src={loading === 'delay' ? undefined : fallbackSrc}
-          data-src={loading === 'delay' ? fallbackSrc : undefined}
-          srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x`}
-          data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]} 2x` : undefined}
+          src={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}`}
+          data-src={loading === 'delay' ? `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}` : undefined}
           sizes={sizesAttr}
           width={width ?? width1x}
           height={height}

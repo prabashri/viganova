@@ -97,6 +97,7 @@ export const securityHeaders = {
     "'self'",
     // "'unsafe-inline'", // ⚠️ Consider removing if you use CSP nonces instead
     "https://fonts.googleapis.com",
+    ""
     // "https://tagmanager.google.com",
     // "https://www.googletagmanager.com"
   ],

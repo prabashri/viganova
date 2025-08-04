@@ -3,7 +3,7 @@ import { siteDefaults } from '../config/siteDefaults';
 import modifiedDatesJson from '../data/modified-dates.json';
 import imageData from '../data/image-format-details.json';
 
-const modifiedDates: { [key: string]: string } = modifiedDatesJson;
+const modifiedDates: Record<string, string> = modifiedDatesJson;
 
 // ✅ Helper: Safely get last modified date
 function getLastModified(slug: string, base?: string): string {
@@ -45,11 +45,10 @@ export async function GET() {
       const url = `${siteDefaults.siteUrl}${basePath ? `${basePath}/` : '/'}${urlSlug}`;
       const lastmod = getLastModified(entry.id, config.base);
 
-      entries.push(`
-<url>
-  <loc>${url}</loc>
-  <lastmod>${lastmod}</lastmod>
-</url>`);
+      entries.push(`  <url>
+    <loc>${url}</loc>
+    <lastmod>${lastmod}</lastmod>
+  </url>`);
     }
   }
 
@@ -59,10 +58,10 @@ export async function GET() {
     const tagMetaList = tagMetaModule.default || [];
     const minPosts = siteDefaults.fieldCollections.tags.sitemapMinPosts || 5;
 
-    const tagCountMap = new Map();
+    const tagCountMap = new Map<string, number>();
     for (const post of allPosts) {
       if (Array.isArray(post.data.tags)) {
-        (post.data.tags as string[]).forEach((tag: string) => {
+        post.data.tags.forEach((tag: string) => {
           tagCountMap.set(tag, (tagCountMap.get(tag) || 0) + 1);
         });
       }
@@ -74,11 +73,10 @@ export async function GET() {
       const count = tagCountMap.get(tagSlug) || 0;
 
       if (count >= minPosts) {
-        entries.push(`
-<url>
-  <loc>${siteDefaults.siteUrl}/tags/${tagSlug}/</loc>
-  <lastmod>${new Date().toISOString()}</lastmod>
-</url>`);
+        entries.push(`  <url>
+    <loc>${siteDefaults.siteUrl}/tags/${tagSlug}/</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+  </url>`);
       }
     }
   }
@@ -89,10 +87,10 @@ export async function GET() {
     const categoryMetaList = categoryMetaModule.default || [];
     const minPosts = siteDefaults.fieldCollections.categories.sitemapMinPosts || 5;
 
-    const categoryCountMap = new Map();
+    const categoryCountMap = new Map<string, number>();
     for (const post of allPosts) {
       if (Array.isArray(post.data.categories)) {
-        (post.data.categories as string[]).forEach((cat: string) => {
+        post.data.categories.forEach((cat: string) => {
           categoryCountMap.set(cat, (categoryCountMap.get(cat) || 0) + 1);
         });
       }
@@ -104,11 +102,10 @@ export async function GET() {
       const count = categoryCountMap.get(catSlug) || 0;
 
       if (count >= minPosts) {
-        entries.push(`
-<url>
-  <loc>${siteDefaults.siteUrl}/categories/${catSlug}/</loc>
-  <lastmod>${new Date().toISOString()}</lastmod>
-</url>`);
+        entries.push(`  <url>
+    <loc>${siteDefaults.siteUrl}/categories/${catSlug}/</loc>
+    <lastmod>${new Date().toISOString()}</lastmod>
+  </url>`);
       }
     }
   }
@@ -120,14 +117,13 @@ export async function GET() {
     const largestVariant = Math.max(...details.variants.map(Number));
     const imageUrl = `${siteDefaults.siteUrl}/images${details.path}${cleanName}-w${largestVariant}-a${details.aspect}.webp`;
 
-    entries.push(`
-<url>
-  <loc>${siteDefaults.siteUrl}/</loc>
-  <image:image xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-    <image:loc>${imageUrl}</image:loc>
-    <image:title>${title}</image:title>
-  </image:image>
-</url>`);
+    entries.push(`  <url>
+    <loc>${siteDefaults.siteUrl}/</loc>
+    <image:image xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+      <image:loc>${imageUrl}</image:loc>
+      <image:title>${title}</image:title>
+    </image:image>
+  </url>`);
   }
 
   // ✅ Final XML
@@ -136,7 +132,7 @@ export async function GET() {
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${entries.join('\n')}
-</urlset>`;
+</urlset>`.trim();
 
   return new Response(xml, {
     headers: { 'Content-Type': 'application/xml' }
