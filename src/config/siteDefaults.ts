@@ -80,7 +80,8 @@ export const siteDefaults = {
       description: "Tags are used to categorize content across the site.",
       meta: "tagMeta",
       defaultImage: "tags/astroweb.png",
-      maxPerEntry: 5
+      maxPerEntry: 5,
+      sitemapMinPosts: 5 // Minimum posts to include in sitemap
     },
     categories: {
       label: "Categories",
@@ -88,13 +89,15 @@ export const siteDefaults = {
       description: "Categories are used to group related content.",
       meta: "categoryMeta",
       defaultImage: "tags/astroweb.png",
-      maxPerEntry: 3
+      maxPerEntry: 3,
+      sitemapMinPosts: 5 // Minimum posts to include in sitemap
     }
   },
 
   collections: {
     blog: {
       index: true,
+      sitemap: true, // sitemap enabled for blog
       base: 'blog',       // base path - used as /blog/slug/
       label: 'Blog',      // display label (optional)
       rss: true,          // should generate RSS?
@@ -105,6 +108,7 @@ export const siteDefaults = {
     },
     post: {
       index: true,
+      sitemap: true,
       base: '',           // no prefix → /slug/
       label: 'Post',
       rss: true,
@@ -115,6 +119,7 @@ export const siteDefaults = {
     },
     team: {
       index: true,
+      sitemap: true,
       base: 'team',
       label: 'Team',
       rss: false,

@@ -2,7 +2,7 @@
   "css": {
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-08-04T13:22:45.528Z",
+      "datetime": "2025-08-04T16:30:58.859Z",
       "names": [
         "base",
         "colors",
@@ -21,8 +21,8 @@
       ]
     },
     "nonCritical": {
-      "file": "/styles/non-critical.ldeshl.css",
-      "datetime": "2025-08-03T14:25:37.997Z",
+      "file": "/styles/non-critical.fvpztq.css",
+      "datetime": "2025-08-04T16:31:04.632Z",
       "names": [
         "faq",
         "footer",
@@ -46,12 +46,13 @@
     "main": {
       "file": "/scripts/main.br6inh.min.js",
       "datetime": "2025-08-03T11:02:03.545Z"
+    },
+    "contact-form": {
+      "file": "/scripts/contact-form.dldotw.min.js",
+      "datetime": "2025-08-04T16:31:07.793Z"
     }
   },
   "icons": {
-    "favicon.ico": {
-      "datetime": "2025-08-04T13:22:59.318Z"
-    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -79,8 +80,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.fs71a7.json",
-      "datetime": "2025-08-04T13:22:36.218Z"
+      "file": "/search-index.oxq7nk.json",
+      "datetime": "2025-08-04T16:30:46.323Z"
     }
   },
   "logos": {

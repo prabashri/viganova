@@ -8,7 +8,7 @@ const baseSchema = ({ image }: SchemaContext) =>
     authors: z.array(reference('team')), // Array of author references
     publishedDate: z.string(),
     lastModified: z.string().optional(),
-    slug: z.string().optional(),
+    slug: z.string(),
     canonicalUrl: z.string().optional(), // removes the .url() check
 
     heroImage: z.string().optional(), // Relative path to the hero image, used in header and social preview
@@ -86,6 +86,8 @@ const team = defineCollection({
           })
           .optional(),
         featured: z.boolean().optional(),
+        draft: z.boolean().default(false), // Exclude from public view if true
+        index: z.boolean().default(true), // Default to true, can be set to false
       }),
   });
 
