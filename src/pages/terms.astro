@@ -1,84 +1,98 @@
 ---
-// export const prerender = true;
-
 import { siteDefaults } from '../config/siteDefaults';
+import modifiedDates from '../data/modified-dates.json';
 import BaseLayout from '../layouts/BaseLayout.astro';
-// This page's file path
-// const meta = pageMeta.find((p) => p.slug === 'terms');
-const lastModified = '2025-06-20'; // Example date, replace with actual logic if needed
-if (!lastModified) {
-  const lastModified = siteDefaults.publishedDate; // Fallback to siteDefaults if no lastModified
-}
-const lastModifiedDate = new Date(lastModified).toLocaleDateString('en-US', { 
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric'
-});
+import type { HeadProps } from '../types/HeadProps';
 
-const pageSeo = {
-  title: 'Terms of service | nViewsWEB Astro Theme',
-  description: 'Read the Terms of Service to understand your rights, tool usage, disclaimers, and more.',
-  updatedAt: lastModifiedDate,
+// ✅ Get last modified date dynamically
+const updatedAt = modifiedDates['terms']
+  ? new Date(modifiedDates['terms']).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    })
+  : siteDefaults.publishedDate;
+
+// ✅ HeadProps for SEO
+const pageSeo: HeadProps = {
+  title: `Terms of Service | ${siteDefaults.siteName}`,
+  description: `Review the Terms of Service for purchasing and using the ${siteDefaults.siteName} theme, including pricing, licensing, and refund policy.`,
+  image: '/images/astro-theme-nviewsweb-main.png',
+  type: 'website',
+  url: `${siteDefaults.siteUrl}/terms`,
+  canonicalUrl: `${siteDefaults.siteUrl}/terms`,
+  siteName: siteDefaults.siteName,
+  authors: [
+    {
+      id: 'prabakaran-shankar',
+      slug: 'prabakaran-shankar',
+      url: siteDefaults.authorUrl,
+      name: siteDefaults.authorName,
+      data: {}
+    }
+  ],
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt,
+  index: true,
+  keywords: [...siteDefaults.keywords, 'Terms of Service', 'Theme License', 'Refund Policy'],
+  showBreadcrumb: true
 };
-
 ---
-<BaseLayout headProps={pageSeo} >
-  <Fragment slot="headContent">    
-  </Fragment> 
-      <article class="prose max-w-width mi-auto">
-        <header class="mb-1 mx-w-content mi-auto">
-          <h1 class="pb-1 ta-center">{pageSeo.title}</h1>       
-        </header>       
-        <div class="mx-w-content p-1 mi-auto">   
-            <hr>   
-             <p>
-              Last updated: <time datetime={lastModified}>{lastModifiedDate}</time>
-            </p>
-            <p>These Terms govern your use of ClampGenerator.com (“the Site”), a tool and resource site operated by NViews Media Private Limited, India.</p>
-            <h2 id="1-services-offered">1. Services Offered</h2>
-            <p>ClampGenerator provides:</p>
-            <ul>
-                <li>Responsive <strong>CSS clamp calculators</strong>  </li>
-                <li>Educational <strong>blog content</strong>  </li>
-                <li>Free tools (online and offline versions)</li>
-            </ul>
-            <h2 id="2-usage-restrictions">2. Usage &amp; Restrictions</h2>
-            <p>You may use our tools freely for personal and commercial projects <strong>with proper permission and attribution</strong>.</p>
-            <p>However, <strong>embedding, redistribution, or use in iframes without explicit permission is prohibited</strong>.</p>
-            <h2 id="3-accounts-and-memberships">3. Accounts and Memberships</h2>
-            <p>We currently do <strong>not require user accounts</strong>. In the future, we may offer <strong>membership plans</strong> for:</p>
-            <ul>
-                <li><strong>Ad-free experience</strong></li>
-                <li><strong>Premium features</strong></li>
-                <li><strong>Support for our mission</strong></li>
-            </ul>
-            <h2 id="4-paid-services">4. Paid Services</h2>
-            <p>While all tools are currently free, future <strong>paid plans or donations</strong> may be introduced.</p>
-            <h2 id="5-attribution">5. Attribution</h2>
-            <p>No attribution is required, but we appreciate being credited when possible.</p>
-            <h2 id="6-accuracy-and-reliability">6. Accuracy and Reliability</h2>
-            <p>Clamp output is <strong>99% accurate</strong> based on tested formulas. However, users must <strong>verify results before using them in production</strong> environments.</p>
-            <h2 id="7-service-modifications">7. Service Modifications</h2>
-            <p>We may modify or remove services, features, or content <strong>at any time, with or without notice</strong>.</p>
-            <h2 id="8-intellectual-property">8. Intellectual Property</h2>
-            <p>All content, code, and tools on this site are protected. You may <strong>not reverse-engineer, resell, or clone</strong> our tools. Some tools may include <strong>open-source code</strong> with respective licenses.</p>
-            <h2 id="9-ads-and-affiliate-links">9. Ads and Affiliate Links</h2>
-            <p>We show:</p>
-            <ul>
-                <li><strong>Google AdSense ads</strong>  </li>
-                <li><strong>Affiliate content</strong>  </li>
-                <li><strong>Promotional material</strong> related to digital and design tools</li>
-            </ul>
-            <p>These help support the free service we offer.</p>
-            <h2 id="10-governing-law">10. Governing Law</h2>
-            <p>These terms are governed by the laws of <strong>India</strong>, specifically the jurisdiction of <strong>Thanjavur, Tamil Nadu</strong>.</p>
-            <h2 id="11-company-information">11. Company Information</h2>
-            <p>ClampGenerator.com is a project by:</p>
-            <p><strong>NViews Media Private Limited (<a href="http://thenviews.com">thenviews.com</a>)</strong><br>Registered in India<br>📧 <a href="mailto:praba@nviewsweb.com"><strong>praba@nviewsweb.com</strong></a></p>
 
-   
-        </div>
-      </article>
-  <Fragment slot="extraScripts">   
-  </Fragment>
+<BaseLayout headProps={pageSeo}>
+  <Fragment slot="headContent"></Fragment>
+
+  <article class="prose mx-w-width mi-auto">
+    <header class="mb-1 mx-w-content mi-auto">
+      <h1 class="pb-1 ta-center">{pageSeo.title}</h1>
+    </header>
+
+    <div class="mx-w-content p-1 mi-auto">
+      <hr />
+      <p><strong>Last updated:</strong> <time datetime={updatedAt}>{updatedAt}</time></p>
+
+      <p>These Terms of Service govern the purchase and usage of the <strong>{siteDefaults.siteName}</strong> theme (“the Theme”). By purchasing or using the Theme, you agree to these terms in full.</p>
+
+      <h2 id="1-theme-overview">1. Theme Overview</h2>
+      <p>{siteDefaults.siteName} is a premium Astro theme designed for speed, SEO, security, and scalability. The theme is sold for commercial and personal use.</p>
+
+      <h2 id="2-pricing-and-licenses">2. Pricing and Licenses</h2>
+      <p>The Theme is sold under two license categories:</p>
+      <ul>
+        <li><strong>Personal License:</strong> USD 39 — for use on a single personal or client project.</li>
+        <li><strong>Unlimited License:</strong> USD 79 — for use on unlimited personal or client projects.</li>
+      </ul>
+      <p>Pricing is in USD and subject to change without prior notice. Applicable taxes may apply based on your location.</p>
+
+      <h2 id="3-no-refund-policy">3. No Refund Policy</h2>
+      <p>All sales are final. We do not offer refunds once the Theme has been purchased. Buyers are encouraged to review the <strong>Theme features, documentation, and demo</strong> before purchase.</p>
+      <p>If you have questions before purchase, please contact us at <a href={`mailto:${siteDefaults.adminEmail}`}>{siteDefaults.adminEmail}</a>.</p>
+
+      <h2 id="4-usage-rights">4. Usage Rights</h2>
+      <p>Depending on the purchased license:</p>
+      <ul>
+        <li><strong>Personal License:</strong> Can be used for a single project, personal or client-based.</li>
+        <li><strong>Unlimited License:</strong> Can be used for unlimited projects, personal or client-based.</li>
+      </ul>
+      <p>The license is <strong>non-transferable</strong> and cannot be resold, redistributed, or sublicensed.</p>
+
+      <h2 id="5-modifications">5. Theme Modifications</h2>
+      <p>You are free to customize or modify the Theme to fit your needs. However, support will only cover the base Theme as provided at the time of purchase.</p>
+
+      <h2 id="6-support-and-updates">6. Support and Updates</h2>
+      <p>Support includes bug fixes, documentation updates, and installation guidance. Major feature requests or customizations may be subject to additional fees.</p>
+
+      <h2 id="7-disclaimer">7. Disclaimer</h2>
+      <p>The Theme is provided “as-is” without warranties of any kind. We are not responsible for any damages or losses resulting from the use or inability to use the Theme.</p>
+
+      <h2 id="8-jurisdiction">8. Jurisdiction</h2>
+      <p>These Terms are governed by the laws of <strong>India</strong>, specifically the jurisdiction of <strong>Thanjavur, Tamil Nadu</strong>.</p>
+
+      <h2 id="9-company-information">9. Company Information</h2>
+      <p>{siteDefaults.siteName} is a project by:</p>
+      <p><strong>NViews Media Private Limited (<a href="https://thenviews.com">thenviews.com</a>)</strong><br/>Registered in India<br/>📧 <a href={`mailto:${siteDefaults.adminEmail}`}><strong>{siteDefaults.adminEmail}</strong></a></p>
+    </div>
+  </article>
+
+  <Fragment slot="extraScripts"></Fragment>
 </BaseLayout>

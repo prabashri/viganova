@@ -1,91 +1,135 @@
 ---
-// export const prerender = true;
-
 import { siteDefaults } from '../config/siteDefaults';
+import { siteFunctions } from '../config/siteFunctions';
+import modifiedDates from '../data/modified-dates.json';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import type { HeadProps } from '../types/HeadProps';
 
-const pageSeo = {
-  title: 'Privacy Policy | nViewsWEB\'s Astro Theme',
-  description: 'Learn about how we handle your data and privacy at nViewsWEB.',
-  updatedDate: siteDefaults.publishedDate, // June 02 2025
+// Get last modified date for privacy-policy
+const updatedAt =
+  modifiedDates['privacy-policy']
+    ? new Date(modifiedDates['privacy-policy']).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+    : siteDefaults.publishedDate;
+
+// Dynamic HeadProps
+const pageSeo: HeadProps = {
+  title: `Privacy Policy`,
+  description: `Learn how ${siteDefaults.siteName} handles your data, cookies, and privacy.`,
+  image: '/images/astro-theme-nviewsweb-main.png',
+  type: 'website', // ✅ Now valid for Privacy Policy
+  url: `${siteDefaults.siteUrl}/privacy-policy`,
+  canonicalUrl: `${siteDefaults.siteUrl}/privacy-policy`,
+  siteName: siteDefaults.siteName,
+  authors: [
+    {
+      id: 'prabakaran-shankar',
+      slug: 'prabakaran-shankar',
+      url: siteDefaults.authorUrl,
+      name: siteDefaults.authorName,
+      data: {}
+    }
+  ],
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt,
+  index: true,
+  keywords: [...siteDefaults.keywords, 'Privacy Policy'],
+  showBreadcrumb: true
 };
 ---
-<BaseLayout headProps={pageSeo} >
+
+<BaseLayout headProps={pageSeo}>
   <Fragment slot="headContent-top"></Fragment>
   <Fragment slot="headContent-bottom"></Fragment>
-    <article class="prose mx-w-width mi-auto">
-      <header class="mb-1 mx-w-content mi-auto">
-        <h1 class="pb-1 ta-center">{pageSeo.title}</h1>       
-      </header>       
-      <div class="mx-w-content p-1 mi-auto">   
-          <hr>   
-            <p>Effective date: {pageSeo.updatedDate}</p>
-          <p>ClampGenerator.com respects your privacy. This Privacy Policy explains how we collect, use, and safeguard your information.</p>
-          <h2 id="1-information-we-collect">1. Information We Collect</h2>
-          <p>We do <strong>not</strong> collect personal data like your name or email unless you submit it via the contact form. However, we collect:</p>
-          <ul>
-              <li><strong>Cookies</strong> for serving ads (via Google AdSense and other partners).  </li>
-              <li><strong>IP address and browser information</strong> for analytics purposes (handled by Google Analytics).  </li>
-              <li><strong>Contact form inputs</strong>, only when you voluntarily submit them.</li>
-          </ul>
-          <p>We <strong>do not store this data</strong> on our servers. We rely on third-party services, which manage their own data policies.</p>
-          <h2 id="2-how-we-collect-information">2. How We Collect Information</h2>
-          <ul>
-              <li>Through <strong>cookies</strong>, analytics, and your browser when you visit our site.  </li>
-              <li>Through the <strong>contact form</strong>, where you may share your name, email, and message voluntarily.</li>
-          </ul>
-          <h2 id="3-third-party-services">3. Third-Party Services</h2>
-          <p>We use the following services, each of which may collect or process data as per their policies:</p>
-          <ul>
-              <li><strong>Google Analytics</strong> - Analytics tracking  </li>
-              <li><strong>Google AdSense</strong> - Ad personalization via cookies  </li>
-              <li><strong>ZeptoMail &amp; AWS Mail</strong> - Sending email responses  </li>
-              <li><strong>Cloudflare</strong> - Performance and security  </li>
-              <li><strong>GitHub</strong>  Source and deployment infrastructure</li>
-          </ul>
-          <h2 id="4-use-of-your-information">4. Use of Your Information</h2>
-          <ul>
-              <li>To process and respond to your <strong>contact form</strong> submissions.  </li>
-              <li>To send occasional <strong>promotional messages</strong> (if applicable).  </li>
-              <li>To improve site performance and user experience.</li>
-          </ul>
-          <h2 id="5-data-sharing">5. Data Sharing</h2>
-          <p>We do <strong>not</strong> share or sell your data to third parties. Data is used solely for the purposes listed above.</p>
-          <h2 id="6-data-storage-and-security">6. Data Storage and Security</h2>
-          <p>We <strong>do not store</strong> personal user data on our servers. Third-party services like Cloudflare and Google may process information based on your browser and region.</p>
-          <h2 id="7-cookies-and-tracking">7. Cookies and Tracking</h2>
-          <p>We use cookies for:</p>
-          <ul>
-              <li>Serving relevant ads  </li>
-              <li>Enhancing performance  </li>
-              <li>Remembering user preferences</li>
-          </ul>
-          <h2 id="8-opting-out">8. Opting Out</h2>
-          <p>You can control cookie settings through your browser. Refer to your browser documentation for disabling cookies or managing tracking preferences.</p>
-          <h2 id="9-contact-form-submissions">9. Contact Form Submissions</h2>
-          <p>When you submit a message via our contact form, we collect:</p>
-          <ul>
-              <li>Your <strong>name</strong> and <strong>email address</strong>  </li>
-              <li>Your <strong>message content</strong>, including feedback, reviews, or questions  </li>
-              <li>The <strong>selected subject</strong> (e.g., Support, Feedback, Business Inquiry)  </li>
-              <li><strong>Review ratings</strong> (if submitted)  </li>
-              <li><strong>Comment visibility preference</strong> (public/private)  </li>
-              <li><strong>Optional metadata</strong>, such as UTM parameters (e.g., campaign, source)</li>
-          </ul>
-          <p>We use this information solely for the purposes of responding to inquiries, collecting feedback, or reviewing suggestions. Some messages (such as reviews or public comments) may be published with user consent.</p>
-          <p>We <strong>do not sell or share</strong> this information with third parties. All submissions are sent securely via email using ZeptoMail and AWS Mail, and processed by our backend (hosted on Cloudflare Workers).</p>
-          <h3 id="submission-limits">Submission Limits</h3>
-          <p>To prevent spam or misuse, we limit contact form submissions to once every 5 minutes. This is enforced using browser-local storage and is not linked to personal identifiers.</p>
-          <h2 id="10-contact">10. Contact</h2>
-          <p>For any questions or privacy concerns, contact us at:</p>
-          <p>📧 <a href="mailto:praba@nviewsweb.com"><strong>praba@nviewsweb.com</strong></a><br>📨 Contact Form</p>
-          <h2 id="11-data-deletion">11. Data Deletion</h2>
-          <p>As we do not store your personal data, there&#39;s no data to delete. However, you may request clarification via email.</p>
-          <h2 id="12-children-s-privacy">12. Children's Privacy</h2>
-          <p>ClampGenerator is intended for users <strong>13 years and older</strong>. We do not knowingly collect information from children under 13.</p>
-  
-      </div>
-    </article>
-  <Fragment slot="extraScripts">
-  </Fragment> 
+
+  <article class="prose mi-auto">
+    <header class="flex flex-col ai-center mb-1 mi-auto bg-secondary-lighter-x col-base-00 mn-h-230 jc-center">
+      <h1 class="mx-w-site mi-auto pb-05 mb-05">{pageSeo.title}</h1>
+      <p class="mx-w-site mi-auto text-xl">{pageSeo.description}</p>
+    </header>
+
+    <div class="mx-w-content p-1 mi-auto">
+      <hr>
+      <p><strong>Effective date:</strong> {pageSeo.updatedAt}</p>
+
+      <p>{siteDefaults.siteName} ({siteDefaults.siteUrl}) values your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website.</p>
+
+      <h2>1. Information We Collect</h2>
+      <p>We do <strong>not</strong> collect personal data like your name or email unless you voluntarily submit it via our contact form. However, we may collect:</p>
+      <ul>
+        <li><strong>Cookies</strong> for serving ads and improving performance</li>
+        {siteFunctions.analyticsId && (
+          <li><strong>Analytics tracking</strong> (via Google Analytics ID: {siteFunctions.analyticsId})</li>
+        )}
+        <li><strong>Contact form inputs</strong> submitted voluntarily</li>
+        <li><strong>IP address and browser information</strong> for security and analytics</li>
+      </ul>
+
+      <h2>2. How We Collect Information</h2>
+      <ul>
+        <li>Through <strong>cookies</strong>, analytics, and browser interactions when you visit our site</li>
+        <li>Through <strong>contact forms</strong>, where you submit your details voluntarily</li>
+      </ul>
+
+      <h2>3. Third-Party Services</h2>
+      <p>We rely on third-party services that may collect or process data under their own policies:</p>
+      <ul>
+        {siteFunctions.analyticsId && (
+          <li><strong>Google Analytics</strong> - Visitor analytics tracking</li>
+        )}
+        <li><strong>Cloudflare</strong> - CDN, performance, and security</li>
+        <li><strong>Hosting</strong> - {siteDefaults.domainName} hosting via Cloudflare Pages</li>
+        <li><strong>Email Services</strong> - ({siteDefaults.socialLinks.email}) for communication</li>
+        <li><strong>GitHub</strong> - Source code and deployment</li>
+      </ul>
+
+      <h2>4. Use of Information</h2>
+      <ul>
+        <li>To respond to <strong>contact form submissions</strong></li>
+        <li>To improve site performance and functionality</li>
+        <li>To serve relevant ads (if enabled)</li>
+      </ul>
+
+      <h2>5. Data Sharing</h2>
+      <p>We do <strong>not</strong> sell or share your personal information. Data is used strictly for operational purposes.</p>
+
+      <h2>6. Data Storage & Security</h2>
+      <p>We do <strong>not</strong> store personal data on our servers. Data may be processed by trusted third-party services for operational purposes.</p>
+
+      <h2>7. Cookies & Tracking</h2>
+      <p>Cookies may be used for:</p>
+      <ul>
+        <li>Analytics tracking</li>
+        <li>Advertising personalization</li>
+        <li>Performance optimization</li>
+        <li>User preference storage</li>
+      </ul>
+
+      <h2>8. Opting Out</h2>
+      <p>You may disable cookies through your browser settings. Refer to your browser documentation for managing cookies.</p>
+
+      <h2>9. Contact Form Submissions</h2>
+      <p>When you contact us, we collect:</p>
+      <ul>
+        <li>Your <strong>name</strong> and <strong>email</strong></li>
+        <li>Your <strong>message content</strong></li>
+      </ul>
+      <p>This data is only used to respond to your inquiry. We do not store personal information permanently.</p>
+
+      <h2>10. Contact</h2>
+      <p>For privacy-related inquiries, contact us:</p>
+      <p>📧 <a href={`mailto:${siteDefaults.adminEmail}`}><strong>{siteDefaults.adminEmail}</strong></a></p>
+
+      <h2>11. Data Deletion</h2>
+      <p>As we do not store personal information, there is no data to delete. However, you may request confirmation by contacting us.</p>
+
+      <h2>12. Children's Privacy</h2>
+      <p>This website is intended for users <strong>13 years and older</strong>. We do not knowingly collect data from children under 13.</p>
+    </div>
+  </article>
+
+  <Fragment slot="extraScripts"></Fragment>
 </BaseLayout>

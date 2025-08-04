@@ -1,42 +1,40 @@
 ---
-// export const prerender = true;
 import BaseLayout from '../layouts/BaseLayout.astro';
+import type { HeadProps } from '../types/HeadProps';
+import { siteDefaults } from '../config/siteDefaults';
 
-const pageSeo = {
+// Define HeadProps for 404 page
+const pageSeo: HeadProps = {
   title: '404 - Page Not Found | nViewsWEB Astro Theme',
   description: 'The page you are looking for does not exist. It may have been moved or deleted.',
-  image: "/images/astro-theme-nviewsweb-main.png"
+  image: '/images/astro-theme-nviewsweb-main.png',
+  type: 'webpage',
+  url: `${siteDefaults.siteUrl}/404`,
+  canonicalUrl: `${siteDefaults.siteUrl}/404`,
+  siteName: siteDefaults.siteName,
+  authors: [],
+  index: false // 404 pages should not be indexed
 };
 ---
-<BaseLayout headProps={pageSeo} >
+<style>
+  main{
+    min-height: 60vh;
+  }
+</style>
+<BaseLayout headProps={pageSeo}>
   <Fragment slot="headContent-top"></Fragment>
   <Fragment slot="headContent-bottom"></Fragment>    
- 
-    <h1 class="ta-center cg-base">404 - Page Not Found</h1>
-      <p class="ta-center cg-h4">
-        The page you're looking for doesn't exist or may have been moved.
-      </p>
-      <div class="mx-w-content mi-auto">
-        <form action="/search" method="GET" class="flex gap mx-w-content full-width mi-auto center">
-          <input
-            type="text"
-            name="q"  
-            placeholder="Search..."
-            class="full-width br p-03 cc-base b-thin-base05"
-            required
-          />
-          <button
-            type="submit"
-            class="full-width mx-w-100 br p-03 cc-base b-thin-base05"
-          >
-            Search
-          </button>
-        </form>
-      </div>  
-      <div class="mi-auto ta-center mb-2">
-        <a href="/" class="col-base-00 p-1 no-bb bg-base-50 br">← Go back to homepage</a>
-      </div>
 
-  <Fragment slot="extraScripts">   
-  </Fragment>
+  <main class="flex flex-col jc-center ai-center mx-w-content mi-auto full-width ta-center page-content ">
+    <h1>404 - Page Not Found</h1>
+    <p class="text-xl">
+      The page you're looking for doesn't exist or may have been moved.
+    </p>
+
+    <div class="mi-auto ta-center mb-2">
+      <a href="/" class="col-base-00 p-1 td-none bg-primary-lighter col-base-100 br">← Go back to homepage</a>
+    </div>
+  </main>
+
+  <Fragment slot="extraScripts"></Fragment>
 </BaseLayout>

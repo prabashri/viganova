@@ -82,7 +82,7 @@ html {
 }
 html, body { 
   font-family: var(--font-family-base);  
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--base-90);
   background-color: var(--background-color);
   word-wrap: break-word;
@@ -118,6 +118,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 body, p, .text-base {
   font-size: clamp(1rem, 0.909rem + 0.455vw, 1.25rem);
+  
 }
 
 small, .text-small, .text-s {
@@ -141,6 +142,12 @@ body, .regular {
 }
 .text-smaller {
   font-size: clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
+}
+
+p {
+    margin-block: 1rem;
+    padding-block: 0.5rem;
+    line-height: 1.6;
 }
 /* ================================
    🧾 Elements
