@@ -2,6 +2,7 @@
 import imageMetadataJson from '../data/image-format-details.json';
 import { registerPreloadImage } from '../utils/preloadRegistry';
 import { siteDefaults } from '../config/siteDefaults';
+import { getAbsoluteImageUrl } from '../utils/getAbsoluteImageUrl';
 
 interface Props {
   src: string;
@@ -121,8 +122,8 @@ if (hasData) {
     set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'ImageObject',
-      contentUrl: `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.webp`,
-      url: `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.webp`,
+      contentUrl: getAbsoluteImageUrl(basePath, `${imageBaseName}-w${width2x}-a${defaultAspect}.webp`),
+      url: getAbsoluteImageUrl(basePath, `${imageBaseName}-w${width2x}-a${defaultAspect}.webp`),
       caption: caption || title || alt,
       description: alt,
       representativeOfPage: true

@@ -2,6 +2,7 @@ import { getCollection } from 'astro:content';
 import { siteDefaults } from '../config/siteDefaults';
 import modifiedDatesJson from '../data/modified-dates.json';
 import imageData from '../data/image-format-details.json';
+import { getAbsoluteImageUrl } from "../utils/getAbsoluteImageUrl";
 
 const modifiedDates: Record<string, string> = modifiedDatesJson;
 
@@ -116,15 +117,16 @@ export async function GET() {
             const cleanName = fileName.replace(/\.[^.]+$/, '');
             const title = filenameToTitle(fileName);
             const largestVariant = Math.max(...details.variants.map(Number));
-            const imageUrl = `${siteDefaults.siteUrl}/images${details.path}${cleanName}-w${largestVariant}-a${details.aspect}.webp`;
-
+            const imageUrl = getAbsoluteImageUrl(details.path, `${cleanName}-w${largestVariant}-a${details.aspect}.webp`);
+            
             entries.push(`  <url>
             <loc>${siteDefaults.siteUrl}/</loc>
             <image:image xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-            <image:loc>${imageUrl}</image:loc>
-            <image:title>${title}</image:title>
+                <image:loc>${imageUrl}</image:loc>
+                <image:title>${title}</image:title>
             </image:image>
-        </url>`);
+            </url>`);
+            
         }
 
         // ✅ Final XML
