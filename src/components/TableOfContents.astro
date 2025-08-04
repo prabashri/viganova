@@ -12,6 +12,7 @@ export interface Props {
   toc: TOCItem[];
   heading?: string;
   depth?: 'h2' | 'h2,h3';
+  className?: string;
 }
 
 
@@ -27,14 +28,14 @@ const allowedLevels = depth === 'h2' ? [2] : [2, 3];
 ---
 
 {toc.length > 0 && (
-    <div class="sticky top-20">
-      <details class="toc group block lg:[open]" open>
+    <aside id="table-of-contents" class={`w-full p-05 ${props.className}`}>
+      <details id="toc-details" class="toc-details block lg:[open]" open>
         <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
-          <h2 class="cg-base no-bold no-margin">{heading}</h2>      
+          <h2 class="text-base bold no-margin">{heading}</h2>      
           <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
         </summary>
-        <nav class="text-sm px-2 py-2 overflow-y-auto max-h-[80vh]">
-            <ul id="toc" class="toc-list cg-small no-bullets">
+        <nav id="toc-nav" class="toc-nav text-s p-02 overflow-y-auto mx-h-80vh">
+            <ul id="toc-list" class="toc-list text-s no-bullets">
                 {props.toc
                     .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
                     .map(item => (
@@ -45,16 +46,16 @@ const allowedLevels = depth === 'h2' ? [2] : [2, 3];
             </ul>
         </nav>
       </details>
-    </div>
+    </aside>
 )}
 
 
 
-<style>
+<style id="toc-style">
     details.toc {
-  border: none;
-  background: none;
-}
+      border: none;
+      background: none;
+    }
 
 
 details.toc summary::-webkit-details-marker {
@@ -95,8 +96,4 @@ details[open] .arrow-icon {
   background-color: var(--highlight-bg, #f0f4ff);
 }
 
-
-  @media (max-width: 768px) {
-   
-  }
 </style>

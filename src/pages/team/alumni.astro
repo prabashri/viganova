@@ -1,16 +1,23 @@
 ---
+// src/pages/team/alumni.astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { siteDefaults } from '../../config/siteDefaults';
 import { Icon } from 'astro-icon/components';
 import gravatarHashesJson from '../../data/email-hash.json';
+import type { HeadProps } from '../../types/HeadProps';
+import HeroCollections from '../../components/ui/HeroCollections.astro';
 
 const gravatarHashes: Record<string, string> = Object.fromEntries(
   Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
 );
 
+// Filter + sort alumni
 const alumni = (await getCollection('team'))
-  .filter(member => member.data.left)
+  .filter(member => 
+    member.data.left &&
+    !member.data.slug.startsWith('_') // Exclude hidden members
+  )
   .sort((a, b) => {
     const aDate = a.data.left ? new Date(a.data.left).valueOf() : 0;
     const bDate = b.data.left ? new Date(b.data.left).valueOf() : 0;
@@ -18,7 +25,38 @@ const alumni = (await getCollection('team'))
     return (a.data.role || '').localeCompare(b.data.role || '') || (a.data.name || '').localeCompare(b.data.name || '');
   });
 
-const headProps = {
+// Color palette for initials fallback
+const colorPalette = [
+  'avatar-color-green',
+  'avatar-color-pink',
+  'avatar-color-blue',
+  'avatar-color-purple',
+  'avatar-color-teal'
+];
+let colorIndex = 0;
+
+// Color class resolver
+function getAvatarColorClass(color?: string) {
+  if (!color) {
+    const assigned = colorPalette[colorIndex % colorPalette.length];
+    colorIndex++;
+    return assigned;
+  }
+  if (color.startsWith('avatar-color-')) return color;
+  return 'avatar-color-default';
+}
+
+// Avatar resolver
+function getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color }: any) {
+  if (useImage && image) return { type: 'img', src: image };
+  if (useInitial && initialText) return { type: 'initial', text: initialText, colorClass: getAvatarColorClass(color) };
+  if (useGravatar && gravatarHashes[slug]) {
+    return { type: 'gravatar', src: `https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon` };
+  }
+  return { type: 'icon', colorClass: getAvatarColorClass(color) };
+}
+
+const headProps: HeadProps = {
   title: 'Our Alumni',
   description: 'A tribute to former team members who shaped our journey.',
   url: `${siteDefaults.siteUrl}/team/alumni/`,
@@ -28,120 +66,118 @@ const headProps = {
   authorName: siteDefaults.authorName,
   authorUrl: siteDefaults.authorUrl,
   publishedAt: siteDefaults.publishedDate,
+  showBreadcrumb: true
 };
 ---
 
 <BaseLayout headProps={headProps}>
-  <style>
-    ul {
+  <style is:inline>
+    .team-grid {
       display: flex;
       flex-wrap: wrap;
-      gap: 2rem;
-      list-style: none;
-      padding: 0;
-      margin: 0;
       justify-content: center;
+      gap: 1rem;
+      padding: 0.5rem 0;
     }
-    li {
-      width: calc(50% - 1rem);
+    .team-card {
+      flex: 1 1 260px;
+      background: var(--base-00);
+      border: 1px solid var(--base-20);
+      border-radius: 1rem;
+      padding: 1.5rem;
       text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      list-style: none;
     }
-    .avatar {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    .avatar-img, .avatar-initial {
+      width: 120px;
+      height: 120px;
       margin: 0 auto 1rem;
-      object-fit: cover;
-    }
-    .initial-box {
-      width: 150px;
-      height: 150px;
       border-radius: 50%;
+      object-fit: cover;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
       font-weight: bold;
-      color: white;
-      margin-bottom: 1rem;
+      color: #fff;
+      font-size: 1.5rem;
     }
-    h2 {
-      margin: 0.25rem 0 0.5rem;
-      font-size: 1.25rem;
+    /* Theme avatar colors */
+    .avatar-color-green   { background: hsl(145, 70%, 50%); }
+    .avatar-color-pink    { background: hsl(320, 70%, 55%); }
+    .avatar-color-blue    { background: hsl(210, 70%, 55%); }
+    .avatar-color-purple  { background: hsl(270, 70%, 55%); }
+    .avatar-color-teal    { background: hsl(180, 70%, 45%); }
+    .avatar-color-default { background: var(--primary-lighter); }
+    
+    .team-card h2 {
+      margin: 0.5rem 0 0.25rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--base-100);
     }
     .role {
+      font-size: 0.9rem;
       font-style: italic;
-      color: var(--gray-text, #666);
-      margin-bottom: 0.25rem;
+      color: var(--base-60);
+      margin-bottom: 0.5rem;
     }
     .expertise {
-      font-size: 0.875rem;
-      color: var(--accent-text, #888);
+      font-size: 0.85rem;
+      color: var(--base-70);
+      border-top: 1px solid var(--base-20);
+      margin-top: 0.75rem;
+      padding-top: 0.5rem;
     }
-    @media (max-width: 768px) {
-      li {
-        width: 100%;
+    @media (max-width: 480px) {
+      .team-card {
+        flex: 1 1 100%;
+        max-width: 100%;
       }
     }
   </style>
+  <HeroCollections
+    title={headProps.title}
+    description={headProps.description}
+    content="We thank you sincerely for your valuable contributions to our success."
+    bgColorClass="bg-secondary-lighter-x"
+    textColorClass="col-base-00"
+  />
+ 
 
-  <header class="mx-w-site mi-auto ta-center mb-2">
-    <h1>{headProps.title}</h1>
-    <p>{headProps.description}</p>
-    <p class="mb-2" style="font-style: italic; max-width: 40rem; margin: 0 auto;">
-      We thank you sincerely for your valuable contributions to our success.
-    </p>
-  </header>
+  <section class="mx-w-site mi-auto mb-2 pb-2">
+    <ul class="team-grid no-bullets">
+      {alumni.map(member => {
+        const { slug, name, role, expertise, color, image, useImage, useInitial, initialText, useGravatar } = member.data;
+        const avatar = getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color });
 
-  <ul>
-    {alumni.map(member => {
-      const {
-        slug,
-        name,
-        role,
-        expertise,
-        color,
-        useImage,
-        image,
-        useInitial,
-        initialText,
-        useGravatar,
-        gravatarEmail
-      } = member.data;
-
-      const avatarHtml = (() => {
-        if (useImage && image) {
-          return <img src={image} alt={`Photo of ${name}`} class="avatar" loading="lazy" />;
-        }
-
-        if (useInitial && initialText) {
-          return <div class="initial-box" style={`background:${color || '#888'}`}>{initialText}</div>;
-        }
-
-        if (useGravatar && gravatarEmail && gravatarHashes[slug]) {
-          return (
-            <img
-              src={`https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon`}
-              alt={`Gravatar of ${name}`}
-              class="avatar"
-              loading="lazy"
-            />
-          );
-        }
-
-        return <Icon name="avatar" width="150" height="150" style={`fill:${color || '#ccc'}; margin-bottom:1rem;`} />;
-      })();
-
-      return (
-        <li>
-          <a href={`/team/${slug}/`}>
-            {avatarHtml}
-            <h2>{name}</h2>
-            <p class="role">{role}</p>
-            <p class="expertise">{expertise?.join(', ')}</p>
-          </a>
-        </li>
-      );
-    })}
-  </ul>
+        return (
+          <li class="team-card">
+            <a class="team-link td-none p-0" href={`/team/${slug}/`}>
+              {avatar.type === 'img' && <img class="avatar-img" src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
+              {avatar.type === 'gravatar' && <img class="avatar-img" src={avatar.src} alt={`Gravatar of ${name}`} loading="lazy" />}
+              {avatar.type === 'initial' && (
+                <div class={`avatar-initial ${avatar.colorClass}`}>
+                  {avatar.text}
+                </div>
+              )}
+              {avatar.type === 'icon' && (
+                <Icon name="avatar" width="120" height="120" class={avatar.colorClass} />
+              )}
+              <h2>{name}</h2>
+              <p class="role">{role}</p>
+              <p class="expertise">{expertise?.join(', ')}</p>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
 </BaseLayout>

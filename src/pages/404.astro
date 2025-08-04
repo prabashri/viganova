@@ -1,0 +1,42 @@
+---
+// export const prerender = true;
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageSeo = {
+  title: '404 - Page Not Found | nViewsWEB Astro Theme',
+  description: 'The page you are looking for does not exist. It may have been moved or deleted.',
+  image: "/images/astro-theme-nviewsweb-main.png"
+};
+---
+<BaseLayout headProps={pageSeo} >
+  <Fragment slot="headContent-top"></Fragment>
+  <Fragment slot="headContent-bottom"></Fragment>    
+ 
+    <h1 class="ta-center cg-base">404 - Page Not Found</h1>
+      <p class="ta-center cg-h4">
+        The page you're looking for doesn't exist or may have been moved.
+      </p>
+      <div class="mx-w-content mi-auto">
+        <form action="/search" method="GET" class="flex gap mx-w-content full-width mi-auto center">
+          <input
+            type="text"
+            name="q"  
+            placeholder="Search..."
+            class="full-width br p-03 cc-base b-thin-base05"
+            required
+          />
+          <button
+            type="submit"
+            class="full-width mx-w-100 br p-03 cc-base b-thin-base05"
+          >
+            Search
+          </button>
+        </form>
+      </div>  
+      <div class="mi-auto ta-center mb-2">
+        <a href="/" class="col-base-00 p-1 no-bb bg-base-50 br">← Go back to homepage</a>
+      </div>
+
+  <Fragment slot="extraScripts">   
+  </Fragment>
+</BaseLayout>

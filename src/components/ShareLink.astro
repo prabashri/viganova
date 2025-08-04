@@ -27,7 +27,6 @@ const pageTitle = titleProp || Astro.props.title || '';
 const pageDescription = descProp || Astro.props.description || '';
 let resolvedUrl = urlProp || Astro.url?.pathname || '/';
 
-// Resolve relative URL using domain
 if (!/^https?:\/\//.test(resolvedUrl)) {
   const domain = siteDefaults.siteUrl || Astro.site?.href || 'http://localhost:4321';
   resolvedUrl = new URL(resolvedUrl, domain).href;
@@ -35,39 +34,16 @@ if (!/^https?:\/\//.test(resolvedUrl)) {
 
 const encodedURL = encodeURIComponent(resolvedUrl);
 const encodedTitle = encodeURIComponent(pageTitle);
-const encodedDesc = encodeURIComponent(pageDescription);
 
 const shareLinks = siteDefaults.shareLinks ?? [];
-
 const platforms = [
-  {
-    name: 'Whatsapp',
-    href: `https://wa.me/?text=${encodedTitle}%20${encodedURL}`,
-  },
-  {
-    name: 'Facebook',
-    href: `https://www.facebook.com/sharer/sharer.php?u=${encodedURL}`,
-  },
-  {
-    name: 'X',
-    href: `https://x.com/intent/tweet?url=${encodedURL}&text=${encodedTitle}`,
-  },
-  {
-    name: 'LinkedIn',
-    href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedURL}&title=${encodedTitle}`,
-  },
-  {
-    name: 'Reddit',
-    href: `https://www.reddit.com/submit?url=${encodedURL}&title=${encodedTitle}`,
-  },
-  {
-    name: 'Email',
-    href: `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encodedURL}`,
-  },
-  {
-    name: 'Copy Link',
-    href: null, // special handling
-  }
+  { name: 'Whatsapp', href: `https://wa.me/?text=${encodedTitle}%20${encodedURL}` },
+  { name: 'Facebook', href: `https://www.facebook.com/sharer/sharer.php?u=${encodedURL}` },
+  { name: 'X', href: `https://x.com/intent/tweet?url=${encodedURL}&text=${encodedTitle}` },
+  { name: 'LinkedIn', href: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedURL}&title=${encodedTitle}` },
+  { name: 'Reddit', href: `https://www.reddit.com/submit?url=${encodedURL}&title=${encodedTitle}` },
+  { name: 'Email', href: `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A${encodedURL}` },
+  { name: 'Copy Link', href: null }
 ];
 
 function toId(name: string) {
@@ -82,49 +58,59 @@ function toIconName(name: string) {
 <nav
   id={id}
   aria-label="Share this page"
-  class={`share-toolbar flex gap ai-center pb-05 mb-05 ${className}`}
+  class={`share-toolbar pb-05 mb-05 ${className}`}
+  role="toolbar"
+  aria-orientation="horizontal"
   data-title={pageTitle}
   data-url={resolvedUrl}
-  data-description={pageDescription}
-  data-location={location}
 >
-  {shareLinks.map((name) => {
-    const platform = platforms.find((p) => p.name.toLowerCase() === name.toLowerCase());
-    if (!platform) return null;
+  {pageTitle && (
+    <span class="share-title text-xs bold block m-bottom-05 uppercase">{pageTitle}</span>
+  )}
+  
+  <ul class="flex gap ai-center no-bullets m-0 p-0" role="list">
+    {shareLinks.map((name, index) => {
+      const platform = platforms.find((p) => p.name.toLowerCase() === name.toLowerCase());
+      if (!platform) return null;
 
-    const label = `Share on ${name}`;
-    const icon = toIconName(name);
-    const dataId = toId(name);
-    const dataLabel = `${name} Share`;
+      const label = `Share on ${name}`;
+      const icon = toIconName(name);
+      const dataId = toId(name);
 
-    return platform.href ? (
-      <a
-        href={platform.href}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={label}
-        aria-label={label}
-        data-id={dataId}
-        data-label={dataLabel}
-        data-action="share"
-        class="flex no-bb h-30 w-30 br no-padding hover-bs-1-1-8-2-base-100"
-      >
-        <Icon name={icon} class={iconSize} />
-        <span class="sr-only">{label}</span>
-      </a>
-    ) : (
-      <button
-        type="button"
-        data-id="share-copy-button"
-        data-label="copy link"
-        data-action="share"
-        title="Copy Link"
-        aria-label="Copy Link"
-        class="flex center bg-col-ff h-30 w-30 br hover-bs-1-1-8-2-base-100 border-none"
-      >
-        <Icon name="clipboard" class={iconSize} />
-        <span class="sr-only">Copy Link</span>
-      </button>
-    );
-  })}
+      const isFirst = index === 0;
+
+      return (
+        <li class="icon-wrapper flex ai-center jc-center p-02 br" role="none">
+          {platform.href ? (
+            <a
+              href={platform.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={label}
+              aria-label={label}
+              data-id={dataId}
+              data-action="share"
+              role="button"
+              tabindex={isFirst ? '0' : '-1'}
+              class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent hover-border hover-box-shadow p-02"
+            >
+              <Icon name={icon} class={iconSize} />
+            </a>
+          ) : (
+            <button
+              type="button"
+              data-id="share-copy-button"
+              title="Copy Link"
+              aria-label="Copy Link"
+              role="button"
+              tabindex={isFirst ? '0' : '-1'}
+              class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent hover-border hover-box-shadow p-02"
+            >
+              <Icon name="clipboard" class={iconSize} />
+            </button>
+          )}
+        </li>
+      );
+    })}
+  </ul> 
 </nav>

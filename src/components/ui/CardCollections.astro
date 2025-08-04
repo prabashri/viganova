@@ -1,4 +1,5 @@
 ---
+// src/components/ui/CardCollections.astro
 import Card from './Card.astro';
 import type { CardProps } from '../../types/CardProps';
 
@@ -9,30 +10,39 @@ interface Props {
   entry?: string;
 }
 
-const { cards, wrapper = 'div', roleType = 'none', entry } = Astro.props;
+let { cards, wrapper = 'div', roleType = 'none', entry } = Astro.props;
+
+// 🔹 Auto-adjust roleType if wrapper is UL
+if (wrapper === 'ul' && roleType === 'article') {
+  roleType = 'list';
+}
+
 const WrapperTag = wrapper;
 const InnerTag = wrapper === 'ul' ? 'li' : 'div';
 
-// Accessibility roles
 const wrapperRole = wrapper === 'ul' && roleType === 'list' ? 'list' : undefined;
 const wrapperLabel = wrapper === 'ul' && entry ? `${entry} list` : undefined;
 const itemRole = wrapper === 'ul' && roleType === 'list' ? 'listitem' : undefined;
 ---
 
-<WrapperTag class="card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-f-start" role={wrapperRole} aria-label={wrapperLabel}>
-  {cards.map((card) => (
-    roleType === 'article'
-      ? (
-        <InnerTag class="card-item" role={itemRole}>
-          <article>
-            <Card {...card} />
-          </article>
-        </InnerTag>
-      )
-      : (
-        <InnerTag class="card-item" role={itemRole}>
+<WrapperTag 
+  class="card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-f-start"
+  role={wrapperRole} 
+  aria-label={wrapperLabel}
+>
+  {cards.map((card) => {
+    if (wrapper === 'div' && roleType === 'article') {
+      return (
+        <article class="card-item">
           <Card {...card} />
-        </InnerTag>
-      )
-  ))}
+        </article>
+      );
+    }
+
+    return (
+      <InnerTag class="card-item" role={itemRole}>
+        <Card {...card} />
+      </InnerTag>
+    );
+  })}
 </WrapperTag>

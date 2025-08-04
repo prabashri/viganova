@@ -1,0 +1,84 @@
+---
+// export const prerender = true;
+
+import { siteDefaults } from '../config/siteDefaults';
+import BaseLayout from '../layouts/BaseLayout.astro';
+// This page's file path
+// const meta = pageMeta.find((p) => p.slug === 'terms');
+const lastModified = '2025-06-20'; // Example date, replace with actual logic if needed
+if (!lastModified) {
+  const lastModified = siteDefaults.publishedDate; // Fallback to siteDefaults if no lastModified
+}
+const lastModifiedDate = new Date(lastModified).toLocaleDateString('en-US', { 
+  month: 'long',
+  day: 'numeric',
+  year: 'numeric'
+});
+
+const pageSeo = {
+  title: 'Terms of service | nViewsWEB Astro Theme',
+  description: 'Read the Terms of Service to understand your rights, tool usage, disclaimers, and more.',
+  updatedAt: lastModifiedDate,
+};
+
+---
+<BaseLayout headProps={pageSeo} >
+  <Fragment slot="headContent">    
+  </Fragment> 
+      <article class="prose max-w-width mi-auto">
+        <header class="mb-1 mx-w-content mi-auto">
+          <h1 class="pb-1 ta-center">{pageSeo.title}</h1>       
+        </header>       
+        <div class="mx-w-content p-1 mi-auto">   
+            <hr>   
+             <p>
+              Last updated: <time datetime={lastModified}>{lastModifiedDate}</time>
+            </p>
+            <p>These Terms govern your use of ClampGenerator.com (“the Site”), a tool and resource site operated by NViews Media Private Limited, India.</p>
+            <h2 id="1-services-offered">1. Services Offered</h2>
+            <p>ClampGenerator provides:</p>
+            <ul>
+                <li>Responsive <strong>CSS clamp calculators</strong>  </li>
+                <li>Educational <strong>blog content</strong>  </li>
+                <li>Free tools (online and offline versions)</li>
+            </ul>
+            <h2 id="2-usage-restrictions">2. Usage &amp; Restrictions</h2>
+            <p>You may use our tools freely for personal and commercial projects <strong>with proper permission and attribution</strong>.</p>
+            <p>However, <strong>embedding, redistribution, or use in iframes without explicit permission is prohibited</strong>.</p>
+            <h2 id="3-accounts-and-memberships">3. Accounts and Memberships</h2>
+            <p>We currently do <strong>not require user accounts</strong>. In the future, we may offer <strong>membership plans</strong> for:</p>
+            <ul>
+                <li><strong>Ad-free experience</strong></li>
+                <li><strong>Premium features</strong></li>
+                <li><strong>Support for our mission</strong></li>
+            </ul>
+            <h2 id="4-paid-services">4. Paid Services</h2>
+            <p>While all tools are currently free, future <strong>paid plans or donations</strong> may be introduced.</p>
+            <h2 id="5-attribution">5. Attribution</h2>
+            <p>No attribution is required, but we appreciate being credited when possible.</p>
+            <h2 id="6-accuracy-and-reliability">6. Accuracy and Reliability</h2>
+            <p>Clamp output is <strong>99% accurate</strong> based on tested formulas. However, users must <strong>verify results before using them in production</strong> environments.</p>
+            <h2 id="7-service-modifications">7. Service Modifications</h2>
+            <p>We may modify or remove services, features, or content <strong>at any time, with or without notice</strong>.</p>
+            <h2 id="8-intellectual-property">8. Intellectual Property</h2>
+            <p>All content, code, and tools on this site are protected. You may <strong>not reverse-engineer, resell, or clone</strong> our tools. Some tools may include <strong>open-source code</strong> with respective licenses.</p>
+            <h2 id="9-ads-and-affiliate-links">9. Ads and Affiliate Links</h2>
+            <p>We show:</p>
+            <ul>
+                <li><strong>Google AdSense ads</strong>  </li>
+                <li><strong>Affiliate content</strong>  </li>
+                <li><strong>Promotional material</strong> related to digital and design tools</li>
+            </ul>
+            <p>These help support the free service we offer.</p>
+            <h2 id="10-governing-law">10. Governing Law</h2>
+            <p>These terms are governed by the laws of <strong>India</strong>, specifically the jurisdiction of <strong>Thanjavur, Tamil Nadu</strong>.</p>
+            <h2 id="11-company-information">11. Company Information</h2>
+            <p>ClampGenerator.com is a project by:</p>
+            <p><strong>NViews Media Private Limited (<a href="http://thenviews.com">thenviews.com</a>)</strong><br>Registered in India<br>📧 <a href="mailto:praba@nviewsweb.com"><strong>praba@nviewsweb.com</strong></a></p>
+
+   
+        </div>
+      </article>
+  <Fragment slot="extraScripts">   
+  </Fragment>
+</BaseLayout>

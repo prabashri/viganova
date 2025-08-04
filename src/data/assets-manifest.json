@@ -2,17 +2,18 @@
   "css": {
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-08-02T13:00:42.745Z",
+      "datetime": "2025-08-03T14:40:47.478Z",
       "names": [
         "base",
         "colors",
         "header",
+        "hero",
         "size"
       ]
     },
     "main": {
-      "file": "/styles/main.7pw5x2.css",
-      "datetime": "2025-08-02T13:00:45.230Z",
+      "file": "/styles/main.7vfhz8.css",
+      "datetime": "2025-08-03T14:30:41.796Z",
       "names": [
         "components",
         "form",
@@ -20,8 +21,8 @@
       ]
     },
     "nonCritical": {
-      "file": "/styles/non-critical.elsvnr.css",
-      "datetime": "2025-08-02T11:04:38.045Z",
+      "file": "/styles/non-critical.ldeshl.css",
+      "datetime": "2025-08-03T14:25:37.997Z",
       "names": [
         "faq",
         "footer",
@@ -43,14 +44,11 @@
       "datetime": "2025-07-30T09:23:11.049Z"
     },
     "main": {
-      "file": "/scripts/main.r7g9dc.min.js",
-      "datetime": "2025-07-30T09:23:10.985Z"
+      "file": "/scripts/main.br6inh.min.js",
+      "datetime": "2025-08-03T11:02:03.545Z"
     }
   },
   "icons": {
-    "favicon.ico": {
-      "datetime": "2025-08-02T13:00:54.290Z"
-    },
     "android-chrome-192x192.png": {
       "datetime": "2025-07-26T13:44:29.370Z"
     },
@@ -78,8 +76,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.szzzxr.json",
-      "datetime": "2025-08-02T13:00:33.904Z"
+      "file": "/search-index.blfdkk.json",
+      "datetime": "2025-08-03T14:40:38.544Z"
     }
   },
   "logos": {

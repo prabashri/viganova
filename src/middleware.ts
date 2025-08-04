@@ -32,7 +32,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     .map(([directive, value]) => {
       if (typeof value === 'boolean' && value) return directive;
       const values = Array.isArray(value) ? value : [value];
-      const needsNonce = directive === 'script-src';
+      const needsNonce = ['script-src', 'style-src'].includes(directive);
       return `${directive} ${[...values, ...(needsNonce ? [`'nonce-${nonce}'`] : [])].join(' ')}`;
     })
     .join('; ');
@@ -56,9 +56,10 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (isHtml && response.body) {
     const rawHtml = await response.text();
 
+    // Add nonce to inline <script> and <style> tags in one pass for performance
     const htmlWithNonce = rawHtml.replace(
-      /<script(?![^>]*\bsrc=)(?![^>]*\bnonce=)([^>]*)>/g,
-      `<script nonce="${nonce}"$1>`
+      /<(script(?![^>]*\bsrc=)|style)(?![^>]*\bnonce=)([^>]*)>/g,
+      (_match, tag, attrs) => `<${tag} nonce="${nonce}"${attrs}>`
     );
 
     return new Response(htmlWithNonce, {

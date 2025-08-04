@@ -1,0 +1,399 @@
+---
+// src/pages/contact-us.astro
+// export const prerender = true; not required in server-side rendered pages
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteDefaults } from '../config/siteDefaults';
+import { siteFunctions } from '../config/siteFunctions';
+
+const contactFormHandler = siteFunctions.contactFormHandler;
+const turnstileSitekey = siteFunctions.turnstileSitekey;
+
+const adminEmail = siteDefaults.adminEmail;
+const siteTitle = siteDefaults.title;
+
+const pageSeo = {
+  title: `Contact ${siteDefaults.separator} ${siteDefaults.title}`,
+  description: `Get in touch with the ${siteDefaults.title} team for any inquiries or support.`,
+};
+---
+<BaseLayout headProps={pageSeo} >
+  <Fragment slot="headContent-top">  
+    {turnstileSitekey && (
+      <>
+        <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
+        <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
+      </>
+    )}
+  </Fragment>
+  <Fragment slot="headContent-bottom">
+    {turnstileSitekey && (
+      <>
+        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+      </>
+    )}
+    <script src="/scripts/contact-form.js" defer></script>
+  </Fragment>
+      <article>
+        <header class="mx-w-content mi-auto">
+          <h1 class="ta-center">{pageSeo.title}</h1>
+          <p class="ta-center">Reach out with your feedback, questions, or suggestions.</p>
+          <p class="ta-center">We're just a mail away...</p>
+        </header>
+        <!--ContactForm /-->
+        <section id="contact-form-container">
+          <div id="success-box" style="display:none;" class="form-status success-box display-none flex flex-col full-width mx-w-420 mi-auto mb-2 p-2 bg-sucess-lighter br"></div>
+          <form id="contact-form"
+              novalidate
+              class="flex flex-col full-width mx-w-420 mi-auto mb-1"
+              aria-label="Contact Form"
+              autocomplete="on">
+
+          {/* -- 🛡️ Honeypot anti-spam field -- */}
+          <div class="form-group form-name" style="display:none;" aria-hidden="true">
+            <label for="website">form name</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          {/*-- Hidden technical fields --*/}
+          <input type="hidden" name="token" />
+          <input type="hidden" name="postUrl" value="" />
+          <input type="hidden" name="postTitle" value="" />
+          <input type="hidden" name="adminEmail" value={adminEmail} />
+          <input type="hidden" name="brand" value={siteTitle} />
+
+          <div class="form-group mb-05">
+            <label for="name" class="text-small col-base-80">
+              Name <span class="col-error">*</span>
+            </label>
+            <input id="name"
+                  name="name"
+                  type="text"
+                  class="form-control full-width p-05 br br-1-base-100"
+                  required
+                  aria-required="true"
+                  autocomplete="name"
+                  spellcheck="false" />
+          </div>
+
+          <div class="form-group mb-05">
+            <label for="email" class="text-small col-base-80">
+              Email <span class="col-error">*</span>
+            </label>
+            <input id="email"
+                  name="email"
+                  type="email"
+                  class="form-control full-width p-05 br br-1-base-100"
+                  required
+                  aria-required="true"
+                  autocomplete="email"
+                  spellcheck="false" />
+          </div>
+
+          <div class="form-group mb-05">
+            <label for="subject" class="text-small col-base-80">
+              Subject <span class="col-error">*</span>
+            </label>
+            <select id="subject"
+                    name="subject"
+                    class="form-control full-width p-05 br br-1-base-100 text-small"
+                    required
+                    aria-required="true">
+              <option value="">Select</option>
+              <option>Support</option>
+              <option>Feedback</option>
+              <option>Suggestions</option>
+              <option>Business Enquiries</option>
+              <option>Reviews</option>
+              <option>Comment</option>
+              <option>Security</option>
+            </select>
+          </div>
+
+          {/*-- Review fields (conditionally shown) --*/}
+          <fieldset id="review-fields" style="display:none;" class="display-none no-border" aria-hidden="true">
+            <legend class="sr-only">Review Details</legend>
+
+            <div class="form-group mb-05">
+              <label for="affiliation" class="text-small col-base-80">
+                Affiliation <span class="col-error">*</span>
+              </label>
+              <input id="affiliation"
+                    name="affiliation"
+                    type="text"
+                    class="form-control full-width p-05 br br-1-base-100"
+                    autocomplete="organization"
+                    required />
+            </div>
+
+            <div class="form-group mb-05">
+              <label for="reviewScore" class="text-xs col-base-80">
+                How do you rate us? <span class="col-error">*</span>
+              </label>
+              <select id="reviewScore"
+                      name="reviewScore"
+                      class="form-control full-width p-05 br br-1-base-100"
+                      required>
+                <option value="1">1 - Poor</option>
+                <option value="2">2 - Fair</option>
+                <option value="3" selected>3 - Good</option>
+                <option value="4">4 - Very Good</option>
+                <option value="5">5 - Excellent</option>
+              </select>
+            </div>
+
+            <div class="form-group mb-05">
+              <label for="isPublicReview" class="text-xs col-base-80 flex flex-row gap ai-start ai-center">
+                <input type="checkbox"
+                      id="isPublicReview" class="br w-auto"
+                      name="isPublicReview"
+                      checked />Use my review publicly with name.
+              </label>
+            </div>
+          </fieldset>
+
+          {/*-- Comment fields (conditionally shown) --*/}
+          <fieldset id="comment-fields" style="display:none;" class="display-none no-border" aria-hidden="true">
+            <legend class="sr-only">Comment Visibility</legend>
+
+            <div class="form-group mb-05">
+              <label for="isPublicComment" class="text-small col-base-80 flex flex-row gap ai-start ai-center">
+                <input type="checkbox"
+                  id="isPublicComment" class="w-auto br"
+                  name="isPublicComment"
+                  checked />Make my comment public
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="form-group mb-05">
+            <label for="message" class="text-small col-base-80">
+              Message <span class="col-error">*</span>
+            </label>
+            <textarea id="message"
+              name="message"
+              class="form-control p-05 br br-1-base-100"
+              rows="3"
+              required
+              aria-required="true"
+              spellcheck="true">
+            </textarea>
+          </div>
+          {turnstileSitekey && 
+            <div class="form-group mb-05">
+              <div id="cf-turnstile"
+                class="cf-turnstile"
+                data-sitekey={turnstileSitekey}
+                aria-label="Captcha verification">
+              </div>
+            </div>
+          }
+          <input type="hidden" name="handler" value={contactFormHandler} />
+
+          <button type="submit"
+            class="form-submit full-width no-border br bg-col-primary p-05 h-60 col-base-00 cg-h6 mb-05"
+            aria-label="Submit your message">
+            Send
+          </button>
+
+          <div id="form-status"
+            class="form-status error"
+            role="status"
+            aria-live="polite">
+          </div>
+        </form>
+      </section> {/** Contact Form container Section end  */}
+      <script type="module">
+          document.addEventListener("DOMContentLoaded", function () {
+            const LOCAL_STORAGE_KEY = "contact_form_last_submitted";
+            const COOLDOWN_MINUTES = 3; // Cooldown period in minutes
+
+            const form = document.getElementById('contact-form');
+            if (!form) return;
+
+            const statusBox = document.getElementById("form-status");
+            const successBox = document.getElementById("success-box");
+            const subjectSelect = document.getElementById("subject");
+            const reviewFields = document.getElementById("review-fields");
+            const commentFields = document.getElementById("comment-fields");
+
+            const validSubjects = [
+              "Support", "Feedback", "Suggestions", "Business Enquiries",
+              "Reviews", "Comment", "Security"
+            ];
+
+            const subjectAliases = {
+              support: "Support",
+              feedback: "Feedback",
+              suggestions: "Suggestions",
+              suggestion: "Suggestions",
+              business: "Business Enquiries",
+              businessenquiry: "Business Enquiries",
+              "business-enquiry": "Business Enquiries",
+              businessenquiries: "Business Enquiries",
+              "business-enquiries": "Business Enquiries",
+              reviews: "Reviews",
+              review: "Reviews",
+              comment: "Comment",
+              comments: "Comment",
+              security: "Security"
+            };
+
+            // Handle subject change
+            subjectSelect?.addEventListener("change", (e) => {
+              const val = e.target.value;
+              reviewFields?.style.setProperty("display", val === "Reviews" ? "block" : "none");
+              commentFields?.style.setProperty("display", val === "Comment" ? "block" : "none");
+
+              reviewFields?.setAttribute("aria-hidden", val !== "Reviews");
+              commentFields?.setAttribute("aria-hidden", val !== "Comment");
+            });
+
+            // Prefill subject from query params
+            const params = new URLSearchParams(window.location.search);
+            const querySubject = params.get("subject");
+            const queryPost = params.get("post");
+            const queryTitle = params.get("title");
+
+            if (querySubject) {
+              const normalized = querySubject.trim().toLowerCase().replace(/[^a-z]/g, "");
+              const matched = subjectAliases[normalized];
+              if (matched && subjectSelect) {
+                subjectSelect.value = matched;
+                subjectSelect.dispatchEvent(new Event("change"));
+              }
+            }
+
+            if (queryPost) form.querySelector("[name='postUrl']").value = decodeURIComponent(queryPost);
+            if (queryTitle) form.querySelector("[name='postTitle']").value = decodeURIComponent(queryTitle);
+
+            // Cooldown check
+            const runCooldownCheck = () => {
+              const last = localStorage.getItem(LOCAL_STORAGE_KEY);
+              if (!last) return false;
+
+              const now = Date.now();
+              const diff = now - parseInt(last, 10);
+              const remaining = COOLDOWN_MINUTES * 60 * 1000 - diff;
+
+              if (remaining > 0) {
+                const mins = Math.floor(remaining / 60000);
+                const secs = Math.floor((remaining % 60000) / 1000);
+                successBox.textContent = `
+                  ✅ Message sent successfully!<br/>
+                  ⏳ Please wait <strong>${mins}:${secs.toString().padStart(2, "0")}</strong> before sending another message.
+                `;
+                successBox.style.display = "block";
+                form.style.display = "none";
+                setTimeout(runCooldownCheck, 1000);
+                return true;
+              } else {
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                return false;
+              }
+            };
+
+            if (runCooldownCheck()) {
+              return; // Block re-submission
+            }
+
+            // Form submission
+            form.addEventListener("submit", async (e) => {
+              e.preventDefault();
+              statusBox.textContent = "Sending...";
+
+              const formData = new FormData(form);
+
+              // Honeypot
+              if (formData.get("website")) {
+                statusBox.textContent = "You are not allowed to submit now, try later.";
+                return;
+              }
+
+              const sanitize = (str) => str?.replace(/<[^>]*>?/gm, "").trim() || "";
+
+              const token = formData.get("token") || formData.get("cf-turnstile-response");
+              if (!token) {
+                statusBox.textContent = "❌ Please complete the CAPTCHA.";
+                return;
+              }
+
+              const name = sanitize(formData.get("name"));
+              const email = sanitize(formData.get("email"));
+              const subject = sanitize(formData.get("subject"));
+              const messageInput = sanitize(formData.get("message"));
+              const adminEmail = sanitize(formData.get("adminEmail")) || "praba@nviewsweb.com";
+
+              if (!name || !email || !subject || !messageInput) {
+                statusBox.textContent = "❌ All required fields must be filled.";
+                return;
+              }
+
+              if (!/^[\w\s.@+-]+$/.test(email)) {
+                statusBox.textContent = "❌ Invalid email format.";
+                return;
+              }
+
+              const postUrl = formData.get("postUrl");
+              const postTitle = formData.get("postTitle");
+              const isPublic =
+                formData.get("isPublicReview") === "on" ||
+                formData.get("isPublicComment") === "on";
+
+              const rawReviewScore = formData.get("reviewScore");
+              const reviewScore =
+                subject === "Reviews" && /^[1-5]$/.test(rawReviewScore)
+                  ? Number(rawReviewScore)
+                  : null;
+
+              const affiliation = sanitize(formData.get("affiliation")) || "";
+              let message = messageInput;
+
+              if (subject === "Reviews") {
+                message += `\n\nReview Score: ${reviewScore}/5`;
+              } else if (subject === "Comment") {
+                message += `\n\nComment on: ${postTitle} (${postUrl || "Unknown"})\nVisibility: ${isPublic ? "Public" : "Private"}`;
+              }
+
+              const payload = {
+                name,
+                email,
+                subject,
+                message,
+                token,
+                adminEmail,
+                brand: "ClampGenerator",
+                reviewScore,
+                isPublic,
+                affiliation,
+                postTitle,
+                postUrl,
+              };
+
+              try {
+                const res = await fetch("https://nviewsweb-email-handler.nviews.workers.dev/", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload),
+                });
+                
+                if (res.ok) {
+                  localStorage.setItem(LOCAL_STORAGE_KEY, Date.now().toString());
+                  form.reset();
+                  successBox.textContent = `✅ Message sent successfully!<br/>⏳ Please wait before submitting again.`;
+                  successBox.style.display = "block";
+                  form.style.display = "none";
+                } else {
+                  statusBox.textContent = "❌ Server error. Please try again.";
+                }
+              } catch (err) {
+                console.error("Network error", err);
+                statusBox.textContent = "❌ Network error. Please try again.";
+              }
+            });
+        });
+      </script>
+      </article>
+  <Fragment slot="extraScripts">
+  </Fragment> 
+</BaseLayout>

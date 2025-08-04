@@ -37,7 +37,8 @@
   --featured-image-width: 960px;
   --site-width: 1280px;
   --content-width: 640px;
-  --sidebar-width: 320px;
+  --sidebar-width: 360px;
+  --toc-width: 320px;
 
   /* Shadows */
   --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -294,4 +295,5 @@ button::after {
   white-space: nowrap;
   border: 0;
 }
+
 

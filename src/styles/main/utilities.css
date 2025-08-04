@@ -179,7 +179,9 @@ svg use {
 .border-primary, .hover-border:hover {
 	border: 1px solid var(--primary-base);
 }
-
+.border-secondary, .hover-border-secondary:hover {
+	border: 1px solid var(--secondary, var(--base-80));
+}
 .border-primary-light, .hover-border-primary-light:hover {
 	border: 1px solid var(--primary-light);
 }
@@ -569,6 +571,9 @@ svg use {
 .m-bottom-0 {
 	margin-bottom: 0;
 }
+.m-bottom-05 {
+	margin-bottom: 0.5rem;
+}
 
 .mb-0 {
 	margin-block: 0;
@@ -631,7 +636,9 @@ svg use {
 .mx-h-360 {
 	max-height: 360px;
 }
-
+.mx-h-80vh {
+	max-height: 80vh;
+}
 .mx-w-100 {
 	max-width: 100px;
 }
@@ -773,6 +780,9 @@ svg use {
 .overflow-y-scroll {
 	overflow-y: scroll;
 }
+.overflow-y-auto {
+	overflow-y: auto;
+}
 
 .p-0 {
 	padding: 0;
@@ -868,6 +878,9 @@ svg use {
 
 .ta-start {
 	text-align: start;
+}
+.ta-end{
+	text-align: end;
 }
 
 .text-x-small {
@@ -1093,13 +1106,29 @@ svg use {
 	.full-display-none {
 		display: none !important;
 	}
+	.full-sticky {
+		position: sticky;
+	}
 	.full-br-1 {
 		border-radius: 1rem;
 	}
 	.full-p-05 {
 		padding: 0.5rem;
 	}
+	.full-mr-unset {
+		margin-right: unset !important;
+	}
+	.full-mr-auto {
+		margin-right: auto;
+	}
+	.full-ml-auto {
+		margin-left: auto !important; 
+	}
+	.full-mx-w-sidebar {
+		max-width: var(--sidebar-width);
+	}
 }
+
 
 
 @media (min-width: 768px) {
@@ -1195,8 +1224,8 @@ svg use {
 	.md-order-3 {
 		order: 3 !important;
 	}
-}
 
+}
 @media (min-width: 1024px) and (max-width: 1279px) {
   /* lg- [ only large screens - above tablet version desktops ] */
 	.lg-display-none {
@@ -1229,10 +1258,4 @@ svg use {
 		flex-wrap: wrap;
 	}
 	
-}
-
-@media(max-width:920px) {
-	.display-900 {
-		display: none;
-	}
 }

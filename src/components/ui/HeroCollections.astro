@@ -4,6 +4,7 @@ import ResponsiveImage from '../ResponsiveImage.astro';
 interface Props {
   title: string;
   description?: string;
+  content?: string;
   bgColorClass?: string;   // default background color
   textColorClass?: string; // text color class
   minHeight?: string;      // height class
@@ -17,6 +18,7 @@ interface Props {
 const {
   title,
   description,
+  content,
   bgColorClass = "bg-secondary-lighter-x",
   textColorClass = "col-base-00",
   minHeight = "mn-h-230",
@@ -28,7 +30,7 @@ const {
 } = Astro.props;
 ---
 
-<header class={`relative overflow-hidden ${bgColorClass} ${textColorClass}`}>
+<header id="content-header" class={`relative overflow-hidden ${bgColorClass} ${textColorClass}`}>
   {image && (
     <ResponsiveImage
       src={image}
@@ -43,5 +45,6 @@ const {
   <div class={`relative z-10 mx-w-site mi-auto ta-center h-fit flex flex-col jc-center ${minHeight}`}>
     <h1 class="mb-1">{title}</h1>
     {description && <p class="text-xl">{description}</p>}
+    {content && <p class="text-base mb-2 mx-w-content mi-auto">{content}</p>}
   </div>
 </header>

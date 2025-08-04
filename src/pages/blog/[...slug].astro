@@ -8,7 +8,8 @@ import modifiedDatesJson from '../../data/modified-dates.json';
 import type { CollectionEntry } from 'astro:content';
 
 const { slug } = Astro.params;
-const collectionBase = siteDefaults.collections['blog']?.base ?? '';
+const base = siteDefaults.collections['blog']?.base ?? '';
+const collectionBase = base ? `${base}/` : '';
 const modifiedDates = modifiedDatesJson as Record<string, string>;
 
 // ✅ Validate slug
@@ -67,7 +68,7 @@ const authors = await Promise.all(
 // ✅ Canonical URL
 const canonicalUrl = post.data?.canonicalUrl?.startsWith('http')
   ? post.data.canonicalUrl
-  : `${siteDefaults.siteUrl}${post.data?.canonicalUrl || `/${collectionBase}/${slug}/`}`;
+  : `${siteDefaults.siteUrl}${post.data?.canonicalUrl || `/${collectionBase}${slug}/`}`;
 
 // ✅ Load all posts for prev/next/related
 const allPosts = await getCollection('blog');

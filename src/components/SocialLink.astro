@@ -26,20 +26,6 @@ function getHref(key: string, value: string): string {
 const baseClass = 'social-links flex gap-1 mi-0 ai-center';
 const combinedClass = `${baseClass} ${className}`.trim();
 ---
-<style>
-
-
-/* Icon visual feedback */
-.icon-wrapper {
-  transition: background-color 0.2s ease;
-}
-
-
-.icon-link:hover .icon-primary {
-  fill: revert-layer;
-}
-</style>
-
 <nav aria-label="Social media links" id={id}>
   <ul class={combinedClass}>
     {Object.entries(links).map(([key, value]) => {
@@ -65,4 +51,20 @@ const combinedClass = `${baseClass} ${className}`.trim();
       );
     })}
   </ul>
+  <a
+    href={`mailto:madanprabakar@gmail.com`}
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Share via Email"
+    aria-label="Share via Email"
+    data-id="share-email"
+    data-action="share"
+    role="button"
+    tabindex="0"
+    class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible"
+  >
+    <svg class="icon">
+      <use href="#icon-mail"></use>
+    </svg>
+  </a>
 </nav>

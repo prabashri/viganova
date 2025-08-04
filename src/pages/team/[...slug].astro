@@ -5,6 +5,8 @@ import TeamLayout from '../../layouts/TeamLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
 import type { DataEntryMap } from 'astro:content';
 import LoadMorePosts from '../../components/LoadMorePosts.astro';
+import Card from '../../components/ui/Card.astro';
+import type { CardProps } from '../../types/CardProps';
 
 
 const { slug } = Astro.params;
@@ -30,8 +32,11 @@ const collectionsWithAuthors = Object.entries(siteDefaults.collections)
     description: string;
     slug: string;
     collection: string;
+    collectionBase: string;
     heroImage?: string | null;
     heroImageAlt?: string;
+    lastModified?: string;
+    draft?: boolean;
   }[] = [];
 
   
@@ -52,6 +57,11 @@ const collectionsWithAuthors = Object.entries(siteDefaults.collections)
       }
       const authors = 'authors' in entry.data ? entry.data.authors : undefined;
 
+      const collectionConfig = siteDefaults.collections[entry.collection as keyof typeof siteDefaults.collections];
+      const base = collectionConfig?.base?.replace(/^\/|\/$/g, '') || '';
+      const collectionBase = base ? `${base}/` : '';
+
+
       const isMatch =
         Array.isArray(authors) &&
         authors.some((author) => typeof author === 'object' && author?.id === slugId);
@@ -63,15 +73,18 @@ const collectionsWithAuthors = Object.entries(siteDefaults.collections)
           description: entry.data.description ?? '',
           slug: entry.data.slug ?? '',
           collection: entry.collection,
+          collectionBase,
           heroImage: entry.data.heroImage ?? null,
           heroImageAlt: entry.data.heroImageAlt ?? '',
+          lastModified: "lastModified" in entry.data ? entry.data.lastModified : entry.data.publishedDate ?? '',
         });
       }
     }
   }
-// limit authored posts to 9 for initial load
-const initialPosts = authoredPosts.slice(0, 3);
-const hasMore = authoredPosts.length > 3;
+const postDisplay = 6;
+// limit authored posts to 3 for initial load
+const initialPosts = authoredPosts.slice(0, postDisplay);
+const hasMore = authoredPosts.length > postDisplay;
 // Team props
 const {
   name,
@@ -127,44 +140,57 @@ const teamProps = {
   id: slugId,
 };
 
+const authorCards: CardProps[] = initialPosts.map((p) => ({
+  link: `/${p.collectionBase}${p.slug}/`,
+  linkAriaLabel: `Read post: ${p.title}`,
+
+  image: p.heroImage || undefined,
+  imageAlt: p.heroImageAlt || p.title,
+
+  title: p.title,
+  description: p.description,
+
+  date: p.lastModified
+    ? new Date(p.lastModified).toLocaleDateString()
+    : undefined,
+
+  orientation: 'vertical',
+  imageSize: 320,
+  roleType: 'article',
+  loading: 'lazy',
+
+  className: 'w-full mn-w-320',
+  imageClassName: '',
+
+  otherEntries: []
+}));
+
 ---
 
 <TeamLayout {...teamProps}>
   <Content />
+  <!-- Posts go in a named slot -->
+  <Fragment slot="posts">
+    {authorCards.length > 0 && (
+      <section id="author-posts-section" class="mx-w-site w-full mi-auto mb-1 pb-1">
+        <h2 class="text-xl bold">Posts by {name}</h2>
 
-  {initialPosts.length > 0 && (
-    <section class="mt-8">
-      <h2 class="text-xl font-semibold mb-4">Posts by {name}</h2>
+        <div id="author-posts" class="flex mx-w-site w-full wrap gap mb-1 ai-center jc-center">
+          {authorCards.map((card) => (
+            <Card {...card} />
+          ))}
+        </div>
 
-      <div id="author-posts" class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {initialPosts.map((p) => (
-          <div class="border rounded shadow hover:shadow-md transition bg-white">
-            <a href={`/${p.collection}/${p.slug}/`} class="block no-bb">
-              {p.heroImage && (
-                <img
-                  src={p.heroImage}
-                  alt={p.heroImageAlt || p.title}
-                  class="w-full h-48 object-cover rounded-t"
-                />
-              )}
-              <div class="p-4">
-                <h3 class="font-bold text-lg">{p.title}</h3>
-                <p class="text-sm text-gray-600">{p.description}</p>
-              </div>
-            </a>
-          </div>
-        ))}
-      </div>
-
-      {hasMore && (
-        <LoadMorePosts
-          slug={slugId}
-          loaded={initialPosts.length}
-          total={authoredPosts.length}
-          sort="lastmodified"
-          collections={collectionsWithAuthors}
-        />
-      )}
-    </section>
-  )}
+        {hasMore && (
+          <LoadMorePosts
+            slug={slugId}
+            loaded={initialPosts.length}
+            total={authoredPosts.length}
+            sort="lastmodified"
+            collections={collectionsWithAuthors}
+          />
+        )}
+      </section>
+    )}
+  </Fragment>
 </TeamLayout>

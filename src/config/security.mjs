@@ -95,7 +95,7 @@ export const securityHeaders = {
   // 🎨 Allowed CSS sources
   "style-src": [
     "'self'",
-    "'unsafe-inline'", // ⚠️ Consider removing if you use CSP nonces instead
+    // "'unsafe-inline'", // ⚠️ Consider removing if you use CSP nonces instead
     "https://fonts.googleapis.com",
     // "https://tagmanager.google.com",
     // "https://www.googletagmanager.com"

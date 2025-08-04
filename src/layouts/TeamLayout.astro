@@ -1,11 +1,11 @@
 ---
 // src/layouts/TeamLayout.astro
-
 import BaseLayout from './BaseLayout.astro';
 import { siteDefaults } from '../config/siteDefaults';
 import type { HeadProps } from '../types/HeadProps';
 import { Icon } from 'astro-icon/components';
-import emailHashes from '../data/email-hash.json'; // map: slug -> { email, sha256 }
+import emailHashes from '../data/email-hash.json';
+import ShareLink from '../components/ShareLink.astro';
 
 const emailHashesMap: Record<string, string> = Object.fromEntries(
   Object.entries(emailHashes).map(([slug, obj]) => [slug, obj.sha256])
@@ -31,7 +31,6 @@ interface Props {
   canonicalUrl?: string;
   id?: string;
   color?: string;
-  // avatar logic
   useImage?: boolean;
   useInitial?: boolean;
   initialText?: string;
@@ -58,7 +57,7 @@ const {
   slug = '',
   canonicalUrl,
   id = '',
-  color = 'hsl(220, 60%, 70%)',
+  color = '',
   useImage = false,
   useInitial = false,
   initialText,
@@ -70,7 +69,7 @@ const resolvedSlug = slug || id;
 const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}/team/${resolvedSlug}/`;
 
 const headProps: HeadProps = {
-  title: `${name} | ${siteDefaults.siteName}`,
+  title: `${name}`,
   description: shortBio || `${prefix} ${name} – ${role}`,
   image: photo || siteDefaults.image,
   canonicalUrl: fullCanonical,
@@ -84,11 +83,10 @@ const headProps: HeadProps = {
       data: { name, role, photo, email, website, social }
     }
   ],
-  authorName: name
 };
 
-let avatarSrc: { type: 'img' | 'gravatar' | 'initial' | 'icon'; src?: string; color?: string; text?: string };
 
+let avatarSrc;
 if (useImage && photo) {
   avatarSrc = { type: 'img', src: photo };
 } else if (useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]) {
@@ -106,76 +104,114 @@ if (useImage && photo) {
   avatarSrc = { type: 'icon', color };
 }
 ---
-<BaseLayout headProps={headProps}>
-  <article class="team-profile">
-    <header class="team-header">
-      {avatarSrc.type === 'img' && (
-        <img src={avatarSrc.src} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
-      )}
-      {avatarSrc.type === 'gravatar' && (
-        <img src={avatarSrc.src} alt={`Gravatar of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />
-      )}
-      {avatarSrc.type === 'initial' && (
-        <div style={`background:${avatarSrc.color};width:160px;height:160px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;`}>
-          <span style="color:#fff;font-size:48px;font-family:sans-serif;">
-            {avatarSrc.text}
-          </span>
-        </div>
-      )}
-      {avatarSrc.type === 'icon' && (
-        <Icon name="avatar" width="160" height="160" style={`fill: ${avatarSrc.color};`} class="team-photo" />
-      )}
 
-      <h1 class="team-name">{prefix ? `${prefix} ` : ''}{name}</h1>
-      {role && <p class="team-role">{role}</p>}
-      {highestDegree && <p class="team-degree">{highestDegree}</p>}
-      {shortBio && <p class="team-short-bio">{shortBio}</p>}
+<BaseLayout headProps={headProps}>
+  <style is:inline>
+
+
+    .team-photo {
+      border-radius: 50%;
+      margin-bottom: 1rem;
+    }
+    .avatar-initial {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 3rem;
+      font-weight: bold;
+      color: white;
+    }
+    .team-details h3 {
+      margin-top: 1.5rem;
+    }
+    .team-details ul {
+      padding-left: 1.25rem;
+    }
+  </style>
+
+  <script is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.avatar-initial[data-color], .icon-avatar[data-color]').forEach(el => {
+        const clr = el.getAttribute('data-color');
+        if (clr) el.style.backgroundColor = clr;
+      });
+    });
+  </script>
+
+  <article class="team-profile" id={id}>
+    <header class="team-header pb-1 mi-auto bg-primary-dark col-base-00">
+      <div class="mx-w-content mi-auto ta-center">
+
+        {avatarSrc.type === 'img' && <img src={avatarSrc.src} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />}
+        {avatarSrc.type === 'gravatar' && <img src={avatarSrc.src} alt={`Gravatar of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />}
+        {avatarSrc.type === 'initial' && (
+          <div class="avatar-initial" data-color={avatarSrc.color || null}>
+            {avatarSrc.text}
+          </div>
+        )}
+        {avatarSrc.type === 'icon' && (
+          <Icon name="avatar" width="160" height="160" class="team-photo icon-avatar" data-color={avatarSrc.color || null} />
+        )}
+
+        <h1>{prefix} {name}</h1>
+        {highestDegree && <p class="team-degree">{highestDegree}</p>}
+        {role && <p class="team-role bold text-xs pb-05 mb-05">{role}</p>}      
+        {shortBio && <p class="team-short-bio">{shortBio}</p>}
+      </div>
     </header>
 
-    <section class="team-details">
+    <section class="team-details mx-w-content mi-auto mb-1 pb-1">
       {affiliation && <p><strong>Affiliation:</strong> {affiliation}</p>}
       {experience && <p><strong>Experience:</strong> {experience} years</p>}
       {joined && <p><strong>Joined:</strong> {new Date(joined).toLocaleDateString()}</p>}
       {addressing && <p><strong>Pronouns:</strong> {addressing}</p>}
 
       {expertise.length > 0 && (
-        <div>
+        <>
           <h3>Expertise</h3>
           <ul>{expertise.map(item => <li>{item}</li>)}</ul>
-        </div>
+        </>
       )}
 
       {awards.length > 0 && (
-        <div>
+        <>
           <h3>Awards</h3>
           <ul>{awards.map(award => <li>{award}</li>)}</ul>
-        </div>
+        </>
       )}
 
       {(email || website) && (
-        <div>
+        <>
           <h3>Contact</h3>
           <ul>
             {email && <li>Email: <a href={`mailto:${email}`}>{email}</a></li>}
             {website && <li>Website: <a href={website} target="_blank" rel="noopener">{website}</a></li>}
           </ul>
-        </div>
+        </>
       )}
 
       {Object.keys(social).length > 0 && (
-        <div>
+        <>
           <h3>Social</h3>
           <ul>
             {Object.entries(social).map(([platform, url]) => (
               <li><a href={url} target="_blank" rel="noopener">{platform}</a></li>
             ))}
           </ul>
-        </div>
+        </>
       )}
     </section>
+    <ShareLink url={fullCanonical} title={`Share ${name}'s profile`} className="mx-w-content mi-auto mb-1" />
 
-    <section class="team-slot-content">
+    <section class="team-slot-content mx-w-content mi-auto mb-1 pb-1">      
       <slot />
+    </section>
+    {/*!-- Posts Section Hook */}
+    <slot name="posts" />      
     </section>
   </article>
 </BaseLayout>

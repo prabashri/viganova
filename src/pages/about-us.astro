@@ -1,0 +1,91 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pageSeo = {
+  title: 'About nViewsWEB Astro Theme',
+  description: 'Learn more about the nViewsWEB Astro Theme, its features, and the team behind it.',
+  image: "/images/astro-theme-nviewsweb-main.png"
+};
+---
+<BaseLayout headProps={pageSeo} >
+  <Fragment slot="headContent-top"></Fragment>
+  <Fragment slot="headContent-bottom"></Fragment>    
+
+    <article class="mx-w-content mi-auto full-width">
+		<header class="mb-1 pb-2 ta-center">	
+			<h1 id="about-heading">About us</h1>
+			<p>Astro theme by <a href="https://nviewsweb.com" class="col-base-00">NViews Web</a></p>
+			<p class="ta-center cg-h4">Learn more about nviewsWeb and the team behind it.</p>
+		</header>
+		<section>					
+			<h2 id="build-responsive-fluid-web-with-confidence">Build Responsive Fluid Web with Confidence</h2>
+			<p>ClampGenerator is a modern, developer-first tool to create responsive, fluid typography and layout spacing using CSS <code>clamp()</code>. It's built by the team at <strong>NViews Web</strong>—the same creators of <a href="https://clampcalculator.com/">ClampCalculator.com</a>.</p>
+			<p>Unlike simple calculators, ClampGenerator goes further: live previews, design-to-code output, typescale customization, and layout spacing utilities—all production-ready.</p>
+			<h2 id="why-we-created-clampgenerator">Why We Created ClampGenerator</h2>
+			<p>While developing client projects at NViews Web, we needed tools that offered:</p>
+			<ul>
+			<li>Real-time responsive typography preview  </li>
+			<li>Custom multipliers per element (h1-h6, small, code)  </li>
+			<li>Layout spacing clamp (margin, padding, gap)  </li>
+			<li>Plain CSS, Tailwind, or SCSS output  </li>
+			<li>Offline-ready performance without logins</li>
+			</ul>
+			<p>Existing clamp tools fell short. So, we built our own.</p>
+			<h2 id="mission">Mission</h2>
+			<p>Our goal is to <strong>simplify modern responsive design</strong> by handling the math, slope logic, and scaling.</p>
+			<p>Focus on creativity. We handle the clamp().</p>
+			<p>ClampGenerator empowers developers and designers to:</p>
+			<ul>
+			<li>Skip manual <code>clamp()</code> math  </li>
+			<li>Maintain consistent typescales  </li>
+			<li>Scale layouts without breakpoints</li>
+			</ul>
+			<h2 id="who-s-behind-it">Who's Behind It?</h2>
+			<p>ClampGenerator is developed by <a href="https://linkedin.com/in/prabakaran-shankar"><strong>Prabakaran Shankar</strong></a> and the team at <strong>NViews Web</strong>—specialists in:</p>
+			<ul>
+			<li>Modern frontend performance</li>
+			<li>WordPress plugin development </li>
+			<li>Web tools for devs and educators</li>
+			</ul>
+			<p>This project was built out of necessity and improved through user feedback.</p>
+			<h2 id="meet-the-creator">Meet the Creator</h2>
+			<div class="flex gap ai-center jc-space-between wrap-mobile">
+			<div class="">
+				<p><strong>👋 Hi, I'm Prabakaran Shankar</strong><br>
+				Founder of <a href="https://nviewsweb.com">NViewsWEB</a>. I'm a developer obsessed with making tools that feel lightweight, reliable, and intuitive.</p>
+				<p>📍 Based in Korea 🇰🇷 — collaborating worldwide.</p>
+			</div>
+			<div class="full-width mx-w-100">
+				<img 
+				class="aspect-3x4 br bx-0-2-8-0"
+				src="/images/prabakaran-shankar-2025-w320-a4x3.png"
+				width="100"
+				height="auto"
+				alt="Prabakaran Shankar - nviewsWEB Founder"
+				/>
+			</div>
+			</div>
+			<p>ClampGenerator started from real-world needs—where tools lacked flexibility, real previews, and exportable code. Today, it helps thousands ship better CSS with zero media queries.</p>
+			<h2 id="tech-stack">Tech Stack</h2>
+			<ul>
+			<li><strong>Built with:</strong> React, TypeScript, Astro  </li>
+			<li><strong>Deployed on:</strong> Cloudflare Pages  </li>
+			<li><strong>Optimized for:</strong> fast loading, offline use, accessibility, and responsive design</li>
+			</ul>
+			<h2 id="support-our-work">Support Our Work</h2>
+			<p>ClampGenerator is free and open. We only run minimal ads.<br>If it saves you time, <a href="https://prabashri.gumroad.com/l/cfnmyr"><strong>buy us a coffee</strong></a> ☕ or <strong>share it with your community</strong>.</p>
+			<h2 id="collaborate-with-us">Collaborate With Us</h2>
+			<p>Need a custom tool or integration?</p>
+			<ul>
+			<li>Responsive design system setup  </li>
+			<li>WordPress plugin dev  </li>
+			<li>Tailwind utility extension</li>
+			</ul>
+			<p>📬 Contact: <strong>praba@nviewsweb.com</strong><br> Or use our <a href="/contact/">contact form</a></p>
+			<p>Let's create something meaningful together.</p>
+
+		</section>
+	</article>
+  <Fragment slot="extraScripts">   
+  </Fragment>
+</BaseLayout>

@@ -5,6 +5,7 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 //import Analytics from '../components/Analytics.astro';
 import type { HeadProps } from '../types/HeadProps';
+import Breadcrumb from '../components/ui/Breadcrumb.astro';
 
 interface Props {
   headProps?: HeadProps;
@@ -13,7 +14,7 @@ interface Props {
 }
 
 const {
-  headProps = { title: 'Default Title' },
+  headProps = { title: 'Default Title', showBreadcrumb: false },
   hideHeader = false,
   hideFooter = false,
 } = Astro.props;
@@ -25,24 +26,27 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <slot name="headContent-top" />
-    <!-- SEO / Meta -->
+    {/* -- SEO / Meta -- */}
     <BaseHead {...headProps} />
-    <!-- Optional extra tags (OG, JSON-LD, fonts, etc.) -->
+    {/* -- Optional extra tags (OG, JSON-LD, fonts, etc.) -- */}
     <slot name="headContent-bottom" />
   </head>
   <body>
-    <!-- Accessibility -->
+    {/* -- Accessibility -- */}
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     {!hideHeader && <Header />}
 
     <main id="main-content">
+      <!-- src/layouts/BaseLayout.astro -->
+      <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={headProps.title} />
+
       <slot />
     </main>
 
     {!hideFooter && <Footer />}
 
-    <!-- Page-specific scripts -->
+    {/* -- Page-specific scripts -- */}
     <slot name="extraScripts" />
   </body>
 </html>

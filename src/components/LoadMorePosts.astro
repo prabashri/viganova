@@ -16,10 +16,10 @@ const {
 } = Astro.props;
 ---
 
-<div class="mt-6 text-center">
+<div class="flex jc-center mb-2">
   <button
     id="loadMoreBtn"
-    class="btn"
+    class="btn border-secondary br ta-center hover-bg-primary-light"
     data-slug={slug}
     data-loaded={loaded}
     data-total={total}
@@ -33,7 +33,7 @@ const {
 <script type="module">
   const btn = document.querySelector('#loadMoreBtn');
   const container = document.querySelector('#author-posts');
-  const offset = 6; // Adjust this based on your initial load size
+  const offset = 6; // Adjust based on initial load size
 
   if (!btn || !container) {
     console.warn('Missing Load More button or author-posts container.');
@@ -63,37 +63,22 @@ const {
       const { posts, hasMore } = await res.json();
 
       posts.forEach((p) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'border rounded shadow hover:shadow-md transition bg-white';
-
         const anchor = document.createElement('a');
-        anchor.href = `/${p.collection}/${p.slug}/`;
-        anchor.className = 'block no-bb';
+        const base = p.collectionBase ? p.collectionBase : '';
+        anchor.href = `/${base}${p.slug}/`;
+        anchor.className = 'block td-none border-primary br bg-base-00 hover-box-shadow transition p-05 mb-1 mx-w-320 w-full';
 
-        if (p.heroImage) {
-          const img = document.createElement('img');
-          img.src = p.heroImage;
-          img.alt = p.heroImageAlt || p.title;
-          img.className = 'w-full h-48 object-cover rounded-t';
-          anchor.appendChild(img);
-        }
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'font-bold text-lg mb-1';
+        titleDiv.textContent = p.title;
 
-        const content = document.createElement('div');
-        content.className = 'p-4';
+        const descDiv = document.createElement('div');
+        descDiv.className = 'text-s col-base-80 clamp-3';
+        descDiv.textContent = p.description;
 
-        const title = document.createElement('h3');
-        title.className = 'font-bold text-lg';
-        title.textContent = p.title;
-
-        const desc = document.createElement('p');
-        desc.className = 'text-sm text-gray-600';
-        desc.textContent = p.description;
-
-        content.appendChild(title);
-        content.appendChild(desc);
-        anchor.appendChild(content);
-        wrapper.appendChild(anchor);
-        container?.appendChild(wrapper);
+        anchor.appendChild(titleDiv);
+        anchor.appendChild(descDiv);
+        container?.appendChild(anchor);
       });
 
       loaded += posts.length;
@@ -112,3 +97,4 @@ const {
 
   btn?.addEventListener('click', loadMorePosts);
 </script>
+

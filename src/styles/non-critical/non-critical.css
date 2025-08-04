@@ -115,3 +115,11 @@ pre {
   padding: 0.5rem 1rem;
   border-radius: var(--border-radius);
 }
+/* Icon visual feedback */
+.icon-wrapper {
+  transition: background-color 0.2s ease;
+}
+
+.icon-link:hover .icon-primary {
+  fill: revert-layer !important;
+}

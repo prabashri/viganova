@@ -13,7 +13,7 @@ heroImageTitle:  "Optional image title"
 heroImageCaption:  "Optional caption text"
 
 slug: 'first-post'
-canonicalUrl: 'https://example.com/first-post'
+canonicalUrl: ''
 tags: ['blog', 'example', 'reference']
 categories: ['Reference']
 keywords: ['Astro blog post', 'static content']

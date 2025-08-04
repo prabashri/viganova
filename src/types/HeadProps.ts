@@ -24,13 +24,14 @@ export interface HeadProps {
   canonicalUrl?: string;
   siteName?: string;
   authors: { id: string; slug: string; url: string; name: string; data: any }[] // or a more specific type if available
-  authorName?: string;
-  authorUrl?: string;
+  // authorName?: string;
+  // authorUrl?: string;
   publishedAt?: string;
   updatedAt?: string;
   index?: boolean;
   keywords?: string[];
   faq?: FaqItem[];
-  breadcrumb?: BreadcrumbItem[];
+  // breadcrumb?: BreadcrumbItem[];  
+  showBreadcrumb?: boolean; // NEW: To control breadcrumb visibility
   listItems?: CollectionItem[];
 }

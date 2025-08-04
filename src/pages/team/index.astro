@@ -5,6 +5,7 @@ import { siteDefaults } from '../../config/siteDefaults';
 import { Icon } from 'astro-icon/components';
 import gravatarHashesJson from '../../data/email-hash.json';
 import type { HeadProps } from '../../types/HeadProps';
+import HeroCollections from '../../components/ui/HeroCollections.astro';
 
 const gravatarHashes: Record<string, string> = Object.fromEntries(
   Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
@@ -12,29 +13,67 @@ const gravatarHashes: Record<string, string> = Object.fromEntries(
 
 const allMembers = await getCollection('team');
 
+// Filter + sort
 const team = allMembers
-  .filter(member => !member.data.left)
+  .filter(member => 
+    !member.data.left &&
+    !member.data.slug.startsWith('_') // Exclude hidden members
+  )
   .sort((a, b) => {
     const aDate = a.data.joined ? new Date(a.data.joined).valueOf() : 0;
     const bDate = b.data.joined ? new Date(b.data.joined).valueOf() : 0;
     return bDate - aDate;
   });
 
+
 const featured = team.filter(member => member.data.featured);
 const others = team.filter(member => !member.data.featured);
 
+// Color palette
+const colorPalette = [
+  'avatar-color-green',
+  'avatar-color-pink',
+  'avatar-color-blue',
+  'avatar-color-purple',
+  'avatar-color-teal'
+];
+let colorIndex = 0;
+
+// Avatar helper
 function getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color }: any) {
-  if (useImage && image) {
-    return { type: 'img', src: image };
-  }
+  if (useImage && image) return { type: 'img', src: image };
   if (useInitial && initialText) {
-    return { type: 'initial', text: initialText, color };
+    const { className, dataColor } = getAvatarColor(color);
+    return { type: 'initial', text: initialText, colorClass: className, dataColor };
   }
-  if (useGravatar && gravatarHashes[slug]) {
-    return { type: 'gravatar', src: `https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon` };
-  }
-  return { type: 'icon', color: color || 'hsl(220, 60%, 70%)' };
+  if (useGravatar && gravatarHashes[slug]) return { type: 'gravatar', src: `https://www.gravatar.com/avatar/${gravatarHashes[slug]}?s=300&d=identicon` };
+  const { className, dataColor } = getAvatarColor(color);
+  return { type: 'icon', colorClass: className, dataColor };
 }
+
+// Resolve color class or data-color
+function getAvatarColor(color?: string) {
+  // No color provided → auto-assign from palette
+  if (!color) {
+    const assigned = colorPalette[colorIndex % colorPalette.length];
+    colorIndex++;
+    return { className: assigned, dataColor: null };
+  }
+
+  // Already matches theme color classes
+  if (color.startsWith('avatar-color-')) {
+    return { className: color, dataColor: null };
+  }
+
+  // Custom HEX or HSL → class becomes `avatar-color-custom`
+  if (/^#([0-9A-F]{3,8})$/i.test(color) || color.startsWith('hsl')) {
+    return { className: 'avatar-color-custom', dataColor: color };
+  }
+
+  // Fallback: treat as theme-named color
+  return { className: `avatar-color-${color}`, dataColor: null };
+}
+
 
 const headProps: HeadProps = {
   title: 'Our Team',
@@ -47,93 +86,141 @@ const headProps: HeadProps = {
   authorUrl: siteDefaults.authorUrl,
   publishedAt: siteDefaults.publishedDate,
   authors: [],
+  showBreadcrumb: true
 };
 ---
 
 <BaseLayout headProps={headProps}>
-  <style>
-    ul {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 2rem;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      justify-content: center;
-    }
-    li {
-      width: calc(50% - 1rem);
+  <style id="team-styles" is:inline>
+   .team-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center; /* keeps them centered */
+  gap: 1rem; /* adjust to control space between cards */
+  padding: 0.5rem 0;
+}
+
+    .team-card {
+      flex: 1 1 260px;  /* flexible width but minimum 260px */
+      background: var(--base-00);
+      border: 1px solid var(--base-20);
+      border-radius: 1rem;
+      padding: 1.5rem;
       text-align: center;
+      max-width: 320px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      list-style: none;
     }
-    img, .avatar-box {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
+    /* Balance last odd card */
+
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    .team-card.featured {
+      border: 2px solid var(--primary-base);
+      box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.2);
+    }
+    .featured-badge {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background: var(--primary-base);
+      color: var(--base-00);
+      font-size: 0.7rem;
+      padding: 0.3rem 0.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+    .avatar-img, .avatar-initial {
+      width: 120px;
+      height: 120px;
       margin: 0 auto 1rem;
+      border-radius: 50%;
       object-fit: cover;
-    }
-    .avatar-box {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
       font-weight: bold;
-      color: white;
+      color: #fff;
+      font-size: 1.5rem;
     }
-    h2 {
-      font-size: 1.25rem;
-      margin: 0.25rem 0 0.5rem;
+    /* Theme avatar colors */
+    .avatar-color-green   { background: hsl(145, 70%, 50%); }
+    .avatar-color-pink    { background: hsl(320, 70%, 55%); }
+    .avatar-color-blue    { background: hsl(210, 70%, 55%); }
+    .avatar-color-purple  { background: hsl(270, 70%, 55%); }
+    .avatar-color-teal    { background: hsl(180, 70%, 45%); }
+    .avatar-color-default { background: var(--primary-lighter); }
+    /* Placeholder for custom */
+    .avatar-color-custom { background: var(--primary-lighter); }
+    
+    .team-card h2 {
+      margin: 0.5rem 0 0.25rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: var(--base-100);
     }
     .role {
+      font-size: 0.9rem;
       font-style: italic;
-      color: var(--gray-text, #555);
+      color: var(--base-60);
+      margin-bottom: 0.5rem;
     }
     .expertise {
-      font-size: 0.875rem;
-      color: var(--accent-text, #666);
+      font-size: 0.85rem;
+      color: var(--base-70);
+      border-top: 1px solid var(--base-20);
+      margin-top: 0.75rem;
+      padding-top: 0.5rem;
     }
-    @media (max-width: 720px) {
-      li {
-        width: 100%;
+
+    @media (max-width: 480px) {
+      .team-card {
+        flex: 1 1 100%;
+        max-width: 100%; /* take full width */
       }
     }
   </style>
 
-  <header class="mx-w-site mi-auto ta-center mb-2">
-    <h1>{headProps.title}</h1>
-    <p>{headProps.description}</p>
-  </header>
+<script id="avatar-color-script" is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.avatar-color-custom[data-color]').forEach(el => {
+      const clr = el.getAttribute('data-color');
+      if (clr) el.style.backgroundColor = clr;
+    });
+  });
+</script>
 
-  <section class="mx-w-site mi-auto">
-    <ul>
+   <HeroCollections
+    title={headProps.title}
+    description={headProps.description}
+    bgColorClass="bg-secondary-lighter-x"
+    textColorClass="col-base-00"
+  />
+
+  <section class="mx-w-site mi-auto mb-2 pb-2">
+    <ul class="team-grid no-bullets">
       {[...featured, ...others].map(member => {
-        const {
-          slug,
-          name,
-          role,
-          expertise,
-          color,
-          image,
-          useImage,
-          useInitial,
-          initialText,
-          useGravatar,
-        } = member.data;
-
+        const { slug, name, role, expertise, color, image, useImage, useInitial, initialText, useGravatar } = member.data;
         const avatar = getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color });
 
         return (
-          <li>
-            <a href={`/team/${slug}/`}>
-              {avatar.type === 'img' && <img src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
-              {avatar.type === 'gravatar' && <img src={avatar.src} alt={`Gravatar of ${name}`} loading="lazy" />}
+          <li class={`team-card ${member.data.featured ? 'featured' : ''}`}>
+            {member.data.featured && <span class="featured-badge">Featured</span>}
+            <a class="team-link td-none p-0" href={`/team/${slug}/`}>
+              {avatar.type === 'img' && <img class="avatar-img" src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
+              {avatar.type === 'gravatar' && <img class="avatar-img" src={avatar.src} alt={`Gravatar of ${name}`} loading="lazy" />}
               {avatar.type === 'initial' && (
-                <div class="avatar-box" style={`background:${avatar.color || '#888'};`}>
+                <div class={`avatar-initial ${avatar.colorClass}`} data-color={avatar.dataColor || null}>
                   {avatar.text}
                 </div>
               )}
               {avatar.type === 'icon' && (
-                <Icon name="avatar" width="150" height="150" style={`fill:${avatar.color}; margin-bottom:1rem;`} />
+                <Icon name="avatar" width="120" height="120" class={avatar.colorClass} data-color={avatar.dataColor || null} />
               )}
               <h2>{name}</h2>
               <p class="role">{role}</p>

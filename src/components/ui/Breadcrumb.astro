@@ -1,0 +1,72 @@
+---
+// src/components/ui/Breadcrumb.astro
+import { siteDefaults } from "../../config/siteDefaults";
+
+interface Props {
+  showBreadcrumb?: boolean;
+  title?: string; // optional title from headProps
+}
+
+const { showBreadcrumb = true, title: pageTitle } = Astro.props;
+
+// Auto-hide on homepage or single segment
+const segments = Astro.url.pathname.split("/").filter(Boolean);
+const shouldShow = showBreadcrumb && segments.length > 0;
+
+// Format + trim function
+function formatSegment(seg: string) {
+  let formatted = seg.replace(/[-_]/g, " ");
+  formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
+  return formatted.length > 30 ? formatted.slice(0, 30) + "…" : formatted;
+}
+
+// Build breadcrumb items
+const breadcrumbItems = [
+  { name: "Home", url: siteDefaults.siteUrl },
+  ...segments.map((seg, i) => {
+    const isLast = i === segments.length - 1;
+    const path = `${siteDefaults.siteUrl}/${segments.slice(0, i + 1).join("/")}/`;
+
+    // For last segment: prefer headProps.title, else fallback to segment
+    const displayName = isLast && pageTitle
+      ? (pageTitle.length > 20 ? pageTitle.slice(0, 20) + "…" : pageTitle)
+      : formatSegment(seg);
+
+    return {
+      name: displayName,
+      url: path
+    };
+  })
+];
+
+// JSON-LD Schema (full names, no trim)
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": breadcrumbItems.map((item, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: item.name,
+    item: item.url
+  }))
+};
+---
+
+{shouldShow && (
+  <nav class="breadcrumb mx-w-site flex wrap ai-center mi-auto text-xs pi-05 pb-02 mb-05" aria-label="Breadcrumb navigation">
+    <ul class="flex wrap ai-center no-bullets no-margin no-padding">
+      {breadcrumbItems.map((item, idx) => (
+        <li class="flex ai-center">
+          {idx > 0 && <span class="mi-05 pi-05" aria-hidden="true">›</span>}
+          {idx === breadcrumbItems.length - 1 ? (
+            <strong aria-current="page">{item.name}</strong>
+          ) : (
+            <a href={item.url} class="td-none pi-05 pb-02">{item.name}</a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
