@@ -85,10 +85,10 @@ const dateModified = parseToIsoString(updatedAt);
 const rssEnabled = siteDefaults.rss === true;
 const sitemapEnabled = siteDefaults.sitemap === true;
 ---
-<!-- 🔹 Primary Page Title -->
+{/** 🔹 Primary Page Title */}
 <title>{title}</title>
 
-<!-- 🔹 Favicons & Manifest -->
+{/** 🔹 Favicons & Manifest */}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/manifest.webmanifest" />
@@ -97,23 +97,23 @@ const sitemapEnabled = siteDefaults.sitemap === true;
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 
-<!-- 🔹 Robots & Referrer -->
+{/** 🔹 Robots & Referrer */}
 <meta name="robots" content={index ? "index, follow" : "noindex, nofollow"} />
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-<!-- 🔹 CSS & Preloads -->
+{/** 🔹 CSS & Preloads */}
 <CssHead />
 {preloadImagesAuto.length > 0 && <ImagePreload images={preloadImagesAuto} />}
 
-<!-- 🔹 Canonical -->
+{/** 🔹 Canonical */}
 <link rel="canonical" href={canonicalURL} />
 
-<!-- 🔹 Primary SEO Meta -->
+{/** 🔹 Primary SEO Meta */}
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <meta name="keywords" content={(keywords ?? []).join(', ')} />
 
-<!-- 🔹 Author Meta -->
+{/** 🔹 Author Meta */}
 {authors.length > 0
   ? authors.map(a => <meta name="author" content={a.name} />)
   : <meta name="author" content={siteDefaults.admin.name} />}
@@ -121,7 +121,7 @@ const sitemapEnabled = siteDefaults.sitemap === true;
   ? authors.map(a => <meta property="article:author" content={a.url ?? siteDefaults.organization.url} />)
   : <meta property="article:author" content={siteDefaults.organization.url} />}
 
-<!-- 🔹 Open Graph -->
+{/** 🔹 Open Graph */}
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={siteName} />
 <meta property="og:url" content={url} />
@@ -137,18 +137,18 @@ const sitemapEnabled = siteDefaults.sitemap === true;
   </>
 )}
 
-<!-- 🔹 Twitter -->
+{/** 🔹 Twitter */}
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:site" content={siteDefaults.socialLinks.x} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageUrl} />
 
-<!-- 🔹 Sitemap & RSS -->
+{/** 🔹 Sitemap & RSS */}
 { sitemapEnabled && <link rel="sitemap" type="application/xml" href="/sitemap.xml" /> }
 { rssEnabled && <Rss /> }
 
-<!-- 🔹 Inline Scripts -->
+{/** 🔹 Inline Scripts */}
 <InlineScript />
 
 <Schema
