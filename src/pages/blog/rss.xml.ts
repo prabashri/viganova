@@ -48,7 +48,7 @@ export async function GET(context: any): Promise<Response> {
   const entries = await getCollection(collectionKey);
   const posts = entries
     .filter(post =>
-      !post.id.startsWith('0-example-') &&
+      !post.id.startsWith('_') &&
       post.data.draft !== true &&
       post.data.index !== false
     )

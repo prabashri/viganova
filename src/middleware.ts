@@ -8,14 +8,6 @@ declare module 'astro' {
   }
 }
 
-interface SecurityHeaders {
-  [directive: string]: string | string[] | boolean;
-}
-
-interface ExtraHttpHeaders {
-  [key: string]: string | object;
-}
-
 export const onRequest = defineMiddleware(async (context, next) => {
   const nonce = crypto.randomUUID();
   context.locals.nonce = nonce;
@@ -25,15 +17,33 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
   const headers = new Headers(response.headers);
   const contentType = headers.get('content-type') || '';
-  const isHtml = contentType.includes('text/html');
 
-  // Construct CSP
-  const cspValue = Object.entries(securityHeaders as SecurityHeaders)
+  const isHtml = contentType.includes('text/html');
+  const isXml =
+    context.url.pathname.toLowerCase().endsWith('.xml') ||
+    contentType.includes('application/xml') ||
+    contentType.includes('text/xml');
+
+  // ✅ Adjust CSP dynamically
+  const adjustedSecurityHeaders = { ...securityHeaders };
+  if (isXml) {
+    adjustedSecurityHeaders['style-src'] = [
+      ...(Array.isArray(adjustedSecurityHeaders['style-src'])
+        ? adjustedSecurityHeaders['style-src']
+        : [adjustedSecurityHeaders['style-src']]),
+      "'unsafe-inline'"
+    ];
+  }
+
+  const cspValue = Object.entries(adjustedSecurityHeaders)
     .map(([directive, value]) => {
       if (typeof value === 'boolean' && value) return directive;
       const values = Array.isArray(value) ? value : [value];
       const needsNonce = ['script-src', 'style-src'].includes(directive);
-      return `${directive} ${[...values, ...(needsNonce ? [`'nonce-${nonce}'`] : [])].join(' ')}`;
+      return `${directive} ${[
+        ...values,
+        ...(needsNonce && isHtml && !isXml ? [`'nonce-${nonce}'`] : [])
+      ].join(' ')}`;
     })
     .join('; ');
 
@@ -41,22 +51,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const cspHeaderName = isDev ? 'Content-Security-Policy-Report-Only' : 'Content-Security-Policy';
   headers.set(cspHeaderName, cspValue);
 
-  // Apply extra headers
-  for (const [key, val] of Object.entries(extraHttpHeaders as ExtraHttpHeaders)) {
+  // ✅ Extra headers
+  for (const [key, val] of Object.entries(extraHttpHeaders)) {
     headers.set(key, typeof val === 'string' ? val : JSON.stringify(val));
   }
+
+  // ✅ Service worker headers
   if (context.url.pathname === '/sw.js') {
-    headers.set('Cache-Control', 'no-cache'); // 🔁 Always checks for updates on reload
-    headers.set('Content-Type', 'application/javascript'); // ✅ Ensures correct MIME type
-    headers.set('Service-Worker-Allowed', '/'); // 🔓 Allows controlling full scope of the origin
+    headers.set('Cache-Control', 'no-cache');
+    headers.set('Content-Type', 'application/javascript');
+    headers.set('Service-Worker-Allowed', '/');
   }
 
-
-  // Add nonce to inline scripts
+  // ✅ Add nonce to HTML only
   if (isHtml && response.body) {
     const rawHtml = await response.text();
-
-    // Add nonce to inline <script> and <style> tags in one pass for performance
     const htmlWithNonce = rawHtml.replace(
       /<(script(?![^>]*\bsrc=)|style)(?![^>]*\bnonce=)([^>]*)>/g,
       (_match, tag, attrs) => `<${tag} nonce="${nonce}"${attrs}>`

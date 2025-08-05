@@ -23,7 +23,7 @@ export async function GET(context) {
   // ✅ Filter & sort entries
   const combinedPosts = allEntries.flat()
     .filter(post =>
-      !post.id.startsWith('0-example-') &&
+      !post.id.startsWith('_') &&
       post.data.draft !== true &&
       post.data.index !== false
     )
