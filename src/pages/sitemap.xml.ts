@@ -1,5 +1,3 @@
-import fs from "fs";
-import path from "path";
 import { getCollection } from "astro:content";
 import { siteDefaults } from "../config/siteDefaults";
 import modifiedDatesJson from "../data/modified-dates.json";
