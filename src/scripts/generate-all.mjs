@@ -26,6 +26,7 @@ run('npx tsx src/scripts/generate-non-critical-css.ts', 'Non-Critical CSS');
 run('npx tsx src/scripts/generate-minified-scripts.ts', 'Minified Scripts');
 run('npx tsx src/scripts/generate-web-manifest.ts', 'Web Manifest');
 run('npx tsx src/scripts/generate-sw.ts', 'Service Worker Generation');
+// run('npx tsx src/scripts/generate-sitemap.ts', 'Sitemap Generation');
 
 /**
  * "gen:headers": "node src/scripts/generate-headers.mjs",
