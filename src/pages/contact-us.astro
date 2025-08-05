@@ -13,7 +13,11 @@ const contactForm = 'contact-form.js' in assetsManifest.js ? assetsManifest.js['
 // Config values
 const contactFormHandler = siteFunctions.contactFormHandler;
 const turnstileSitekey = siteFunctions.turnstileSitekey;
-const adminEmail = siteDefaults.adminEmail;
+const adminEmail = siteDefaults.admin.email 
+  || siteDefaults.organization.incharge.email 
+  || siteDefaults.organization.email 
+  || `contact@${siteDefaults.siteUrl.replace(/^https?:\/\//, '')}` 
+  || `contact@${Astro.url.hostname}`;
 
 // HeadProps
 const pageSeo: HeadProps = {

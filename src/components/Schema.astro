@@ -1,0 +1,228 @@
+---
+import { siteDefaults } from '../config/siteDefaults';
+import { siteLogo } from '../config/siteLogo';
+
+const {
+  type,
+  authors = [],
+  image,
+  title,
+  description,
+  url,
+  publishedAt,
+  updatedAt,
+  faq,
+  listItems
+} = Astro.props; // ✅ Direct destructure from passed props
+
+// --- Common IDs
+const orgId = `${siteDefaults.siteUrl}#organization`;
+const webPageId = `${url || siteDefaults.siteUrl}#webpage`;
+const articleId = `${url || siteDefaults.siteUrl}#article`;
+const collectionId = `${url || siteDefaults.siteUrl}#collection`;
+const faqId = `${url || siteDefaults.siteUrl}#faq`;
+const rssId = `${siteDefaults.siteUrl}rss.xml`;
+
+// --- Organization Type & Incharge
+const orgType = siteDefaults.organization.type || 'Organization';
+const orgIncharge = siteDefaults.organization.incharge;
+
+// --- Person Schemas (Multiple Authors)
+const personSchemas = authors.length > 0
+  ? authors.map((author: any) => {
+      const aData = author?.data ?? {};
+      return {
+        '@context': 'https://schema.org',
+        '@type': 'Person',
+        '@id': `${new URL(author.url, Astro.site)}#person`,
+        name: `${aData.prefix ? `${aData.prefix} ` : ''}${author.name}`,
+        url: new URL(author.url, Astro.site).toString(),
+        image: aData.image || undefined,
+        jobTitle: aData.role || undefined,
+        affiliation: aData.affiliation || undefined,
+        email: aData.email || undefined,
+        sameAs: aData.social ? Object.values(aData.social).filter(Boolean) : undefined,
+        alumniOf: aData.highestDegree || undefined,
+        worksFor: { '@id': orgId },
+        memberOf: { '@id': orgId }
+      };
+    })
+  : [];
+
+// --- Fallback Person Schema if no authors & orgType = Person
+const fallbackPersonSchema = (authors.length === 0 && orgType === 'Person' && orgIncharge?.name)
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      '@id': `${siteDefaults.organization.url}#person`,
+      name: orgIncharge.name,
+      url: orgIncharge.url || siteDefaults.organization.url,
+      image: orgIncharge.image || siteLogo.desktopLogo,
+      email: orgIncharge.email || undefined,
+      sameAs: orgIncharge.sameAs?.length ? orgIncharge.sameAs : undefined,
+      worksFor: { '@id': orgId }
+    }
+  : null;
+
+// --- Organization Schema
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': orgType,
+  '@id': orgId,
+  name: siteDefaults.organization.name,
+  url: siteDefaults.organization.url,
+  email: siteDefaults.organization.email || undefined,
+  logo: {
+    '@type': 'ImageObject',
+    url: siteDefaults.organization.logo || siteLogo.desktopLogo
+  },
+  sameAs: siteDefaults.organization.sameAs?.length
+    ? siteDefaults.organization.sameAs
+    : undefined,
+  ...(orgType === 'Organization' && orgIncharge?.name && {
+    founder: {
+      '@type': 'Person',
+      name: orgIncharge.name,
+      url: orgIncharge.url || undefined,
+      sameAs: orgIncharge.sameAs?.length ? orgIncharge.sameAs : undefined
+    }
+  }),
+  member: authors.length > 0
+    ? authors.map((a: any) => ({
+        '@type': 'Person',
+        name: a.name,
+        url: new URL(a.url, Astro.site).toString()
+      }))
+    : undefined
+};
+
+// --- WebPage / WebSite Schema
+const webpageSchema = {
+  '@context': 'https://schema.org',
+  '@type': type === 'website' ? 'WebSite' : 'WebPage',
+  '@id': webPageId,
+  url: url || siteDefaults.siteUrl,
+  name: title || siteDefaults.title,
+  description: description || siteDefaults.description,
+  publisher: { '@id': orgId }
+};
+
+// --- Article Schema
+const articleSchema = type === 'article' ? {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  '@id': articleId,
+  headline: title || siteDefaults.title,
+  description: description || siteDefaults.description,
+  url: url || siteDefaults.siteUrl,
+  image: image ? {
+    '@type': 'ImageObject',
+    url: image,
+    width: 1200,
+    height: 628
+  } : undefined,
+  datePublished: publishedAt || siteDefaults.publishedDate,
+  dateModified: updatedAt || publishedAt || siteDefaults.publishedDate,
+  author: authors.length > 0
+    ? authors.map((a: any) => ({
+        '@id': `${new URL(a.url, Astro.site)}#person`
+      }))
+    : (orgType === 'Person' && orgIncharge?.name)
+      ? { '@id': `${siteDefaults.organization.url}#person` }
+      : { '@id': orgId },
+  publisher: {
+    '@id': orgId
+  }
+} : null;
+
+// --- CollectionPage Schema
+const collectionSchema = type === 'collection' && listItems?.length ? {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  '@id': collectionId,
+  name: title || siteDefaults.title,
+  hasPart: listItems.map((item: any) => ({
+    '@type': 'Article',
+    '@id': `${new URL(item.url, Astro.site)}#article`,
+    name: item.name,
+    url: item.url
+  })),
+  publisher: { '@id': orgId }
+} : null;
+
+
+// --- FAQ Schema
+const faqSchema = faq?.length ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': faqId,
+  mainEntity: faq.map((q: { question: string; answer: string }) => ({
+    '@type': 'Question',
+    name: q.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: q.answer
+    }
+  }))
+} : null;
+
+// --- RSS Schema
+const rssSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'DataFeed',
+  '@id': rssId,
+  name: `${siteDefaults.title} RSS Feed`,
+  dataFeedElement: [
+    {
+      '@type': 'DataFeedItem',
+      dateCreated: siteDefaults.publishedDate,
+      url: `${siteDefaults.siteUrl}rss.xml`
+    }
+  ]
+};
+
+// --- Speakable Schema
+const speakableJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: url || siteDefaults.siteUrl,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['.speak-head', '.speak-text']
+  }
+};
+---
+{/** WebPage / WebSite Schema */}
+<script type="application/ld+json" set:html={JSON.stringify(webpageSchema)}></script>
+{/** Organization Schema */}
+<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)}></script>
+{/** Article Schema */}
+{articleSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)}></script>
+)}
+
+{/** CollectionPage Schema */}
+{collectionSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)}></script>
+)}
+
+{/** FAQ Schema */}
+{faqSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
+)}
+
+{/** RSS Schema */}
+<script type="application/ld+json" set:html={JSON.stringify(rssSchema)}></script>
+
+{/** Speakable Schema */}
+<script type="application/ld+json" set:html={JSON.stringify(speakableJsonLd)}></script>
+
+{/** Person Schemas */}
+{personSchemas.map((person: any) => (
+  <script type="application/ld+json" set:html={JSON.stringify(person)}></script>
+))}
+
+{/** Fallback Person Schema */}
+{fallbackPersonSchema && (
+  <script type="application/ld+json" set:html={JSON.stringify(fallbackPersonSchema)}></script>
+)}

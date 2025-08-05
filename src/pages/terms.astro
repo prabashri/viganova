@@ -13,6 +13,12 @@ const updatedAt = modifiedDates['terms']
     })
   : siteDefaults.publishedDate;
 
+const adminEmail = siteDefaults.admin.email 
+  || siteDefaults.organization.incharge.email 
+  || siteDefaults.organization.email 
+  || `contact@${siteDefaults.siteUrl.replace(/^https?:\/\//, '')}` 
+  || `contact@${Astro.url.hostname}`;
+
 // ✅ HeadProps for SEO
 const pageSeo: HeadProps = {
   title: `Terms of Service | ${siteDefaults.siteName}`,
@@ -22,15 +28,7 @@ const pageSeo: HeadProps = {
   url: `${siteDefaults.siteUrl}/terms`,
   canonicalUrl: `${siteDefaults.siteUrl}/terms`,
   siteName: siteDefaults.siteName,
-  authors: [
-    {
-      id: 'prabakaran-shankar',
-      slug: 'prabakaran-shankar',
-      url: siteDefaults.authorUrl,
-      name: siteDefaults.authorName,
-      data: {}
-    }
-  ],
+  authors: [ ],
   publishedAt: siteDefaults.publishedDate,
   updatedAt,
   index: true,
@@ -66,7 +64,7 @@ const pageSeo: HeadProps = {
 
       <h2 id="3-no-refund-policy">3. No Refund Policy</h2>
       <p>All sales are final. We do not offer refunds once the Theme has been purchased. Buyers are encouraged to review the <strong>Theme features, documentation, and demo</strong> before purchase.</p>
-      <p>If you have questions before purchase, please contact us at <a href={`mailto:${siteDefaults.adminEmail}`}>{siteDefaults.adminEmail}</a>.</p>
+      <p>If you have questions before purchase, please contact us at <a href={`mailto:${adminEmail}`}>{adminEmail}</a>.</p>
 
       <h2 id="4-usage-rights">4. Usage Rights</h2>
       <p>Depending on the purchased license:</p>
@@ -90,7 +88,7 @@ const pageSeo: HeadProps = {
 
       <h2 id="9-company-information">9. Company Information</h2>
       <p>{siteDefaults.siteName} is a project by:</p>
-      <p><strong>NViews Media Private Limited (<a href="https://thenviews.com">thenviews.com</a>)</strong><br/>Registered in India<br/>📧 <a href={`mailto:${siteDefaults.adminEmail}`}><strong>{siteDefaults.adminEmail}</strong></a></p>
+      <p><strong>NViews Media Private Limited (<a href="https://thenviews.com">thenviews.com</a>)</strong><br/>Registered in India<br/>📧 <a href={`mailto:${adminEmail}`}><strong>{adminEmail}</strong></a></p>
     </div>
   </article>
 

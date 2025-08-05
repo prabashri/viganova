@@ -2,10 +2,7 @@ export const siteDefaults = {
   siteName: "AstroWEB by Nviews WEB",
   shortName: "AstroWEB",
   publishedDate: "June 19 2025",
-  adminName: "nviews web",
-  adminEmail: "admin@nviewsweb.com",
-  authorName: "Prabakaran Shankar",
-  authorUrl: "https://prabakaranshankar.com",
+  
   domainName: "astroweb-template-ssr.pages.dev",
   siteUrl: "https://astroweb-template-ssr.pages.dev/",
   title: "Theme for Astro by nViewsWEB - The Ultimate Frontend Toolkit",
@@ -23,6 +20,44 @@ export const siteDefaults = {
     bluesky: "https://bsky.app/profile/nviewsweb.com",
     email: "mailto:admin@nviewsweb.com"
   },
+
+    // Admin contact (for technical/meta info)
+  admin: {
+    name: 'NViews Web',
+    email: 'admin@nviewsweb.com'
+  },
+
+  // Organization block (main entity)
+  organization: {
+    // Set entity type dynamically: 'Organization' or 'Person'
+    type: 'Organization', // Change to 'Person' if site is personal brand
+
+    // Common fields (both Organization & Person use name, url, logo, sameAs)
+    name: 'NViews Web', // or 'Prabakaran Shankar' if type = 'Person'
+    url: 'https://nviewsweb.com', // or personal website
+    email: 'admin@nviewsweb.com',
+    logo: 'src/assets/logos/AstroWEB-logo.png',
+    sameAs: [
+      'https://linkedin.com/company/nviewsweb',
+      'https://prabakaranshankar.com'
+    ],
+
+    // Only relevant if type is Organization
+    incharge: { // for person, no need to fill this
+      type: 'Person',
+      name: 'Prabakaran Shankar',
+      email: 'madanprabakar@gmail.com',
+      image: '',
+      url: 'https://prabakaranshankar.com',
+      internalId: 'team/prabakaran-shankar',
+      // only if dont have internalId
+      sameAs: [
+        'https://linkedin.com/in/prabakaranshankar',
+        'https://x.com/@madanpraba'
+      ]
+    }
+  },
+
   shareLinks: [
     "Whatsapp",
     "X",
@@ -34,7 +69,7 @@ export const siteDefaults = {
   ],
 
   separator: "|",
-  authors: [],
+  
   rss: true,
   sitemap: true,
   cdnPath: "",
@@ -59,7 +94,7 @@ export const siteDefaults = {
   outputImageBase: './public/images', // fixed output folder
 
   inputImageFolder: './src/assets/images', // user-editable image folder
-  featuredImageFolder: './src/assets/featured', // featured images only
+  featuredImageFolder: './src/assets/images/featured', // featured images only
   featuredImageSize: 960, // larger size for SEO & cards
 
   // ✅ Breakpoint config for responsive images

@@ -1,28 +1,27 @@
+// src/scripts/generate-web-manifest.ts
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import { encode as encodeIco } from 'sharp-ico';
 
-import { siteLogo } from '../config/siteLogo';
+import { siteImages } from '../config/siteImages';
 import { siteColors } from '../config/siteColors';
-
 import { siteDefaults } from '../config/siteDefaults';
+import { getConfigModified, updateConfigModified } from '../utils/configModified';
+
 type AssetsManifest = {
-  css: Record<string, { file: string; datetime: string }>;
-  preload: Record<string, { file: string; datetime: string }>;
-  js: Record<string, { file: string; datetime: string }>;
   icons?: Record<string, { datetime: string }>;
-  siteDefaults?: { datetime: string };
 };
 
 import assetsManifestJson from '../data/assets-manifest.json';
 const assetsManifest = assetsManifestJson as unknown as AssetsManifest;
 
+// --- Paths
 const publicDir = path.resolve('public');
 const manifestPath = path.join(publicDir, 'manifest.webmanifest');
-
 const siteDefaultsPath = path.resolve('src/config/siteDefaults.ts');
-const recordedSiteDefaultsTime = assetsManifest?.siteDefaults?.datetime;
+const siteImagesPath = path.resolve('src/config/siteImages.ts');
+const siteColorsPath = path.resolve('src/config/siteColors.ts');
 
 const iconSizes = [
   { name: 'android-chrome-192x192.png', size: 192 },
@@ -31,26 +30,25 @@ const iconSizes = [
   { name: 'favicon-32x32.png', size: 32 }
 ];
 
-// --- Trim utility
+// --- Utility: Trim text
 const trimTo = (str: string, max: number) =>
   str.length > max ? str.slice(0, max).trim() : str.trim();
 
-// --- Check if file update is needed
-function needsUpdate(filePath: string, recordedTime?: string) {
-  if (!fs.existsSync(filePath)) return true;
-  const stats = fs.statSync(filePath);
-  return new Date(stats.mtime).toISOString() !== recordedTime;
+// --- Utility: Get mtime of a file
+function getMTime(filePath: string): number {
+  return fs.existsSync(filePath) ? Math.floor(fs.statSync(filePath).mtimeMs) : 0;
 }
 
-// --- Resolve favicon source
+// --- Utility: Resolve favicon source
 function resolveFaviconSource(): string | null {
-  const favIconPath = path.resolve(siteLogo.favIcon ?? '');
+  const favIconPath = path.resolve(siteImages.favIcon ?? '');
   return fs.existsSync(favIconPath) ? favIconPath : null;
 }
+
+// --- Utility: Get sharp pipeline
 function getSharpPipelineByFormat(sourcePath: string, size: number) {
   const ext = path.extname(sourcePath).toLowerCase();
-  const base = sharp(sourcePath)
-    .resize(size, size, { fit: 'cover', position: 'center' });
+  const base = sharp(sourcePath).resize(size, size, { fit: 'cover', position: 'center' });
 
   switch (ext) {
     case '.jpg':
@@ -68,17 +66,25 @@ function getSharpPipelineByFormat(sourcePath: string, size: number) {
 
 // --- Generate PNG icons
 async function generateIcons(source: string) {
-  const meta = await sharp(source).metadata();
-  const minDim = Math.min(meta.width ?? 0, meta.height ?? 0);
-
   for (const { name, size } of iconSizes) {
     const outputPath = path.join(publicDir, name);
     const recordedTime = assetsManifest?.icons?.[name]?.datetime;
+    const srcMTime = fs.statSync(source).mtime.toISOString();
 
-    if (needsUpdate(outputPath, recordedTime)) {
-      const pipeline = getSharpPipelineByFormat(source, size);
-      await pipeline.toFile(outputPath);
-      console.log(`✅ Generated ${name}`);
+    if (!fs.existsSync(outputPath) || srcMTime !== recordedTime) {
+      try {
+        const pipeline = getSharpPipelineByFormat(source, size);
+        await pipeline.toFile(outputPath);
+
+        console.log(`✅ Generated ${name}`);
+
+        if (!assetsManifest.icons) assetsManifest.icons = {};
+        assetsManifest.icons[name] = { datetime: srcMTime };
+      } catch (err) {
+        console.error(`❌ Error generating ${name}:`, err);
+      }
+    } else {
+      console.log(`⏩ Skipped ${name} (no change)`);
     }
   }
 }
@@ -86,7 +92,7 @@ async function generateIcons(source: string) {
 
 // --- Handle favicon.svg
 function handleSvgIcon() {
-  const svgSrcPath = path.resolve(siteLogo.favIconSvg ?? '');
+  const svgSrcPath = path.resolve(siteImages.favIconSvg ?? '');
   const svgDestPath = path.join(publicDir, 'favicon.svg');
 
   if (!fs.existsSync(svgSrcPath)) {
@@ -94,9 +100,15 @@ function handleSvgIcon() {
     return;
   }
 
-  if (!fs.existsSync(svgDestPath)) {
+  const srcMTime = fs.statSync(svgSrcPath).mtime.toISOString();
+  if (!fs.existsSync(svgDestPath) ||
+    assetsManifest?.icons?.['favicon.svg']?.datetime !== srcMTime) {
     fs.copyFileSync(svgSrcPath, svgDestPath);
     console.log('✅ Copied favicon.svg to public folder');
+    if (!assetsManifest.icons) assetsManifest.icons = {};
+    assetsManifest.icons['favicon.svg'] = { datetime: srcMTime };
+  } else {
+    console.log('⏩ Skipped favicon.svg (no change)');
   }
 }
 
@@ -124,88 +136,42 @@ function writeWebManifest() {
 
   fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   console.log('✅ Web App Manifest generated.');
-}
 
-// --- Update assets-manifest.json
-function updateAssetsManifest(
-  siteDefaultsTime: string,
-  extraIcons: Record<string, { datetime: string }> = {}
-) {
-  const updatedIcons: Record<string, { datetime: string }> = { ...extraIcons };
-
-  for (const { name } of iconSizes) {
-    const iconPath = path.join(publicDir, name);
-    if (fs.existsSync(iconPath)) {
-      const time = fs.statSync(iconPath).mtime.toISOString();
-      updatedIcons[name] = { datetime: time };
-    }
-  }
-
-  const otherFiles = ['favicon.svg', 'manifest.webmanifest', 'favicon-16x16.png'];
-  for (const file of otherFiles) {
-    const filePath = path.join(publicDir, file);
-    if (fs.existsSync(filePath)) {
-      const time = fs.statSync(filePath).mtime.toISOString();
-      updatedIcons[file] = { datetime: time };
-    }
-  }
-
-  const updated = {
-    ...assetsManifest,
-    icons: updatedIcons,
-    siteDefaults: {
-      datetime: siteDefaultsTime
-    }
+  if (!assetsManifest.icons) assetsManifest.icons = {};
+  assetsManifest.icons['manifest.webmanifest'] = {
+    datetime: new Date().toISOString()
   };
-
-  fs.writeFileSync(
-    path.resolve('src/data/assets-manifest.json'),
-    JSON.stringify(updated, null, 2)
-  );
-
-  console.log('📦 Updated assets-manifest.json (icons + siteDefaults.ts timestamp)');
 }
 
-
-
-async function generateFaviconIco(source: string): Promise<Record<string, { datetime: string }>> {
+// --- Generate favicon.ico
+async function generateFaviconIco(source: string) {
   const icoPath = path.join(publicDir, 'favicon.ico');
+  const srcMTime = fs.statSync(source).mtime.toISOString();
   const recordedTime = assetsManifest?.icons?.['favicon.ico']?.datetime;
 
-  if (fs.existsSync(icoPath)) {
-    const mtime = fs.statSync(icoPath).mtime.toISOString();
-    if (recordedTime === mtime) {
-      return {}; // No need to regenerate
-    }
+  if (!fs.existsSync(icoPath) || srcMTime !== recordedTime) {
+    const pngBuffer = await sharp(source)
+      .resize(64, 64, { fit: 'cover', position: 'center' })
+      .png({ compressionLevel: 9 })
+      .toBuffer();
+
+    const icoBuffer = await encodeIco([pngBuffer]);
+    fs.writeFileSync(icoPath, icoBuffer);
+    console.log('✅ Generated favicon.ico');
+
+    if (!assetsManifest.icons) assetsManifest.icons = {};
+    assetsManifest.icons['favicon.ico'] = { datetime: srcMTime };
+  } else {
+    console.log('⏩ Skipped favicon.ico (no change)');
   }
-
-  const pngBuffer = await sharp(source)
-    .resize(64, 64, { fit: 'cover', position: 'center' })
-    .png({ compressionLevel: 9 })
-    .toBuffer();
-
-  const icoBuffer = await encodeIco([pngBuffer]);
-  fs.writeFileSync(icoPath, icoBuffer);
-
-  const updatedTime = new Date().toISOString();
-  console.log('✅ Generated favicon.ico');
-
-  return { 'favicon.ico': { datetime: updatedTime } };
 }
 
-
-// --- Runner
-async function main() {
-  if (!fs.existsSync(siteDefaultsPath)) {
-    console.error('❌ siteDefaults.ts not found.');
-    return;
-  }
-
-  const siteDefaultsStats = fs.statSync(siteDefaultsPath);
-  const currentSiteDefaultsTime = siteDefaultsStats.mtime.toISOString();
-
-  const isSiteDefaultsChanged =
-    !recordedSiteDefaultsTime || currentSiteDefaultsTime !== recordedSiteDefaultsTime;
+// --- Main runner
+(async () => {
+  // Get config mtimes
+  const siteDefaultsTime = getMTime(siteDefaultsPath);
+  const siteImagesTime = getMTime(siteImagesPath);
+  const siteColorsTime = getMTime(siteColorsPath);
 
   const pngSource = resolveFaviconSource();
   if (!pngSource) {
@@ -214,27 +180,59 @@ async function main() {
   }
 
   try {
-    let updated = false;
+    const configChanged =
+      siteDefaultsTime > getConfigModified('siteDefaults') ||
+      siteImagesTime > getConfigModified('siteImages') ||
+      siteColorsTime > getConfigModified('siteColors');
 
-    if (isSiteDefaultsChanged) {
-      console.log('🔁 siteDefaults.ts has changed, regenerating manifest...');
+    if (configChanged) {
+      console.log('🔁 Config changed, regenerating manifest & icons...');
       writeWebManifest();
-      updated = true;
+      await generateIcons(pngSource);
+      handleSvgIcon();
+      await generateFaviconIco(pngSource);
+
+      // ✅ Update configModified times
+      updateConfigModified('siteDefaults', siteDefaultsTime);
+      updateConfigModified('siteImages', siteImagesTime);
+      updateConfigModified('siteColors', siteColorsTime);
+
+    } else {
+      console.log('✅ No config changes detected. Checking icons individually...');
+      await generateIcons(pngSource);
+      handleSvgIcon();
+      await generateFaviconIco(pngSource);
     }
 
-    await generateIcons(pngSource);
-    handleSvgIcon();
-    const icoMeta = await generateFaviconIco(pngSource);
-    updateAssetsManifest(currentSiteDefaultsTime, icoMeta);
-
-
-    if (!updated) {
-      console.log('✅ No changes in siteDefaults.ts. Icons updated only if required.');
+    // --- Merge icons safely without overwriting other keys
+    const manifestPathFull = path.resolve('src/data/assets-manifest.json');
+    let existingManifest: Record<string, any> = {};
+    try {
+      existingManifest = JSON.parse(fs.readFileSync(manifestPathFull, 'utf-8'));
+    } catch {
+      console.warn('⚠️ Could not parse existing assets-manifest.json. Starting fresh.');
     }
+
+    const sortedIcons: Record<string, { datetime: string }> = {};
+    if (assetsManifest.icons) {
+      Object.keys(assetsManifest.icons)
+        .sort()
+        .forEach(k => sortedIcons[k] = assetsManifest.icons![k]);
+    }
+
+    const finalManifest = {
+      ...existingManifest,
+      icons: {
+        ...(existingManifest.icons || {}),
+        ...sortedIcons
+      }
+    };
+
+    fs.writeFileSync(manifestPathFull, JSON.stringify(finalManifest, null, 2));
+    console.log('📦 Merged and updated assets-manifest.json');
+
   } catch (err) {
     console.error('❌ Error during manifest generation:', err);
   }
-}
+})();
 
-
-main();

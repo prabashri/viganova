@@ -1,5 +1,4 @@
 ---
-// src/components/BaseHead.astro
 import { siteDefaults } from '../config/siteDefaults';
 import { parseToIsoString } from '../utils/date-utils';
 import CssHead from './CssHead.astro';
@@ -8,243 +7,160 @@ import Rss from './Rss.astro';
 import ImagePreload from './ImagePreload.astro';
 import assetsManifest from '../data/assets-manifest.json';
 import InlineScript from './InlineScript.astro';
-import { siteLogo } from '../config/siteLogo';
-
 import { getPreloadImages, clearPreloadImages } from '../utils/preloadRegistry';
+import { getImageMeta } from '../utils/getImageMeta';
+import Schema from './Schema.astro';
 
 const preloadImagesAuto = getPreloadImages();
-// Clear registry after reading to avoid leakage between pages
 clearPreloadImages();
 
-const isDev = import.meta.env.DEV; 
+const isDev = import.meta.env.DEV;
+
+// Determine fallback author(s) based on organization type
+let fallbackAuthors: { name: string; url: string }[] = [];
+
+if (siteDefaults.organization.type === 'Organization' && siteDefaults.organization.incharge?.name) {
+  fallbackAuthors = [{
+    name: siteDefaults.organization.incharge.name,
+    url: siteDefaults.organization.incharge.url ?? siteDefaults.organization.url
+  }];
+} 
+else if (siteDefaults.organization.type === 'Person') {
+  fallbackAuthors = [{
+    name: siteDefaults.organization.name,
+    url: siteDefaults.organization.url
+  }];
+}
 
 const props: HeadProps = {
   ...Astro.props,
   title: Astro.props.title ?? siteDefaults.title,
-  authors: Astro.props.authors ?? siteDefaults.authors ?? [],
+  description: Astro.props.description ?? siteDefaults.description,
+  image: Astro.props.image,
+  type: Astro.props.type ?? 'webpage',
+  url: Astro.props.url ?? Astro.url.toString(),
+  siteName: Astro.props.siteName ?? siteDefaults.siteName,
+  authors: (Astro.props.authors?.length > 0 ? Astro.props.authors : fallbackAuthors),
+  publishedAt: Astro.props.publishedAt ?? siteDefaults.publishedDate,
+  updatedAt: Astro.props.updatedAt,
+  index: Astro.props.index ?? true,
+  keywords: Astro.props.keywords ?? siteDefaults.keywords,
+  faq: Astro.props.faq ?? [],
+  listItems: Astro.props.listItems ?? [],
+  canonicalUrl: Astro.props.canonicalUrl
 };
 
-const canonicalURL = new URL(props.canonicalUrl ?? Astro.url.pathname, Astro.site).toString();
+// Canonical URL
+const canonicalURL = new URL(
+  props.canonicalUrl ?? Astro.url.pathname,
+  siteDefaults.siteUrl
+).toString();
 
+// Destructure props for use in head
 const {
   title,
-  description = '',
+  description,
   image,
-  type = 'webpage',
-  url = Astro.url.toString(),
-  siteName = siteDefaults.title,
-  authors = [],
-  authorName = siteDefaults.authorName,
-  authorUrl = siteDefaults.authorUrl,
+  type,
+  url,
+  siteName,
+  authors,
   publishedAt,
   updatedAt,
-  index = true,
-  keywords = [],
-  faq = [],
-  breadcrumb = [],
-  listItems = [],
+  index,
+  keywords,
+  faq,
+  listItems
 } = props;
 
-const imageUrl =
-  typeof image === 'string' ? new URL(image, Astro.site).toString() : siteDefaults.image;
 
-const datePublished = parseToIsoString(publishedAt? publishedAt : siteDefaults.publishedDate);
+const imageMeta = getImageMeta(image);
+const imageUrl = imageMeta?.url || '';
+const imageWidth = imageMeta?.width || 0;
+const imageHeight = imageMeta?.height || 0;
+
+const datePublished = parseToIsoString(publishedAt ?? siteDefaults.publishedDate);
 const dateModified = parseToIsoString(updatedAt);
 
 const rssEnabled = siteDefaults.rss === true;
-
-let primaryJsonLd: Record<string, any> = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  headline: title,
-  name: title,
-  description,
-  url,
-  image: imageUrl,
-  keywords,
-  datePublished,
-  dateModified,
-  author: {
-    '@type': 'Person',
-    name: authorName,
-    url: authorUrl,
-  },
-  publisher: {
-    '@type': 'Organization',
-    name: siteName,
-    logo: {
-      '@type': 'ImageObject',
-      url: siteLogo.desktopLogo,
-    },
-  },
-};
-
-if (type === 'article') {
-  primaryJsonLd['@type'] = 'Article';
-} else if (type === 'collection') {
-  primaryJsonLd['@type'] = 'CollectionPage';
-  if (listItems.length > 0) {
-    primaryJsonLd['hasPart'] = listItems.map(item => ({
-      '@type': 'Article',
-      name: item.name,
-      url: new URL(item.url, Astro.site).toString(),
-    }));
-  }
-}
-const rssSchema ={
-  "@id": "https://astrotheme.nviewsweb.com/rss.xml",
-  "name": `${siteDefaults.title} RSS Feed`,
-  "@context": "https://schema.org",
-  "@type": "DataFeed",
-  "dataFeedElement": [
-    { "@type": "DataFeedItem", "dateCreated": "2025-07-21", "url": `${Astro.site}/rss.xml` }
-  ]
-}
-
-
-// ✅ Always present JSON-LD (Organization, Speakable)
-const speakableJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  url,
-  speakable: {
-    '@type': 'SpeakableSpecification',
-    cssSelector: ['.speak-head', '.speak-text'],
-  },
-};
-
-const orgJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: siteName,
-  url: 'https://clampgenerator.com',
-  logo: {
-    '@type': 'ImageObject',
-    url: siteLogo.desktopLogo,
-  },
-  sameAs: [
-    'https://linkedin.com/in/prabakaran-shankar',
-    'https://prabakaranshankar.com',
-  ],
-};
-
-// ✅ Optional schemas
-const faqJsonLd = faq.length > 0 ? {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: faq.map(({ question, answer }) => ({
-    '@type': 'Question',
-    name: question,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: answer,
-    },
-  })),
-} : null;
-
-const breadcrumbJsonLd = breadcrumb.length > 0 ? {
-  '@context': 'https://schema.org',
-  '@type': 'BreadcrumbList',
-  itemListElement: breadcrumb.map((item, index) => ({
-    '@type': 'ListItem',
-    position: index + 1,
-    name: item.name,
-    item: item.url,
-  })),
-} : null;
+const sitemapEnabled = siteDefaults.sitemap === true;
 ---
 
-<!-- Global Metadata primary -->
-<title>{title}</title>   
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="preconnect" href="/" crossorigin="">
-<meta name="robots" content={ index !== true ?"index":"no-index" } />
-<meta name="referrer" content="strict-origin-when-cross-origin" />
-<!-- css tags -->
-<CssHead />
-{ preloadImagesAuto.length > 0 && (
-  <ImagePreload images={preloadImagesAuto} />
-)}
-
-<!-- global metadata others -->
-<meta name="preview-image" content="true" />
-<link rel="sitemap" href="/sitemap.xml" />
-<link
-	rel="alternate"
-	type="application/rss+xml"
-	title={siteDefaults.title}
-	href={new URL('rss.xml', Astro.site)}
+<Schema
+  type={type}
+  authors={authors}
+  image={imageUrl}
+  title={title}
+  description={description}
+  url={url}
+  publishedAt={publishedAt}
+  updatedAt={updatedAt}
+  faq={faq}
+  listItems={listItems}
 />
-{isDev && <meta name="generator" content={Astro.generator} />}
 
-<!-- Web App Manifest -->
-<link rel="manifest" href="/manifest.webmanifest" />
+<!-- 🔹 Primary Page Title -->
+<title>{title}</title>
 
-<!-- Theme Color for Android -->
-<meta name="theme-color" content="#0d9488" />
-
-<!-- Apple Touch Icon (iOS Home Screen) -->
-<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-<!-- Favicons -->
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+<!-- 🔹 Favicons & Manifest -->
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-
-<!-- Windows Tile (optional) -->
-<meta name="msapplication-TileColor" content="#0d9488" />
-<meta name="msapplication-TileImage" content="/android-chrome-192x192.png" />
-
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<meta name="theme-color" content="#0d9488" />
 <meta name="application-name" content={siteDefaults.siteName} />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 
-<!-- ✅ Responsive Image Preload -->
-{/* ✅ Responsive Image Preload */}
+<!-- 🔹 Robots & Referrer -->
+<meta name="robots" content={index ? "index, follow" : "noindex, nofollow"} />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
 
+<!-- 🔹 CSS & Preloads -->
+<CssHead />
+{preloadImagesAuto.length > 0 && <ImagePreload images={preloadImagesAuto} />}
 
-<!-- Canonical URL -->
+<!-- 🔹 Canonical -->
 <link rel="canonical" href={canonicalURL} />
 
-<!-- Primary SEO Meta Tags -->
-
+<!-- 🔹 Primary SEO Meta -->
 <meta name="title" content={title} />
 <meta name="description" content={description} />
-<meta name="keywords" content={keywords.join(', ')} />
-<meta name="author" content={authorName} />
-<meta property="article:author" content={authorName} />
+<meta name="keywords" content={(keywords ?? []).join(', ')} />
 
-<!-- Open Graph / Facebook -->
+<!-- 🔹 Author Meta -->
+{authors.length > 0
+  ? authors.map(a => <meta name="author" content={a.name} />)
+  : <meta name="author" content={siteDefaults.admin.name} />}
+{authors.length > 0
+  ? authors.map(a => <meta property="article:author" content={a.url ?? siteDefaults.organization.url} />)
+  : <meta property="article:author" content={siteDefaults.organization.url} />}
+
+<!-- 🔹 Open Graph -->
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={siteName} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={url} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageUrl} />
-{type === 'article' && <>
-  <meta property="article:published_time" content={datePublished} />
-  <meta property="article:modified_time" content={dateModified} />
-</>}
+<meta property="og:image:width" content={imageWidth.toString()} />
+<meta property="og:image:height" content={imageHeight.toString()} />
+{type === 'article' && (
+  <>
+    <meta property="article:published_time" content={datePublished} />
+    <meta property="article:modified_time" content={dateModified} />
+  </>
+)}
 
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<!--meta property="twitter:image" content={new URL(image, Astro.url)} /-->
-<meta name="twitter:image" content={image} />
+<!-- 🔹 Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content={siteDefaults.socialLinks.x} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />
 
-<link rel="sitemap" type="application/xml" href="/sitemap-index.xml" />
-{/*-- RSS Feed Discovery */}
-{rssEnabled && <Rss />}
+<!-- 🔹 Sitemap & RSS -->
+{ sitemapEnabled && <link rel="sitemap" type="application/xml" href="/sitemap.xml" /> }
+{ rssEnabled && <Rss /> }
 
-
-{/*-- JSON-LD Structured Data --*/}
-<script is:inline type="application/ld+json" set:html={JSON.stringify(primaryJsonLd)} />
-<script is:inline type="application/ld+json" set:html={JSON.stringify(speakableJsonLd)} />
-<script is:inline type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
-{faqJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(faqJsonLd)} />}
-{breadcrumbJsonLd && <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />}
-{rssEnabled && <script is:inline type="application/ld+json" set:html={JSON.stringify(rssSchema)} />}
+<!-- 🔹 Inline Scripts -->
 <InlineScript />

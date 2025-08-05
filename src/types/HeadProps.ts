@@ -19,7 +19,7 @@ export interface HeadProps {
   title: string;
   description?: string;
   image?: string;
-  type?: 'website' | 'webpage' | 'article' | 'collection' | 'list';
+  type?: 'website' | 'webpage' | 'article' | 'collection' | 'list' | 'person' | 'product' | 'evnt' | 'publication';
   url?: string;
   canonicalUrl?: string;
   siteName?: string;

@@ -2,10 +2,11 @@
 import imageMetadataJson from '../data/image-format-details.json';
 import { registerPreloadImage } from '../utils/preloadRegistry';
 import { siteDefaults } from '../config/siteDefaults';
+import { siteImages } from '../config/siteImages';
 import { getAbsoluteImageUrl } from '../utils/getAbsoluteImageUrl';
 
 interface Props {
-  src: string;
+  src: string; // path like "featured/astroweb-modern-website-theme-astro.png"
   alt: string;
   width?: string | number;
   height?: number;
@@ -33,18 +34,17 @@ const {
   breakpoints,
   height,
   width,
-   addSchema = true
+  addSchema = true
 } = Astro.props as Props;
 
-const mobileMax = siteDefaults.breakpoints.mobileMax ?? 768;
-const desktopMin = siteDefaults.breakpoints.desktopMin ?? 769;
+const mobileMax = siteImages.breakpoints.mobileMax ?? 768;
+const desktopMin = siteImages.breakpoints.desktopMin ?? 769;
 
 const metadata = imageMetadataJson as Record<string, any>;
 const data = metadata[src];
 
 let hasData = !!data;
 let targetWidth = breakpoints?.desktop ?? (typeof width === 'number' ? width : 320);
-let aspectRatio = '1/1';
 
 let basePath = '';
 let availableWidths: number[] = [];
@@ -53,19 +53,31 @@ let formats: string[] = [];
 let sizesAttr = sizes;
 let width1x = targetWidth;
 let width2x = targetWidth * 2;
+let widthMax = targetWidth;
 let imageBaseName = '';
 let fallbackSrc = '';
 let aspectClass = '';
 let widthClassMobile = '';
 let widthClassDesktop = '';
 let objectFitClass = '';
+let imageMaxUrl = '';
+
 if (hasData) {
   basePath = `/images${data.path}`;
   availableWidths = data.variants.map(Number).sort((a: number, b: number) => a - b);
   defaultAspect = data.aspect;
-  aspectRatio = defaultAspect.replace('x', '/');
 
-  formats = [...data.format].sort((a, b) => (a === 'webp' ? -1 : b === 'webp' ? 1 : 0));
+  // ✅ Format priority: webp > png > jpeg/jpg > avif
+  const formatPriority: Record<string, number> = {
+    webp: 1,
+    png: 2,
+    jpeg: 3,
+    jpg: 3,
+    avif: 4
+  };
+  formats = [...data.format].sort((a, b) =>
+    (formatPriority[a.toLowerCase()] ?? 99) - (formatPriority[b.toLowerCase()] ?? 99)
+  );
 
   if (!sizesAttr && breakpoints) {
     const { mobile = 320, desktop = 640 } = breakpoints;
@@ -77,44 +89,45 @@ if (hasData) {
 
   width1x = availableWidths.find(w => w >= targetWidth) ?? availableWidths[0];
   width2x = availableWidths.find(w => w >= width1x * 2) ?? width1x;
+  widthMax = Math.max(...availableWidths);
 
   imageBaseName = src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '');
   fallbackSrc = `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]}`;
+  imageMaxUrl = getAbsoluteImageUrl(
+    basePath,
+    `${imageBaseName}-w${widthMax}-a${defaultAspect}.${formats[0]}`
+  );
 
   aspectClass = `a-${defaultAspect}`;
   widthClassMobile = `w-${breakpoints?.mobile ?? 320}`;
-
-  // ✅ Replace magic widths with semantic classes
   widthClassDesktop = breakpoints?.desktop && breakpoints.desktop > 640
     ? `mx-w-featured big-w-full`
     : `mx-w-content big-w-full`;
-
   objectFitClass = `object-${objectFit}`;
 
-  const format = formats[0];
-  const buildSrc = (w: number) => `${basePath}${imageBaseName}-w${w}-a${defaultAspect}.${format}`;
+  const buildSrc = (w: number, fmt: string) =>
+    `${basePath}${imageBaseName}-w${w}-a${defaultAspect}.${fmt}`;
   const mobileBP = breakpoints?.mobile ?? 320;
   const desktopBP = breakpoints?.desktop ?? mobileBP;
   const mWidth = availableWidths.find(w => w >= mobileBP) ?? availableWidths[0];
   const dWidth = availableWidths.find(w => w >= desktopBP) ?? mWidth;
 
+  // ✅ Preload logic
   if (loading === 'eager') {
-    registerPreloadImage({ src: buildSrc(mWidth), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'high' });
+    registerPreloadImage({ src: buildSrc(mWidth, formats[0]), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'high' });
     if (dWidth !== mWidth) {
-      registerPreloadImage({ src: buildSrc(dWidth), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'high' });
+      registerPreloadImage({ src: buildSrc(dWidth, formats[0]), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'high' });
     }
   }
-
   if (loading === 'delay') {
-    registerPreloadImage({ src: buildSrc(mWidth), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'low' });
+    registerPreloadImage({ src: buildSrc(mWidth, formats[0]), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'low' });
     if (dWidth !== mWidth) {
-      registerPreloadImage({ src: buildSrc(dWidth), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'low' });
+      registerPreloadImage({ src: buildSrc(dWidth, formats[0]), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'low' });
     }
   }
 }
-
-
 ---
+
 {addSchema && hasData && (
   <script 
     is:inline 
@@ -122,11 +135,14 @@ if (hasData) {
     set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'ImageObject',
-      contentUrl: getAbsoluteImageUrl(basePath, `${imageBaseName}-w${width2x}-a${defaultAspect}.webp`),
-      url: getAbsoluteImageUrl(basePath, `${imageBaseName}-w${width2x}-a${defaultAspect}.webp`),
+      '@id': imageMaxUrl,
+      contentUrl: imageMaxUrl,
+      url: imageMaxUrl,
       caption: caption || title || alt,
       description: alt,
-      representativeOfPage: true
+      representativeOfPage: true,
+      width: widthMax,
+      height: Math.round(widthMax * (Number(defaultAspect.split('x')[1]) / Number(defaultAspect.split('x')[0])))
     })}
   />
 )}
@@ -143,11 +159,11 @@ if (hasData) {
     {caption ? (
       <figure class={`block image-wrapper ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} h-fit`}>
         <picture>
-          {formats.filter(f => f !== formats[0]).map(format => (
+          {formats.map(fmt => (
             <source
-              type={`image/${format === 'jpg' ? 'jpeg' : format}`}
-              srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x`}
-              data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x` : undefined}
+              type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
+              srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x`}
+              data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x` : undefined}
               delay-image={loading === 'delay' ? "true" : undefined}
             />
           ))}
@@ -169,11 +185,11 @@ if (hasData) {
       </figure>
     ) : (
       <picture class={`block image-wrapper ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} h-fit`}>
-        {formats.filter(f => f !== formats[0]).map(format => (
+        {formats.map(fmt => (
           <source
-            type={`image/${format === 'jpg' ? 'jpeg' : format}`}
-            srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x`}
-            data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${format} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${format} 2x` : undefined}
+            type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
+            srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x`}
+            data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x` : undefined}
             delay-image={loading === 'delay' ? "true" : undefined}
           />
         ))}

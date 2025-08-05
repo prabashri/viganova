@@ -25,6 +25,7 @@ interface Props {
   email?: string;
   website?: string;
   joined?: string;
+  left?: string;
   social?: Record<string, string>;
   featured?: boolean;
   slug?: string;
@@ -52,6 +53,7 @@ const {
   email,
   website,
   joined,
+  left,
   social = {},
   featured = false,
   slug = '',
@@ -69,21 +71,53 @@ const resolvedSlug = slug || id;
 const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}/team/${resolvedSlug}/`;
 
 const headProps: HeadProps = {
-  title: `${name}`,
-  description: shortBio || `${prefix} ${name} – ${role}`,
-  image: photo || siteDefaults.image,
+  title: `${prefix ? `${prefix} ` : ''}${name}`,
+  description: shortBio || `${prefix} ${name}${role ? ` – ${role}` : ''}`,
+  image: useImage && photo 
+    ? photo 
+    : useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]
+      ? `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300`
+      : useInitial
+        ? undefined // No fallback image for initials
+        : undefined, // No fallback to siteDefaults.image for Person
+
   canonicalUrl: fullCanonical,
   index: true,
+  type: 'person',
+
   authors: [
     {
       id: resolvedSlug,
       slug: resolvedSlug,
       url: `/team/${resolvedSlug}/`,
       name,
-      data: { name, role, photo, email, website, social }
+      data: {
+        name,
+        prefix,
+        role,
+        highestDegree,
+        shortBio,
+        experience,
+        expertise,
+        awards,
+        affiliation,
+        addressing,
+        email,
+        website,
+        joined,
+        left,
+        social,
+        // Best image for schema
+        image: useImage && photo 
+          ? photo 
+          : useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]
+            ? `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300`
+            : undefined
+      }
     }
-  ],
+  ]
 };
+
 
 
 let avatarSrc;
