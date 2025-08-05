@@ -1,5 +1,5 @@
 // src/pages/sitemap.xml.ts
-import { getCollection } from 'astro:content';
+// import { getCollection } from 'astro:content';
 
 export async function GET() {
   const baseUrl = "https://astroweb-template-ssr.pages.dev"; // adjust if needed

@@ -236,7 +236,7 @@ svg use {
 
 .br {
 	border-radius: var(--border-radius);
-	overflow: hidden;
+	
 }
 .br-unset {
 	border-radius: unset;
