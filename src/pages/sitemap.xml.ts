@@ -2,8 +2,6 @@
 import { getCollection } from "astro:content";
 import { siteDefaults } from "../config/siteDefaults";
 import modifiedDatesJson from "../data/modified-dates.json";
-import imageData from "../data/image-format-details.json";
-import { getAbsoluteImageUrl } from "../utils/getAbsoluteImageUrl";
 
 const modifiedDates: Record<string, string> = modifiedDatesJson;
 
@@ -12,15 +10,10 @@ function getLastModified(slug: string, base?: string): string {
   return modifiedDates[key] || modifiedDates[slug] || new Date().toISOString();
 }
 
-function filenameToTitle(fileName: string): string {
-  return fileName.replace(/\.[^.]+$/, "").replace(/-/g, " ");
-}
-
 export async function GET() {
   try {
     const baseUrl = siteDefaults.siteUrl.replace(/\/$/, "");
-    const pages: { url: string; lastmod?: string; priority?: number; image?: { loc: string; title: string } }[] = [];
-    const allPosts: any[] = [];
+    const pages: { url: string; lastmod?: string; priority?: number }[] = [];
 
     // ------------------------
     // 1️⃣ Static Pages
@@ -49,9 +42,7 @@ export async function GET() {
       }
     }
 
-    staticPages.forEach((p) => {
-      pages.push({ url: p.url, priority: p.priority });
-    });
+    staticPages.forEach((p) => pages.push(p));
 
     // ------------------------
     // 2️⃣ Dynamic Collections (entries inside collections)
@@ -65,10 +56,8 @@ export async function GET() {
       const items = await getCollection(key, ({ data }) =>
         data.index !== false &&
         !(typeof data.slug === "string" && data.slug.startsWith("_")) &&
-        (!("draft" in data) || !data.draft)
+        data.draft !== true
       );
-
-      allPosts.push(...items);
 
       items.forEach((entry) => {
         const basePath = config.base ? `/${config.base}` : "";
@@ -82,30 +71,11 @@ export async function GET() {
     }
 
     // ------------------------
-    // 3️⃣ Images
-    // ------------------------
-    for (const [fileName, details] of Object.entries(imageData)) {
-      const cleanName = fileName.replace(/\.[^.]+$/, "");
-      const title = filenameToTitle(fileName);
-      const largestVariant = Math.max(...details.variants.map(Number));
-      const imageUrl = getAbsoluteImageUrl(
-        details.path,
-        `${cleanName}-w${largestVariant}-a${details.aspect}.webp`
-      );
-
-      pages.push({
-        url: "/",
-        image: { loc: imageUrl, title },
-      });
-    }
-
-    // ------------------------
-    // 4️⃣ Generate XML
+    // 3️⃣ Generate XML
     // ------------------------
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset 
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${pages
   .map((p) => {
     const fullUrl = `${baseUrl}${p.url}`;
@@ -113,11 +83,6 @@ ${pages
   <loc>${fullUrl}</loc>
   ${p.lastmod ? `<lastmod>${new Date(p.lastmod).toISOString()}</lastmod>` : ""}
   ${p.priority ? `<priority>${p.priority.toFixed(1)}</priority>` : ""}
-  ${
-    p.image
-      ? `<image:image><image:loc>${p.image.loc}</image:loc><image:title>${p.image.title}</image:title></image:image>`
-      : ""
-  }
 </url>`;
   })
   .join("\n")}
