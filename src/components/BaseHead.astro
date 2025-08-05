@@ -85,20 +85,6 @@ const dateModified = parseToIsoString(updatedAt);
 const rssEnabled = siteDefaults.rss === true;
 const sitemapEnabled = siteDefaults.sitemap === true;
 ---
-
-<Schema
-  type={type}
-  authors={authors}
-  image={imageUrl}
-  title={title}
-  description={description}
-  url={url}
-  publishedAt={publishedAt}
-  updatedAt={updatedAt}
-  faq={faq}
-  listItems={listItems}
-/>
-
 <!-- 🔹 Primary Page Title -->
 <title>{title}</title>
 
@@ -164,3 +150,16 @@ const sitemapEnabled = siteDefaults.sitemap === true;
 
 <!-- 🔹 Inline Scripts -->
 <InlineScript />
+
+<Schema
+  type={type}
+  authors={authors}
+  image={imageUrl}
+  title={title}
+  description={description}
+  url={url}
+  publishedAt={publishedAt}
+  updatedAt={updatedAt}
+  faq={faq}
+  listItems={listItems}
+/>
