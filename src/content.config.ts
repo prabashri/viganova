@@ -38,7 +38,7 @@ const baseSchema = ({ image }: SchemaContext) =>
 
 const blog = defineCollection({
     loader: glob({ pattern: '**/*.(md|mdx)', base: './src/content/blog' }),
-    schema: baseSchema
+    schema: baseSchema,
   });
 
 const post = defineCollection({
