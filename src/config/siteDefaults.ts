@@ -4,7 +4,7 @@ export const siteDefaults = {
   publishedDate: "June 19 2025",
   
   domainName: "astroweb-template-ssr.pages.dev",
-  siteUrl: "https://astroweb-template-ssr.pages.dev/",
+  siteUrl: "https://astroweb-template-ssr.pages.dev",
   title: "Theme for Astro by nViewsWEB - The Ultimate Frontend Toolkit",
   description: "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
   keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],

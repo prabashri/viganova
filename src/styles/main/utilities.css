@@ -75,22 +75,22 @@ svg use {
 	-webkit-backdrop-filter: blur(12px) saturate(160%);
 	backdrop-filter: blur(12px) saturate(160%);
 }
-.bg {
+.bg, .hover-bg:hover {
   background-color: var(--background-color);
 }
-.bg-base-00 {
+.bg-base-00, .hover-bg-base-00:hover {
 	background-color: var(--base-00);
 }
 
-.bg-base-05 {
+.bg-base-05, .hover-bg-base-05:hover {
 	background-color: var(--base-05);
 }
 
-.bg-base-10 {
+.bg-base-10, .hover-bg-base-10:hover {
 	background-color: var(--base-10);
 }
 
-.bg-base-100 {
+.bg-base-100, .hover-bg-base-100:hover {
 	background-color: var(--base-100);
 }
 
@@ -209,7 +209,15 @@ svg use {
 .border-transparent, .hover-border-transparent:hover {
 	border: 1px solid transparent;
 }
-
+hr, .hr {  	
+	border: none;
+	border-top: 1px solid var(--base-40);
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	margin-top: 0.2rem;
+	margin-bottom: 0.5rem;
+	margin-block: 1rem;
+}
 .bottom-10 {
 	bottom: 10px;
 }
@@ -354,15 +362,11 @@ svg use {
 	transition: transform 0.3s ease-in-out;
 }
 
-.fill-base-00 {
+.fill-base-00, .hover-fill-base-00:hover .icon-primary, .hover-fill-base-00:hover {
 	fill: var(--base-00);
 }
 
-.fill-base-00, .hover-fill-base-00:hover {
-	fill: var(--base-00);
-}
-
-.fill-base-100 {
+.fill-base-100, .hover-fill-base-100:hover .icon-primary, .hover-fill-base-100:hover {
 	fill: var(--base-100);
 }
 
@@ -511,7 +515,9 @@ svg use {
 .inset-0{
 	inset: 0;
 }
-
+.grid{
+	display: grid;
+}
 .inherit {
 	display: inherit !important;
 }
@@ -1099,6 +1105,15 @@ svg use {
 	.sm-bg{
 		background-color: var(--background-color);
 	}
+	.sm-hr {
+		border: none;
+		border-top: 1px solid var(--base-40);
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
+		margin-top: 0.2rem;
+		margin-bottom: 0.5rem;
+		margin-block: 1rem;
+	}
 }
 
 @media (min-width: 1280px) {
@@ -1127,6 +1142,12 @@ svg use {
 	.full-mx-w-sidebar {
 		max-width: var(--sidebar-width);
 	}
+	.full-w-full {
+		width: 100% !important;
+	}
+	.full-mx-w-featured {
+		max-width: var(--featured-image-width);
+	}
 }
 
 
@@ -1151,9 +1172,9 @@ svg use {
 		box-shadow: var(--shadow-base);
 	}
   
-.big-b-thin-primary-lighter {
-	border: 0.5px solid var(--primary-lighter);
-}
+	.big-b-thin-primary-lighter {
+		border: 0.5px solid var(--primary-lighter);
+	}
 	.sm-display {
 		display: none;
 	}
@@ -1256,6 +1277,9 @@ svg use {
 	}
 	.lg-wrap {
 		flex-wrap: wrap;
+	}
+	.lg-mx-w-featured {
+		max-width: var(--featured-image-width);
 	}
 	
 }

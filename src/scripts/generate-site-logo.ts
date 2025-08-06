@@ -1,51 +1,93 @@
+// src/scripts/generate-site-logo.ts
 import fs from 'fs/promises';
 import path from 'path';
-import { siteLogo } from '../config/siteLogo';
-import { readManifest } from '../utils/write-manifest';
+import sharp from 'sharp';
+import { siteImages } from '../config/siteImages';
 
-const iconsDir = path.resolve('./src/icons');
-const configPath = path.resolve('./src/config/siteLogo.ts');
+const publicLogosDir = path.resolve('./public/logos');
 const manifestPath = path.resolve('./src/data/assets-manifest.json');
+
+function toExt(filename: string) {
+  const ext = path.extname(filename).toLowerCase();
+  return ext === '.jpeg' ? '.jpg' : ext;
+}
+
+async function getManifest() {
+  try {
+    const data = await fs.readFile(manifestPath, 'utf8');
+    return JSON.parse(data);
+  } catch {
+    return {};
+  }
+}
 
 async function logosChangedSinceLastBuild(): Promise<boolean> {
   try {
-    const manifestContent = await fs.readFile(manifestPath, 'utf8');
-    const manifest = JSON.parse(manifestContent);
-    const manifestEntry = manifest?.logos;
-
-    const logoStat = await fs.stat(configPath);
-    if (!manifestEntry?.datetime) return true;
-
-    const manifestTime = new Date(manifestEntry.datetime).getTime();
-    const fileTime = logoStat.mtime.getTime();
+    const manifest = await getManifest();
+    const manifestTime = manifest?.configModified?.siteImages || 0;
+    const siteImagesPath = path.resolve('./src/config/siteImages.ts');
+    const stat = await fs.stat(siteImagesPath);
+    const fileTime = stat.mtime.getTime();
     return fileTime > manifestTime;
   } catch {
     return true;
   }
 }
 
-async function cleanOldIcons() {
+async function cleanOldPublicLogos() {
   try {
-    const files = await fs.readdir(iconsDir);
-    const oldIcons = files.filter(f => f.match(/^(DesktopLogo|MobileLogo|SiteIcon)\.svg$/i));
-    await Promise.all(oldIcons.map(file => fs.unlink(path.join(iconsDir, file))));
-    console.log(`🧹 Removed old SVG icons: ${oldIcons.join(', ')}`);
+    await fs.rm(publicLogosDir, { recursive: true, force: true });
+    console.log(`🧹 Removed old public logos`);
+  } catch {}
+}
+
+async function ensureDir(dir: string) {
+  await fs.mkdir(dir, { recursive: true });
+}
+
+async function copySvg(source: string, targetName: string) {
+  try {
+    const targetPath = path.join(publicLogosDir, targetName);
+    await ensureDir(publicLogosDir);
+    await fs.copyFile(path.resolve(source), targetPath);
+    return `/logos/${targetName}`;
   } catch {
-    // No icons folder, ignore
+    console.warn(`⚠️ Missing SVG: ${source}`);
+    return null;
   }
 }
 
-async function copySvgIfExists(source: string, targetName: string) {
-  const sourcePath = path.resolve(source);
-  const targetPath = path.join(iconsDir, targetName);
+async function processLogoImage(source: string, baseName: string, width: number) {
+  const ext = toExt(source);
+  const originalPath = path.join(publicLogosDir, `${baseName}-original${ext}`);
+  const resizedPngPath = path.join(publicLogosDir, `${baseName}-${width}w.png`);
+  const resizedWebpPath = path.join(publicLogosDir, `${baseName}-${width}w.webp`);
+  const resizedAvifPath = path.join(publicLogosDir, `${baseName}-${width}w.avif`);
 
   try {
-    await fs.access(sourcePath);
-    await fs.mkdir(iconsDir, { recursive: true });
-    await fs.copyFile(sourcePath, targetPath);
-    return `/src/icons/${targetName}`;
+    await ensureDir(publicLogosDir);
+    const inputBuffer = await fs.readFile(path.resolve(source));
+
+    // Save original
+    await fs.writeFile(originalPath, inputBuffer);
+
+    // Save resized PNG
+    await sharp(inputBuffer).resize(width).png({ quality: 80 }).toFile(resizedPngPath);
+
+    // Save resized WebP
+    await sharp(inputBuffer).resize(width).webp({ quality: 80 }).toFile(resizedWebpPath);
+
+    // Save resized AVIF
+    await sharp(inputBuffer).resize(width).avif({ quality: 50 }).toFile(resizedAvifPath);
+
+    return {
+      original: `/logos/${baseName}-original${ext}`,
+      png: `/logos/${baseName}-${width}w.png`,
+      webp: `/logos/${baseName}-${width}w.webp`,
+      avif: `/logos/${baseName}-${width}w.avif`
+    };
   } catch {
-    console.warn(`⚠️ Missing SVG file: ${sourcePath}`);
+    console.warn(`⚠️ Could not process logo: ${source}`);
     return null;
   }
 }
@@ -57,33 +99,50 @@ async function main() {
     return;
   }
 
-  console.log('🔄 Updating site SVG logos...');
+  console.log('🔄 Updating site logos...');
+  await cleanOldPublicLogos();
 
-  // 🧹 Clean old SVGs
-  await cleanOldIcons();
+  // Process desktop logo (300px)
+  const desktopLogo = await processLogoImage(siteImages.desktopLogo, 'desktop-logo', 300);
 
-  // Copy SVGs only
-  const desktopLogoSvg = await copySvgIfExists(siteLogo.desktopLogoSvg, 'DesktopLogo.svg');
-  const mobileLogoSvg = await copySvgIfExists(siteLogo.mobileLogoSvg, 'MobileLogo.svg');
-  const siteIconSvg = await copySvgIfExists(siteLogo.siteIconSvg, 'SiteIcon.svg');
+  // Process mobile logo (100px)
+  const mobileLogo = await processLogoImage(siteImages.mobileLogo, 'mobile-logo', 100);
+
+  // Process icon logo (100px)
+  const iconLogo = await processLogoImage(siteImages.siteIcon, 'icon-logo', 100);
+
+  // Copy SVGs
+  const desktopLogoSvg = await copySvg(siteImages.desktopLogoSvg, 'desktop-logo.svg');
+  const mobileLogoSvg = await copySvg(siteImages.mobileLogoSvg, 'mobile-logo.svg');
+  const iconLogoSvg = await copySvg(siteImages.siteIconSvg, 'icon-logo.svg');
+  const favIconSvg = await copySvg(siteImages.favIconSvg, 'favicon.svg');
 
   // Update manifest
-  const manifestContent = await fs.readFile(manifestPath, 'utf8');
-  const manifest = JSON.parse(manifestContent);
+  try {
+    const manifest = await getManifest();
 
-  manifest.logos = {
-    file: '/src/icons/',
-    datetime: new Date().toISOString(),
-    files: {
-      desktopLogoSvg,
-      mobileLogoSvg,
-      siteIconSvg
-    }
-  };
+    manifest.configModified = {
+      ...(manifest.configModified || {}),
+      siteImages: Date.now()
+    };
 
-  await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+    manifest.logosPublic = {
+      desktopLogo,
+      mobileLogo,
+      iconLogo,
+      svgs: {
+        desktopLogoSvg,
+        mobileLogoSvg,
+        iconLogoSvg,
+        favIconSvg
+      }
+    };
 
-  console.log('✅ SVG logos updated, old icons cleaned, and manifest refreshed');
+    await fs.writeFile(manifestPath, JSON.stringify(manifest, null, 2), 'utf8');
+    console.log('✅ Logos updated in manifest');
+  } catch (err) {
+    console.error('❌ Failed to update manifest:', err);
+  }
 }
 
 main();

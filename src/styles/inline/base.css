@@ -83,7 +83,7 @@ html {
 html, body { 
   font-family: var(--font-family-base);  
   line-height: 1.6;
-  color: var(--base-90);
+  color: var(--text-color);
   background-color: var(--background-color);
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -144,7 +144,7 @@ body, .regular {
   font-size: clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
 }
 
-p {
+.post-content p {
     margin-block: 1rem;
     padding-block: 0.5rem;
     line-height: 1.6;
@@ -156,7 +156,7 @@ a {
   color: inherit;
   text-decoration: underline;
   text-decoration-color: var(--primary-base);
-  /* text-decoration-thickness: 2px; */
+  text-decoration-thickness: 2px;
   /* text-underline-offset: 0.2em; */
   text-underline-position: under;
   /* border-bottom: 3px solid var(--primary-light); */
@@ -170,8 +170,8 @@ a {
 }
 
 a:hover {
-  background-color: var(--primary-base) !important;
-  color: var(--base-00);
+  background-color: var(--primary-lighter);
+  color: var(--base-100);
   text-decoration: none !important;
   border-radius: var(--border-radius);
 }
@@ -232,7 +232,7 @@ button:hover,
 button:focus-visible,
 .button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  /*box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);*/
 }
 
 button:focus-visible,

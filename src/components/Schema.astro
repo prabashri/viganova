@@ -1,11 +1,20 @@
 ---
 import { siteDefaults } from '../config/siteDefaults';
-import { siteLogo } from '../config/siteLogo';
+
+import manifest from '../data/assets-manifest.json';
+
+// Get optimized logos from manifest
+const desktopLogoOptimized = manifest?.logosPublic?.desktopLogo?.png || manifest?.logosPublic?.desktopLogo?.original;
+const mobileLogoOptimized = manifest?.logosPublic?.mobileLogo?.png || manifest?.logosPublic?.mobileLogo?.original;
+const iconLogoOptimized = manifest?.logosPublic?.iconLogo?.png || manifest?.logosPublic?.iconLogo?.original;
+const desktopLogoSvgOptimized = manifest?.logosPublic?.svgs?.desktopLogoSvg;
+
 
 const {
   type,
   authors = [],
   image,
+  allImages = [],
   title,
   description,
   url,
@@ -13,31 +22,81 @@ const {
   updatedAt,
   faq,
   listItems
-} = Astro.props; // ✅ Direct destructure from passed props
+} = Astro.props;
+
+const siteBase = siteDefaults.siteUrl.replace(/\/$/, '');
+
+function toAbsoluteUrl(pathOrUrl: string): string {
+  try {
+    const siteBase = siteDefaults.siteUrl.replace(/\/$/, '');
+    const base = new URL(siteBase);
+    const incoming = new URL(pathOrUrl, siteBase);
+    incoming.protocol = base.protocol;
+    incoming.host = base.host;
+    return incoming.toString();
+  } catch {
+    return `${siteDefaults.siteUrl.replace(/\/$/, '')}/${pathOrUrl.replace(/^\/+/, '')}`;
+  }
+}
+
+
 
 // --- Common IDs
-const orgId = `${siteDefaults.siteUrl}#organization`;
-const webPageId = `${url || siteDefaults.siteUrl}#webpage`;
-const articleId = `${url || siteDefaults.siteUrl}#article`;
-const collectionId = `${url || siteDefaults.siteUrl}#collection`;
-const faqId = `${url || siteDefaults.siteUrl}#faq`;
-const rssId = `${siteDefaults.siteUrl}rss.xml`;
+const orgId = `${siteBase}#organization`;
+const webPageId = `${toAbsoluteUrl(url || siteBase)}#webpage`;
+const articleId = `${toAbsoluteUrl(url || siteBase)}#article`;
+const collectionId = `${toAbsoluteUrl(url || siteBase)}#collection`;
+const faqId = `${toAbsoluteUrl(url || siteBase)}#faq`;
+const rssId = `${siteBase}/rss.xml`;
 
-// --- Organization Type & Incharge
+// --- Organization Schema
 const orgType = siteDefaults.organization.type || 'Organization';
 const orgIncharge = siteDefaults.organization.incharge;
 
-// --- Person Schemas (Multiple Authors)
-const personSchemas = authors.length > 0
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': orgType,
+  '@id': orgId,
+  name: siteDefaults.organization.name,
+  url: toAbsoluteUrl(siteDefaults.organization.url || siteBase),
+  email: siteDefaults.organization.email || undefined,
+  logo: {
+    '@type': 'ImageObject',
+    url: toAbsoluteUrl(
+      siteDefaults.organization.logo ||
+      desktopLogoOptimized ||
+      desktopLogoSvgOptimized
+    )
+  },
+  sameAs: siteDefaults.organization.sameAs?.length ? siteDefaults.organization.sameAs : undefined,
+  ...(orgType === 'Organization' && orgIncharge?.name && {
+    founder: {
+      '@type': 'Person',
+      name: orgIncharge.name,
+      url: toAbsoluteUrl(orgIncharge.url || siteDefaults.organization.url || siteBase),
+      sameAs: orgIncharge.sameAs?.length ? orgIncharge.sameAs : undefined
+    }
+  }),
+  member: authors.length
+    ? authors.map((a: any) => ({
+        '@type': 'Person',
+        name: a.name,
+        url: toAbsoluteUrl(a.url)
+      }))
+    : undefined
+};
+
+// --- Authors as Person Schemas
+const personSchemas = authors.length
   ? authors.map((author: any) => {
       const aData = author?.data ?? {};
       return {
         '@context': 'https://schema.org',
         '@type': 'Person',
-        '@id': `${new URL(author.url, Astro.site)}#person`,
+        '@id': `${toAbsoluteUrl(author.url)}#person`,
         name: `${aData.prefix ? `${aData.prefix} ` : ''}${author.name}`,
-        url: new URL(author.url, Astro.site).toString(),
-        image: aData.image || undefined,
+        url: toAbsoluteUrl(author.url),
+        image: aData.image ? toAbsoluteUrl(aData.image) : undefined,
         jobTitle: aData.role || undefined,
         affiliation: aData.affiliation || undefined,
         email: aData.email || undefined,
@@ -49,122 +108,101 @@ const personSchemas = authors.length > 0
     })
   : [];
 
-// --- Fallback Person Schema if no authors & orgType = Person
-const fallbackPersonSchema = (authors.length === 0 && orgType === 'Person' && orgIncharge?.name)
-  ? {
-      '@context': 'https://schema.org',
-      '@type': 'Person',
-      '@id': `${siteDefaults.organization.url}#person`,
-      name: orgIncharge.name,
-      url: orgIncharge.url || siteDefaults.organization.url,
-      image: orgIncharge.image || siteLogo.desktopLogo,
-      email: orgIncharge.email || undefined,
-      sameAs: orgIncharge.sameAs?.length ? orgIncharge.sameAs : undefined,
-      worksFor: { '@id': orgId }
-    }
-  : null;
-
-// --- Organization Schema
-const organizationSchema = {
-  '@context': 'https://schema.org',
-  '@type': orgType,
-  '@id': orgId,
-  name: siteDefaults.organization.name,
-  url: siteDefaults.organization.url,
-  email: siteDefaults.organization.email || undefined,
-  logo: {
-    '@type': 'ImageObject',
-    url: siteDefaults.organization.logo || siteLogo.desktopLogo
-  },
-  sameAs: siteDefaults.organization.sameAs?.length
-    ? siteDefaults.organization.sameAs
-    : undefined,
-  ...(orgType === 'Organization' && orgIncharge?.name && {
-    founder: {
-      '@type': 'Person',
-      name: orgIncharge.name,
-      url: orgIncharge.url || undefined,
-      sameAs: orgIncharge.sameAs?.length ? orgIncharge.sameAs : undefined
-    }
-  }),
-  member: authors.length > 0
-    ? authors.map((a: any) => ({
+// --- Fallback Person Schema
+const fallbackPersonSchema =
+  authors.length === 0 && orgType === 'Person' && orgIncharge?.name
+    ? {
+        '@context': 'https://schema.org',
         '@type': 'Person',
-        name: a.name,
-        url: new URL(a.url, Astro.site).toString()
-      }))
-    : undefined
-};
+        '@id': `${toAbsoluteUrl(siteDefaults.organization.url || siteBase)}#person`,
+        name: orgIncharge.name,
+        url: toAbsoluteUrl(orgIncharge.url || siteDefaults.organization.url || siteBase),
+        image: orgIncharge.image
+          ? toAbsoluteUrl(orgIncharge.image)
+          : toAbsoluteUrl(desktopLogoOptimized || desktopLogoSvgOptimized),
+        email: orgIncharge.email || undefined,
+        sameAs: orgIncharge.sameAs?.length ? orgIncharge.sameAs : undefined,
+        worksFor: { '@id': orgId }
+      }
+    : null;
+
 
 // --- WebPage / WebSite Schema
 const webpageSchema = {
   '@context': 'https://schema.org',
   '@type': type === 'website' ? 'WebSite' : 'WebPage',
   '@id': webPageId,
-  url: url || siteDefaults.siteUrl,
+  url: toAbsoluteUrl(url || siteBase),
   name: title || siteDefaults.title,
   description: description || siteDefaults.description,
   publisher: { '@id': orgId }
 };
 
 // --- Article Schema
-const articleSchema = type === 'article' ? {
-  '@context': 'https://schema.org',
-  '@type': 'Article',
-  '@id': articleId,
-  headline: title || siteDefaults.title,
-  description: description || siteDefaults.description,
-  url: url || siteDefaults.siteUrl,
-  image: image ? {
-    '@type': 'ImageObject',
-    url: image,
-    width: 1200,
-    height: 628
-  } : undefined,
-  datePublished: publishedAt || siteDefaults.publishedDate,
-  dateModified: updatedAt || publishedAt || siteDefaults.publishedDate,
-  author: authors.length > 0
-    ? authors.map((a: any) => ({
-        '@id': `${new URL(a.url, Astro.site)}#person`
-      }))
-    : (orgType === 'Person' && orgIncharge?.name)
-      ? { '@id': `${siteDefaults.organization.url}#person` }
-      : { '@id': orgId },
-  publisher: {
-    '@id': orgId
-  }
-} : null;
+const articleSchema =
+  type === 'article'
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        '@id': articleId,
+        headline: title || siteDefaults.title,
+        description: description || siteDefaults.description,
+        url: toAbsoluteUrl(url || siteBase),
+        image: allImages.length
+          ? allImages.map((img: string) => ({
+              '@type': 'ImageObject',
+              url: toAbsoluteUrl(img)
+            }))
+          : image
+          ? { '@type': 'ImageObject', url: toAbsoluteUrl(image) }
+          : undefined,
+        datePublished: publishedAt || siteDefaults.publishedDate,
+        dateModified: updatedAt || publishedAt || siteDefaults.publishedDate,
+        author: authors.length
+          ? authors.map((a: any) => ({
+              '@id': `${toAbsoluteUrl(`${a.url}#person`)}`
+            }))
+          : orgType === 'Person' && orgIncharge?.name
+          ? { '@id': `${toAbsoluteUrl(`${siteDefaults.organization.url || siteBase}#person`)}` }
+          : { '@id': orgId },
+        publisher: { '@id': orgId }
+      }
+    : null;
 
 // --- CollectionPage Schema
-const collectionSchema = type === 'collection' && listItems?.length ? {
-  '@context': 'https://schema.org',
-  '@type': 'CollectionPage',
-  '@id': collectionId,
-  name: title || siteDefaults.title,
-  hasPart: listItems.map((item: any) => ({
-    '@type': 'Article',
-    '@id': `${new URL(item.url, Astro.site)}#article`,
-    name: item.name,
-    url: item.url
-  })),
-  publisher: { '@id': orgId }
-} : null;
-
+const collectionSchema =
+  (type === 'collection' || type === 'list') && listItems?.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        '@id': collectionId,
+        name: title || siteDefaults.title,
+        hasPart: listItems.map((item: { url: string; name: string }) => ({
+          '@type': 'Article',
+          '@id': `${toAbsoluteUrl(`${item.url}#article`)}`,
+          name: item.name,
+          url: toAbsoluteUrl(item.url)
+        })),
+        publisher: { '@id': orgId }
+      }
+    : null;
 
 // --- FAQ Schema
-const faqSchema = faq?.length ? {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  '@id': faqId,
-  mainEntity: faq.map((q: { question: string; answer: string }) => ({
-    '@type': 'Question',
-    name: q.question,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: q.answer
+const faqSchema = faq?.length
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      '@id': faqId,
+      mainEntity: faq.map((q: { question: string; answer: string }) => ({
+        '@type': 'Question',
+        name: q.question,
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: q.answer
+        }
+      }))
     }
-  }))
-} : null;
+  : null;
 
 // --- RSS Schema
 const rssSchema = {
@@ -176,7 +214,7 @@ const rssSchema = {
     {
       '@type': 'DataFeedItem',
       dateCreated: siteDefaults.publishedDate,
-      url: `${siteDefaults.siteUrl}rss.xml`
+      url: `${siteBase}/rss.xml`
     }
   ]
 };
@@ -185,44 +223,20 @@ const rssSchema = {
 const speakableJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebPage',
-  url: url || siteDefaults.siteUrl,
+  url: toAbsoluteUrl(url || siteBase),
   speakable: {
     '@type': 'SpeakableSpecification',
     cssSelector: ['.speak-head', '.speak-text']
   }
 };
+
 ---
-{/** WebPage / WebSite Schema */}
-<script type="application/ld+json" set:html={JSON.stringify(webpageSchema)}></script>
-{/** Organization Schema */}
-<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)}></script>
-{/** Article Schema */}
-{articleSchema && (
-  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)}></script>
-)}
-
-{/** CollectionPage Schema */}
-{collectionSchema && (
-  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)}></script>
-)}
-
-{/** FAQ Schema */}
-{faqSchema && (
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>
-)}
-
-{/** RSS Schema */}
-<script type="application/ld+json" set:html={JSON.stringify(rssSchema)}></script>
-
-{/** Speakable Schema */}
-<script type="application/ld+json" set:html={JSON.stringify(speakableJsonLd)}></script>
-
-{/** Person Schemas */}
-{personSchemas.map((person: any) => (
-  <script type="application/ld+json" set:html={JSON.stringify(person)}></script>
-))}
-
-{/** Fallback Person Schema */}
-{fallbackPersonSchema && (
-  <script type="application/ld+json" set:html={JSON.stringify(fallbackPersonSchema)}></script>
-)}
+<script id="webpage-schema" type="application/ld+json" set:html={JSON.stringify(webpageSchema)}></script>
+<script id="organization-schema" type="application/ld+json" set:html={JSON.stringify(organizationSchema)}></script>
+{articleSchema && <script id="article-schema" type="application/ld+json" set:html={JSON.stringify(articleSchema)}></script>}
+{collectionSchema && <script id="collection-schema" type="application/ld+json" set:html={JSON.stringify(collectionSchema)}></script>}
+{faqSchema && <script id="faq-schema" type="application/ld+json" set:html={JSON.stringify(faqSchema)}></script>}
+<script id="rss-schema" type="application/ld+json" set:html={JSON.stringify(rssSchema)}></script>
+<script id="speakable-schema" type="application/ld+json" set:html={JSON.stringify(speakableJsonLd)}></script>
+{personSchemas.map((p: any) => <script id={`person-schema-${p.id}`} type="application/ld+json" set:html={JSON.stringify(p)}></script>)}
+{fallbackPersonSchema && <script id="fallback-person-schema" type="application/ld+json" set:html={JSON.stringify(fallbackPersonSchema)}></script>}

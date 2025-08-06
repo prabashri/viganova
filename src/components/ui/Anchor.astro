@@ -52,9 +52,9 @@ const dataAttributes = dataId ? `data-id="${dataId}"` : '';
 const variantClassMap = {
   plain: '',
   nav: 'no-bb br',
-  ghost: 'button bg-transparent col-inherit hover-bg-base-200 transition focus-vis-bg-base-200 focus-vis-col-base-900',
+  ghost: 'button bg-transparent col-inherit hover-bg-base-10 transition focus-vis-bg-base-200 focus-vis-col-base-900',
   primary: 'button col-base-00 hover-col-base-100 border-2 bg-primary hover-bg-primary-lighter transition focus-vis-bg-primary-lighter focus-vis-col-base-100 p-05',
-  secondary: 'button bg-transparent col-primary hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
+  secondary: 'button bg-primary-lighter-x hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
 };
 
 const variantClass = variantClassMap[variant as Variant] ?? '';

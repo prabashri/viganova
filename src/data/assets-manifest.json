@@ -1,9 +1,9 @@
 {
   "configModified": {
-    "siteDefaults": 1754394605809,
+    "siteDefaults": 1754465246237,
     "siteLogo": 1754383794286,
-    "siteColors": 1754139587699,
-    "siteImages": 1754407210422
+    "siteColors": 1754488309863,
+    "siteImages": 1754461569630
   },
   "icons": {
     "android-chrome-192x192.png": {
@@ -28,20 +28,20 @@
       "datetime": "2025-07-26T08:39:30.340Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-08-05T13:04:42.011Z"
+      "datetime": "2025-08-06T14:54:46.269Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-08-05T13:19:17.930Z",
+      "datetime": "2025-08-06T14:53:48.443Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-08-05T13:19:54.318Z",
+      "datetime": "2025-08-06T14:54:33.195Z",
       "names": [
         "base",
         "colors",
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.x9x8yk.css",
-      "datetime": "2025-08-05T13:19:56.825Z",
+      "file": "/styles/main.676kzw.css",
+      "datetime": "2025-08-06T14:54:36.034Z",
       "names": [
         "components",
         "form",
@@ -60,8 +60,8 @@
       ]
     },
     "nonCritical": {
-      "file": "/styles/non-critical.ix8z91.css",
-      "datetime": "2025-08-05T13:19:59.398Z",
+      "file": "/styles/non-critical.63t9o9.css",
+      "datetime": "2025-08-06T10:55:54.248Z",
       "names": [
         "faq",
         "footer",
@@ -81,8 +81,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.f3jscb.json",
-      "datetime": "2025-08-05T17:46:44.105Z"
+      "file": "/search-index.qxjwhb.json",
+      "datetime": "2025-08-06T14:54:21.676Z"
     }
   },
   "js": {
@@ -97,6 +97,32 @@
     "search": {
       "file": "/scripts/search.hjv8kx.min.js",
       "datetime": "2025-08-05T13:20:02.367Z"
+    }
+  },
+  "logosPublic": {
+    "desktopLogo": {
+      "original": "/logos/desktop-logo-original.png",
+      "png": "/logos/desktop-logo-300w.png",
+      "webp": "/logos/desktop-logo-300w.webp",
+      "avif": "/logos/desktop-logo-300w.avif"
+    },
+    "mobileLogo": {
+      "original": "/logos/mobile-logo-original.png",
+      "png": "/logos/mobile-logo-100w.png",
+      "webp": "/logos/mobile-logo-100w.webp",
+      "avif": "/logos/mobile-logo-100w.avif"
+    },
+    "iconLogo": {
+      "original": "/logos/icon-logo-original.png",
+      "png": "/logos/icon-logo-100w.png",
+      "webp": "/logos/icon-logo-100w.webp",
+      "avif": "/logos/icon-logo-100w.avif"
+    },
+    "svgs": {
+      "desktopLogoSvg": "/logos/desktop-logo.svg",
+      "mobileLogoSvg": "/logos/mobile-logo.svg",
+      "iconLogoSvg": "/logos/icon-logo.svg",
+      "favIconSvg": "/logos/favicon.svg"
     }
   }
 }

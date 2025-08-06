@@ -1,6 +1,6 @@
 export const siteImages = {  
 
-    image: "/featured/astroweb-modern-website-theme-astro.png",
+    image: "featured/astroweb-modern-website-theme-astro.png",
     imageAlt: "design to represent the nviewsweb astro theme using text and images",
     imageTitle: "nViewsWEB Astro Theme",
     imageVariants: [

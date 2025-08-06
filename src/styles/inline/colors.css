@@ -3,6 +3,8 @@
 ================================ */
 :root {
   color-scheme: light dark;
+
+  /* Primary Colors */
   --primary-darker-x: hsla(267, 100%, 33%, 1);
   --primary-darker: hsla(270, 94%, 25%, 1);
   --primary-dark: hsla(267, 73%, 49%, 1);
@@ -11,6 +13,7 @@
   --primary-lighter: hsla(274, 100%, 92%, 1);
   --primary-lighter-x: hsla(285, 100%, 96%, 1);
 
+  /* Secondary Colors */
   --secondary-darker-x: hsla(232, 91%, 5%, 1);
   --secondary-darker: hsla(232, 91%, 9%, 1);
   --secondary-dark: hsla(232, 91%, 24%, 1);
@@ -19,9 +22,11 @@
   --secondary-lighter: hsla(232, 91%, 54%, 1);
   --secondary-lighter-x: hsla(232, 91%, 64%, 1);
 
+  /* Background & Text */
   --background-color: hsla(0, 0%, 95%, 1);
   --text-color: hsla(0, 0%, 5%, 1);
 
+  /* Base Greyscale */
   --base-00: hsla(0, 0%, 100%, 1);
   --base-05: hsla(0, 0%, 95%, 1);
   --base-10: hsla(0, 0%, 90%, 1);
@@ -38,36 +43,42 @@
 }
 
 [data-theme="dark"] {
-  --primary-darker-x: hsla(275, 100%, 54%, 1);
-  --primary-darker: hsla(275, 100%, 64%, 1);
-  --primary-dark: hsla(275, 100%, 79%, 1);
-  --primary-base: hsla(275, 100%, 89%, 1);
-  --primary-light: hsla(275, 100%, 95%, 1);
-  --primary-lighter: hsla(275, 100%, 95%, 1);
-  --primary-lighter-x: hsla(275, 100%, 95%, 1);
+  color-scheme: dark;
 
-  --secondary-darker-x: hsla(235, 100%, 53%, 1);
-  --secondary-darker: hsla(235, 100%, 63%, 1);
-  --secondary-dark: hsla(235, 100%, 78%, 1);
-  --secondary-base: hsla(235, 100%, 88%, 1);
-  --secondary-light: hsla(235, 100%, 95%, 1);
-  --secondary-lighter: hsla(235, 100%, 95%, 1);
-  --secondary-lighter-x: hsla(235, 100%, 95%, 1);
+  /* Primary Colors (Dark) */
+  --primary-darker-x: hsla(267, 100%, 33%, 1);
+  --primary-darker: hsla(267, 100%, 43%, 1);
+  --primary-dark: hsla(267, 100%, 58%, 1);
+  --primary-base: hsla(267, 100%, 68%, 1);
+  --primary-light: hsla(267, 100%, 78%, 1);
+  --primary-lighter: hsla(267, 100%, 88%, 1);
+  --primary-lighter-x: hsla(267, 100%, 95%, 1);
 
+  /* Secondary Colors (Dark) */
+  --secondary-darker-x: hsla(232, 91%, 5%, 1);
+  --secondary-darker: hsla(232, 91%, 9%, 1);
+  --secondary-dark: hsla(232, 91%, 24%, 1);
+  --secondary-base: hsla(232, 91%, 34%, 1);
+  --secondary-light: hsla(232, 91%, 44%, 1);
+  --secondary-lighter: hsla(232, 91%, 54%, 1);
+  --secondary-lighter-x: hsla(232, 91%, 64%, 1);
+
+  /* Background & Text (Dark) */
   --background-color: hsla(0, 0%, 7%, 1);
   --text-color: hsla(0, 0%, 95%, 1);
 
-  --base-00: hsla(0, 0%, 100%, 1);
-  --base-05: hsla(0, 0%, 95%, 1);
-  --base-10: hsla(0, 0%, 90%, 1);
-  --base-20: hsla(0, 0%, 80%, 1);
-  --base-30: hsla(0, 0%, 70%, 1);
-  --base-40: hsla(0, 0%, 60%, 1);
+  /* Base Greyscale (Reversed) */
+  --base-00: hsla(0, 0%, 0%, 1);
+  --base-05: hsla(0, 0%, 5%, 1);
+  --base-10: hsla(0, 0%, 10%, 1);
+  --base-20: hsla(0, 0%, 20%, 1);
+  --base-30: hsla(0, 0%, 30%, 1);
+  --base-40: hsla(0, 0%, 40%, 1);
   --base-50: hsla(0, 0%, 50%, 1);
-  --base-60: hsla(0, 0%, 40%, 1);
-  --base-70: hsla(0, 0%, 30%, 1);
-  --base-80: hsla(0, 0%, 20%, 1);
-  --base-90: hsla(0, 0%, 10%, 1);
-  --base-95: hsla(0, 0%, 5%, 1);
-  --base-100: hsla(0, 0%, 0%, 1);
+  --base-60: hsla(0, 0%, 60%, 1);
+  --base-70: hsla(0, 0%, 70%, 1);
+  --base-80: hsla(0, 0%, 80%, 1);
+  --base-90: hsla(0, 0%, 90%, 1);
+  --base-95: hsla(0, 0%, 95%, 1);
+  --base-100: hsla(0, 0%, 100%, 1);
 }

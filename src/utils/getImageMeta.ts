@@ -41,14 +41,7 @@ export function getImageMeta(imageKey?: string): ImageMeta | null {
   const metadata = (imageMetadataJson as Record<string, any>)[keyToUse];
   if (!metadata) {
     // ⚠️ No metadata, build fallback basic URL
-    const fallbackUrl = `${siteDefaults.siteUrl}/images${siteImages.image}`;
-    return {
-      url: fallbackUrl,
-      width: siteImages.imageVariants?.[siteImages.imageVariants.length - 1] || 1200,
-      height:  Math.round(
-        (siteImages.imageVariants?.[siteImages.imageVariants.length - 1] || 1200) * (9 / 16)
-      ),
-    };
+    return null;
   }
 
   // ✅ Sort formats (webp > png > jpg > avif)
@@ -59,11 +52,13 @@ export function getImageMeta(imageKey?: string): ImageMeta | null {
   const format = formatsSorted[0];
   const maxWidth = Math.max(...metadata.variants.map(Number));
   const [aspectW, aspectH] = metadata.aspect.split('x').map(Number);
+  const outputImageBase = siteImages.outputImageBase || './public/images';
+    const folderPath = outputImageBase.replace(/^\.\/public\//, '');
 
   const imageBaseName = keyToUse.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '');
-  const basePath = `/images${metadata.path}`;
+  const basePath = `${folderPath}${metadata.path}`;
 
-  const url = `${siteDefaults.siteUrl}${basePath}${imageBaseName}-w${maxWidth}-a${metadata.aspect}.${format}`;
+  const url = `${siteDefaults.siteUrl.replace(/\/$/, '')}/${basePath}${imageBaseName}-w${maxWidth}-a${metadata.aspect}.${format}`;
   const height = Math.round(maxWidth * (aspectH / aspectW));
 
   return {

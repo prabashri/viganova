@@ -6,6 +6,7 @@ import { readManifest, writeManifestEntry } from '../utils/write-manifest';
 
 const cssPath = path.resolve('./src/styles/inline/colors.css');
 
+type DarkAdjustmentMode = 'swap' | 'adjust';
 /* -------------------------
    🎨 Helpers
 ------------------------- */
@@ -128,14 +129,14 @@ function generateColorSet(baseColor: string, userValues: Record<ShadeKey, string
 /* -------------------------
    ⚪ Base Scale
 ------------------------- */
-function generateBaseScale() {
+function generateBaseScale(reverse = false) {
   const base: Record<string, string> = {};
   const steps = [0, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95, 100];
 
   for (let step of steps) {
-    let val = 100 - step; // White at base-00, black at base-100
+    // Light theme: base-00 = white (100%), Dark theme: base-00 = black (0%)
+    const val = reverse ? step : 100 - step;
 
-    // Format key: base-00, base-05, ..., base-100
     const key =
       step === 100
         ? 'base-100'
@@ -147,12 +148,43 @@ function generateBaseScale() {
   return base;
 }
 
+function generateDarkModeShades(lightShades: Record<ShadeKey, string>) {
+  const adjusted: Record<ShadeKey, string> = {} as any;
 
+  // Swap mapping for dark mode
+  const shadeSwapMap: Record<ShadeKey, ShadeKey> = {
+    'darker-x': 'lighter-x',
+    'darker': 'lighter',
+    'dark': 'light',
+    'base': 'base',
+    'light': 'dark',
+    'lighter': 'darker',
+    'lighter-x': 'darker-x'
+  };
+
+  if (siteColors.darkAdjustmentMode === 'swap') {
+    // 🔄 Swap shades directly
+    (Object.keys(shadeSwapMap) as ShadeKey[]).forEach(key => {
+      adjusted[key] = lightShades[shadeSwapMap[key]];
+    });
+  } else {
+    // 🎛 Adjust HSL values
+    (Object.keys(lightShades) as ShadeKey[]).forEach(key => {
+      const hsla = parseColorToHSLA(lightShades[key], false);
+      const newL = Math.min(Math.max(hsla.l + 5, 5), 95);    // +5% lightness
+      const newS = Math.min(Math.max(hsla.s - 10, 0), 100);  // -10% saturation
+      adjusted[key] = hslaToCss({ h: hsla.h, s: newS, l: newL, a: hsla.a ?? 1 });
+    });
+  }
+
+  return adjusted;
+}
 
 /* -------------------------
    🎨 CSS Builder
 ------------------------- */
 function generateCSS(colors: typeof siteColors) {
+  // Light mode shades
   const primaryShades = generateColorSet(colors.primaryColor, {
     'darker-x': colors.primaryColorDarkerX,
     'darker': colors.primaryColorDarker,
@@ -173,38 +205,69 @@ function generateCSS(colors: typeof siteColors) {
     'lighter-x': colors.secondaryColorLighterX
   });
 
-  const primaryDarkShades = generateColorSet(colors.darkPrimaryColor ?? colors.primaryColor, {} as any);
-  const secondaryDarkShades = generateColorSet(colors.darkSecondaryColor ?? colors.secondaryColor, {} as any);
+  // 3. Base scales (darkBase support)
+  const baseLight = generateBaseScale(false);
+  const baseDark = colors.darkBase === false ? baseLight : generateBaseScale(true);
 
-  const baseLight = generateBaseScale();
-  const baseDark = generateBaseScale();
+  const bgLightHSLA = parseColorToHSLA(colors.backgroundColor, true);
+  const textLightHSLA = parseColorToHSLA(colors.textColor, true);
+  const bgDarkHSLA = parseColorToHSLA(colors.darkBackgroundColor, true);
+  const textDarkHSLA = parseColorToHSLA(colors.darkTextColor, true);
 
+  // Dark theme block only if enabled
+  let darkThemeBlock = '';
+  if (colors.darkMode) {
+    const primaryDarkShades = colors.darkPrimaryColor
+      ? generateColorSet(colors.darkPrimaryColor, {} as any)
+      : (colors.autoDarkAdjust ? generateDarkModeShades(primaryShades) : primaryShades);
+
+    const secondaryDarkShades = colors.darkSecondaryColor
+      ? generateColorSet(colors.darkSecondaryColor, {} as any)
+      : (colors.autoDarkAdjust ? generateDarkModeShades(secondaryShades) : secondaryShades);
+
+    darkThemeBlock = `
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Primary Colors (Dark) */
+  ${Object.entries(primaryDarkShades).map(([k, v]) => `--primary-${k}: ${v};`).join('\n  ')}
+
+  /* Secondary Colors (Dark) */
+  ${Object.entries(secondaryDarkShades).map(([k, v]) => `--secondary-${k}: ${v};`).join('\n  ')}
+
+  /* Background & Text (Dark) */
+  --background-color: ${hslaToCss(bgDarkHSLA)};
+  --text-color: ${hslaToCss(textDarkHSLA)};
+
+  /* Base Greyscale (Reversed) */
+  ${Object.entries(baseDark).map(([k, v]) => `--${k}: ${v};`).join('\n  ')}
+}`;
+  }
+
+  // Build CSS output
   return `/* ================================
    🌈 CSS VARIABLES
 ================================ */
 :root {
   color-scheme: light dark;
-  ${Object.entries(primaryShades).map(([k,v]) => `--primary-${k}: ${v};`).join("\n  ")}
 
-  ${Object.entries(secondaryShades).map(([k,v]) => `--secondary-${k}: ${v};`).join("\n  ")}
+  /* Primary Colors */
+  ${Object.entries(primaryShades).map(([k, v]) => `--primary-${k}: ${v};`).join('\n  ')}
 
-  --background-color: ${hslaToCss(parseColorToHSLA(colors.backgroundColor, true))};
-  --text-color: ${hslaToCss(parseColorToHSLA(colors.textColor, true))};
+  /* Secondary Colors */
+  ${Object.entries(secondaryShades).map(([k, v]) => `--secondary-${k}: ${v};`).join('\n  ')}
 
-  ${Object.entries(baseLight).map(([k,v]) => `--${k}: ${v};`).join("\n  ")}
+  /* Background & Text */
+  --background-color: ${hslaToCss(bgLightHSLA)};
+  --text-color: ${hslaToCss(textLightHSLA)};
+
+  /* Base Greyscale */
+  ${Object.entries(baseLight).map(([k, v]) => `--${k}: ${v};`).join('\n  ')}
+}
+${darkThemeBlock}`;
 }
 
-[data-theme="dark"] {
-  ${Object.entries(primaryDarkShades).map(([k,v]) => `--primary-${k}: ${v};`).join("\n  ")}
 
-  ${Object.entries(secondaryDarkShades).map(([k,v]) => `--secondary-${k}: ${v};`).join("\n  ")}
-
-  --background-color: ${hslaToCss(parseColorToHSLA(colors.darkBackgroundColor, true))};
-  --text-color: ${hslaToCss(parseColorToHSLA(colors.darkTextColor, true))};
-
-  ${Object.entries(baseDark).map(([k,v]) => `--${k}: ${v};`).join("\n  ")}
-}`;
-}
 
 /* -------------------------
    🛠 Change Detector

@@ -17,51 +17,51 @@ const desktopAlt = `${siteDefaults.siteName} Desktop Logo`;
 
 ---
 
-<footer class="site-footer text-s">
-  <div class="footer-columns mx-w-site w-full mi-auto">
+<footer class="site-footer text-s pb-2 pi-1">
+  <div class="footer-columns mx-w-site w-full mi-auto pb-05 pi-1 grid gap-2 ta-start hr">
     {/* Column 1: Site Info & Contact */}
-    <div class="footer-col">
-		{hasDesktopSvg ? (
-			<Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
-		) : siteLogo.desktopLogo ? (
-			<img src={siteLogo.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
-		) : (
-			<span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
-		)}
-      	<h3 class="text-s">{siteDefaults.siteName}</h3>
-      	<p class="text-xs">{siteDefaults.title}</p>
-	  	<p class="text-2xs">
-			&copy; {today.getFullYear()} {siteDefaults.siteName}. All rights reserved.
-		</p>
-		<hr />
-		<h4 class="text-xs uppercase">connect with us</h4>
-      	<SocialLink id="footer-social-links" />
+    <div class="footer-col sm-hr">
+      {hasDesktopSvg ? (
+        <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
+      ) : siteLogo.desktopLogo ? (
+        <img src={siteLogo.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
+      ) : (
+        <span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
+      )}
+        <h3 class="text-s">{siteDefaults.siteName}</h3>
+        <p class="text-xs">{siteDefaults.title}</p>
+        <p class="text-2xs pb-05">
+          &copy; {today.getFullYear()} {siteDefaults.siteName}. All rights reserved.
+        </p>
+        <hr />
+        <h4 class="text-xs uppercase">connect with us</h4>
+        <SocialLink id="footer-social-links" />
     </div>
 
     {/* Column 2: Main Pages */}
-    <div class="footer-col">
+    <div class="footer-col sm-hr">
       <h4 class="text-2xs uppercase">Main Pages</h4>
       <ul class="no-bullets">
-        <li class="text-xs"><a href="/">Home</a></li>
-        <li class="text-xs"><a href="/about/">About</a></li>
-        <li class="text-xs"><a href="/contact/">Contact</a></li>
-        <li class="text-xs"><a href="/privacy-policy/">Privacy Policy</a></li>
-        <li class="text-xs"><a href="/terms/">Terms of Service</a></li>
+        <li class="text-xs mb-05 pb-02"><a href="/">Home</a></li>
+        <li class="text-xs mb-05 pb-02"><a href="/about/">About</a></li>
+        <li class="text-xs mb-05 pb-02"><a href="/contact/">Contact</a></li>
+        <li class="text-xs mb-05 pb-02"><a href="/privacy-policy/">Privacy Policy</a></li>
+        <li class="text-xs mb-05 pb-02"><a href="/terms/">Terms of Service</a></li>
       </ul>
     </div>
 
     {/* <!-- Column 3: Social Links -->*/}
-    <div class="footer-col">
+    <div class="footer-col sm-hr">
       <h4 class="text-2xs uppercase">Portfolio to look around</h4>
       <ul class="no-bullets">
-    	<li class="text-xs"><a href="/portfolio/clampgenerator/" target="_self" title="clampGenerator for css clamp font-size & layout properties">ClampGenerator</a></li>
-		<li class="text-xs"><a href="/portfolio/individual/" target="_self" title="Individual Portfolio">Individuals site</a></li>
+    	  <li class="text-xs mb-05 pb-02"><a href="/portfolio/clampgenerator/" target="_self" title="clampGenerator for css clamp font-size & layout properties">ClampGenerator</a></li>
+		    <li class="text-xs mb-05 pb-02"><a href="/portfolio/individual/" target="_self" title="Individual Portfolio">Individuals site</a></li>
       </ul>
     </div>
   </div>
 
   <!-- Bottom bar -->
-  <div class="footer-bottom">    
+  <div class="footer-bottom ta-center text-xs pb-1 hr">    
     <p class="text-xs">
       Built using <a href="https://astro.build" target="_blank">Astro Framework</a>, by <a href="https://nviewsweb.com" target="_blank">NViewsWEB's AstroWEB theme</a>.
     </p>

@@ -1,16 +1,18 @@
 ---
 import imageMetadataJson from '../data/image-format-details.json';
 import { registerPreloadImage } from '../utils/preloadRegistry';
+import { registerSchemaImage } from '../utils/registerSchemaImage';
 import { siteDefaults } from '../config/siteDefaults';
 import { siteImages } from '../config/siteImages';
 import { getAbsoluteImageUrl } from '../utils/getAbsoluteImageUrl';
 
 interface Props {
-  src: string; // path like "featured/astroweb-modern-website-theme-astro.png"
+  src: string;
   alt: string;
   width?: string | number;
   height?: number;
   title?: string;
+  id?: string;
   className?: string;
   imageClassName?: string;
   caption?: string;
@@ -25,6 +27,7 @@ const {
   src,
   alt,
   title,
+  id ="", 
   className = '',
   imageClassName = 'inline-image',
   objectFit = 'cover',
@@ -42,6 +45,10 @@ const desktopMin = siteImages.breakpoints.desktopMin ?? 769;
 
 const metadata = imageMetadataJson as Record<string, any>;
 const data = metadata[src];
+const origin = siteDefaults.siteUrl.endsWith('/')
+  ? siteDefaults.siteUrl.slice(0, -1)
+  : siteDefaults.siteUrl;
+const folderPath = siteImages.outputImageBase?.replace(/^\.\/public\//, '') || 'images';
 
 let hasData = !!data;
 let targetWidth = breakpoints?.desktop ?? (typeof width === 'number' ? width : 320);
@@ -51,127 +58,121 @@ let availableWidths: number[] = [];
 let defaultAspect = '';
 let formats: string[] = [];
 let sizesAttr = sizes;
-let width1x = targetWidth;
-let width2x = targetWidth * 2;
 let widthMax = targetWidth;
 let imageBaseName = '';
 let fallbackSrc = '';
 let aspectClass = '';
-let widthClassMobile = '';
-let widthClassDesktop = '';
 let objectFitClass = '';
 let imageMaxUrl = '';
+let srcSetList = '';
 
 if (hasData) {
-  basePath = `/images${data.path}`;
+
+  basePath = `/${folderPath}${data.path}`;
   availableWidths = data.variants.map(Number).sort((a: number, b: number) => a - b);
   defaultAspect = data.aspect;
 
-  // ✅ Format priority: webp > png > jpeg/jpg > avif
-  const formatPriority: Record<string, number> = {
-    webp: 1,
-    png: 2,
-    jpeg: 3,
-    jpg: 3,
-    avif: 4
-  };
-  formats = [...data.format].sort((a, b) =>
-    (formatPriority[a.toLowerCase()] ?? 99) - (formatPriority[b.toLowerCase()] ?? 99)
+  // ✅ Format priority
+  const formatPriority: Record<string, number> = { webp: 1, png: 2, jpeg: 3, jpg: 3, avif: 4 };
+  formats = [...data.format].sort(
+    (a, b) => (formatPriority[a.toLowerCase()] ?? 99) - (formatPriority[b.toLowerCase()] ?? 99)
   );
 
-  if (!sizesAttr && breakpoints) {
-    const { mobile = 320, desktop = 640 } = breakpoints;
-    sizesAttr = `(max-width: ${mobileMax}px) ${mobile}px, ${desktop}px`;
-  }
-  if (!sizesAttr) {
-    sizesAttr = `(max-width: ${mobileMax}px) 320px, 640px`;
-  }
-
-  width1x = availableWidths.find(w => w >= targetWidth) ?? availableWidths[0];
-  width2x = availableWidths.find(w => w >= width1x * 2) ?? width1x;
-  widthMax = Math.max(...availableWidths);
-
-  imageBaseName = src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '');
-  fallbackSrc = `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${formats[0]}`;
-  imageMaxUrl = getAbsoluteImageUrl(
-    basePath,
-    `${imageBaseName}-w${widthMax}-a${defaultAspect}.${formats[0]}`
-  );
-
-  aspectClass = `a-${defaultAspect}`;
-  widthClassMobile = `w-${breakpoints?.mobile ?? 320}`;
-  widthClassDesktop = breakpoints?.desktop && breakpoints.desktop > 640
-    ? `mx-w-featured big-w-full`
-    : `mx-w-content big-w-full`;
-  objectFitClass = `object-${objectFit}`;
-
-  const buildSrc = (w: number, fmt: string) =>
-    `${basePath}${imageBaseName}-w${w}-a${defaultAspect}.${fmt}`;
+  // ✅ Sizes
   const mobileBP = breakpoints?.mobile ?? 320;
   const desktopBP = breakpoints?.desktop ?? mobileBP;
+  widthMax = Math.max(...availableWidths);
+
+  if (!sizesAttr) {
+    if (mobileBP === desktopBP) {
+      sizesAttr = `${mobileBP}px`;
+    } else {
+      sizesAttr = `(max-width: ${mobileMax}px) ${mobileBP}px, (max-width: 1280px) ${desktopBP}px, ${widthMax}px`;
+    }
+  }
+
+  // ✅ Widths
   const mWidth = availableWidths.find(w => w >= mobileBP) ?? availableWidths[0];
   const dWidth = availableWidths.find(w => w >= desktopBP) ?? mWidth;
 
-  // ✅ Preload logic
-  if (loading === 'eager') {
-    registerPreloadImage({ src: buildSrc(mWidth, formats[0]), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'high' });
-    if (dWidth !== mWidth) {
-      registerPreloadImage({ src: buildSrc(dWidth, formats[0]), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'high' });
-    }
+  // ✅ srcset
+  const buildSrc = (w: number, fmt: string) => `${basePath}${imageBaseName}-w${w}-a${defaultAspect}.${fmt}`;
+  imageBaseName = src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '');
+  fallbackSrc = buildSrc(mWidth, formats[0]);
+  imageMaxUrl = `${origin}${buildSrc(widthMax, formats[0])}`;
+
+  srcSetList = (mobileBP === desktopBP)
+    ? `${buildSrc(mWidth, formats[0])} ${mWidth}w, ${buildSrc(widthMax, formats[0])} ${widthMax}w`
+    : `${buildSrc(mWidth, formats[0])} ${mWidth}w, ${buildSrc(dWidth, formats[0])} ${dWidth}w, ${buildSrc(widthMax, formats[0])} ${widthMax}w`;
+
+  // ✅ Classes
+  aspectClass = `a-${defaultAspect}`;
+
+  objectFitClass = `object-${objectFit}`;
+
+  // ✅ Preload from srcset
+  if (loading === 'eager' || loading === 'delay') {
+    const priority = loading === 'eager' ? 'high' : 'low';
+    const srcsetParts = srcSetList.split(',');
+    srcsetParts.forEach(entry => {
+      const match = entry.trim().match(/(.*)\s+(\d+)w$/);
+      if (match) {
+        const [ , url, width ] = match;
+        const media = (parseInt(width) <= mobileBP)
+          ? `(max-width: ${mobileMax}px)`
+          : (parseInt(width) < widthMax ? `(min-width: ${desktopMin}px)` : undefined);
+        registerPreloadImage({ src: url.trim(), media, fetchPriority: priority });
+      }
+    });
   }
-  if (loading === 'delay') {
-    registerPreloadImage({ src: buildSrc(mWidth, formats[0]), media: `(max-width: ${mobileMax}px)`, fetchPriority: 'low' });
-    if (dWidth !== mWidth) {
-      registerPreloadImage({ src: buildSrc(dWidth, formats[0]), media: `(min-width: ${desktopMin}px)`, fetchPriority: 'low' });
+
+  // ✅ Schema
+    if (addSchema) {
+      registerSchemaImage(imageMaxUrl);
     }
-  }
+
 }
 ---
 
 {addSchema && hasData && (
-  <script 
-    is:inline 
-    type="application/ld+json" 
-    set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'ImageObject',
-      '@id': imageMaxUrl,
-      contentUrl: imageMaxUrl,
-      url: imageMaxUrl,
-      caption: caption || title || alt,
-      description: alt,
-      representativeOfPage: true,
-      width: widthMax,
-      height: Math.round(widthMax * (Number(defaultAspect.split('x')[1]) / Number(defaultAspect.split('x')[0])))
-    })}
-  />
+  <script is:inline type="application/ld+json" set:html={JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ImageObject',
+    '@id': imageMaxUrl,
+    contentUrl: imageMaxUrl,
+    url: imageMaxUrl,
+    caption: caption || title || alt,
+    description: alt,
+    representativeOfPage: true,
+    width: widthMax,
+    height: Math.round(widthMax * (Number(defaultAspect.split('x')[1]) / Number(defaultAspect.split('x')[0])))
+  })} />
 )}
 
 {!hasData ? (
-  <div class={`flex ai-center jc-center bg-base-20 ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" id="svg-placeholder" class={`w-full h-auto ${imageClassName} ${objectFitClass}`}>
-      <path fill="red" d="M0 0h400v225H0Z" class="icon-background fill-primary-lighter"></path>
+  <div class={`flex ai-center jc-center bg-primary-lighter ${aspectClass} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit ${className}`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-full h-auto ${imageClassName} ${objectFitClass}`}>
+      <rect width="400" height="225" fill="#00000000"></rect>
     </svg>
-    <span id="svg-placeholder-text" class="absolute fill-primary bold text-base">{siteDefaults.siteName}</span>
+    <span class="absolute bold text-base">{siteDefaults.siteName}</span>
   </div>
 ) : (
   <>
     {caption ? (
-      <figure class={`block image-wrapper ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} h-fit`}>
+      <figure id={id} class={`block image-wrapper mx-w-95-0 ${aspectClass} h-fit ${className}`}>
         <picture>
           {formats.map(fmt => (
             <source
               type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
-              srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x`}
-              data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x` : undefined}
-              delay-image={loading === 'delay' ? "true" : undefined}
+              srcset={srcSetList.replace(new RegExp(`\\.${formats[0]}`, 'g'), `.${fmt}`)}
+              sizes={sizesAttr}
             />
           ))}
           <img
-            src={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}`}
-            data-src={loading === 'delay' ? `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}` : undefined}
+            src={fallbackSrc}
+            srcset={srcSetList}
             sizes={sizesAttr}
-            width={width ?? width1x}
+            width={width ?? availableWidths[0]}
             height={height}
             alt={alt}
             title={title}
@@ -184,20 +185,19 @@ if (hasData) {
         <figcaption class="text-s">{caption}</figcaption>
       </figure>
     ) : (
-      <picture class={`block image-wrapper ${className} ${aspectClass} ${widthClassMobile} ${widthClassDesktop} h-fit`}>
+      <picture id={id} class={`block image-wrapper mx-w-95-0 ${aspectClass} h-fit ${className}`}>
         {formats.map(fmt => (
           <source
             type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
-            srcset={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x`}
-            data-srcset={loading === 'delay' ? `${basePath}${imageBaseName}-w${width1x}-a${defaultAspect}.${fmt} 1x, ${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${fmt} 2x` : undefined}
-            delay-image={loading === 'delay' ? "true" : undefined}
+            srcset={srcSetList.replace(new RegExp(`\\.${formats[0]}`, 'g'), `.${fmt}`)}
+            sizes={sizesAttr}
           />
         ))}
         <img
-          src={loading === 'delay' ? undefined : `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}`}
-          data-src={loading === 'delay' ? `${basePath}${imageBaseName}-w${width2x}-a${defaultAspect}.${formats[0]}` : undefined}
+          src={fallbackSrc}
+          srcset={srcSetList}
           sizes={sizesAttr}
-          width={width ?? width1x}
+          width={width ?? availableWidths[0]}
           height={height}
           alt={alt}
           title={title}

@@ -49,9 +49,9 @@ const {
 } = Astro.props;
 
 const variantClassMap = {
-  primary: 'button col-base-00 hover-col-base-100 bg-primary hover-bg-base-00 transition focus-vis-bg-primary-lighter focus-vis-col-base-100',
-  secondary: 'button bg-transparent border-2 col-primary hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00',
-  plain: 'button bg-transparent col-inherit hover-bg-primary hover-col-base-00 transition focus-vis-bg-primary focus-vis-col-base-00',
+  primary: 'button col-base-00 hover-col-base-100 hover-fill-base-100 bg-primary hover-bg-base-00 transition focus-vis-bg-primary-lighter focus-vis-col-base-100',
+  secondary: 'button bg-transparent border-2 col-primary hover-col-base-100 hover-fill-base-100 border-2 hover-bg-primary-light transition focus-vis-bg-primary focus-vis-col-base-00',
+  plain: 'button bg-transparent col-inherit hover-bg-primary-lighter hover-col-base-100 hover-fill-base-100 transition focus-vis-bg-primary focus-vis-col-base-100',
 };
 
 const variantClass = variantClassMap[variant] ?? '';

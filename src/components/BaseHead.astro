@@ -8,11 +8,15 @@ import ImagePreload from './ImagePreload.astro';
 import assetsManifest from '../data/assets-manifest.json';
 import InlineScript from './InlineScript.astro';
 import { getPreloadImages, clearPreloadImages } from '../utils/preloadRegistry';
+import { getSchemaImages, clearSchemaImages } from '../utils/registerSchemaImage';
 import { getImageMeta } from '../utils/getImageMeta';
 import Schema from './Schema.astro';
 
 const preloadImagesAuto = getPreloadImages();
 clearPreloadImages();
+
+const schemaImages = getSchemaImages();
+clearSchemaImages();
 
 const isDev = import.meta.env.DEV;
 
@@ -162,4 +166,5 @@ const sitemapEnabled = siteDefaults.sitemap === true;
   updatedAt={updatedAt}
   faq={faq}
   listItems={listItems}
+  allImages={schemaImages}
 />
