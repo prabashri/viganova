@@ -1,4 +1,8 @@
 ---
+/**
+ *  loaded in the BaseLayout after the main content
+ *  to ensure all images are loaded before lazy-loading scripts
+ */
 import assetsManifest from '../data/assets-manifest.json';
 const mainJsFile = assetsManifest.js?.main?.file || '';
 const isDev = import.meta.env.DEV;

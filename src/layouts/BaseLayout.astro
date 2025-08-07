@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 //import Analytics from '../components/Analytics.astro';
 import type { HeadProps } from '../types/HeadProps';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import InlineScript from '../components/InlineScript.astro';
 
 interface Props {
   headProps?: HeadProps;
@@ -43,6 +44,11 @@ const {
 
       <slot />
     </main>
+      
+    {/** 🔹 Inline Scripts */}
+    <InlineScript />
+
+    {/* -- Optional extra content -- */}
 
     {!hideFooter && <Footer />}
 
