@@ -1,6 +1,11 @@
 ---
 import { siteDefaults } from '../config/siteDefaults';
 
+import { getSchemaImages, clearSchemaImages } from '../utils/registerSchemaImage';
+
+const schemaImages = getSchemaImages();
+clearSchemaImages();
+
 import manifest from '../data/assets-manifest.json';
 
 // Get optimized logos from manifest
@@ -14,7 +19,6 @@ const {
   type,
   authors = [],
   image,
-  allImages = [],
   title,
   description,
   url,
@@ -38,7 +42,6 @@ function toAbsoluteUrl(pathOrUrl: string): string {
     return `${siteDefaults.siteUrl.replace(/\/$/, '')}/${pathOrUrl.replace(/^\/+/, '')}`;
   }
 }
-
 
 
 // --- Common IDs
@@ -148,10 +151,10 @@ const articleSchema =
         headline: title || siteDefaults.title,
         description: description || siteDefaults.description,
         url: toAbsoluteUrl(url || siteBase),
-        image: allImages.length
-          ? allImages.map((img: string) => ({
+        image: schemaImages.length
+          ? schemaImages.map((img: { url: string }) => ({
               '@type': 'ImageObject',
-              url: toAbsoluteUrl(img)
+              url: toAbsoluteUrl(img.url)
             }))
           : image
           ? { '@type': 'ImageObject', url: toAbsoluteUrl(image) }

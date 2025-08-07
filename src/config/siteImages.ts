@@ -4,10 +4,24 @@ export const siteImages = {
     imageAlt: "design to represent the nviewsweb astro theme using text and images",
     imageTitle: "nViewsWEB Astro Theme",
     imageVariants: [
-        320, // standard width for mobile devices
+        380, // standard width for mobile devices
         640,  // standard width for tablets, content width
         1280, // standard width to support image seo according to google's image seo guidelines
     ],
+    variants: {
+        thumbnail: 120, // thumbnail size
+        featured: 960, // featured image size
+        mobile: 380, // standard width for mobile devices
+        tablet: 640,
+        desktop: 640,  // standard width for tablets, content width
+        full: 1280, // standard width to support image seo according to google's image seo guidelines
+    },
+     breakpoints: {
+        mobileMax: 460,   // `(max-width: 460px)`
+        tabletMax: 1079,  // `(max-width: 1079px)`
+        desktopMin: 1080,   // `(min-width: 1080px)`
+        fullMin: 1440,     // `(min-width: 1440px)`
+    },
     imageFormats: [ // upload png images, and this script will generate resized variants in these formats
         'avif', // supports modern browsers - most efficient
         'webp', // supports modern browsers - widely used
@@ -23,10 +37,7 @@ export const siteImages = {
     featuredImageSize: 960, // larger size for SEO & cards
 
     // ✅ Breakpoint config for responsive images
-    breakpoints: {
-        mobileMax: 768,   // `(max-width: 768px)`
-        desktopMin: 769   // `(min-width: 769px)`
-    },
+   
     // General thumbnail settings
     thumbnail: true,
     thumbnailSize: 120,

@@ -1,66 +1,80 @@
 ---
 import assetsManifest from '../data/assets-manifest.json';
-
 const mainJsFile = assetsManifest.js?.main?.file || '';
-
 const isDev = import.meta.env.DEV;
-
 ---
-{ !isDev &&(
-<>
-    <script>
+
+{isDev && (
+  <>
+    <script id="main-js" type="module" src="/scripts/main.js?direct" async></script>
+    <script is:inline type="module">
+      function registerSWandLazyLoader() {
+        // ✅ Register Service Worker
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-            .catch(err => {
-                // Log only errors if absolutely necessary
-                if (location.hostname === 'localhost') {
-                console.warn('❌ Service Worker Failed:', err);
-                }
-            });
+          navigator.serviceWorker.register('/sw.js').catch((err) => {
+            if (location.hostname === 'localhost') {
+              console.warn('❌ Service Worker Failed:', err);
+            }
+          });
         }
-    </script>  
-</>
-)}
-{isDev &&  (  
-    <script id="main-js" type="module" src="/scripts/main.js?direct" async />  
-)}
-{
-  !isDev && mainJsFile && (
-    <script id="main-js" type="module" data-src={mainJsFile} async />
-  ) 
-}
 
-<>
-    <script id="lazy-load-scripts">
-        let loaded = !1;
-        const trigger = () => {
-            if (loaded) return;
-            loaded = !0;
+        // ✅ Lazy-load CSS and JS scripts
+        let loaded = false;
 
-            // ✅ Process all link tags in one query
-            document.querySelectorAll('link[rel="stylesheet"]').forEach(e => {
-            if (e.hasAttribute("data-swap")) {
-                /** @type {HTMLLinkElement} */
-                const link = e;
-                link.media = "all";
-                link.removeAttribute("data-swap");
+        function trigger() {
+          if (loaded) return;
+          loaded = true;
+
+          // Swap CSS
+          document.querySelectorAll('link[rel="stylesheet"]').forEach((el) => {
+            if (el.hasAttribute('data-swap')) {
+              el.media = 'all';
+              el.removeAttribute('data-swap');
             }
-            if (e.hasAttribute("data-href")) {
-                const realHref = e.getAttribute("data-href");
-                if (realHref) e.href = realHref;
-                e.removeAttribute("data-href");
+            if (el.hasAttribute('data-href')) {
+              const href = el.getAttribute('data-href');
+              if (href) el.href = href;
+              el.removeAttribute('data-href');
             }
-            });
+          });
 
-            // ✅ Load all scripts with data-src
-            document.querySelectorAll("script[data-src]").forEach(e => {
-            const realSrc = e.getAttribute("data-src");
-            if (realSrc) e.src = realSrc;
-            e.removeAttribute("data-src");
-            });
+          // Load deferred JS
+          document.querySelectorAll('script[data-src]').forEach((el) => {
+            const src = el.getAttribute('data-src');
+            if (src) {
+              el.src = src;
+              el.removeAttribute('data-src');
+            }
+          });
+        }
+
+        // Trigger on first user interaction
+        const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'];
+        const handler = () => {
+          events.forEach((e) => window.removeEventListener(e, handler));
+          trigger();
         };
+        events.forEach((e) => window.addEventListener(e, handler, { once: true }));
 
-        window.addEventListener("scroll", trigger, { once: !0 });
-        window.addEventListener("load", () => setTimeout(trigger, 2000));
+        // Fallback after 3 seconds
+        window.addEventListener('load', () => {
+          setTimeout(() => {
+            if (!loaded) trigger();
+          }, 3000);
+        });
+      }
+
+      registerSWandLazyLoader();
     </script>
-</>
+  </>
+)}
+
+{!isDev && mainJsFile && (
+  <script id="main-js" type="module" data-src={mainJsFile} async></script>
+)}
+
+{!isDev && (
+  <script id="inline-script" is:inline type="module">
+    function registerSWandLazyLoader(){"serviceWorker"in navigator&&navigator.serviceWorker.register("/sw.js").catch((e=>{"localhost"===location.hostname&&console.warn("Service Worker Failed:",e)}));let e=!1;function t(){e||(e=!0,document.querySelectorAll('link[rel="stylesheet"]').forEach((e=>{if(e.hasAttribute("data-swap")&&(e.media="all",e.removeAttribute("data-swap")),e.hasAttribute("data-href")){const t=e.getAttribute("data-href");t&&(e.href=t),e.removeAttribute("data-href")}})),document.querySelectorAll("script[data-src]").forEach((e=>{const t=e.getAttribute("data-src");t&&(e.src=t,e.removeAttribute("data-src"))})))}const r=["mousemove","mousedown","keydown","touchstart","scroll"],a=()=>{r.forEach((e=>window.removeEventListener(e,a))),t()};r.forEach((e=>window.addEventListener(e,a,{once:!0}))),window.addEventListener("load",(()=>{setTimeout((()=>{e||t()}),3e3)}))}registerSWandLazyLoader();
+  </script>
+)}

@@ -116,7 +116,7 @@ const headProps: HeadProps = {
     "content"
     "sidebar"
     "footer";
-  gap: 1rem;
+  /*gap: 1rem;*/
   width: 100%;
 }
 
@@ -169,7 +169,7 @@ const headProps: HeadProps = {
 
 } 
 </style>
-  <article id="post-layout" class="post-layout gap jc-center">
+  <article id="post-layout" class="post-layout jc-center">
     {/* Header */}
     <header class="post-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
       <div id="post-header-content" class="mx-w-site mi-auto ta-center mb-2">
@@ -223,8 +223,8 @@ const headProps: HeadProps = {
         title={heroImageTitle || ''}
         caption={heroImageCaption || ''}
         width="960" id="hero-image"
-        loading="eager" className='hero-image w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-2'
-        breakpoints={{ mobile: 320, desktop: 960 }} addSchema={true}
+        loading="eager" className='hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-2'
+        variant='desktop' addSchema={true}
       />     
     )}
 
@@ -232,7 +232,7 @@ const headProps: HeadProps = {
     <TableOfContents toc={toc} heading="On This Page" depth="h2,h3" className="toc as-f-start mb-05 mx-w-content bg-base-00 br ml-auto mr-auto full-mr-unset full-sticky top-20" />
 
     { /** Content */ }
-    <div class="post-content mx-w-content mi-auto mb-05 p-05">
+    <div class="post-content mx-w-content mi-auto mb-05 p-1">
       <slot />
     </div>
 

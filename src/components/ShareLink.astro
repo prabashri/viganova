@@ -54,63 +54,67 @@ function toIconName(name: string) {
   return name === 'Copy Link' ? 'clipboard' : name.toLowerCase().replace(/\s+/g, '-');
 }
 ---
-
 <nav
   id={id}
   aria-label="Share this page"
   class={`share-toolbar pb-05 mb-05 ${className}`}
-  role="toolbar"
-  aria-orientation="horizontal"
   data-title={pageTitle}
   data-url={resolvedUrl}
 >
   {pageTitle && (
     <span class="share-title text-xs bold block m-bottom-05 uppercase">{pageTitle}</span>
   )}
-  
-  <ul class="flex gap ai-center no-bullets m-0 p-0" role="list">
-    {shareLinks.map((name, index) => {
-      const platform = platforms.find((p) => p.name.toLowerCase() === name.toLowerCase());
-      if (!platform) return null;
 
-      const label = `Share on ${name}`;
-      const icon = toIconName(name);
-      const dataId = toId(name);
+  <div role="toolbar" aria-orientation="horizontal" class="w-full">
+    <ul class="flex gap ai-center no-bullets m-0 p-0" role="list">
+      {shareLinks.map((name, index) => {
+        const platform = platforms.find(
+          (p) => p.name.toLowerCase() === name.toLowerCase()
+        );
+        if (!platform) return null;
 
-      const isFirst = index === 0;
+        const label = `Share on ${name}`;
+        const icon = toIconName(name);
+        const dataId = toId(name);
+        const isFirst = index === 0;
 
-      return (
-        <li class="icon-wrapper flex ai-center jc-center p-02 br" role="none">
-          {platform.href ? (
-            <a
-              href={platform.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={label}
-              aria-label={label}
-              data-id={dataId}
-              data-action="share"
-              role="button"
-              tabindex={isFirst ? '0' : '-1'}
-              class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent hover-border hover-box-shadow p-02"
-            >
-              <Icon name={icon} class={iconSize} />
-            </a>
-          ) : (
-            <button
-              type="button"
-              data-id="share-copy-button"
-              title="Copy Link"
-              aria-label="Copy Link"
-              role="button"
-              tabindex={isFirst ? '0' : '-1'}
-              class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent bg-transparent hover-border hover-box-shadow p-02"
-            >
-              <Icon name="clipboard" class={iconSize} />
-            </button>
-          )}
-        </li>
-      );
-    })}
-  </ul> 
+        return (
+          <li
+            class="icon-wrapper flex ai-center jc-center p-02 br"
+            role="none"
+          >
+            {platform.href ? (
+              <a
+                href={platform.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={label}
+                aria-label={label}
+                data-id={dataId}
+                data-action="share"
+                role="button"
+                tabindex={isFirst ? '0' : '-1'}
+                class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent hover-border hover-box-shadow p-02"
+              >
+                <Icon name={icon} class={iconSize} />
+              </a>
+            ) : (
+              <button
+                type="button"
+                data-id="share-copy-button"
+                title="Copy Link"
+                aria-label="Copy Link"
+                role="button"
+                tabindex={isFirst ? '0' : '-1'}
+                class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent bg-transparent hover-border hover-box-shadow p-02"
+              >
+                <Icon name="clipboard" class={iconSize} />
+              </button>
+            )}
+          </li>
+        );
+      })}
+    </ul>
+  </div>
 </nav>
+

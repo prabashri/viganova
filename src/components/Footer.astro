@@ -28,19 +28,19 @@ const desktopAlt = `${siteDefaults.siteName} Desktop Logo`;
       ) : (
         <span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
       )}
-        <h3 class="text-s">{siteDefaults.siteName}</h3>
+        <p class="text-s bold">{siteDefaults.siteName}</p>
         <p class="text-xs">{siteDefaults.title}</p>
         <p class="text-2xs pb-05">
           &copy; {today.getFullYear()} {siteDefaults.siteName}. All rights reserved.
         </p>
         <hr />
-        <h4 class="text-xs uppercase">connect with us</h4>
+        <p class="text-xs bold uppercase">connect with us</p>
         <SocialLink id="footer-social-links" />
     </div>
 
     {/* Column 2: Main Pages */}
     <div class="footer-col sm-hr">
-      <h4 class="text-2xs uppercase">Main Pages</h4>
+      <p class="text-2xs bold uppercase">Main Pages</p>
       <ul class="no-bullets">
         <li class="text-xs mb-05 pb-02"><a href="/">Home</a></li>
         <li class="text-xs mb-05 pb-02"><a href="/about/">About</a></li>
@@ -52,7 +52,7 @@ const desktopAlt = `${siteDefaults.siteName} Desktop Logo`;
 
     {/* <!-- Column 3: Social Links -->*/}
     <div class="footer-col sm-hr">
-      <h4 class="text-2xs uppercase">Portfolio to look around</h4>
+      <p class="text-2xs bold uppercase">Portfolio to look around</p>
       <ul class="no-bullets">
     	  <li class="text-xs mb-05 pb-02"><a href="/portfolio/clampgenerator/" target="_self" title="clampGenerator for css clamp font-size & layout properties">ClampGenerator</a></li>
 		    <li class="text-xs mb-05 pb-02"><a href="/portfolio/individual/" target="_self" title="Individual Portfolio">Individuals site</a></li>

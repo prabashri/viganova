@@ -1,19 +1,23 @@
 ---
+import { getPreloadImages, clearPreloadImages } from '../utils/preloadRegistry';
+
 interface PreloadItem {
   src: string;
   media?: string;
   fetchPriority?: 'high' | 'low' | 'auto';
 }
 
-interface Props {
-  images: PreloadItem[];
-}
+const preloadImagesAuto = getPreloadImages();
+clearPreloadImages();
 
-const { images = [] } = Astro.props;
 
 const uniqueImages = Array.from(
-  new Map(images.map(i => [`${i.src}|${i.media ?? ''}|${i.fetchPriority ?? 'auto'}`, i])).values()
+  new Map(preloadImagesAuto.map(i => [`${i.src}|${i.media ?? ''}|${i.fetchPriority ?? 'auto'}`, i])).values()
 );
+
+const item = uniqueImages.length > 0
+  ? uniqueImages.map(i => i.src).join(', ')
+  : '';
 
 function getDelayImageAttr(src: string, fetchPriority?: string) {
   if (fetchPriority === 'low') {
@@ -23,10 +27,10 @@ function getDelayImageAttr(src: string, fetchPriority?: string) {
   return {};
 }
 
-// Detect if any images require delay loader
-const hasDelayImages = uniqueImages.some(img => img.fetchPriority === 'low');
+const isDev = import.meta.env.DEV;
 ---
 
+{/** 🔹 Preload images */ }
 {uniqueImages.map(({ src, media, fetchPriority }) => (
   <link
     rel="preload"
@@ -38,6 +42,6 @@ const hasDelayImages = uniqueImages.some(img => img.fetchPriority === 'low');
   />
 ))}
 
-{hasDelayImages && (
-  <script type="module" data-src="/scripts/delay-image-loader.js" async></script>
+{isDev && (
+  <meta name="preload-images" content={item.replace(/"/g, '&quot;')} />
 )}

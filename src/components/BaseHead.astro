@@ -5,18 +5,12 @@ import CssHead from './CssHead.astro';
 import type { HeadProps } from '../types/HeadProps';
 import Rss from './Rss.astro';
 import ImagePreload from './ImagePreload.astro';
-import assetsManifest from '../data/assets-manifest.json';
 import InlineScript from './InlineScript.astro';
-import { getPreloadImages, clearPreloadImages } from '../utils/preloadRegistry';
-import { getSchemaImages, clearSchemaImages } from '../utils/registerSchemaImage';
+
+
 import { getImageMeta } from '../utils/getImageMeta';
 import Schema from './Schema.astro';
 
-const preloadImagesAuto = getPreloadImages();
-clearPreloadImages();
-
-const schemaImages = getSchemaImages();
-clearSchemaImages();
 
 const isDev = import.meta.env.DEV;
 
@@ -77,8 +71,13 @@ const {
   listItems
 } = props;
 
+function getImageKeyFromPublicUrl(src?: string): string | undefined {
+  if (!src) return undefined;
+  // Remove leading slash and `/images/` directory
+  return src.replace(/^\/+/, '').replace(/^images\//, '');
+}
 
-const imageMeta = getImageMeta(image);
+const imageMeta = getImageMeta(getImageKeyFromPublicUrl(image));
 const imageUrl = imageMeta?.url || '';
 const imageWidth = imageMeta?.width || 0;
 const imageHeight = imageMeta?.height || 0;
@@ -102,12 +101,14 @@ const sitemapEnabled = siteDefaults.sitemap === true;
 <meta name="mobile-web-app-capable" content="yes" />
 
 {/** 🔹 Robots & Referrer */}
-<meta name="robots" content={index ? "index, follow" : "noindex, nofollow"} />
+{ !isDev && <meta name="robots" content={index ? "index, follow" : "noindex, nofollow"} /> }
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-{/** 🔹 CSS & Preloads */}
+{/** 🔹 CSS */}
 <CssHead />
-{preloadImagesAuto.length > 0 && <ImagePreload images={preloadImagesAuto} />}
+{/** 🔹 Preload Images */}
+<ImagePreload />
+
 
 {/** 🔹 Canonical */}
 <link rel="canonical" href={canonicalURL} />
@@ -166,5 +167,4 @@ const sitemapEnabled = siteDefaults.sitemap === true;
   updatedAt={updatedAt}
   faq={faq}
   listItems={listItems}
-  allImages={schemaImages}
 />

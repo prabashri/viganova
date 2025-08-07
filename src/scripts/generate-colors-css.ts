@@ -148,10 +148,11 @@ function generateBaseScale(reverse = false) {
   return base;
 }
 
-function generateDarkModeShades(lightShades: Record<ShadeKey, string>) {
+function generateDarkModeShades(
+  lightShades: Record<ShadeKey, string>
+): Record<ShadeKey, string> {
   const adjusted: Record<ShadeKey, string> = {} as any;
 
-  // Swap mapping for dark mode
   const shadeSwapMap: Record<ShadeKey, ShadeKey> = {
     'darker-x': 'lighter-x',
     'darker': 'lighter',
@@ -163,22 +164,23 @@ function generateDarkModeShades(lightShades: Record<ShadeKey, string>) {
   };
 
   if (siteColors.darkAdjustmentMode === 'swap') {
-    // 🔄 Swap shades directly
+    // 🔁 Swap based on light shade keys
     (Object.keys(shadeSwapMap) as ShadeKey[]).forEach(key => {
       adjusted[key] = lightShades[shadeSwapMap[key]];
     });
   } else {
-    // 🎛 Adjust HSL values
+    // 🎚 Generate adjusted shades by tweaking lightness and saturation
     (Object.keys(lightShades) as ShadeKey[]).forEach(key => {
       const hsla = parseColorToHSLA(lightShades[key], false);
-      const newL = Math.min(Math.max(hsla.l + 5, 5), 95);    // +5% lightness
-      const newS = Math.min(Math.max(hsla.s - 10, 0), 100);  // -10% saturation
-      adjusted[key] = hslaToCss({ h: hsla.h, s: newS, l: newL, a: hsla.a ?? 1 });
+      const newL = clampLightness(hsla.l + 5);
+      const newS = Math.max(0, Math.min(100, hsla.s - 10));
+      adjusted[key] = hslaToCss({ ...hsla, l: newL, s: newS });
     });
   }
 
   return adjusted;
 }
+
 
 /* -------------------------
    🎨 CSS Builder
@@ -217,13 +219,17 @@ function generateCSS(colors: typeof siteColors) {
   // Dark theme block only if enabled
   let darkThemeBlock = '';
   if (colors.darkMode) {
-    const primaryDarkShades = colors.darkPrimaryColor
-      ? generateColorSet(colors.darkPrimaryColor, {} as any)
-      : (colors.autoDarkAdjust ? generateDarkModeShades(primaryShades) : primaryShades);
+    const hasCustomDarkPrimary = !!colors.darkPrimaryColor?.trim();
+    const hasCustomDarkSecondary = !!colors.darkSecondaryColor?.trim();
 
-    const secondaryDarkShades = colors.darkSecondaryColor
-      ? generateColorSet(colors.darkSecondaryColor, {} as any)
-      : (colors.autoDarkAdjust ? generateDarkModeShades(secondaryShades) : secondaryShades);
+    const primaryDarkShades = hasCustomDarkPrimary
+      ? generateColorSet(colors.darkPrimaryColor!, {} as any)
+      : (colors.autoDarkAdjust ? generateDarkModeShades(primaryShades) : generateDarkModeShades(primaryShades)); // fallback to swap/adjust
+
+    const secondaryDarkShades = hasCustomDarkSecondary
+      ? generateColorSet(colors.darkSecondaryColor!, {} as any)
+      : (colors.autoDarkAdjust ? generateDarkModeShades(secondaryShades) : generateDarkModeShades(secondaryShades));
+
 
     darkThemeBlock = `
 [data-theme="dark"] {
