@@ -95,9 +95,9 @@ const additionalPaths = siteDefaults.serviceWorkerPaths ?? [];
 const allPaths = [
   '/',
   '/offline.html',
-  ...cssPaths,
-  ...jsPaths,
-  ...additionalPaths
+  // ...cssPaths,
+  // ...jsPaths,
+  // ...additionalPaths
 ];
 
 // Filter to include only existing files (for local, not remote)
