@@ -119,15 +119,15 @@ if (hasData) {
       const sizesList: string[] = [];
 
       if (wMobile) {
-        sizesList.push(`(max-width: ${breakpoints.mobileMax}px) ${wMobile}vw`);
+        sizesList.push(`(max-width: ${breakpoints.mobileMax}px) ${wMobile}px`);
       }
 
       if (wTablet) {
-        sizesList.push(`(max-width: ${breakpoints.tabletMax}px) ${wTablet}vw`);
+        sizesList.push(`(max-width: ${breakpoints.tabletMax}px) ${wTablet}px`);
       }
 
       if (wDesktop) {
-        sizesList.push(`(max-width: ${breakpoints.fullMin - 1}px) ${wDesktop}vw`);
+        sizesList.push(`(max-width: ${breakpoints.fullMin - 1}px) ${wDesktop}px`);
       }
 
       sizesList.push(`${wFull}vw`);
@@ -166,7 +166,6 @@ if (hasData) {
   aspectClass = `a-${defaultAspect}`;
 }
 ---
-
 {addSchema && hasData && (
   <script is:inline type="application/ld+json" set:html={JSON.stringify({
     '@context': 'https://schema.org',
@@ -190,38 +189,9 @@ if (hasData) {
     <span class="absolute bold text-base">{siteDefaults.siteName}</span>
   </div>
 ) : (
-  <>
-    {caption ? (
-      <figure id={id} class={`block image-wrapper w-full ${aspectClass} h-fit ${className}`}>
-        <picture>
-          {formats.map(fmt => (
-            <source
-              type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
-              {...(loading === 'delay'
-                ? { 'data-srcset': srcSetList.replaceAll(`.${primaryFormat}`, `.${fmt}`), 'delay-image': true }
-                : { srcset: srcSetList.replaceAll(`.${primaryFormat}`, `.${fmt}`) })}
-              sizes={sizesAttr}
-            />
-          ))}
-          <img
-            {...(loading === 'delay'
-              ? { 'data-src': fallbackSrc, 'data-srcset': srcSetList, 'delay-image': true }
-              : { src: fallbackSrc, srcset: srcSetList })}
-            sizes={sizesAttr}
-            width={width}
-            height={height}
-            alt={alt}
-            title={title}
-            loading={loading === 'delay' ? 'lazy' : loading}
-            decoding="async"
-            fetchpriority={loading === 'eager' ? 'high' : loading === 'delay' ? 'low' : undefined}
-            class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
-          />
-        </picture>
-        <figcaption class="text-s">{caption}</figcaption>
-      </figure>
-    ) : (
-      <picture id={id} class={`block image-wrapper w-full ${aspectClass} h-fit ${className}`}>
+  caption ? (
+    <figure id={id} class={`block image-wrapper w-full ${aspectClass} h-fit ${className}`}>
+      <picture>
         {formats.map(fmt => (
           <source
             type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
@@ -246,6 +216,36 @@ if (hasData) {
           class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
         />
       </picture>
-    )}
-  </>
+      <figcaption class="text-s">{caption}</figcaption>
+    </figure>
+  ) : (
+    <figure id={id} class={`block image-wrapper w-full ${aspectClass} h-fit ${className}`}>
+      <picture>
+        {formats.map(fmt => (
+          <source
+            type={`image/${fmt === 'jpg' ? 'jpeg' : fmt}`}
+            {...(loading === 'delay'
+              ? { 'data-srcset': srcSetList.replaceAll(`.${primaryFormat}`, `.${fmt}`), 'delay-image': true }
+              : { srcset: srcSetList.replaceAll(`.${primaryFormat}`, `.${fmt}`) })}
+            sizes={sizesAttr}
+          />
+        ))}
+        <img
+          {...(loading === 'delay'
+            ? { 'data-src': fallbackSrc, 'data-srcset': srcSetList, 'delay-image': true }
+            : { src: fallbackSrc, srcset: srcSetList })}
+          sizes={sizesAttr}
+          width={width}
+          height={height}
+          alt={alt}
+          title={title}
+          loading={loading === 'delay' ? 'lazy' : loading}
+          decoding="async"
+          fetchpriority={loading === 'eager' ? 'high' : loading === 'delay' ? 'low' : undefined}
+          class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
+        />
+      </picture>
+    </figure>
+  )
 )}
+
