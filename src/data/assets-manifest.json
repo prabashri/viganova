@@ -2,8 +2,8 @@
   "configModified": {
     "siteDefaults": 1754465246237,
     "siteLogo": 1754383794286,
-    "siteColors": 1754488309863,
-    "siteImages": 1754543834218
+    "siteColors": 1754615126129,
+    "siteImages": 1754566120651
   },
   "icons": {
     "android-chrome-192x192.png": {
@@ -28,20 +28,20 @@
       "datetime": "2025-07-26T08:39:30.340Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-08-06T14:54:46.269Z"
+      "datetime": "2025-08-08T01:33:57.020Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-08-06T14:53:48.443Z",
+      "datetime": "2025-08-08T01:33:20.067Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-08-06T14:54:33.195Z",
+      "datetime": "2025-08-08T01:33:47.738Z",
       "names": [
         "base",
         "colors",
@@ -51,11 +51,15 @@
       ]
     },
     "main": {
-      "file": "/styles/main.676kzw.css",
-      "datetime": "2025-08-06T14:54:36.034Z",
+      "file": "/styles/main.hrb9r6.css",
+      "datetime": "2025-08-08T01:33:50.273Z",
       "names": [
         "components",
+        "faq",
+        "footer",
         "form",
+        "non-critical",
+        "search-icon",
         "utilities"
       ]
     },
@@ -81,8 +85,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.5zyb6k.json",
-      "datetime": "2025-08-07T07:00:50.569Z"
+      "file": "/search-index.5zdv2h.json",
+      "datetime": "2025-08-08T01:33:38.965Z"
     }
   },
   "js": {

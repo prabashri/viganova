@@ -85,7 +85,8 @@ blockquote {
 code {
   font-family: var(--font-family-mono);
   font-size: clamp(0.88rem, 0.795rem + 0.398vw, 1.09rem);
-  background-color: #eaeaea;
+  background-color: var(--base-90);
+  color: var(--base-00);
   padding: 0.1em 0.3em;
   border-radius: var(--border-radius);
 }

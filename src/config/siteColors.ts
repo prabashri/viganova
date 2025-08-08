@@ -37,12 +37,12 @@ export const siteColors = {
   secondaryColorLighterX: "",
   
   backgroundColor: "#ffffff", 
-   
+     
   textColor: "#000000",
-  
+
   /* Dark Mode Colors */
 
-  darkBackgroundColor: "#131313ff", // Optional dark mode background color
+  darkBackgroundColor: "#1b1a1aff", // Optional dark mode background color
 
   darkTextColor: "#ffffff", // Optional dark mode text color
 
@@ -53,7 +53,7 @@ export const siteColors = {
   darkPrimaryColorLight: "hsla(267, 100%, 60%, 1)",
   darkPrimaryColorLighter: "hsla(267, 100%, 50%, 1)",
   darkPrimaryColorLighterX: "hsla(267, 100%, 40%, 1)",
-
+  
   darkSecondaryColorDarkerX: "",
   darkSecondaryColorDarker: "",
   darkSecondaryColorDark: "",

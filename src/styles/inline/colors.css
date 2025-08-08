@@ -46,13 +46,13 @@
   color-scheme: dark;
 
   /* Primary Colors (Dark) */
-  --primary-darker-x: hsla(267, 100%, 33%, 1);
-  --primary-darker: hsla(267, 100%, 43%, 1);
-  --primary-dark: hsla(267, 100%, 58%, 1);
+  --primary-darker-x: hsla(267, 100%, 90%, 1);
+  --primary-darker: hsla(267, 100%, 80%, 1);
+  --primary-dark: hsla(267, 100%, 70%, 1);
   --primary-base: hsla(267, 100%, 68%, 1);
-  --primary-light: hsla(267, 100%, 78%, 1);
-  --primary-lighter: hsla(267, 100%, 88%, 1);
-  --primary-lighter-x: hsla(267, 100%, 95%, 1);
+  --primary-light: hsla(267, 100%, 60%, 1);
+  --primary-lighter: hsla(267, 100%, 50%, 1);
+  --primary-lighter-x: hsla(267, 100%, 40%, 1);
 
   /* Secondary Colors (Dark) */
   --secondary-darker-x: hsla(232, 91%, 5%, 1);
@@ -64,10 +64,10 @@
   --secondary-lighter-x: hsla(232, 91%, 64%, 1);
 
   /* Background & Text (Dark) */
-  --background-color: hsla(0, 0%, 7%, 1);
+  --background-color: hsla(0, 2%, 10%, 1);
   --text-color: hsla(0, 0%, 95%, 1);
 
-  /* Base Greyscale (Reversed) */
+  /* Base Greyscale (Dark) */
   --base-00: hsla(0, 0%, 0%, 1);
   --base-05: hsla(0, 0%, 5%, 1);
   --base-10: hsla(0, 0%, 10%, 1);

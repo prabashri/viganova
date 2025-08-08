@@ -39,6 +39,8 @@ export async function buildCssBundle({
 
   if (cssFiles.length === 0) {
     console.log(`⚠️ No CSS files found in ${inputDir}. Skipping.`);
+    await writeManifestEntry('css', type, '', { names: cssNames });
+    console.log(`⚠️ Updated the assets-manifest.json with no CSS files found in ${inputDir}.`);
     return;
   }
 

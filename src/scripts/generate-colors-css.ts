@@ -181,12 +181,8 @@ function generateDarkModeShades(
   return adjusted;
 }
 
-
-/* -------------------------
-   🎨 CSS Builder
-------------------------- */
 function generateCSS(colors: typeof siteColors) {
-  // Light mode shades
+  // --- Light mode: always respect user input, auto-generate gaps
   const primaryShades = generateColorSet(colors.primaryColor, {
     'darker-x': colors.primaryColorDarkerX,
     'darker': colors.primaryColorDarker,
@@ -207,7 +203,7 @@ function generateCSS(colors: typeof siteColors) {
     'lighter-x': colors.secondaryColorLighterX
   });
 
-  // 3. Base scales (darkBase support)
+  // Base greys + explicit bg/text
   const baseLight = generateBaseScale(false);
   const baseDark = colors.darkBase === false ? baseLight : generateBaseScale(true);
 
@@ -216,22 +212,53 @@ function generateCSS(colors: typeof siteColors) {
   const bgDarkHSLA = parseColorToHSLA(colors.darkBackgroundColor, true);
   const textDarkHSLA = parseColorToHSLA(colors.darkTextColor, true);
 
-  // Dark theme block only if enabled
-  let darkThemeBlock = '';
-  if (colors.darkMode) {
-    const hasCustomDarkPrimary = !!colors.darkPrimaryColor?.trim();
-    const hasCustomDarkSecondary = !!colors.darkSecondaryColor?.trim();
+  // --- Dark mode strategy:
+  // If ANY dark* value is provided, use generateColorSet() with those overrides
+  // (and auto-generate missing ones). Otherwise, derive from lightShades using darkAdjustmentMode.
+  const anyDarkPrimaryProvided =
+    !!(colors.darkPrimaryColor?.trim() ||
+       colors.darkPrimaryColorDarkerX?.trim() ||
+       colors.darkPrimaryColorDarker?.trim() ||
+       colors.darkPrimaryColorDark?.trim() ||
+       colors.darkPrimaryColorLight?.trim() ||
+       colors.darkPrimaryColorLighter?.trim() ||
+       colors.darkPrimaryColorLighterX?.trim());
 
-    const primaryDarkShades = hasCustomDarkPrimary
-      ? generateColorSet(colors.darkPrimaryColor!, {} as any)
-      : (colors.autoDarkAdjust ? generateDarkModeShades(primaryShades) : generateDarkModeShades(primaryShades)); // fallback to swap/adjust
+  const anyDarkSecondaryProvided =
+    !!(colors.darkSecondaryColor?.trim() ||
+       colors.darkSecondaryColorDarkerX?.trim() ||
+       colors.darkSecondaryColorDarker?.trim() ||
+       colors.darkSecondaryColorDark?.trim() ||
+       colors.darkSecondaryColorLight?.trim() ||
+       colors.darkSecondaryColorLighter?.trim() ||
+       colors.darkSecondaryColorLighterX?.trim());
 
-    const secondaryDarkShades = hasCustomDarkSecondary
-      ? generateColorSet(colors.darkSecondaryColor!, {} as any)
-      : (colors.autoDarkAdjust ? generateDarkModeShades(secondaryShades) : generateDarkModeShades(secondaryShades));
+  const primaryDarkShades = anyDarkPrimaryProvided
+    ? generateColorSet(colors.darkPrimaryColor || colors.primaryColor, {
+        'darker-x': colors.darkPrimaryColorDarkerX,
+        'darker': colors.darkPrimaryColorDarker,
+        'dark': colors.darkPrimaryColorDark,
+        'base': colors.darkPrimaryColor || '', // if empty, auto-gen from provided base fallback
+        'light': colors.darkPrimaryColorLight,
+        'lighter': colors.darkPrimaryColorLighter,
+        'lighter-x': colors.darkPrimaryColorLighterX
+      })
+    : generateDarkModeShades(primaryShades);
 
+  const secondaryDarkShades = anyDarkSecondaryProvided
+    ? generateColorSet(colors.darkSecondaryColor || colors.secondaryColor, {
+        'darker-x': colors.darkSecondaryColorDarkerX,
+        'darker': colors.darkSecondaryColorDarker,
+        'dark': colors.darkSecondaryColorDark,
+        'base': colors.darkSecondaryColor || '',
+        'light': colors.darkSecondaryColorLight,
+        'lighter': colors.darkSecondaryColorLighter,
+        'lighter-x': colors.darkSecondaryColorLighterX
+      })
+    : generateDarkModeShades(secondaryShades);
 
-    darkThemeBlock = `
+  // --- Build CSS
+  const darkThemeBlock = colors.darkMode ? `
 [data-theme="dark"] {
   color-scheme: dark;
 
@@ -245,12 +272,10 @@ function generateCSS(colors: typeof siteColors) {
   --background-color: ${hslaToCss(bgDarkHSLA)};
   --text-color: ${hslaToCss(textDarkHSLA)};
 
-  /* Base Greyscale (Reversed) */
+  /* Base Greyscale (Dark) */
   ${Object.entries(baseDark).map(([k, v]) => `--${k}: ${v};`).join('\n  ')}
-}`;
-  }
+}` : '';
 
-  // Build CSS output
   return `/* ================================
    🌈 CSS VARIABLES
 ================================ */
@@ -272,6 +297,7 @@ function generateCSS(colors: typeof siteColors) {
 }
 ${darkThemeBlock}`;
 }
+
 
 
 
