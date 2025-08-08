@@ -1,0 +1,66 @@
+---
+// src/components/Analytics.astro
+// 🚫 disable automatic pageview (we send manually for PWA) by using send_page_view: false
+import {siteFunctions} from '../config/siteFunctions';
+const analyticsId = siteFunctions.analyticsId;
+const cloudflareAnalyticsId = siteFunctions.cloudflareAnalyticsId;
+
+---
+{/*-- Google tag: fast, async, non-blocking, also, load only we have analytics id --*/}
+{
+  typeof cloudflareAnalyticsId === "string" && cloudflareAnalyticsId.trim() && (
+    <script 
+      data-category="analytics"
+      defer
+      type="text/javascript"
+      src={`https://static.cloudflareinsights.com/beacon.min.js`} data-cf-beacon='{"token": "5583179e635941e390608e36b79fd756"}'>
+    </script>
+  )
+}
+{
+  typeof analyticsId === "string" && analyticsId.trim() && (
+    <>
+      <script 
+        data-category="analytics"
+        defer
+        data-src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}>
+      </script>
+
+
+      <script 
+          data-category="analytics"
+          defer
+          type="text/javascript"
+          define:vars={{analyticsId: analyticsId}}
+        >
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+
+        // Ensure pageview is sent as early as possible
+        gtag('js', new Date());
+        gtag('config', analyticsId, {
+          send_page_view: true
+        });
+
+        // Safe: interaction tracking once DOM is interactive
+        document.addEventListener('DOMContentLoaded', () => {
+          document.addEventListener('click', (e) => {
+            const el = e.target.closest('[data-action]');
+            if (!el || typeof gtag !== 'function') return;
+
+            const action = el.getAttribute('data-action');
+            const label = el.getAttribute('data-label') || el.innerText || el.getAttribute('href') || location.pathname;
+
+            gtag('event', action, {
+              event_category: 'interaction',
+              event_label: label,
+              value: 1,
+            });
+          });
+        });
+      </script>
+    </>
+  )
+}
+
+

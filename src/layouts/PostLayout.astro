@@ -104,8 +104,6 @@ const headProps: HeadProps = {
   <Fragment slot="headContent-bottom" />
 
   <style id="post-layout-styles" is:inline>
-
-
 .post-layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -119,7 +117,6 @@ const headProps: HeadProps = {
   /*gap: 1rem;*/
   width: 100%;
 }
-
 /* Assign grid-areas + max-widths */
 .post-header     { grid-area: header; }
 .hero-image      { grid-area: hero; width: 100%; }
@@ -127,9 +124,6 @@ const headProps: HeadProps = {
 .post-content    { grid-area: content; max-width: var(--content-width); }
 .sidebar         { grid-area: sidebar; }
 .post-footer     { grid-area: footer; max-width: var(--content-width); }
-
-
-
 /* 🖥 Desktop: 3 columns */
 @media (min-width: 1280px) {
   .post-layout {
@@ -141,10 +135,8 @@ const headProps: HeadProps = {
       "toc content sidebar"
       "toc footer sidebar";
   }
-
   .full-mr-unset { margin-right: unset !important; }
   .full-ml-unset { margin-left: unset !important; }
-
   /* Sticky sidebars */
   .toc {
     max-width: var(--toc-width);
@@ -154,19 +146,15 @@ const headProps: HeadProps = {
     max-height: calc(100vh - 5rem);
     overflow: auto;
     margin-inline: auto;
-  }
-  
+  }  
 }
-
 /* Hide empty */
 .sidebar:empty,
 .toc:empty {
   display: none;
 }
-
 .icon-link:hover {
   background-color: var(--primary-lighter-x) !important;
-
 } 
 </style>
   <article id="post-layout" class="post-layout jc-center">

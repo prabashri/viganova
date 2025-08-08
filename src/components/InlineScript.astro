@@ -74,7 +74,7 @@ const isDev = import.meta.env.DEV;
 )}
 
 {!isDev && mainJsFile && (
-  <script id="main-js" type="module" data-src={mainJsFile} async></script>
+  <script id="main-js" type="module" data-src={mainJsFile} defer></script>
 )}
 
 {!isDev && (

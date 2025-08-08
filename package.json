@@ -6,6 +6,7 @@
     "dev": "node src/scripts/generate-all.mjs && astro dev",
     "generate:all": "node src/scripts/generate-all.mjs",
     "build": "npm run generate:all && astro build",
+    "postbuild": "node src/scripts/submit-indexnow.ts",
     "preview": "astro preview",
     "astro": "astro"
   },

@@ -54,7 +54,7 @@ const isFormAvailable = contactFormHandler && turnstileSitekey;
       <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
     )}
     { isDev && <script src="/scripts/contact-form.js" defer></script>}
-    { !isDev && contactForm && <script id="contact-form" data-src={contactForm} async></script>}
+    { !isDev && contactForm && <script id="contact-form" data-src={contactForm} defer></script>}
   </Fragment>
 <style>
   /* Contact Form Base */

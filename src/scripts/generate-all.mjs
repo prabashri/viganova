@@ -12,7 +12,7 @@ function run(script, label) {
 }
 
 // Run all generate scripts
-
+run('npx tsx src/scripts/prepare-indexnow.ts', 'IndexNow Preparation');
 run('npx tsx src/scripts/generate-colors-css.ts', 'Colors CSS Generation');
 run('npx tsx src/scripts/generate-site-logo.ts', 'Site Logo Generation');
 run('npx tsx src/scripts/generate-last-modified-date.ts', 'Last Modified Date');

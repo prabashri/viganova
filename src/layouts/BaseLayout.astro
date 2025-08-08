@@ -6,6 +6,7 @@ import Footer from '../components/Footer.astro';
 //import Analytics from '../components/Analytics.astro';
 import type { HeadProps } from '../types/HeadProps';
 import Breadcrumb from '../components/ui/Breadcrumb.astro';
+import Analytics from '../components/Analytics.astro';
 import InlineScript from '../components/InlineScript.astro';
 
 interface Props {
@@ -45,7 +46,10 @@ const {
       <slot />
     </main>
       
-    {/** 🔹 Inline Scripts */}
+    {/** 🔹 Analytics */}
+    <Analytics />
+    
+    {/* -- inline scripts -- */}
     <InlineScript />
 
     {/* -- Optional extra content -- */}

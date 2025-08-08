@@ -1,9 +1,5 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import ResponsiveImage from '../components/ResponsiveImage.astro';
 import type { HeadProps } from '../types/HeadProps';
 import { siteDefaults } from '../config/siteDefaults';	
@@ -34,7 +30,7 @@ const headProps: HeadProps = {
 		<header id="post-header" class="mx-w-site mi-auto ta-center">
 			<h1 class="post-title">Modern flexible theme "AstroWEB" for Astro Framework by nViewsWEB</h1>
 			<p class="post-desc">A theme to support and promote your digital presence with modern design, features, seo, security, and so on.</p>			
-			<div id="hero-image" class="mx-w-content w-full mi-auto">				
+			<div id="hero-image" class="mx-w-content w-full mi-auto ">				
 				<ResponsiveImage
 					src="astroweb-theme-features-listed-by-user-hero-image.png"
 					alt="A beautiful view of the cosmos with stars and galaxies"
