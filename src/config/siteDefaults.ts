@@ -1,24 +1,26 @@
 export const siteDefaults = {
-  siteName: "AstroWEB by Nviews WEB",
-  shortName: "AstroWEB",
+  siteName: "Easy Apostille",
+  shortName: "Easy Apostille",
   publishedDate: "June 19 2025",
-  
-  domainName: "astroweb-template-ssr.pages.dev",
-  siteUrl: "https://astroweb-template-ssr.pages.dev",
-  title: "Theme for Astro by nViewsWEB - The Ultimate Frontend Toolkit",
-  description: "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
-  keywords: ["Astro", "Theme", "Frontend", "Web Development", "CSS", "JavaScript"],
+
+  cloudflareUrl: "https://easyapostille.pages.dev",
+
+  domainName: "easyapostille.in",
+  siteUrl: "https://easyapostille.in",
+  title: "Easy Apostille - Simplifying Document Apostille Attestation",
+  description: "Easy Apostille is your trusted partner for hassle-free document apostille and attestation services. We simplify the process, ensuring your documents are authenticated and ready for international use.",
+  keywords: ["Apostille Attestation", "Document Authentication", "Notary Process", "India Apostille Services"],
 
   socialLinks: {
     x: "@nviewsweb", // twitter handle without @
-    github: "https://github.com/nviewsweb",
+    github: "https://github.com/easyapostille",
     linkedin: "https://linkedin.com/company/nviewsweb",
     facebook: "https://facebook.com/nviewsweb",
     instagram: "https://instagram.com/nviewsweb",
     youtube: "https://youtube.com/@nviewsweb",
     mastodon: "https://mastodon.social/@nviewsweb",
     bluesky: "https://bsky.app/profile/nviewsweb.com",
-    email: "mailto:admin@nviewsweb.com"
+    email: "mailto:admin@verifiedapostille.com"
   },
 
     // Admin contact (for technical/meta info)

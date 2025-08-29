@@ -9,7 +9,7 @@ import icon from 'astro-icon';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://astroweb-template-ssr.pages.dev',
+  site: 'https://easyapostille.pages.dev',
   integrations: [
     mdx(),   
     icon()
