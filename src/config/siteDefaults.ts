@@ -1,6 +1,6 @@
 // src/config/siteDefaults.ts
-import type { StaticPageDefaults, PageFlags, PageKey } from '@/types/siteDefaults';
-import { normalizePageFlags } from '@/types/siteDefaults';
+import type { StaticPageDefaults, PageFlags, PageKey } from '../types/siteDefaults';
+import { normalizePageFlags } from '../types/siteDefaults';
 
 const SITE_NAME = "EasyApostille";
 

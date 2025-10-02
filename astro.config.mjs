@@ -5,8 +5,8 @@ import mdx from '@astrojs/mdx';
 import cloudflare from '@astrojs/cloudflare';
 import path from 'path';
 
-// ⛳️ Use relative import here (no "@/...")
-import { siteDefaults } from './src/config/siteDefaults.js';
+// ⛳️ relative import (no "@/")
+import { siteDefaults } from './src/config/siteDefaults';
 
 export default defineConfig({
   site: siteDefaults.siteUrl || siteDefaults.cloudflareUrl,
