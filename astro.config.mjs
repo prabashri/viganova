@@ -1,30 +1,26 @@
+// astro.config.mjs or astro.config.js
 // @ts-check
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
-
 import cloudflare from '@astrojs/cloudflare';
 import path from 'path';
 
-import icon from 'astro-icon';
+// ⛳️ Use relative import here (no "@/...")
+import { siteDefaults } from './src/config/siteDefaults.js';
 
-// https://astro.build/config
 export default defineConfig({
-  site: 'https://easyapostille.pages.dev',
-  integrations: [
-    mdx(),   
-    icon()
-  ],
+  site: siteDefaults.siteUrl || siteDefaults.cloudflareUrl,
+  integrations: [mdx()],
   adapter: cloudflare({
-     imageService: 'compile'
+    imageService: 'compile', // good for Pages/Workers
   }),
-  output: 'server',
+  output: 'server',          // ✅ SSR
   trailingSlash: 'always',
-
   vite: {
     resolve: {
       alias: {
-        '@': path.resolve('./src')
-        }
-      }
+        '@': path.resolve('./src'),
+      },
     },
+  },
 });
