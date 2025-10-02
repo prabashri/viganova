@@ -38,7 +38,7 @@ export const siteDefaults = {
     // youtube: "https://youtube.com/@easyapostille",
     // mastodon: "https://mastodon.social/@easyapostille",
     // bluesky: "https://bsky.app/profile/easyapostille",
-    email: "mailto:admin@verifiedapostille.com",
+    email: "mailto:admin@easyapostille.in",
   },
 
   // Admin contact (for technical/meta info)
