@@ -54,7 +54,7 @@ export async function submitToIndexNow(
   urls: string[] = [],
   opts?: { force?: boolean; minDaysBetween?: number; maxUrls?: number }
 ) {
-  const indexEnabled = siteFunctions.index === true;
+  const indexEnabled = !!siteFunctions.index;
   const isProd = import.meta.env?.PROD === true;
   const minDays = Math.max(0, opts?.minDaysBetween ?? 14);
   const minMs = minDays * 24 * 60 * 60 * 1000;
