@@ -6,7 +6,7 @@
     "dev": "node src/scripts/generate-all.mjs && astro dev",
     "generate:all": "node src/scripts/generate-all.mjs",
     "build": "npm run generate:all && astro build",
-    "postbuild": "node src/scripts/submit-indexnow.ts",
+    "postbuild": "tsx src/scripts/submit-indexnow.ts",
     "preview": "astro preview",
     "astro": "astro"
   },
@@ -33,7 +33,7 @@
     "remark-stringify": "^11.0.0",
     "sharp": "^0.34.2",
     "sharp-ico": "^0.1.5",
-    "tsx": "^4.20.3",
+    "tsx": "^4.20.6",
     "unified": "^11.0.5"
   }
 }
