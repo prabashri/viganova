@@ -16,12 +16,12 @@
     "@astrojs/mdx": "^4.3.6",
     "@astrojs/rss": "^4.0.12",
     "astro": "^5.13.10",
-    "astro-icon": "^1.1.5",
     "fuse.js": "^7.1.0",
     "typescript": "^5.9.2"
   },
   "devDependencies": {
     "@types/html-to-text": "^9.0.4",
+    "astro-icon": "^1.1.5",
     "esbuild": "^0.25.8",
     "gray-matter": "^4.0.3",
     "html-to-text": "^9.0.5",
