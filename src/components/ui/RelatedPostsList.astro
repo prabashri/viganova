@@ -1,0 +1,43 @@
+---
+export interface RelatedItem {
+  title: string;
+  url: string;
+}
+
+export interface Props {
+  items: RelatedItem[];
+  /** Optional heading text (defaults to 'Related posts') */
+  heading?: string;
+  /** Optional aria-label override for the list region */
+  ariaLabel?: string;
+  wrapperClass?: string;
+  headingClass?: string;
+  listClass?: string;
+  itemClass?: string;
+}
+
+const { 
+    items = [], 
+    heading = 'Related posts', 
+    ariaLabel,
+    wrapperClass = '',
+    headingClass = '',
+    listClass = '',
+    itemClass = '',
+} = Astro.props;
+const safeItems = Array.isArray(items) ? items.filter(i => i?.title && i?.url) : [];
+---
+
+{safeItems.length > 0 ? (
+  <div class={`p-1 br bg ${wrapperClass}`} aria-label={ariaLabel ?? heading}>
+    <h3 class={`mb-05 text-base uppercase ${headingClass}`}>{heading}</h3>
+    <ul class={`no-bullets ${listClass}`}>
+      {safeItems.map((item) => (
+        <li class={`pb-05 ${itemClass}`}>
+          <a class={`${itemClass}`} href={item.url}>{item.title}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+) : null}
+

@@ -1,0 +1,410 @@
+---
+// src/components/schema/SchemaLocalBusiness.astro
+import { localBusiness } from "@/config/localBusiness";
+import { siteDefaults } from "@/config/siteDefaults";
+
+import manifest from "@/data/assets-manifest.json";
+import { resolveLogoFromManifest } from "@/utils/resolveLogos";
+import { priceInfo, price as priceOf, PRICES_LAST_UPDATED } from "@/config/pricing";
+
+import type {
+  OpeningHour,
+  LocationEntry,
+  LocalBusinessSchemaType,
+  BusinessMode,
+  ServiceChannelInfo
+} from "@/types/localBusiness";
+
+import type { PageTypes } from "@/types/HeadProps";
+
+import { toAbsoluteUrl, idFor } from "@/utils/urls";
+
+/* ===== Props ===== */
+/* ===== Internal page types SchemaLocalBusiness cares about ===== */
+type InternalPageType = "home" | "contact" | "location" | "service" | "other";
+type PageTypeProp = PageTypes | InternalPageType;
+
+type OfferProp = { priceKey: string; name?: string; buyNowLink?: string };
+
+interface Props {
+  pageType?: PageTypeProp;
+  orgId?: string;
+  websiteId?: string;
+  localBusinessId?: string;
+  offers?: OfferProp[];
+  priceKey?: string | string[];
+  offerName?: string | string[];
+  offerUrl?: string;
+  priceCurrency?: string;
+  availability?: string;
+  title?: string;
+}
+
+/* 🔧 Normalize with awareness of offers */
+function normalizePageType(
+  input: PageTypeProp | undefined,
+  pathname: string,
+  hasOffers: boolean
+): InternalPageType {
+  const p = (input || "other").toLowerCase();
+
+  // Home detection
+  if (p === "home") return "home";
+  if ((p === "website" || p === "webpage") && (pathname === "/" || pathname === "")) return "home";
+
+  if (p === "contact") return "contact";
+  if (p === "service" || p === "product") return "service";
+
+  // ✅ If a page is marked as "article" but has offers, treat it like a service page for business schema
+  if (p === "article" && hasOffers) return "service";
+
+  if (p === "about") return "location";
+  if (p === "profile" || p === "person") return "other";
+  if (["list","collection","search","faq","howto","review"].includes(p)) return "other";
+  if (["watch","watchpage","video","audio","listen","listenpage","podcast","404","terms","privacy"].includes(p)) return "other";
+
+  if (p === "location") return "location";
+  return "other";
+}
+
+const {
+  pageType: pageTypeProp,
+  offers,
+  priceKey,
+  offerName,
+  offerUrl,
+  availability = "https://schema.org/InStock",
+  priceCurrency = "INR",
+  title: pageTitleProp,
+  orgId: orgIdFromCaller,
+  websiteId: websiteIdFromCaller,
+  localBusinessId
+} = Astro.props as Props;
+
+/* Compute offers FIRST */
+const hasPageOffers = (Array.isArray(offers) && offers.length > 0) || !!priceKey;
+
+/* Normalize with offers-awareness */
+const pathname = Astro.url?.pathname || "/";
+const pageType: InternalPageType = normalizePageType(pageTypeProp, pathname, hasPageOffers);
+
+/* ===== gates ===== */
+const enabled = (localBusiness?.enabled ?? true);
+const hasLocations = Array.isArray(localBusiness?.locations) && localBusiness.locations.length > 0;
+
+const shouldEmitLB = enabled && hasLocations && ["home","contact","location"].includes(pageType);
+
+/* ✅ Emit Service schema when offers exist, except on obvious non-service contexts */
+const shouldEmitService =
+  (pageType === "service" || hasPageOffers) && !["contact","location","home"].includes(pageType);
+
+/* ===== IDs ===== */
+const firstSuffix = hasLocations ? (localBusiness.locations[0]["@idSuffix"] || "main") : "main";
+const LB_ID = localBusinessId ?? idFor(`localbusiness-${firstSuffix}`, "/");
+/* ===== Site/Org fallbacks ===== */
+function collectSameAsFromSiteDefaults(): string[] {
+  const s = siteDefaults.socialLinks || {};
+  const out: string[] = [];
+  for (const v of Object.values(s)) if (typeof v === "string" && /^https?:\/\//i.test(v)) out.push(v);
+  if (typeof s.x === "string") {
+    const handle = s.x.replace(/^@/, "");
+    if (handle) out.push(`https://x.com/${handle}`);
+  }
+  return Array.from(new Set(out));
+}
+const PARENT = siteDefaults.parentOrganization || {};
+const ORG_ID =
+  orgIdFromCaller ?? idFor("organization", siteDefaults.parentOrganization?.url || "/");
+const ORG_NAME_FALLBACK =
+  siteDefaults.siteName || siteDefaults.legalName || PARENT.name || siteDefaults.title;
+const ORG_LOGO_FALLBACK = siteDefaults.parentOrganization?.logo;
+
+const ORG_LOGO_RESOLVED = resolveLogoFromManifest({
+  manifest,
+  kind: "organization",
+  toAbsoluteUrl
+});
+
+const ORG_TAX_ID = siteDefaults.taxId || PARENT.taxId || "";
+const ORG_REG_ID = siteDefaults.registrationId || PARENT.registrationId || "";
+const ORG_FOUNDED = siteDefaults.foundingDate || PARENT.foundingDate || "";
+
+/* ===== Helpers ===== */
+function normalizeSchemaType(input?: LocalBusinessSchemaType): LocalBusinessSchemaType {
+  if (!input) return "LocalBusiness";
+  const s = String(input).trim().toLowerCase();
+  const map: Record<string, LocalBusinessSchemaType> = {
+    "localbusiness": "LocalBusiness",
+    "local business": "LocalBusiness",
+    "professionalservice": "ProfessionalService",
+    "professional service": "ProfessionalService",
+    "legalservice": "LegalService",
+    "legal service": "LegalService",
+    "store": "Store"
+  };
+  return map[s] || input;
+}
+
+function mapOpeningHours(hours?: OpeningHour[] | null) {
+  if (!hours || !Array.isArray(hours)) return undefined;
+  return hours.map((h) =>
+    h.closed
+      ? { "@type": "OpeningHoursSpecification", dayOfWeek: h.dayOfWeek }
+      : { "@type": "OpeningHoursSpecification", dayOfWeek: h.dayOfWeek, opens: h.opens, closes: h.closes }
+  );
+}
+
+function buildOfferCatalog() {
+  const services = localBusiness.services || [];
+  if (!services.length) return undefined;
+
+  const list = services.map((s: any, i: number) => {
+    const hasPrice = Boolean(s.priceKey);
+    const serviceItem = { "@type": "Service", name: s.name, url: toAbsoluteUrl(s.url) };
+    return hasPrice
+      ? {
+          "@type": "Offer",
+          position: i + 1,
+          priceCurrency: "INR",
+          price: String(priceOf(s.priceKey)),
+          itemOffered: serviceItem
+        }
+      : { "@type": "Offer", position: i + 1, itemOffered: serviceItem };
+  });
+
+  return {
+    "@type": "OfferCatalog",
+    name: `${localBusiness.businessUnit.name} Services`,
+    dateModified: localBusiness.pricesLastUpdated,
+    itemListElement: list
+  };
+}
+const offerCatalog = buildOfferCatalog();
+
+function buildServiceChannel(info?: ServiceChannelInfo) {
+  if (!info) return undefined;
+  const channel: any = {
+    "@type": "ServiceChannel",
+    availableLanguage: info.availableLanguage,
+    serviceUrl: info.serviceUrl ? toAbsoluteUrl(info.serviceUrl) : undefined
+  };
+
+  if (info.bookingUrl) {
+    channel.hasOfferCatalog = {
+      "@type": "OfferCatalog",
+      name: "Booking",
+      itemListElement: [
+        {
+          "@type": "Offer",
+          itemOffered: { "@type": "Service", name: "Book/Request", url: toAbsoluteUrl(info.bookingUrl) }
+        }
+      ]
+    };
+  }
+
+  if (info.servicePhone || info.serviceEmail || info.whatsapp) {
+    channel.servicePhone = {
+      "@type": "ContactPoint",
+      telephone: info.servicePhone,
+      email: info.serviceEmail,
+      contactType: "customer support",
+      availableLanguage: info.availableLanguage,
+      sameAs: info.whatsapp ? [`https://wa.me/${String(info.whatsapp).replace(/\D/g, "")}`] : undefined
+    };
+  }
+  return channel;
+}
+
+function effectiveMode(loc: LocationEntry): BusinessMode {
+  return loc.mode || localBusiness.businessMode || "physical";
+}
+
+/* ===== Page-level Offers (Service pages) ===== */
+function pageLevelOffers() {
+  const normalized: OfferProp[] = (() => {
+    if (Array.isArray(offers) && offers.length) return offers;
+    if (!priceKey) return [];
+    const keys = Array.isArray(priceKey) ? priceKey : [priceKey];
+    const names = Array.isArray(offerName) ? offerName : offerName ? [offerName] : [];
+    return keys.map((k, i) => ({ priceKey: k, name: names[i] || names[0] }));
+  })();
+
+  if (!normalized.length) return undefined;
+
+  const pageAbs = toAbsoluteUrl(offerUrl || Astro.url?.pathname || "/");
+  const pageTitle = pageTitleProp || localBusiness.businessUnit?.name;
+
+  const items = normalized.map((o) => {
+    const p = priceInfo(o.priceKey as any);
+    const displayName = o.name || p.name || pageTitle;
+    const targetUrl = o.buyNowLink || p.buyNowLink || pageAbs;
+
+    return {
+      "@type": "Offer",
+      priceCurrency: p.currency || priceCurrency || "INR",
+      price: String(p.amount),
+      availability,
+      url: toAbsoluteUrl(targetUrl),
+      itemOffered: { "@type": "Service", name: displayName, url: pageAbs }
+    };
+  });
+
+  return items.length ? items : undefined;
+}
+
+/* ===== LocalBusiness node builder ===== */
+function locationToSchema(loc: LocationEntry, index: number) {
+  const idSuffix = loc["@idSuffix"] || `loc-${index + 1}`;
+  const localId = idFor(`localbusiness-${idSuffix}`, "/");
+
+  const nodeType = normalizeSchemaType(loc.schemaType || localBusiness.schemaType || "LocalBusiness");
+  const mode = effectiveMode(loc);
+
+  const attachOfferCatalog =
+  offerCatalog && (mode === "online" || mode === "serviceArea") ? offerCatalog : undefined;
+  
+  const opening = mapOpeningHours(
+  (loc.openingHours === null ? undefined : loc.openingHours) || localBusiness.openingHours
+)?.map((o: any) => (o.dayOfWeek === "Sunday" && !o.opens && !o.closes
+  ? { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", closed: true }
+  : o
+));
+  // const opening = mapOpeningHours((loc.openingHours === null ? undefined : loc.openingHours) || localBusiness.openingHours);
+
+  const areaServed =
+    (loc.serviceArea && loc.serviceArea.length ? loc.serviceArea : localBusiness.areaServed) || undefined;
+
+  const sameAsBase = Array.isArray(localBusiness.businessUnit.sameAs)
+    ? [...localBusiness.businessUnit.sameAs]
+    : collectSameAsFromSiteDefaults();
+
+  if (localBusiness.googleBusinessProfile?.listingUrl) sameAsBase.push(localBusiness.googleBusinessProfile.listingUrl);
+  if (localBusiness.googleBusinessProfile?.reviewsUrl) sameAsBase.push(localBusiness.googleBusinessProfile.reviewsUrl);
+  if (loc.whatsapp) sameAsBase.push(`https://wa.me/${String(loc.whatsapp).replace(/\D/g, "")}`);
+
+  const identifiers: any[] = [];
+  if (localBusiness.googleBusinessProfile?.placeId) {
+    identifiers.push({ "@type": "PropertyValue", name: "Google Place ID", value: localBusiness.googleBusinessProfile.placeId });
+  }
+  const TAX_ID = localBusiness.taxId || ORG_TAX_ID;
+  const REG_ID = localBusiness.registrationId || ORG_REG_ID;
+  if (TAX_ID) identifiers.push({ "@type": "PropertyValue", name: "Tax ID", value: TAX_ID });
+  if (REG_ID) identifiers.push({ "@type": "PropertyValue", name: "Registration ID", value: REG_ID });
+
+  const onlineChannel = buildServiceChannel({ ...localBusiness.online, ...loc.online });
+
+  const node: Record<string, any> = {
+    "@context": "https://schema.org",
+    "@type": nodeType,
+    "@id": localId,
+    name: loc.name || localBusiness.businessUnit.name || siteDefaults.siteName,
+    url: toAbsoluteUrl(localBusiness.businessUnit.url || "/"),
+    image: loc.image ? toAbsoluteUrl(loc.image) : undefined,
+
+    brand: {
+      "@type": "Brand",
+      name: localBusiness.businessUnit.name || siteDefaults.siteName,
+      url: toAbsoluteUrl(localBusiness.businessUnit.url || "/"),
+      logonew: ORG_LOGO_RESOLVED,
+      logo: (() => {
+        const buLogo = localBusiness.businessUnit.logo;
+        if (buLogo && (buLogo.startsWith("/") || /^https?:\/\//i.test(buLogo))) return toAbsoluteUrl(buLogo);
+        return ORG_LOGO_RESOLVED.url || (ORG_LOGO_FALLBACK ? toAbsoluteUrl(ORG_LOGO_FALLBACK) : undefined);
+      })()
+    },
+
+    telephone: loc.telephone || undefined,
+    email: loc.email || undefined,
+    sameAs: sameAsBase.length ? Array.from(new Set(sameAsBase)) : undefined,
+
+    priceRange: localBusiness.priceRange || undefined,
+    currenciesAccepted: localBusiness.currenciesAccepted || undefined,
+    paymentAccepted: Array.isArray(localBusiness.paymentAccepted)
+      ? localBusiness.paymentAccepted.join(", ")
+      : localBusiness.paymentAccepted || undefined,
+    availableLanguage: localBusiness.availableLanguage || undefined,
+
+    address:
+      mode === "physical" && loc.address
+        ? {
+            "@type": "PostalAddress",
+            streetAddress: loc.address.streetAddress,
+            addressLocality: loc.address.addressLocality,
+            addressRegion: loc.address.addressRegion,
+            postalCode: loc.address.postalCode,
+            addressCountry: loc.address.addressCountry
+          }
+        : undefined,
+    geo: mode === "physical" && loc.geo ? { "@type": "GeoCoordinates", latitude: loc.geo.latitude, longitude: loc.geo.longitude } : undefined,
+    hasMap: mode === "physical" && loc.hasMap ? toAbsoluteUrl(loc.hasMap) : undefined,
+
+    openingHoursSpecification: opening,
+    areaServed,
+
+    parentOrganization: { "@id": ORG_ID },
+    branchOf: { "@id": ORG_ID },
+
+    legalName: localBusiness.legalName || ORG_NAME_FALLBACK || undefined,
+    taxID: TAX_ID || undefined,
+    foundingDate: localBusiness.foundingDate || ORG_FOUNDED || undefined,
+
+    additionalProperty: [
+      (loc.category || localBusiness.primaryCategory) && {
+        "@type": "PropertyValue",
+        name: "PrimaryCategory",
+        value: loc.category || localBusiness.primaryCategory
+      },
+      Array.isArray(localBusiness.additionalCategories) &&
+        localBusiness.additionalCategories.length && {
+          "@type": "PropertyValue",
+          name: "AdditionalCategories",
+          value: localBusiness.additionalCategories.join(", ")
+        },
+      { "@type": "PropertyValue", name: "BusinessMode", value: effectiveMode(loc) }
+    ].filter(Boolean),
+
+    hasOfferCatalog: attachOfferCatalog, 
+    availableChannel: (effectiveMode(loc) !== "physical") && onlineChannel ? onlineChannel : undefined,
+    identifier: identifiers.length ? identifiers : undefined,
+
+    ...(pageLevelOffers() ? { makesOffer: pageLevelOffers() } : {}),
+    ...(PRICES_LAST_UPDATED ? { dateModified: PRICES_LAST_UPDATED } : {})
+  };
+
+  // ✅ On homepage, mark the online/service-area LB as the main entity
+  if (Astro.url?.pathname === "/" && (mode === "online" || mode === "serviceArea")) {
+    node.mainEntityOfPage = toAbsoluteUrl("/");
+  }
+
+  return node;
+}
+
+
+
+/* ===== Build LocalBusiness nodes when needed ===== */
+const localSchemas = shouldEmitLB ? localBusiness.locations.map(locationToSchema) : [];
+---
+
+{shouldEmitLB && localSchemas.map((node, i) => (
+  <script
+    type="application/ld+json"
+    id={`localbusiness-${i}`}
+    set:html={JSON.stringify(node)}
+  />
+))}
+
+{shouldEmitService && (
+  <script
+    type="application/ld+json"
+    id="service-schema"
+    set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "name": pageTitleProp || localBusiness.businessUnit.name,
+      "url": toAbsoluteUrl(offerUrl || Astro.url?.pathname || "/"),
+      "provider": { "@id": LB_ID },
+      // "offers": pageLevelOffers()
+      ...(pageLevelOffers() ? { offers: pageLevelOffers() } : {})
+    })}
+  />
+)}

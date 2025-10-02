@@ -1,20 +1,4 @@
-.sr-only {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
-	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
-	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
-	white-space: nowrap;
-}
+
 .image-link {
     border-bottom: none;
 }
@@ -36,7 +20,7 @@
   border: 2px solid var(--primary-color);
   background-color: var(--primary-color);
   color: var(--base-00);
-  border-radius: 6px;
+  border-radius: var(--border-radius, 6px);
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
@@ -117,3 +101,31 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.tick::before {
+  content: "✔";
+  position: absolute;
+  left: -10px;
+  top: 0;
+  color: var(--base-00);
+  font-weight: bold;
+  font-size: 1rem;
+  background-color: var(--success-color-dark, #00c02dff);
+  width: 1.5rem;
+  vertical-align: middle;
+  text-align: center;
+  border-radius: 50%;  
+}
+.tick {
+   position: relative;
+  margin: 0.5rem 0;
+  padding-left: 1.6rem;  
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+
+
+
+
+

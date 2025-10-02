@@ -1,0 +1,169 @@
+---
+import ContactForm from '@/components/forms/ContactForm.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteFunctions } from '@/config/siteFunctions';
+import Anchor from '@/components/ui/Anchor.astro';
+import HeroPages from '@/components/ui/HeroPages.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  updatedAt?: string;
+  isFormAvailable?: boolean;
+}
+
+const {
+  title,
+  description,
+  updatedAt,
+  isFormAvailable = true,
+} = Astro.props as Props;
+
+/* --------- robust fallbacks --------- */
+const brand =
+  (siteDefaults.parentOrganization?.name) ||
+  siteDefaults.siteName;
+
+const contactEmail =
+  siteDefaults.contact?.email ||
+  siteDefaults.incharge?.email ||
+  `contact@${siteDefaults.domainName}`;
+
+const phoneDisplay =
+  siteDefaults.contact?.phone ||
+  siteDefaults.incharge?.contact?.phone || '';
+
+const whatsappRaw =
+  siteDefaults.contact?.whatsapp ||
+  siteDefaults.incharge?.contact?.whatsapp || '';
+
+const addr =
+  siteDefaults.address ||
+  siteDefaults.parentOrganization?.address || null;
+
+const googleMapUrl = addr?.googleMap || '';
+
+/* normalize numbers for tel:/wa.me links */
+const digitsOnly = (s: string) => s.replace(/[^\d+]/g, '');
+const telHref = phoneDisplay ? `tel:${digitsOnly(phoneDisplay)}` : '';
+const waHref  = whatsappRaw ? `https://wa.me/${digitsOnly(whatsappRaw)}` : '';
+
+/* address lines for <address> */
+const addressLines = addr ? [
+  addr.streetAddress,
+  [addr.addressLocality, addr.addressRegion].filter(Boolean).join(', '),
+  [addr.postalCode, addr.addressCountry].filter(Boolean).join(', ')
+].filter(Boolean) : [];
+---
+
+<article class="prose mi-auto">
+  <HeroPages
+    variant="band"
+    title={title}
+    description={description}
+    publishedAt={siteDefaults.publishedDate}
+    updatedAt={updatedAt}
+  />
+
+  {/* two-column: form | info */}
+  <section class="mx-w-content mi-auto pi-1 pb-2 grid cols-1 big-cols-2 gap-1">
+    {/* LEFT: contact form (or fallback) */}
+    <div>
+      {isFormAvailable ? (
+        <ContactForm
+          contactEmail={contactEmail}
+          brand={brand}
+          handler={siteFunctions.contactFormHandler ?? ''}
+          turnstileSitekey={siteFunctions.turnstileSitekey ?? ''}
+          subjectOptions={['Support','Feedback','Suggestions','Business Enquiries','Reviews','Comment','Security']}
+          defaultReviewScore={3}
+        />
+      ) : (
+        <section class="ta-center card br bg-base-00 border-primary-light box-shadow p-1">
+          <p>⚠️ The contact form is temporarily unavailable.</p>
+          <p>
+            Reach us at{' '}
+            <Anchor href={`mailto:${contactEmail}`} className="link">{contactEmail}</Anchor>
+          </p>
+        </section>
+      )}
+    </div>
+
+    {/* RIGHT: location & direct contacts (from siteDefaults) */}
+    <aside class="card br bg-base-00 border-primary-light box-shadow p-1">
+      <h2 class="text-base bold mb-05">Reach {brand}</h2>
+
+      {addressLines.length ? (
+        <address class="not-italic text-s">
+          {addressLines.map((line) => (
+            <div class="mb-02">{line}</div>
+          ))}
+          {googleMapUrl && (
+            <div class="mt-03">
+              <Anchor
+                href={googleMapUrl}
+                target="_blank"
+                rel="noopener"
+                className="td-none underline"
+              >
+                Open in Google Maps
+              </Anchor>
+            </div>
+          )}
+        </address>
+      ) : (
+        <p class="text-s opacity-80">Our office address will be published here.</p>
+      )}
+
+      <hr class="my-1 b-thin-primary-light" />
+
+      <ul class="no-bullets flex flex-col gap-05 text-s">
+        <li>
+          <strong>Email:</strong>{' '}
+          <Anchor href={`mailto:${contactEmail}`} className="td-none underline">
+            {contactEmail}
+          </Anchor>
+        </li>
+
+        {phoneDisplay && (
+          <li>
+            <strong>Phone:</strong>{' '}
+            <Anchor href={telHref} className="td-none underline">
+              {phoneDisplay}
+            </Anchor>
+          </li>
+        )}
+
+        {whatsappRaw && (
+          <li>
+            <strong>WhatsApp:</strong>{' '}
+            <Anchor href={waHref} className="td-none underline">
+              {`+${digitsOnly(whatsappRaw)}`}
+            </Anchor>
+          </li>
+        )}
+      </ul>
+
+      {/* Primary contact person (incharge) */}
+      {siteDefaults.incharge?.name && (
+        <>
+          <hr class="my-1 b-thin-primary-light" />
+          <div class="text-s">
+            <strong>Primary contact:</strong>
+            <div class="mt-02">
+              {siteDefaults.incharge.name}
+              {siteDefaults.incharge.jobTitle ? ` — ${siteDefaults.incharge.jobTitle}` : ''}
+            </div>
+            {siteDefaults.incharge.url && (
+              <div class="mt-02">
+                <Anchor href={siteDefaults.incharge.url} className="td-none underline" target="_blank" rel="noopener">
+                  Profile
+                </Anchor>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </aside>
+  </section>
+</article>

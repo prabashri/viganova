@@ -1,17 +1,18 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { siteDefaults } from '../../config/siteDefaults';
-import type { HeadProps } from '../../types/HeadProps';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
 
-import type { EntryMetaProps } from '../../types/EntryMetaProps';
-import HeroCollections from '../../components/ui/HeroCollections.astro';
+import type { EntryMetaProps } from '@/types/EntryMetaProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
 
-import { collectFieldCounts } from "../../utils/collectFieldCounts";
-import CardCollections from '../../components/ui/CardCollections.astro';
-import type { CardProps } from '../../types/CardProps';
+import { collectFieldCounts } from "@/utils/collectFieldCounts";
+import CardCollections from '@/components/ui/CardCollections.astro';
+import type { CardProps } from '@/types/CardProps';
 
 const entry = "tags";
-import { tagMeta as entryMeta } from '../../config/tagMeta'; 
+import { tagMeta as entryMeta } from '@/config/tagMeta';
 
 // Map entryMeta for quick lookup
 const entryMetaMap = new Map<string, EntryMetaProps>(
@@ -60,7 +61,7 @@ const mergedEntries = [...knownEntries, ...unknownEntries];
 const headProps: HeadProps = {
   title: `All ${entry.charAt(0).toUpperCase() + entry.slice(1)} | ${siteDefaults.siteName}`,
   description: `Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`,
-  image: siteDefaults.image,
+  image: siteImages.image,
   canonicalUrl: `${siteDefaults.siteUrl}/${entry}/`,
   index: true,
   keywords: mergedEntries.map(c => c.name),
@@ -100,7 +101,7 @@ const mergedCards: CardProps[] = mergedEntries.map((item, index) => mapToCardPro
   <HeroCollections
     title={`All ${entry.charAt(0).toUpperCase() + entry.slice(1)}`}
     description={`Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`}
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
 
   />

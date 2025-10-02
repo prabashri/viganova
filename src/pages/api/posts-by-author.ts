@@ -62,7 +62,7 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
 
       for (const entry of entries) {
         const isDraft = 'draft' in entry.data && entry.data.draft === true;
-        const isHidden = entry.id.startsWith('_') || entry.data.slug?.startsWith('_');
+        const isHidden = entry.id.startsWith('_') || (('slug' in entry.data) && (entry.data as any).slug?.startsWith('_'));
 
         if (isDraft || isHidden) continue;
 
@@ -80,12 +80,15 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
               description: entry.data.description ?? '',
               slug: entry.data.slug ?? '',
               collection: entry.collection,
-              heroImage: entry.data.heroImage ?? null,
-              heroImageAlt: entry.data.heroImageAlt ?? '',
+              heroImage: (entry.data as any)?.heroImage ?? null,
+              heroImageAlt: (entry.data as any)?.heroImageAlt ?? '',
               lastModified:
-                (entry.data.lastModified && new Date(entry.data.lastModified).toISOString()) ||
-                (entry.data.publishedDate && new Date(entry.data.publishedDate).toISOString()) ||
-                new Date().toISOString(),
+                ('lastModified' in entry.data && entry.data.lastModified
+                  ? new Date(entry.data.lastModified).toISOString()
+                  : 'publishedDate' in entry.data && entry.data.publishedDate
+                  ? new Date(entry.data.publishedDate).toISOString()
+                  : new Date().toISOString()
+                ),
             });
           }
         }

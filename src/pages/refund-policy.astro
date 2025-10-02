@@ -1,0 +1,58 @@
+---
+// src/pages/privacy-policy.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+import type { HeadProps } from '../types/HeadProps';
+
+import { siteDefaults } from '../config/siteDefaults';
+// import modifiedDates from '@/data/modified-dates.json';
+
+import { lastModifiedRaw } from '@/utils/last-modified';
+import { toMachineDate, toHumanDate, machineAndHuman } from '@/utils/date-format';
+
+import RefundContent from '@/content/pages/Refund.astro';
+
+// Pull page copy from global defaults
+const { title, description } = siteDefaults.pages.refund;
+
+// Last modified: try multiple keys; fall back to publishedDate
+const rawLastMod = lastModifiedRaw(['privacy-policy'], siteDefaults.publishedDate);
+
+// For SEO/meta (machine readable) + UI (human readable)
+// const updatedAt   = toMachineDate(rawLastMod, 'now'); // e.g. "2025-09-12T01:23:45.000Z"
+// const updatedAtHuman = toHumanDate(rawLastMod, 'now');   // e.g. "Sep 12, 2025" per site config
+const { iso: publishedAtISO, human: publishedAtHuman } = machineAndHuman(siteDefaults.publishedDate, 'now');
+const { iso: updatedAtISO, human: updatedAtHuman } = machineAndHuman(rawLastMod, 'now');
+
+// Pull "index" entry from modified-dates or fall back to publishedDate
+// const updatedAt =  modifiedDates['index'] ? new Date(modifiedDates['index']).toISOString(): siteDefaults.publishedDate;
+
+// Last modified (fallback -> publishedDate)
+
+
+// SEO
+const pageSeo: HeadProps = {
+  title,
+  description,
+  image: '',
+  type: 'terms',
+  url: `${siteDefaults.siteUrl}/refund-policy/`,
+  canonicalUrl: `${siteDefaults.siteUrl}/refund-policy/`,
+  siteName: siteDefaults.siteName,
+  authors: [],
+  publishedAt: publishedAtHuman,
+  publishedAtISO: publishedAtISO,
+  updatedAt: updatedAtHuman,
+  updatedAtISO: updatedAtISO,
+  index: true,
+  keywords: [...siteDefaults.keywords, 'Refund Policy'],
+  showBreadcrumb: false,
+};
+---
+
+<BaseLayout headProps={pageSeo}>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
+    <RefundContent title={title} description={description} updatedAt={updatedAtHuman} updatedAtISO={updatedAtISO} publishedAt={publishedAtHuman} publishedAtISO={publishedAtISO} />
+  <Fragment slot="extraScripts" />
+</BaseLayout>
+ 

@@ -1,47 +1,47 @@
 {
   "configModified": {
-    "siteDefaults": 1754465246237,
+    "siteDefaults": 1759314482297,
     "siteLogo": 1754383794286,
-    "siteColors": 1754615126129,
-    "siteImages": 1754566120651
+    "siteColors": 1758967619583,
+    "siteImages": 1757775286857
   },
   "icons": {
     "android-chrome-192x192.png": {
-      "datetime": "2025-06-27T05:19:07.497Z"
+      "datetime": "2025-08-31T11:05:14.168Z"
     },
     "android-chrome-512x512.png": {
-      "datetime": "2025-06-27T05:19:07.497Z"
+      "datetime": "2025-08-31T11:05:14.168Z"
     },
     "apple-touch-icon.png": {
-      "datetime": "2025-06-27T05:19:07.497Z"
+      "datetime": "2025-08-31T11:05:14.168Z"
     },
     "favicon-16x16.png": {
       "datetime": "2025-06-27T05:12:16.114Z"
     },
     "favicon-32x32.png": {
-      "datetime": "2025-06-27T05:19:07.497Z"
+      "datetime": "2025-08-31T11:05:14.168Z"
     },
     "favicon.ico": {
-      "datetime": "2025-06-27T05:19:07.497Z"
+      "datetime": "2025-08-31T11:05:14.168Z"
     },
     "favicon.svg": {
-      "datetime": "2025-07-26T08:39:30.340Z"
+      "datetime": "2025-08-31T10:24:13.083Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-08-08T01:33:57.020Z"
+      "datetime": "2025-10-01T16:26:56.728Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-08-08T01:33:20.067Z",
+      "datetime": "2025-09-28T03:49:23.976Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-08-08T01:33:47.738Z",
+      "datetime": "2025-09-29T20:33:17.779Z",
       "names": [
         "base",
         "colors",
@@ -51,27 +51,41 @@
       ]
     },
     "main": {
-      "file": "/styles/main.hrb9r6.css",
-      "datetime": "2025-08-08T01:33:50.273Z",
+      "file": "/styles/main.ici8bs.css",
+      "datetime": "2025-10-02T01:21:34.101Z",
       "names": [
+        "blockquote",
+        "callout",
+        "colors",
         "components",
         "faq",
         "footer",
         "form",
+        "markdown",
         "non-critical",
         "search-icon",
+        "search",
+        "star-rating",
+        "table",
         "utilities"
       ]
     },
-    "nonCritical": {
-      "file": "/styles/non-critical.63t9o9.css",
-      "datetime": "2025-08-06T10:55:54.248Z",
+    "pages": {
+      "file": "/styles/",
+      "datetime": "2025-10-02T01:21:36.602Z",
       "names": [
-        "faq",
-        "footer",
-        "non-critical",
-        "search-icon"
-      ]
+        "home"
+      ],
+      "dir": "/styles/"
+    },
+    "pages:home": {
+      "file": "/styles/home.5a8276.css",
+      "datetime": "2025-09-23T13:31:29.816Z",
+      "name": "home",
+      "hash": "5a8276",
+      "mtimeMs": 1758633705846,
+      "bytes": 6553,
+      "source": "src\\styles\\pages\\home.css"
     }
   },
   "logos": {
@@ -85,48 +99,104 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.5zdv2h.json",
-      "datetime": "2025-08-08T01:33:38.965Z"
+      "file": "/search-index.pea3u2.json",
+      "datetime": "2025-10-02T01:21:21.127Z"
     }
   },
   "js": {
     "contact-form": {
-      "file": "/scripts/contact-form.2tazt3.min.js",
-      "datetime": "2025-08-05T13:20:02.259Z"
+      "file": "/scripts/contact-form.ka44bd.min.js",
+      "datetime": "2025-08-29T14:32:48.692Z"
     },
     "main": {
-      "file": "/scripts/main.nipeml.min.js",
-      "datetime": "2025-08-05T13:20:02.307Z"
+      "file": "/scripts/main.w8m82c.min.js",
+      "datetime": "2025-08-29T14:32:49.165Z"
     },
     "search": {
-      "file": "/scripts/search.hjv8kx.min.js",
-      "datetime": "2025-08-05T13:20:02.367Z"
+      "file": "/scripts/search.5sjaht.min.js",
+      "datetime": "2025-08-29T14:32:49.358Z"
+    },
+    "video-watch": {
+      "file": "/scripts/video-watch.5oxhga.min.js",
+      "datetime": "2025-09-08T14:08:37.542Z"
     }
   },
   "logosPublic": {
     "desktopLogo": {
       "original": "/logos/desktop-logo-original.png",
-      "png": "/logos/desktop-logo-300w.png",
-      "webp": "/logos/desktop-logo-300w.webp",
-      "avif": "/logos/desktop-logo-300w.avif"
+      "variants": [
+        {
+          "width": 175,
+          "png": "/logos/desktop-logo-175w.png",
+          "webp": "/logos/desktop-logo-175w.webp",
+          "avif": "/logos/desktop-logo-175w.avif"
+        },
+        {
+          "width": 350,
+          "png": "/logos/desktop-logo-350w.png",
+          "webp": "/logos/desktop-logo-350w.webp",
+          "avif": "/logos/desktop-logo-350w.avif"
+        }
+      ]
     },
     "mobileLogo": {
       "original": "/logos/mobile-logo-original.png",
-      "png": "/logos/mobile-logo-100w.png",
-      "webp": "/logos/mobile-logo-100w.webp",
-      "avif": "/logos/mobile-logo-100w.avif"
+      "variants": [
+        {
+          "width": 100,
+          "png": "/logos/mobile-logo-100w.png",
+          "webp": "/logos/mobile-logo-100w.webp",
+          "avif": "/logos/mobile-logo-100w.avif"
+        },
+        {
+          "width": 200,
+          "png": "/logos/mobile-logo-200w.png",
+          "webp": "/logos/mobile-logo-200w.webp",
+          "avif": "/logos/mobile-logo-200w.avif"
+        }
+      ]
     },
     "iconLogo": {
       "original": "/logos/icon-logo-original.png",
-      "png": "/logos/icon-logo-100w.png",
-      "webp": "/logos/icon-logo-100w.webp",
-      "avif": "/logos/icon-logo-100w.avif"
+      "variants": [
+        {
+          "width": 100,
+          "png": "/logos/icon-logo-100w.png",
+          "webp": "/logos/icon-logo-100w.webp",
+          "avif": "/logos/icon-logo-100w.avif"
+        }
+      ]
     },
     "svgs": {
-      "desktopLogoSvg": "/logos/desktop-logo.svg",
-      "mobileLogoSvg": "/logos/mobile-logo.svg",
+      "desktopLogoSvg": "/logos/desktoplogo.svg",
+      "mobileLogoSvg": "/logos/mobilelogo.svg",
       "iconLogoSvg": "/logos/icon-logo.svg",
-      "favIconSvg": "/logos/favicon.svg"
+      "favIconSvg": "/logos/favicon.svg",
+      "srcIcons": {
+        "desktopLogoSvg": "src/icons/desktoplogo.svg",
+        "mobileLogoSvg": "src/icons/mobilelogo.svg",
+        "iconLogoSvg": "src/icons/icon-logo.svg",
+        "favIconSvg": "src/icons/favicon.svg",
+        "parentOrganizationLogoSvg": null
+      },
+      "parentOrganizationLogoSvg": null
+    },
+    "parentOrganizationLogo": {
+      "original": "/logos/parent-organization-nviews-media-private-limited-logo-original.png",
+      "variants": [
+        {
+          "width": 200,
+          "png": "/logos/parent-organization-nviews-media-private-limited-logo-200w.png",
+          "webp": "/logos/parent-organization-nviews-media-private-limited-logo-200w.webp",
+          "avif": "/logos/parent-organization-nviews-media-private-limited-logo-200w.avif"
+        }
+      ]
+    }
+  },
+  "sources": {
+    "parentOrganizationLogo": {
+      "path": "D:\\Onedrive\\websites\\easyapostille\\src\\assets\\logos\\nviews-logo.png",
+      "fingerprint": "D:\\Onedrive\\websites\\easyapostille\\src\\assets\\logos\\nviews-logo.png:14467:1650088292000:552f40ee00c3275430409766eb634f0b8ce70936"
     }
   }
 }

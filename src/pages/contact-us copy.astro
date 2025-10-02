@@ -1,0 +1,263 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteDefaults } from '../config/siteDefaults';
+import { siteFunctions } from '../config/siteFunctions';
+import type { HeadProps } from '../types/HeadProps';
+import assetsManifest from '../data/assets-manifest.json';
+
+const isDev = import.meta.env.DEV;
+
+// Safely access contact-form.js if it exists
+const contactForm = 'contact-form.js' in assetsManifest.js ? assetsManifest.js['contact-form.js'] : undefined;
+
+// Config values
+const contactFormHandler = siteFunctions.contactFormHandler;
+const turnstileSitekey = siteFunctions.turnstileSitekey;
+const adminEmail = siteDefaults.admin.email 
+  || siteDefaults.organization.incharge.email 
+  || siteDefaults.organization.email 
+  || `contact@${siteDefaults.siteUrl.replace(/^https?:\/\//, '')}` 
+  || `contact@${Astro.url.hostname}`;
+
+// HeadProps
+const pageSeo: HeadProps = {
+  title: `Contact us`,
+  description: `Get in touch with the ${siteDefaults.siteName} team for any inquiries or support.`,
+  type: 'contact',
+  url: `${siteDefaults.siteUrl}/contact-us/`,
+  canonicalUrl: `${siteDefaults.siteUrl}/contact-us/`,
+  siteName: siteDefaults.siteName,
+  authors: [],
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt: siteDefaults.publishedDate,
+  index: true,
+  keywords: [...siteDefaults.keywords, 'Contact'],
+  showBreadcrumb: true
+};
+
+// Flag to determine form availability
+const isFormAvailable = contactFormHandler && turnstileSitekey;
+---
+
+<BaseLayout headProps={pageSeo}>
+  <Fragment slot="headContent-top">
+    {isFormAvailable && (
+      <>
+        <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
+        <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
+      </>
+    )}
+  </Fragment>
+
+  <Fragment slot="headContent-bottom">
+    {isFormAvailable && (
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+    )}
+    { isDev && <script src="/scripts/contact-form.js" defer></script>}
+    { !isDev && contactForm && <script id="contact-form" data-src={contactForm} defer></script>}
+  </Fragment>
+<style>
+  /* Contact Form Base */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  gap: 0.75rem;
+}
+
+/* Form Group */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.form-control {
+  padding: 0.5rem;
+  border: 1px solid var(--base-100);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: var(--base-80);
+  background: var(--base-00);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
+}
+
+/* Labels & Required */
+label {
+  font-size: 0.85rem;
+  color: var(--base-80);
+}
+
+.required {
+  color: var(--error);
+}
+
+/* Honeypot Hidden */
+.honeypot {
+  display: none !important;
+}
+
+/* Conditional Fields */
+.conditional-fields.hidden {
+  display: none !important;
+}
+
+/* Submit Button */
+.form-submit {
+  background: var(--primary);
+  color: var(--base-00);
+  font-weight: bold;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.form-submit:hover {
+  background: var(--primary-dark);
+}
+
+/* Status Messages */
+.form-status {
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.success-box {
+  background: var(--success-light);
+  color: var(--success-dark);
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.error {
+  color: var(--error);
+}
+
+.display-none {
+  display: none !important;
+}
+
+</style>
+  <article>
+    <header class="mx-w-content mi-auto">
+      <h1 class="ta-center">{pageSeo.title}</h1>
+      <p class="ta-center">Reach out with your feedback, questions, or suggestions.</p>
+      <p class="ta-center">We're just a mail away...</p>
+    </header>
+
+    {isFormAvailable ? (
+      <section id="contact-form-container">
+        <div id="success-box" class="form-status success-box display-none"></div>
+
+        <form id="contact-form" novalidate class="contact-form" aria-label="Contact Form" autocomplete="on">
+          <!-- Honeypot anti-spam -->
+          <div class="form-group honeypot" aria-hidden="true">
+            <label for="website">Form name</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <!-- Hidden technical fields -->
+          <input type="hidden" name="token" />
+          <input type="hidden" name="postUrl" value="" />
+          <input type="hidden" name="postTitle" value="" />
+          <input type="hidden" name="adminEmail" value={adminEmail} />
+          <input type="hidden" name="brand" value={siteDefaults.siteName} />
+          <input type="hidden" name="handler" value={contactFormHandler} />
+
+          <!-- Name -->
+          <div class="form-group">
+            <label for="name">Name <span class="required">*</span></label>
+            <input id="name" name="name" type="text" class="form-control" required autocomplete="name" />
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email <span class="required">*</span></label>
+            <input id="email" name="email" type="email" class="form-control" required autocomplete="email" />
+          </div>
+
+          <!-- Subject -->
+          <div class="form-group">
+            <label for="subject">Subject <span class="required">*</span></label>
+            <select id="subject" name="subject" class="form-control" required>
+              <option value="">Select</option>
+              <option>Support</option>
+              <option>Feedback</option>
+              <option>Suggestions</option>
+              <option>Business Enquiries</option>
+              <option>Reviews</option>
+              <option>Comment</option>
+              <option>Security</option>
+            </select>
+          </div>
+
+          <!-- Conditional Fields -->
+          <fieldset id="review-fields" class="conditional-fields hidden">
+            <legend class="sr-only">Review Details</legend>
+            <div class="form-group">
+              <label for="affiliation">Affiliation <span class="required">*</span></label>
+              <input id="affiliation" name="affiliation" type="text" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label for="reviewScore">How do you rate us? <span class="required">*</span></label>
+              <select id="reviewScore" name="reviewScore" class="form-control">
+                <option value="1">1 - Poor</option>
+                <option value="2">2 - Fair</option>
+                <option value="3" selected>3 - Good</option>
+                <option value="4">4 - Very Good</option>
+                <option value="5">5 - Excellent</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="isPublicReview">
+                <input type="checkbox" id="isPublicReview" name="isPublicReview" checked /> Use my review publicly with name.
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset id="comment-fields" class="conditional-fields hidden">
+            <legend class="sr-only">Comment Visibility</legend>
+            <div class="form-group">
+              <label for="isPublicComment">
+                <input type="checkbox" id="isPublicComment" name="isPublicComment" checked /> Make my comment public
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- Message -->
+          <div class="form-group">
+            <label for="message">Message <span class="required">*</span></label>
+            <textarea id="message" name="message" class="form-control" rows="3" required></textarea>
+          </div>
+
+          {turnstileSitekey && (
+            <div class="form-group">
+              <div id="cf-turnstile" class="cf-turnstile" data-sitekey={turnstileSitekey}></div>
+            </div>
+          )}
+
+          <!-- Submit -->
+          <button type="submit" class="form-submit">Send</button>
+          <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+        </form>
+      </section>
+    ) : (
+      <section class="mx-w-content mi-auto ta-center">
+        <p>⚠️ The contact form is temporarily unavailable.</p>
+        <p>Please reach us directly at <a href={`mailto:${adminEmail}`} class="link">{adminEmail}</a></p>
+      </section>
+    )}
+  </article>
+
+  <Fragment slot="extraScripts"></Fragment>
+</BaseLayout>

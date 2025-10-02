@@ -1,0 +1,88 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages'; 
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import type { CardProps } from '@/types/CardProps';
+import { getCollection } from 'astro:content';
+
+// =========================
+// 🔹 Constants
+// =========================
+const entry = "resource";
+const entryConfig = siteDefaults.collections[entry];
+const basePath = entryConfig?.base ? `/${entryConfig.base}` : ``;
+const heroTitle = 'Apostille resource articles & guides';
+const metaDescription =
+  `Browse resource articles to understand apostille processes—what to prepare, how to apply, timelines & checklists—from ${siteDefaults.siteName}.`;
+
+// =========================
+// 🔹 Get blog posts
+// =========================
+const posts = (await getCollection(entry))
+  .filter(post =>
+    !post.id.startsWith('_') && post.data?.draft !== true
+  )
+  .sort(
+    (a, b) => new Date(b.data.publishedDate).valueOf() - new Date(a.data.publishedDate).valueOf()
+  );
+
+// =========================
+// 🔹 SEO
+// =========================
+const headProps: HeadProps = {
+  title: `${heroTitle} | ${siteDefaults.siteName}`,
+  description: metaDescription,
+  image: siteImages.image,
+  canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
+  index: true,
+  keywords: posts.map(p => p.data.title),
+  type: 'collection',
+  url: `${siteDefaults.siteUrl}${basePath}/`,
+  authors: []
+};
+
+// =========================
+// 🔹 Map posts to CardProps
+// =========================
+function mapToCardProps(post: any, index: number): CardProps {
+  const postSlug = post.data.slug ?? post.id; // Fallback to id if no slug in frontmatter
+  return {
+    link: `${basePath}/${postSlug}/`,
+    linkAriaLabel: `Read blog post: ${post.data.title}`,
+    image: post.data.heroImage ?? '',
+    imageAlt: post.data.heroImageAlt ?? post.data.title,
+    title: post.data.title,
+    description: post.data.description ?? '',
+    afterDescription: post.data.publishedDate
+      ? new Date(post.data.publishedDate).toLocaleDateString()
+      : '',
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy' // First 3 eager
+  };
+}
+
+const blogCards: CardProps[] = posts.map((post, index) => mapToCardProps(post, index));
+---
+
+<BaseLayout headProps={headProps}>
+  <HeroCollections
+    title={heroTitle}
+    description={metaDescription}  
+    bgColorClass="bg-secondary-base"
+    textColorClass="col-base-00"
+    image=''
+    imageAlt=''
+    imageLoading="delay"
+  />
+
+  {blogCards.length > 0 && (
+    <section class="mx-w-site mi-auto mb-2 pb-2">
+      <CardCollections cards={blogCards} wrapper="ul" roleType="list" entry={entry} />
+    </section>
+  )}
+</BaseLayout>

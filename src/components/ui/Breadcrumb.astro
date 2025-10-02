@@ -1,49 +1,86 @@
 ---
 // src/components/ui/Breadcrumb.astro
-import { siteDefaults } from "../../config/siteDefaults";
+import { toAbsoluteUrl, toRelativeUrl } from "@/utils/urls";
+
+interface Crumb {
+  name: string;   // Full name for JSON-LD
+  url: string;    // Absolute URL (canonical)
+  label?: string; // Optional short UI label
+}
 
 interface Props {
   showBreadcrumb?: boolean;
-  title?: string; // optional title from headProps
+  title?: string;          // Page title (for last crumb label)
+  breadcrumbs?: Crumb[];   // Optional override (any URLs allowed)
 }
 
-const { showBreadcrumb = true, title: pageTitle } = Astro.props;
+const { showBreadcrumb = true, title: pageTitle, breadcrumbs: override } = Astro.props;
 
-// Auto-hide on homepage or single segment
+// Segments from current path (e.g., "/services/marriage-certificate-apostille/")
 const segments = Astro.url.pathname.split("/").filter(Boolean);
+
+// Auto-hide on homepage (no segments)
 const shouldShow = showBreadcrumb && segments.length > 0;
 
-// Format + trim function
+// UI text helpers
 function formatSegment(seg: string) {
-  let formatted = seg.replace(/[-_]/g, " ");
-  formatted = formatted.charAt(0).toUpperCase() + formatted.slice(1);
-  return formatted.length > 30 ? formatted.slice(0, 30) + "…" : formatted;
+  const s = seg.replace(/[-_]/g, " ");
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+function trimLabel(s: string, max = 30) {
+  return s.length > max ? s.slice(0, max) + "…" : s;
 }
 
-// Build breadcrumb items
-const breadcrumbItems = [
-  { name: "Home", url: siteDefaults.siteUrl },
+// Ensure a page-like path ends with a trailing slash (no file extension)
+function pagePath(path: string) {
+  const hasExt = /\.[a-z0-9]{2,8}$/i.test(path);
+  if (hasExt) return path;
+  return path.endsWith("/") ? path : `${path}/`;
+}
+
+// Build default crumbs from the current URL
+const derivedCrumbs: Crumb[] = [
+  // Home
+  { name: "Home", url: toAbsoluteUrl("/", { cdn: "never" }) },
+
+  // Intermediate segments → absolute canonical URLs
   ...segments.map((seg, i) => {
     const isLast = i === segments.length - 1;
-    const path = `${siteDefaults.siteUrl}/${segments.slice(0, i + 1).join("/")}/`;
+    const path = pagePath("/" + segments.slice(0, i + 1).join("/"));
 
-    // For last segment: prefer headProps.title, else fallback to segment
-    const displayName = isLast && pageTitle
-      ? (pageTitle.length > 20 ? pageTitle.slice(0, 20) + "…" : pageTitle)
-      : formatSegment(seg);
+    // Full (untrimmed) name for schema
+    const fullName = isLast && pageTitle ? pageTitle : formatSegment(seg);
+
+    // UI label
+    const uiLabel = isLast && pageTitle
+      ? trimLabel(pageTitle, 20)
+      : trimLabel(formatSegment(seg), 30);
 
     return {
-      name: displayName,
-      url: path
+      name: fullName,
+      url: toAbsoluteUrl(path, { cdn: "never" }), // canonical absolute
+      label: uiLabel
     };
   })
 ];
 
-// JSON-LD Schema (full names, no trim)
+// If override provided, normalize it to absolute canonical URLs & prepend Home
+const crumbs: Crumb[] = Array.isArray(override) && override.length
+  ? [
+      { name: "Home", url: toAbsoluteUrl("/", { cdn: "never" }) },
+      ...override.map((c) => ({
+        name: c.name,
+        url: toAbsoluteUrl(pagePath(c.url || "/"), { cdn: "never" }),
+        label: c.label ?? undefined
+      }))
+    ]
+  : derivedCrumbs;
+
+// JSON-LD uses absolute canonical URLs + full names
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
-  "itemListElement": breadcrumbItems.map((item, index) => ({
+  "itemListElement": crumbs.map((item, index) => ({
     "@type": "ListItem",
     position: index + 1,
     name: item.name,
@@ -55,16 +92,21 @@ const breadcrumbSchema = {
 {shouldShow && (
   <nav class="breadcrumb mx-w-site flex wrap ai-center mi-auto text-xs pi-05 pb-02 mb-05" aria-label="Breadcrumb navigation">
     <ul class="flex wrap ai-center no-bullets no-margin no-padding">
-      {breadcrumbItems.map((item, idx) => (
-        <li class="flex ai-center">
-          {idx > 0 && <span class="mi-05 pi-05" aria-hidden="true">›</span>}
-          {idx === breadcrumbItems.length - 1 ? (
-            <strong aria-current="page">{item.name}</strong>
-          ) : (
-            <a href={item.url} class="td-none pi-05 pb-02">{item.name}</a>
-          )}
-        </li>
-      ))}
+      {crumbs.map((item, idx) => {
+        // Site-relative link for UI (external stays absolute)
+        const href = toRelativeUrl(item.url, { cdn: "never" });
+        const isLast = idx === crumbs.length - 1;
+        return (
+          <li class="flex ai-center">
+            {idx > 0 && <span class="mi-05 pi-05" aria-hidden="true">›</span>}
+            {isLast ? (
+              <strong aria-current="page">{item.label ?? item.name}</strong>
+            ) : (
+              <a href={href} class="td-none pi-05 pb-02">{item.label ?? item.name}</a>
+            )}
+          </li>
+        );
+      })}
     </ul>
   </nav>
 )}

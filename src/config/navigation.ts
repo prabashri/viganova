@@ -9,7 +9,7 @@
  * ✅ Secondary navigation (for tools/docs/blog subpages)
  * ✅ Navigation style (glassy, layout width, separator, etc.)
  */
-
+import { buildWhatsAppLink } from "@/utils/whatsapp";
 import type {
   NavItem,
   NavSubItem,
@@ -17,8 +17,22 @@ import type {
   NavStyleConfig,
   LogoConfig,
   CtaButton
-} from '../types/navigation.ts';
+} from '@/types/navigation.ts';
+// Intent A: Start process (share docs)
+const waStartHref = buildWhatsAppLink({
+  phone: '',
+  text:
+    "Hi EasyApostille! I want to start the apostille process by sharing my certificates/documents.",
+  source: "Hero • Start Apostille",
+});
 
+// Intent B: Get quote (consult first)
+const waQuoteHref = buildWhatsAppLink({
+  phone: '',
+  text:
+    "Hi EasyApostille! I need a consultation and price/timeline quote for apostille services.",
+  source: "Hero • Free Quote",
+});
 /** LOGO CONFIGURATION */
 export const siteLogo: LogoConfig = {
   desktopSvg: true, // add svg logo in config/DesktopLogo.astro - it has high priority
@@ -32,12 +46,13 @@ export const siteLogo: LogoConfig = {
 export const siteNav: NavItem[] = [
 
   { label: 'Home', href: '/', type: 'link', menuId: '', 
-    icon: '', iconName: 'home-2', iconUrl: '', iconLocation: 'left', iconSize: 'medium', iconClass: '', className: '',
-    title: 'Go to homepage', altText: 'Home icon', ariaLabel: 'Home', variant: 'nav', description: 'Navigate to the homepage of our site' },
-
+    icon: '', iconName: 'home-2', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '',
+    title: 'Go to homepage', altText: 'Home icon', ariaLabel: 'Home', variant: 'nav', description: 'Navigate to the homepage of our site' 
+  },
+  /*
   {
-    label: 'Tools',
-    href: '/tools/',
+    label: 'Apostille Services',
+    href: '/services/',
     type: 'dropdown',
     iconName: '',
     menuId: 'dropdown-tools',
@@ -64,54 +79,57 @@ export const siteNav: NavItem[] = [
       }
     ]
   },
-
-  { label: 'Docs', href: '/docs/', type: 'link', menuId: '', icon: '', title: 'Go to docs', altText: 'Docs icon', ariaLabel: 'Docs', variant: 'nav' },
-  { label: 'Blog', href: '/blog/', type: 'link', menuId: '', icon: '', title: 'Go to blog', altText: 'Blog icon', ariaLabel: 'Blog', variant: 'nav' },
+  */
+  { label: 'Explore Apostille Process', href: '/resources/', type: 'link', menuId: '', icon: '', iconName: 'idea-2', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '', title: 'Go to apostille resources', altText: 'idea icon - bulb with shining light', ariaLabel: 'Informations', variant: 'nav', description: 'List of resources about the apostille process' },
+ 
 
   {
-    label: 'Resources',
+    label: 'Apostille Services',
     type: 'mega',
-    menuId: 'mega-resources',
+    menuId: 'mega-resources', iconName: 'stamp',
+    iconUrl: '',
+    iconLocation: 'left', iconSize: 'large', iconClass: '', className: '',
+    title: 'Go to services available in easyapostille', altText: 'icon of stamp with right sign', ariaLabel: 'stamp', variant: 'plain', description: 'Navigate to the list of services we offer',
     columns: [
       {
-        title: 'Column 1',
+        title: 'Personal Documents',
         items: [
           {
-            label: 'Item 1',
-            href: '/#',
-            icon: '/icons/width.svg',
-            altText: 'Width icon',
-            title: 'Tool for responsive width'
+            label: 'Birth Certificate',
+            href: '/services/birth-certificate-apostille/',
+            icon: '',
+            altText: '',
+            title: 'Birth Certificate'
           },
           {
-            label: 'Item 2',
-            href: '/#',
-            icon: '/icons/margin.svg',
-            altText: 'Margin icon',
-            title: 'Margin calculation'
+            label: 'Marriage Certificate',
+            href: '/services/marriage-certificate-apostille/',
+            icon: '',
+            altText: '',
+            title: 'Marriage Certificate'
           },
-          { label: 'Item 3', href: '/#', title: 'Item without icon' }
+          { label: 'PCC / Affidavit', href: '/services/pcc-affidavit-apostille/', title: 'PCC / Affidavit' }
         ]
       },
       {
-        title: 'Column 2',
+        title: 'Educational Documents',
         items: [
           {
-            label: 'Item 1',
-            href: '/#',
-            icon: '/icons/font.svg',
-            altText: 'Font icon',
-            title: 'Font clamp generator'
+            label: 'Marksheets',
+            href: '/services/marksheets-apostille/',
+            icon: '',
+            altText: '',
+            title: '10th, 12th, and Other Marksheets'
           },
           {
-            label: 'Item 2',
-            href: '/#',
-            icon: '/icons/line-height.svg',
-            altText: 'Line-height icon',
-            title: 'Line height visualizer'
+            label: 'Degree Certificate',
+            href: '/services/degree-certificate-apostille/',
+            icon: '',
+            altText: '',
+            title: 'Degree Certificates'
           }
         ]
-      },
+      }/*
       {
         title: 'Column 3',
         items: [
@@ -125,11 +143,11 @@ export const siteNav: NavItem[] = [
             title: 'Visual card menu item'
           }
         ]
-      }
+      } */
     ]
   },
-
-  { label: 'Contact', href: '/contact', title: 'Get in touch with us' }
+  { label: 'Reviews', href: '/reviews/', type: 'link', menuId: '', icon: '', iconName: 'star', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '', title: 'check out user experience', altText: 'star icon - user reviews', ariaLabel: 'User Reviews', variant: 'nav', description: 'List of reviews about the apostille process' },
+  { label: 'Contact', href: '/contact/', type: 'link', menuId: '', icon: '', iconName: 'email', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '', altText: 'email icon - envelope', description: 'List of resources about the apostille process', title: 'Get in touch with us', ariaLabel: 'Contact us', variant: 'nav' }
 ];
 
 /** SEARCH ICON ENABLED */
@@ -138,23 +156,26 @@ export const searchIconEnable = true; // Enable search icon in header
 /** PRIMARY CTA BUTTONS */
 export const primaryCTA: CtaButton[] = [  
   {
-    label: 'Try Free',
-    href: '/#',
+    label: 'Get Consultation',
+    href: waQuoteHref,
     variant: 'secondary',
     type: 'link',
     menuId: '',
-    icon: '',
-    title: 'Try our service for free',
-    altText: 'Try Free icon',
-    ariaLabel: 'Try Free',
+    icon: 'whatsapp',
+    title: 'Get free consultation and quote',
+    altText: 'Get Consultation icon',
+    ariaLabel: 'Get Consultation',
   },
   {
-    label: 'Buy Now $59',
-    href: '/#',
+    label: 'Start Apostille',
+    href: waStartHref,
     variant: 'primary',
-    title: 'Buy modern AstroWEB theme',
-    altText: 'Buy Now icon',
-    ariaLabel: 'Buy Now',
+    type: 'link',
+    icon: 'whatsapp',
+    menuId: '',
+    title: 'Start the apostille process',
+    altText: 'Start Apostille icon',
+    ariaLabel: 'Start Apostille process',
   }
 ];
 
@@ -169,9 +190,9 @@ export const secondaryNavigation: NavItem[] = [
 
 /** NAVIGATION BAR STYLE OPTIONS */
 export const headerStyle: NavStyleConfig = {
-  mode: 'glassy',               // 'default' | 'glassy' | 'transparent' | 'primary-light' | 'primary-dark' | 'custom'
+  mode: 'primary-lighter-x',               // 'default' | 'glassy' | 'transparent' | 'base-00' | 'base-90' | 'primary-lighter-x' | 'primary-lighter' | 'primary-darker' | 'primary-darker-x' | 'custom'
   width: 'fullwidth',          // fullwidth | sitewidth
-  position: 'sticky',          // static | sticky | fixed
+  position: 'static',          // static | sticky | fixed
   scrollBehavior: 'none',      // none | hide-on-scroll | show-on-scroll-up
   separator: 'none'          // none | border | shadow (adds bottom split)
 };

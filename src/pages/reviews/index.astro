@@ -1,0 +1,74 @@
+---
+// src/pages/reviews/index.astro
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
+
+import { getAllReviews, getGlobalAggregate } from "@/utils/reviews";
+import ReviewList from "@/components/ReviewList.astro";
+
+import { toRelativeUrl } from "@/utils/urls";
+
+// ===== Constants (mirrors services/index.astro) =====
+const entry = 'review';
+const entryCfg = siteDefaults.collections?.[entry] || {};
+const base = entryCfg?.base ?? 'reviews';
+const basePath = `/${base}`;
+
+// ===== Helpers =====
+function getLastModified(r: any): string | undefined {
+  // Prefer explicit modified, then published
+  return r?.dateModified || r?.datePublished || undefined;
+}
+function targetName(r: any): string {
+  return r?.target?.name || r?.service?.name || 'Service';
+}
+
+const heroTitle = `Customer reviews and testimonials for ${siteDefaults.siteName}`;
+// const metaDescription = `Customer reviews and testimonials to highlight ${siteDefaults.siteName}'s service and support.`;
+const metaDescription = `Customer reviews and testimonials to highlight ${siteDefaults.siteName}'s service and support on the document certificate apostille process.`;
+
+// ===== Data load, filter, sort =====
+const allRaw = await getAllReviews();
+
+// 1) exclude drafts
+const all = allRaw.filter((r: any) => r?.draft !== true);
+
+// 2) sort by latest (desc)
+const reviews = all.sort((a: any, b: any) => {
+  const ad = new Date(getLastModified(a) ?? 0).valueOf();
+  const bd = new Date(getLastModified(b) ?? 0).valueOf();
+  return bd - ad;
+});
+
+// ===== Head props (mirrors services/index.astro) =====
+const headProps: HeadProps = {
+  title: heroTitle,
+  description: metaDescription,
+  image: siteImages.image,
+  canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
+  index: true,
+  keywords: reviews.map((r: any) => r.headline || targetName(r)),
+  type: 'collection',
+  url: `${siteDefaults.siteUrl}${basePath}/`,
+  authors: []
+};
+
+// ===== Aggregate / Org for schema =====
+const agg = await getGlobalAggregate();
+const org = { name: siteDefaults.siteName, url: siteDefaults.siteUrl };
+---
+
+<BaseLayout headProps={headProps}>
+  <HeroCollections
+    title={heroTitle}
+    description={metaDescription}
+    bgColorClass="bg-secondary-base"
+    textColorClass="col-base-00"
+    image=""
+    imageAlt=""
+  />
+  <ReviewList reviews={reviews} showRating={true} />
+</BaseLayout>

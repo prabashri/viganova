@@ -1,7 +1,26 @@
 {
-  "astroweb-theme-features-listed-by-user-hero-image.png": {
-    "lastModified": 1753347156398,
-    "path": "/2025/07/",
+  "avatar/praba-photo-2025.png": {
+    "lastModified": 1741863486512,
+    "path": "/2025/03/",
+    "variants": [
+      "60",
+      "120",
+      "380",
+      "640",
+      "900",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "1x1",
+    "thumbnail": "120"
+  },
+  "document-with-notary-sdm-attestation-mea-ministry-external-affairs-apostille-stamp-open-from-cover.png": {
+    "lastModified": 1756688003645,
+    "path": "/2025/09/",
     "variants": [
       "380",
       "640",
@@ -14,9 +33,9 @@
     ],
     "aspect": "1x1"
   },
-  "featured/astroweb-modern-website-theme-astro.png": {
-    "lastModified": 1753346042886,
-    "path": "/2025/07/",
+  "featured/apostille-on-original-certificate-or-document-photo-copy.png": {
+    "lastModified": 1758891708708,
+    "path": "/2025/09/",
     "variants": [
       "120",
       "380",
@@ -32,9 +51,290 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
+  "featured/apostille-price-in-india.png": {
+    "lastModified": 1758991332100,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easy-apostille-service.png": {
+    "lastModified": 1757378563234,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-apostille-guide-india-hague-convention-mea.png": {
+    "lastModified": 1758591406617,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-birth-certificate-apostille-service-india.png": {
+    "lastModified": 1759056828830,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-business-documents-apostille-service-india.png": {
+    "lastModified": 1759367629294,
+    "path": "/2025/10/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-degree-certificate-apostille-service-india.png": {
+    "lastModified": 1759056854281,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-education-documents-apostille-service-india.png": {
+    "lastModified": 1759058086223,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-marksheet-apostille-service-india.png": {
+    "lastModified": 1759056866388,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-marriage-certificate-apostille-service-india.png": {
+    "lastModified": 1759056838951,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/easyapostille-personal-documents-apostille-service-india.png": {
+    "lastModified": 1759058105922,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/features-of-easy-apostille-services-india-mea-approved-certificate-attestation.png": {
+    "lastModified": 1756651989632,
+    "path": "/2025/08/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280",
+      "1600"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/how-to-get-apostille-step-by-step-process-india.png": {
+    "lastModified": 1758728729498,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/type-of-documents-for-state-hrd-sdm-coc-authenticaion-before-mea-apostille.png": {
+    "lastModified": 1758903337656,
+    "path": "/2025/09/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "profile/prabakaran-shankar-2025.png": {
+    "lastModified": 1749709844676,
+    "path": "/2025/06/",
+    "variants": [
+      "320",
+      "380",
+      "640",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "3x4"
+  },
+  "resources/amrita-university-esanad-certificate-verification-fees-2025-09-27.png": {
+    "lastModified": 1758985058440,
+    "path": "/2025/09/",
+    "variants": [
+      "380",
+      "640",
+      "1212"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9"
+  },
+  "resources/model-of-apostille-certificate-by-hague-and-apostille-sticker-stamp-of-india.jpeg": {
+    "lastModified": 1758517130398,
+    "path": "/2025/09/",
+    "variants": [
+      "380",
+      "640",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "jpeg"
+    ],
+    "aspect": "16x9"
+  },
   "tags/astroweb.png": {
-    "lastModified": 1753957094386,
-    "path": "/2025/07/",
+    "lastModified": 1756476357181,
+    "path": "/2025/08/",
     "variants": [
       "380",
       "640",

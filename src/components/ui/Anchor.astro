@@ -1,7 +1,6 @@
 ---
-// src/components/ui/Anchor.astro
-import { siteDefaults } from '../../config/siteDefaults';
-import type { Variant } from '../../types/navigation'; // Importing the Variant type
+import { siteDefaults } from '@/config/siteDefaults';
+import type { Variant } from '@/types/navigation';
 
 interface Props {
   href: string;
@@ -11,11 +10,18 @@ interface Props {
   ariaLabel?: string;
   title?: string;
 
-  type?: 'link' | 'button'; // NEW: control styling
-  variant?: Variant; // NEW: for button-style links
-  dataId?: string; // Optional, for tracking or identification
-  dataAttributes?: string; // Optional, for additional data attributes
-  role?: string | undefined; // Optional, defaults to 'link' for standard links
+  /** Visual intent */
+  type?: 'link' | 'button';
+  variant?: Variant;
+
+  /** Analytics / tracking */
+  dataId?: string;
+  dataAction?: string;
+  dataLabel?: string;
+  dataTargets?: string;
+
+  /** A11y */
+  role?: string | undefined;
 }
 
 const {
@@ -25,14 +31,20 @@ const {
   rel,
   ariaLabel,
   title,
+
   type = 'link',
   variant = 'plain',
-  dataId, // Optional for tracking
-  role = 'link', // Default role for standard links
-  
-} = Astro.props;
 
-// Site origin and external check
+  dataId,
+  dataAction,
+  dataLabel,
+  dataTargets,
+
+  role,
+  ...rest // forward extra attributes, including any data-* you didn’t explicitly type
+} = Astro.props as Props & Record<string, any>;
+
+// Site origin + external detection
 const siteOrigin = Astro.site?.origin ?? new URL(siteDefaults.siteUrl).origin;
 
 let resolvedHref: URL;
@@ -43,22 +55,37 @@ try {
 }
 
 const isExternal = resolvedHref.origin !== siteOrigin;
+
+// Target/rel defaults for safety
 const finalTarget = target ?? (isExternal ? '_blank' : '_self');
 const finalRel = rel ?? (isExternal && finalTarget === '_blank' ? 'noopener noreferrer' : undefined);
 
-const dataAttributes = dataId ? `data-id="${dataId}"` : '';
-
-// Variant class logic
-const variantClassMap = {
+// Variant class logic (apply button variants only when type="button")
+const variantClassMap: Record<string, string> = {
   plain: '',
   nav: 'no-bb br',
-  ghost: 'button bg-transparent col-inherit hover-bg-base-10 transition focus-vis-bg-base-200 focus-vis-col-base-900',
-  primary: 'button col-base-00 hover-col-base-100 border-2 bg-primary hover-bg-primary-lighter transition focus-vis-bg-primary-lighter focus-vis-col-base-100 p-05',
-  secondary: 'button bg-primary-lighter-x hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
+  ghost:
+    'button bg-transparent col-inherit hover-bg-base-10 transition focus-vis-bg-base-200 focus-vis-col-base-900',
+  primary:
+    'button col-base-00 hover-col-base-100 border-2 bg-primary hover-bg-primary-lighter transition focus-vis-bg-primary-lighter focus-vis-col-base-100 p-05',
+  secondary:
+    'button bg-primary-lighter-x col-primary-darker hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
 };
 
-const variantClass = variantClassMap[variant as Variant] ?? '';
+// If not a "button" type, ignore button-specific classes except 'nav'/'plain'
+const allowedVariant =
+  type === 'button' ? variant : (variant === 'nav' ? 'nav' : 'plain');
+
+const variantClass = variantClassMap[variant] ?? '';
 const computedClass = `${variantClass} ${className}`.trim();
+
+// Default action fallback for analytics if caller didn’t set one
+const defaultAction =
+  type === 'button' ? 'button_click' : isExternal ? 'outbound_click' : 'link_click';
+
+// Compute role default: use provided role, else 'button' for type="button", else 'link'
+const computedRole = role ?? (type === 'button' ? 'button' : 'link');
+
 
 /**
  * Anchor component for links and link-style buttons
@@ -105,7 +132,6 @@ const computedClass = `${variantClass} ${className}`.trim();
 <Anchor href="/contact" type="button" variant="secondary">Contact</Anchor>
 
  */
-
 ---
 <a
   href={href}
@@ -115,11 +141,18 @@ const computedClass = `${variantClass} ${className}`.trim();
   aria-label={ariaLabel}
   title={title}
   itemprop="url"
-  role={role as any}
-  data-attributes={dataAttributes}
+  role={computedRole as any}
+
   data-id={dataId}
+  data-action={dataAction ?? defaultAction}
+  data-label={dataLabel}
+  data-targets={dataTargets}
+
+  {...rest}
 >
   <slot name="icon-left" />
   <slot />
   <slot name="icon-right" />
 </a>
+
+

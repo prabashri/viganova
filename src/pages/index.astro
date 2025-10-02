@@ -1,84 +1,61 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ResponsiveImage from '../components/ResponsiveImage.astro';
-import type { HeadProps } from '../types/HeadProps';
-import { siteDefaults } from '../config/siteDefaults';	
-import { getImageVariants } from '../utils/getImageVariants';
+// src/pages/index.astro
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { HeadProps } from '@/types/HeadProps';
 
-const heroImageAll = getImageVariants('astroweb-theme-features-listed-by-user-hero-image.png');
-const heroImageFullWebp = heroImageAll?.full?.webp;
-const heroImageFullPng = heroImageAll?.full?.png;
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+// import modifiedDates from '@/data/modified-dates.json';
 
+import { lastModifiedRaw } from '@/utils/last-modified';
+import { toMachineDate, toHumanDate, machineAndHuman } from '@/utils/date-format';
+
+import CssFilesToLoad from "@/components/CssFilesToLoad.astro";
+
+import Home from '@/content/pages/Home.astro';
+
+// Prefer featured image, else fallback to site default (empty string is fine)
+const heroImage = (siteImages as any)?.featuredImage ?? (siteImages as any)?.image ?? '';
+
+
+// Last modified: try multiple keys; fall back to publishedDate
+const rawLastMod = lastModifiedRaw(['index'], siteDefaults.publishedDate);
+
+// For SEO/meta (machine readable) + UI (human readable)
+const updatedAt   = toMachineDate(rawLastMod, 'now'); // e.g. "2025-09-12T01:23:45.000Z"
+// const updatedAtHuman = toHumanDate(rawLastMod, 'now');   // e.g. "Sep 12, 2025" per site config
+
+// const { iso: updatedAtISO, human: updatedAtHuman } = machineAndHuman(rawLastMod, 'now');
+
+// Pull "index" entry from modified-dates or fall back to publishedDate
+// const updatedAt =  modifiedDates['index'] ? new Date(modifiedDates['index']).toISOString(): siteDefaults.publishedDate;
+
+// SEO head props for the homepage
 const headProps: HeadProps = {
-  title: `Modern flexible Astro theme by Astroweb.dev`,
-  description: "Astroweb.dev is a modern flexible Astro theme for building fast, secure, and SEO-optimized websites. It includes features like a mega menu, schema for SEO, and strict content security policies.",
-  image: siteDefaults.image,
-  type: 'article',
-  // canonicalUrl: fullCanonical,
-  keywords: siteDefaults.keywords,
-  publishedAt: siteDefaults.publishedDate,
-  updatedAt: "",
+  title: siteDefaults.title,
+  description: siteDefaults.description,
+  image: heroImage,
+  type: 'website', // homepage should be website (not article)
+  url: `${siteDefaults.siteUrl}/`,
+  canonicalUrl: `${siteDefaults.siteUrl}/`,
+  siteName: siteDefaults.siteName,
   authors: [],
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt,
+  index: true,
+  keywords: siteDefaults.keywords,
 };
-
 ---
 
 <BaseLayout headProps={headProps}>
-  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-top">
+     <CssFilesToLoad
+        files={[
+          { name: "home", preload: false, fetchPriority: "high" }
+        ]}
+      />
+  </Fragment>
   <Fragment slot="headContent-bottom" />
-	<article id="post-layout">
-		<header id="post-header" class="mx-w-site mi-auto ta-center">
-			<h1 class="post-title">Modern flexible theme "AstroWEB" for Astro Framework by nViewsWEB</h1>
-			<p class="post-desc">A theme to support and promote your digital presence with modern design, features, seo, security, and so on.</p>			
-			<div id="hero-image" class="mx-w-content w-full mi-auto ">				
-				<ResponsiveImage
-					src="astroweb-theme-features-listed-by-user-hero-image.png"
-					alt="A beautiful view of the cosmos with stars and galaxies"
-					title="Astro Hero Image"
-					width="320" addSchema={true} className="mi-auto"
-					loading="eager" variant="desktop"
-				/>
-			</div>
-		</header>
-		<div class="post-content mx-w-content mi-auto mb-2">
-			<p>
-				we have the theme for astro framework to build modern websites with full strict content security policies, speed 100%, google analytics, and all necessary features like mega menu, schema for generative engine optimization, semantic html5 seo optimized static (free theme) and server side generation, ssr (for 69 USD unlimited usage) - theme name is astroweb.dev. 
-
-create a landing page to address the solution for the people looking for their dream digital world start may be a creator, business seller, blogger, educator, ...
-
-we not only sell theme, we are here to promote you.
-			</p>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</div>
-	</article>			
-
+  <Home />
   <Fragment slot="extraScripts" />
 </BaseLayout>

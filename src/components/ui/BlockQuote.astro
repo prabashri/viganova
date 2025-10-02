@@ -1,0 +1,118 @@
+---
+/**
+ * Minimal BlockQuote component
+ * - citeUrl: optional URL (also applied to <blockquote cite="…">)
+ * - citeName: visible text for the source (linked if citeUrl exists)
+ * - prefixTitle: optional caption prefix (e.g., "Official Notice")
+ * - prefixDate: optional caption date string (e.g., "2025-09-20" or "Sep 20, 2025")
+ * - compact: tighter padding
+ * - addQuotes: add typographic “ … ” around first/last <p>
+ * - lead / leadTag / leadAlign: optional text/slot shown above the panel
+ *
+ * Back-compat mapping:
+ *   href|cite  -> citeUrl
+ *   label|sourceName -> citeName
+ *   workTitle|sourceTitle -> prefixTitle (closest intent)
+ */
+
+export interface Props {
+  citeUrl?: string;
+  citeName?: string;
+  prefixTitle?: string;
+  prefixDate?: string;
+
+  compact?: boolean;
+  addQuotes?: boolean;
+
+  lead?: string;
+  leadTag?: 'p' | 'span' | 'div' | 'h6';
+  leadAlign?: 'start' | 'end';
+
+  /** Legacy props (mapped) */
+  href?: string;
+  label?: string;
+  workTitle?: string;
+  date?: string;
+  cite?: string;
+  sourceName?: string;
+  sourceTitle?: string;
+  author?: string; // ignored for rendering; preserved for future if needed
+}
+
+const {
+  // New API
+  citeUrl,
+  citeName,
+  prefixTitle,
+  prefixDate,
+
+  compact = false,
+  addQuotes = false,
+
+  // Lead
+  lead,
+  leadTag = 'p',
+  leadAlign = 'start',
+
+  // Legacy (map → new)
+  href, label, workTitle, date, cite, sourceName, sourceTitle,
+} = Astro.props;
+
+// Back-compat mapping (new props take precedence)
+const finalCiteUrl   = citeUrl   ?? href ?? cite ?? undefined;
+const finalCiteName  = citeName  ?? label ?? sourceName ?? undefined;
+const finalPrefixTit = prefixTitle ?? workTitle ?? sourceTitle ?? undefined;
+const finalPrefixDt  = prefixDate ?? date ?? undefined;
+
+const hasCaption = Boolean(finalPrefixTit || finalPrefixDt || finalCiteName || finalCiteUrl);
+---
+
+<!-- Optional lead text above the panel -->
+{(lead || Astro.slots.has('lead')) && (
+  <div class:list={['blockquote-lead', `blockquote-lead--${leadAlign}`]}>
+    {Astro.slots.has('lead')
+      ? <slot name="lead" />
+      : (leadTag === 'h6'
+          ? <h6>{lead}</h6>
+          : leadTag === 'span'
+          ? <span>{lead}</span>
+          : leadTag === 'div'
+          ? <div>{lead}</div>
+          : <p>{lead}</p>)}
+  </div>
+)}
+
+<figure class:list={[
+  "blockquote-figure",
+  compact && "blockquote-figure--compact",
+  addQuotes && "blockquote-figure--add-quotes",
+]}>
+  <!-- Apply machine-readable cite ONLY when we have a URL -->
+  <blockquote {...(finalCiteUrl ? { cite: finalCiteUrl } : {})}>
+    <slot />
+  </blockquote>
+
+  {hasCaption && (
+    <figcaption>
+      <div>
+      {/* Prefix (Title • Date) — shown as plain text before the link/name */}
+      {(finalPrefixTit || finalPrefixDt) && (
+        <span class="prefix">
+          {finalPrefixTit}
+          {(finalCiteName || finalCiteUrl) && ' — '}
+        </span>
+      )}
+
+      {/* Visible source: link if we have URL, else plain text (or omit) */}
+      {finalCiteName
+        ? (finalCiteUrl
+            ? <a href={finalCiteUrl} rel="nofollow noopener">{finalCiteName}</a>
+            : <span class="src">{finalCiteName}</span>)
+        : (finalCiteUrl
+            ? <a href={finalCiteUrl} rel="nofollow noopener">{finalCiteUrl}</a>
+            : null)}
+        </div>
+        {finalPrefixDt ? <span class="blockquote-date">{finalPrefixDt}</span> : null}
+    </figcaption>
+  )}
+</figure>

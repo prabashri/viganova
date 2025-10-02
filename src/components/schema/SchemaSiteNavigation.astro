@@ -1,0 +1,126 @@
+---
+// src/components/schema/SchemaSiteNavigation.astro
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteNav, primaryCTA, secondaryNavigation } from '@/config/navigation';
+import { toAbsoluteUrl, idFor } from '@/utils/urls';
+
+// Canonical site origin (always has a trailing slash)
+const SITE_ORIGIN = toAbsoluteUrl('/', { cdn: 'never' });
+const SITE_ORIGIN_URL = new URL(SITE_ORIGIN);
+
+// Ensure internal “page-like” paths end with a trailing slash (no file extensions)
+function ensurePathTrailingSlash(href: string) {
+  const u = new URL(href, SITE_ORIGIN_URL);
+  const hasExt = /\.[a-z0-9]{2,8}$/i.test(u.pathname);
+  if (!hasExt && !u.pathname.endsWith('/')) u.pathname += '/';
+  return u.pathname + u.search; // hash stripped by toAbsoluteUrl later
+}
+
+// Canonicalize any href:
+// - Internal → absolute on site origin, trailing slash for page paths
+// - External → returned absolute, tracking stripped, hash removed
+function canonUrl(href?: string) {
+  if (!href) return toAbsoluteUrl('/', { cdn: 'never' });
+  const u = new URL(href, SITE_ORIGIN_URL);
+  const isInternal = u.origin === SITE_ORIGIN_URL.origin;
+  return isInternal
+    ? toAbsoluteUrl(ensurePathTrailingSlash(href), { cdn: 'never' })
+    : toAbsoluteUrl(u.toString(), { cdn: 'never' });
+}
+
+/* ---------- Mapping helpers ---------- */
+function mapSimpleLink(item: any, position?: number) {
+  if (!item?.href || !item?.label) return null;
+  return {
+    '@type': 'SiteNavigationElement',
+    name: item.label,
+    url: canonUrl(item.href),
+    ...(typeof position === 'number' ? { position } : {})
+  };
+}
+
+function mapDropdown(item: any, position: number) {
+  const hasPart = Array.isArray(item?.content)
+    ? item.content.map((sub: any, i: number) => mapSimpleLink(sub, i + 1)).filter(Boolean)
+    : [];
+  return {
+    '@type': 'SiteNavigationElement',
+    name: item.label,
+    ...(item.href ? { url: canonUrl(item.href) } : {}),
+    position,
+    ...(hasPart.length ? { hasPart } : {})
+  };
+}
+
+function mapMega(item: any, position: number) {
+  const cols = Array.isArray(item?.columns) ? item.columns : [];
+  const columnNodes = cols.map((col: any, cIdx: number) => {
+    const leafs = Array.isArray(col?.items)
+      ? col.items.map((leaf: any, i: number) => mapSimpleLink(leaf, i + 1)).filter(Boolean)
+      : [];
+    return {
+      '@type': 'SiteNavigationElement',
+      name: col?.title || `Column ${cIdx + 1}`,
+      ...(leafs.length ? { hasPart: leafs } : {})
+    };
+  }).filter(Boolean);
+
+  return {
+    '@type': 'SiteNavigationElement',
+    name: item.label,
+    position,
+    ...(item.href ? { url: canonUrl(item.href) } : {}),
+    ...(columnNodes.length ? { hasPart: columnNodes } : {})
+  };
+}
+
+function topLevelToNode(item: any, index: number) {
+  const pos = index + 1;
+  if (item?.type === 'mega')     return mapMega(item, pos);
+  if (item?.type === 'dropdown') return mapDropdown(item, pos);
+  return mapSimpleLink(item, pos);
+}
+
+/* ---------- Build schema ---------- */
+const siteNavNodes = Array.isArray(siteNav) ? siteNav.map(topLevelToNode).filter(Boolean) : [];
+
+const ctaNodes = Array.isArray(primaryCTA)
+  ? primaryCTA
+      .map((btn: any, i: number) =>
+        btn?.href && btn?.label
+          ? { '@type': 'SiteNavigationElement', name: btn.label, url: canonUrl(btn.href), position: i + 1 }
+          : null
+      )
+      .filter(Boolean)
+  : [];
+
+const secondaryNodes = Array.isArray(secondaryNavigation)
+  ? secondaryNavigation.map((n: any, i: number) => mapSimpleLink(n, i + 1)).filter(Boolean)
+  : [];
+
+const siteNavigationSchema: any = {
+  '@context': 'https://schema.org',
+  '@type': 'SiteNavigationElement',
+  '@id': idFor('sitenavigation', '/'), // → https://domain.tld/#sitenavigation
+  name: 'Main Navigation',
+  hasPart: [
+    ...(siteNavNodes.length ? [{
+      '@type': 'SiteNavigationElement',
+      name: 'Primary',
+      hasPart: siteNavNodes
+    }] : []),
+    ...(ctaNodes.length ? [{
+      '@type': 'SiteNavigationElement',
+      name: 'Calls to Action',
+      hasPart: ctaNodes
+    }] : []),
+    ...(secondaryNodes.length ? [{
+      '@type': 'SiteNavigationElement',
+      name: 'Secondary',
+      hasPart: secondaryNodes
+    }] : [])
+  ]
+};
+---
+
+<script id="sitenav-schema" type="application/ld+json" set:html={JSON.stringify(siteNavigationSchema)}></script>

@@ -6,6 +6,7 @@ import type { HeadProps } from '../types/HeadProps';
 import { Icon } from 'astro-icon/components';
 import emailHashes from '../data/email-hash.json';
 import ShareLink from '../components/ShareLink.astro';
+import type { imageConfig } from 'astro:assets';
 
 const emailHashesMap: Record<string, string> = Object.fromEntries(
   Object.entries(emailHashes).map(([slug, obj]) => [slug, obj.sha256])
@@ -37,6 +38,12 @@ interface Props {
   initialText?: string;
   photo?: string;
   useGravatar?: boolean;
+  image?: string;
+  imageAlt?: string;
+  profileImage?: string;
+  profileImageAlt?: string;
+  profileImageCaption?: string;
+  profileImageTitle?: string;
 }
 
 const {
@@ -64,7 +71,14 @@ const {
   useInitial = false,
   initialText,
   photo = '',
-  useGravatar = false
+  useGravatar = false,
+  image,
+  imageAlt,
+  profileImage,
+  profileImageAlt,
+  profileImageCaption,
+  profileImageTitle
+
 } = Astro.props as Props;
 
 const resolvedSlug = slug || id;
@@ -73,22 +87,17 @@ const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}/team/${resolvedSl
 const headProps: HeadProps = {
   title: `${prefix ? `${prefix} ` : ''}${name}`,
   description: shortBio || `${prefix} ${name}${role ? ` – ${role}` : ''}`,
-  image: useImage && photo 
-    ? photo 
-    : useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]
-      ? `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300`
-      : useInitial
-        ? undefined // No fallback image for initials
-        : undefined, // No fallback to siteDefaults.image for Person
-
+  image: profileImage
+    || ((useImage && photo) ? photo : (useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]
+        ? `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300` : undefined)),
   canonicalUrl: fullCanonical,
   index: true,
   type: 'person',
 
   authors: [
     {
-      id: resolvedSlug,
-      slug: resolvedSlug,
+      // id: resolvedSlug ? `${siteDefaults.siteUrl}/team/#${resolvedSlug}` : undefined,
+      // slug: resolvedSlug,
       url: `/team/${resolvedSlug}/`,
       name,
       data: {
@@ -107,12 +116,18 @@ const headProps: HeadProps = {
         joined,
         left,
         social,
-        // Best image for schema
-        image: useImage && photo 
-          ? photo 
-          : useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]
-            ? `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300`
-            : undefined
+        // 1:1 avatar for Person node
+        image: (useImage && photo) 
+          ? photo
+          : (useGravatar && resolvedSlug && emailHashesMap[resolvedSlug]
+              ? `https://www.gravatar.com/avatar/${emailHashesMap[resolvedSlug]}?s=300`
+              : undefined),
+        imageAlt,
+        // 4:3 background/canvas for WebPage (optional)
+        profileImage,
+        profileImageAlt,
+        profileImageTitle,
+        profileImageCaption
       }
     }
   ]
@@ -141,8 +156,6 @@ if (useImage && photo) {
 
 <BaseLayout headProps={headProps}>
   <style is:inline>
-
-
     .team-photo {
       border-radius: 50%;
       margin-bottom: 1rem;
@@ -191,7 +204,7 @@ if (useImage && photo) {
           <Icon name="avatar" width="160" height="160" class="team-photo icon-avatar" data-color={avatarSrc.color || null} />
         )}
 
-        <h1>{prefix} {name}</h1>
+        <h1>{headProps.title}</h1>
         {highestDegree && <p class="team-degree">{highestDegree}</p>}
         {role && <p class="team-role bold text-xs pb-05 mb-05">{role}</p>}      
         {shortBio && <p class="team-short-bio">{shortBio}</p>}

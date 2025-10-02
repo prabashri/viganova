@@ -1,6 +1,6 @@
 // src/scripts/generate-main-css.ts
 import path from 'path';
-import { buildCssBundle } from '../utils/buildCssBundle.ts';
+import { buildCssBundle } from '@/utils/buildCssBundle.ts';
 
 await buildCssBundle({
   type: 'main',

@@ -1,0 +1,197 @@
+---
+// src/content/pages/About.astro
+import { siteDefaults } from '@/config/siteDefaults';
+import HeroPages from '@/components/ui/HeroPages.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+
+// Props (all optional; fall back to siteDefaults/modifiedDates)
+interface Props {
+  title: string;
+  description?: string;
+  publishedAt?: string | number | Date;
+  updatedAt?: string | number | Date;
+}
+
+const props = Astro.props as Props;
+
+/* ---------------- Derived fields from siteDefaults (correct paths) ---------------- */
+
+// Primary author/contact name (prefer incharge, then founder)
+const authorName =
+  siteDefaults?.incharge?.name ||
+  siteDefaults?.founder?.name ||
+  'Editor';
+
+// Internal profile route (prefer internalId), else external URL, else undefined
+const authorInternal =
+  siteDefaults?.incharge?.internalId
+    ? `/${siteDefaults.incharge.internalId.replace(/^\/?/, '')}`
+    : undefined;
+
+const authorHref =
+  authorInternal ||
+  siteDefaults?.incharge?.url ||
+  undefined;
+
+// Handy links if configured (keep your fallbacks)
+const contactPath = (siteDefaults as any)?.pages?.contact?.path || '/contact-us/';
+const privacyPath = (siteDefaults as any)?.pages?.privacyPolicy?.path || '/privacy-policy/';
+const refundPath  = (siteDefaults as any)?.pages?.refundPolicy?.path  || '/refund-policy/';
+const termsPath   = (siteDefaults as any)?.pages?.terms?.path         || '/terms/';
+const teamPath    = (siteDefaults as any)?.collections?.team?.base
+  ? `/${(siteDefaults as any).collections.team.base}/`
+  : '/team/';
+
+// WhatsApp / tel deeplinks from top-level contact
+const waDigits = (siteDefaults.contact?.whatsapp || '').replace(/[^\d]/g, '');
+const waHref   = waDigits ? `https://wa.me/${waDigits}` : undefined;
+const telHref  = siteDefaults.contact?.phone
+  ? `tel:${siteDefaults.contact.phone.replace(/[^\d+]/g, '')}`
+  : undefined;
+
+// Incharge profile fallback (internal page > team index > external URL)
+const prabaHref =
+  authorInternal ||
+  teamPath ||
+  siteDefaults?.incharge?.url ||
+  '';
+
+// Choose best available address: site-level address, else parentOrganization.address
+const addr =
+  siteDefaults.address ||
+  siteDefaults.parentOrganization?.address ||
+  null;
+
+// Helper to join non-empty parts with commas
+const joinParts = (...xs: Array<string | undefined>) =>
+  xs.filter(Boolean).join(', ');
+
+// Build a human-friendly location line
+const location = addr
+  ? joinParts(
+      addr.streetAddress,
+      joinParts(addr.addressLocality, addr.addressRegion),
+      joinParts(addr.postalCode, addr.addressCountry),
+      addr.addressCountryCode
+    )
+  : '';
+
+---
+<article class="w-full">
+  <HeroPages
+    variant="post"
+    title={props.title}
+    meta={false}
+    description={props.description}
+    publishedAt={props.publishedAt}
+    updatedAt={props.updatedAt}
+    authorName={authorName}
+    authorHref={authorHref}
+  />
+
+  <section class="mx-w-content mi-auto pi-1 pb-2">
+    <h2 id="who-we-help">Who we help</h2>
+    <p>
+      Easy Apostille helps <strong>students</strong>, <strong>professionals</strong>, <strong>families</strong>, and <strong>businesses</strong>
+      get documents accepted abroad—fast and safely.
+    </p>
+    <ul>
+      <li><strong>Students:</strong> university admissions, WES/credential evaluations.</li>
+      <li><strong>Professionals:</strong> work visas, employment contracts, PCC needs.</li>
+      <li><strong>Families:</strong> birth/marriage/adoption/death certificates for overseas use.</li>
+      <li><strong>Businesses:</strong> board resolutions, incorporation docs, POA.</li>
+    </ul>
+
+    <h2 id="who-we-are">Who we are</h2>
+    <ul>
+      <li>
+        <strong>Team Head — <Anchor href={prabaHref}>Prabakaran Shankar</Anchor>:</strong>
+        strategy and oversight of the entire apostille/attestation workflow (Notary → SDM → MEA).
+      </li>
+      <li>
+        <strong>Client Success — Lakshmishri Prabakaran:</strong>
+        leads all <strong>communications</strong> with users and customers, clarifications, document checks, and timeline updates.
+      </li>
+      <li>
+        <strong>Dispatch &amp; QA — Vasudevan Shankar:</strong>
+        manages <strong>dispatch, verification, and final checks</strong> for documents before and after processing.
+      </li>
+    </ul>
+    <p>
+      Prefer <strong>WhatsApp</strong> for quick coordination{waHref ? <> — <Anchor href={waHref}>chat now</Anchor></> : ''}. If needed, we can arrange a <strong>video call</strong> for complex cases.
+    </p>
+    <p class="text-s col-base-70 p-1 mb-1 br-left-primary">
+      We're an independent facilitation service (not a Government/MEA office). Where required, we coordinate through authorised/representative partners.
+    </p>
+
+    <h2 id="where-we-are">Where we are</h2>
+    <ul>
+      {location && (
+        <li>
+          <strong>Operations address (India):</strong> {location}
+          {siteDefaults?.address?.googleMap && (
+            <> — <Anchor href={siteDefaults.address.googleMap}>Google Maps</Anchor></>
+          )}
+        </li>
+      )}
+      <li><strong>Team head (overseas):</strong> Suwon, South Korea</li>
+      <li><strong>Dispatch lead (India):</strong> Thandalam, Chennai 600012</li>
+    </ul>
+
+    <h2 id="how-it-works">How it works (short version)</h2>
+    <ol>
+      <li><strong>Check:</strong> share scans; we confirm steps for your country/purpose.</li>
+      <li><strong>Notary:</strong> preparation &amp; notarisation (where applicable).</li>
+      <li><strong>SDM:</strong> attestation by Sub-Divisional Magistrate (if required).</li>
+      <li><strong>MEA:</strong> apostille/attestation for final acceptance.</li>
+      <li><strong>Return:</strong> tracked delivery back to you.</li>
+    </ol>
+
+    <h2 id="courier">Courier &amp; safe handling</h2>
+    <p>
+      We use trusted logistics partners for pickups and returns, including <strong>The Professional Couriers</strong>, <strong>Blue Dart</strong>, <strong>ST Courier</strong>, and <strong>DTDC</strong>.
+      Originals are packed securely and tracked; scans are printed only when needed and disposed of safely.
+    </p>
+
+    <h2 id="what-to-prepare">What to prepare</h2>
+    <ul>
+      <li>Clear <strong>PDF/PNG/JPG scans</strong> (front &amp; back if applicable).</li>
+      <li>A government <strong>ID</strong> for verification.</li>
+      <li>Any country-specific <strong>supporting docs</strong> (transcripts, affidavits, translations).</li>
+    </ul>
+
+    <h2 id="fees-refunds">Fees &amp; refunds</h2>
+    <ul>
+      <li>Quotes list our service fees; <strong>government/office/courier costs</strong> may be separate.</li>
+      <li>
+        Refunds follow our <Anchor href={refundPath}><strong>Refund Policy</strong></Anchor>:
+        <ul>
+          <li><strong>No refund</strong> once Notary has started (handover/queue confirmed).</li>
+          <li><strong>Before Notary start</strong>: typically 75% of service fee refunded (25% admin retained); courier/third-party costs deducted if used.</li>
+        </ul>
+      </li>
+      <li>Full legal terms: <Anchor href={termsPath}><strong>Terms &amp; Conditions</strong></Anchor>. See also our <Anchor href={privacyPath}><strong>Privacy Policy</strong></Anchor>.</li>
+    </ul>
+
+    <h2 id="contact">Talk to us</h2>
+    <p>
+      Tell us your document type and destination country:
+      {' '}
+      <Anchor href={contactPath}><strong>Contact {siteDefaults.siteName}</strong></Anchor>
+      {' '}or email{' '}
+      <Anchor href={`mailto:${siteDefaults.contact?.email || 'hello@example.com'}`}>
+        <strong>{siteDefaults.contact?.email || 'hello@example.com'}</strong>
+      </Anchor>
+      {telHref && (
+        <>
+          {' '}| call <Anchor href={telHref}><strong>{siteDefaults.contact?.phone}</strong></Anchor>
+        </>
+      )}
+      {waHref && (
+        <>
+          {' '}| WhatsApp <Anchor href={waHref}><strong>{waDigits}</strong></Anchor>
+        </>
+      )}
+    </p>
+  </section>
+</article>

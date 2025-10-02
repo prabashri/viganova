@@ -1,8 +1,10 @@
+// src/utils/getImageVariants.ts
 import imageMetadataJson from '../data/image-format-details.json';
 import { siteDefaults } from '../config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
 
 type ImageFormat = 'webp' | 'jpg' | 'jpeg' | 'png' | 'avif' | string;
-type ImageSize = 'full' | 'desktop' | 'mobile' | 'featured' | 'thumbnail';
+type ImageSize = 'avatar' | 'full' | 'desktop' | 'mobile' | 'featured' | 'thumbnail';
 
 export type ImageVariants = {
   [size in ImageSize]?: {
@@ -11,11 +13,12 @@ export type ImageVariants = {
 };
 
 const targetWidths: Record<ImageSize, number> = {
-  full: 1280,
-  desktop: 640,
-  mobile: 320,
-  featured: siteDefaults.featuredImageSize ?? 960,
-  thumbnail: siteDefaults.thumbnailSize ?? 120
+  avatar: siteImages.variants.avatar ?? 80,
+  full: siteImages.variants.full ?? 1280,
+  desktop: siteImages.variants.desktop ?? 640,
+  mobile: siteImages.variants.mobile ?? 320,
+  featured: siteImages.variants.featured ?? 960,
+  thumbnail: siteImages.variants.thumbnail ?? 120
 };
 
 export function getImageVariants(imagePath: string): ImageVariants | null {

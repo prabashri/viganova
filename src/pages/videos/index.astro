@@ -1,0 +1,126 @@
+---
+// src/pages/videos/index.astro
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import type { CardProps } from '@/types/CardProps';
+import { getCollection } from 'astro:content';
+
+// =========================
+// 🔹 Constants
+// =========================
+const entry = 'videos';
+const entryConfig = siteDefaults.collections[entry];
+const basePath = entryConfig?.base ? `/${entryConfig.base}` : ``;
+
+// hide files/entries that start with "_" (e.g., "_example")
+const isHiddenId = (id: string) => id.startsWith('_');
+const isHiddenSlug = (slug?: string) => !!slug && slug.startsWith('_');
+
+// =========================
+// 🔹 Get videos (watch pages)
+// =========================
+const videos = (await getCollection(entry))
+  .filter(v =>
+    !isHiddenId(v.id) &&
+    !isHiddenSlug(v.data?.slug) &&
+    v.data?.draft !== true
+  )
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
+  );
+
+// =========================
+// 🔹 Helpers
+// =========================
+function formatDuration(totalSeconds?: number): string {
+  if (!totalSeconds || totalSeconds <= 0) return '';
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = Math.floor(totalSeconds % 60);
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+// =========================
+// 🔹 SEO
+// =========================
+const headProps: HeadProps = {
+  title: `All Videos | ${siteDefaults.siteName}`,
+  description: `Browse all videos from ${siteDefaults.siteName}: guides, explainers, and walkthroughs.`,
+  image: siteImages.image,
+  canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
+  index: true,
+  keywords: videos.map(v => v.data.title),
+  type: 'collection',
+  url: `${siteDefaults.siteUrl}${basePath}/`,
+  authors: []
+};
+
+// =========================
+// 🔹 Map videos to CardProps
+// =========================
+function mapToCardProps(v: any, index: number): CardProps {
+  const slug = v.data.slug ?? v.id;
+  const link = `${basePath}/${slug}/`;
+
+  // pick a representative image (prefer poster → hero → first thumbnail → site default)
+  const thumb = (v.data.thumbnails && v.data.thumbnails[0]) || null;
+  const image =
+    v.data.poster ??
+    v.data.image ??
+    (thumb ? thumb.url : '') ??
+    siteImages.image;
+
+  const imageAlt =
+    v.data.posterAlt ??
+    (thumb && thumb.alt) ??
+    v.data.title;
+
+  const date = v.data.publishDate
+    ? new Date(v.data.publishDate).toLocaleDateString()
+    : '';
+
+  const dur = formatDuration(v.data.durationSeconds);
+  const afterDescription = [date, dur ? `⏱ ${dur}` : ''].filter(Boolean).join(' • ');
+
+  return {
+    link,
+    linkAriaLabel: `Watch video: ${v.data.title}`,
+    image,
+    imageAlt,
+    title: v.data.title,
+    description: v.data.description ?? '',
+    afterDescription,
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy'
+  };
+}
+
+const videoCards: CardProps[] = videos.map((v, i) => mapToCardProps(v, i));
+---
+
+<BaseLayout headProps={headProps}>
+  <HeroCollections
+    title="All Videos"
+    description={`Browse all videos from ${siteDefaults.siteName}: guides, explainers, and walkthroughs.`}
+    bgColorClass="bg-secondary-base"
+    textColorClass="col-base-00"
+    image={siteImages.image}
+    imageAlt="Videos Hero Image"
+    imageLoading="delay"
+  />
+
+  {videoCards.length > 0 && (
+    <section class="mx-w-site mi-auto mb-2 pb-2">
+      <CardCollections cards={videoCards} wrapper="ul" roleType="list" entry={entry} />
+    </section>
+  )}
+</BaseLayout>

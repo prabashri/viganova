@@ -1,0 +1,186 @@
+---
+import { siteDefaults } from '@/config/siteDefaults';
+import { machineAndHuman } from '@/utils/date-format';
+import Anchor from './Anchor.astro';
+
+type Variant = 'simple' | 'band' | 'post' | 'error';
+type Align = 'center' | 'left';
+
+type MH = { iso?: string; human?: string };
+
+interface Props {
+  /* basics */
+  title: string | number;
+  description?: string;
+  variant?: Variant;
+  align?: Align;
+
+  /* dates/meta */
+  publishedAt?: string | number | Date;
+  publishedAtISO?: string;
+  updatedAt?: string | number | Date;
+  updatedAtISO?: string;
+  meta?: boolean;
+  authorName?: string;
+  authorHref?: string;
+
+  /* style hooks (kept for backward-compat) */
+  class?: string;
+  headingClass?: string;
+  descriptionClass?: string;
+  containerClass?: string;
+  bgClass?: string;
+  textClass?: string;
+
+  /* central class overrides */
+  classes?: Partial<typeof DEFAULT_CLS>;
+
+  /* error mode */
+  errorCode?: string | number;
+
+  /* accessibility */
+  headingId?: string;
+}
+
+/* ---------------- Central class map ---------------- */
+const DEFAULT_CLS = {
+  // roots
+  rootError: 'flex flex-col jc-center ai-center mb-2 mi-auto mn-h-230',
+  rootBand:  'flex flex-col jc-center ai-center mx-w-full w-full mb-1 mi-auto pb-2 mn-h-230',
+  rootSimple:'flex flex-col mi-auto mb-1',
+
+  // common
+  container: 'mx-w-content w-full mi-auto',
+  title:     'mx-w-content mi-auto mb-05',
+  desc:      'text-xl',
+  metaWrap:  'post-meta text-s mb-1',
+  authors:   'post-authors mb-1',
+  dates:     'post-dates text-s mb-1',
+  dateText:  'text-s',
+
+  // helpers
+  alignCenter: 'ta-center ai-center',
+  alignLeft:   'ta-left ai-start',
+  titleCenter: 'ta-center',
+};
+
+function cx(...xs: Array<string | false | null | undefined>) {
+  return xs.filter(Boolean).join(' ');
+}
+
+/* ---------------- Props ---------------- */
+const {
+  title,
+  description,
+  variant = 'simple',
+  align = 'center',
+
+  publishedAt,
+  publishedAtISO,
+  updatedAt,
+  updatedAtISO,
+  meta = true,
+
+  authorName = siteDefaults?.incharge?.name ?? 'Editor',
+  authorHref = siteDefaults?.incharge?.internalId
+    ? `/${siteDefaults.incharge.internalId.replace(/^\/?/, '')}`
+    : undefined,
+
+  class: className,
+  headingClass = '',
+  descriptionClass = '',
+  containerClass,
+  bgClass = 'bg-secondary-base col-base-00',
+  textClass,
+
+  classes = {},
+
+  errorCode = title,
+  headingId = (variant === 'post' || variant === 'band') ? 'about-heading' : undefined,
+} = Astro.props as Props;
+
+/* Merge classes */
+const CLS = { ...DEFAULT_CLS, ...classes };
+const containerCls = containerClass || CLS.container;
+
+/* Resolve dates (prefer ISO props, otherwise compute) */
+function resolveDates(raw?: string | number | Date, iso?: string): MH {
+  if (iso) return { iso, human: machineAndHuman(iso).human };
+  return raw ? machineAndHuman(raw) : { iso: undefined, human: undefined };
+}
+const pub: MH = resolveDates(publishedAt, publishedAtISO);
+const upd: MH = resolveDates(updatedAt, updatedAtISO);
+
+/* same-day check in configured timeZone */
+const sameDay = pub.iso && upd.iso ? pub.iso.slice(0, 10) === upd.iso.slice(0, 10) : false;
+/* Align helpers */
+const alignWrap  = align === 'left' ? CLS.alignLeft   : CLS.alignCenter;
+const titleAlign = align === 'left' ? ''              : CLS.titleCenter;
+const isBandLike = variant === 'band' || variant === 'post';
+---
+
+{variant === 'error' ? (
+  /* ========================= ERROR ========================= */
+  <header class={cx(CLS.rootError, className, textClass)}>
+    <h1 class={cx('mx-w-site mi-auto pb-05 mb-05', headingClass)}>{errorCode}</h1>
+    {description && <p class={cx('mx-w-featured mi-auto text-xl mb-1', descriptionClass)}>{description}</p>}
+    <slot name="actions" />
+  </header>
+) : isBandLike ? (
+  /* ==================== BANDED / POST ==================== */
+  <header class={cx(CLS.rootBand, bgClass, textClass, className)}>
+    <div class={containerCls}>
+      <div class={titleAlign}>
+        <h1 id={headingId} class={cx(CLS.title, headingClass)}>{title}</h1>
+        {description && <p class={cx('ta-center text-l', descriptionClass)}>{description}</p>}
+      </div>
+
+      <slot name="breadcrumb" />
+
+      {meta && authorName && (
+        <div class={CLS.metaWrap}>
+          <div class={CLS.authors}>
+            By{' '}
+            {authorHref
+              ? <Anchor href={authorHref} className="underline">{authorName}</Anchor>
+              : <span>{authorName}</span>}
+          </div>
+
+          {(pub.iso || upd.iso) && (
+            <div class={CLS.dates}>
+              {pub.iso && pub.human && (
+                <time datetime={pub.iso} itemprop="datePublished" class={CLS.dateText}>
+                  Published: {pub.human}
+                </time>
+              )}
+
+              {upd.iso && (
+                sameDay
+                  ? <meta itemprop="dateModified" content={upd.iso} />
+                  : (
+                    <time datetime={upd.iso} itemprop="dateModified" class={CLS.dateText}>
+                      • Updated: {upd.human}
+                    </time>
+                  )
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      <slot name="actions" />
+    </div>
+  </header>
+) : (
+  /* ============================= SIMPLE ============================= */
+  <header class={cx(CLS.rootSimple, alignWrap, className, textClass)}>
+    <h1 class={cx(CLS.title, headingClass)}>{title}</h1>
+    {description && <p class={cx(CLS.desc, descriptionClass)}>{description}</p>}
+    {meta && upd.iso && upd.human && (
+      <p class="text-s col-base-60 mt-05">
+        Last updated: <time datetime={upd.iso}>{upd.human}</time>
+      </p>
+    )}
+    <slot name="actions" />
+  </header>
+)}

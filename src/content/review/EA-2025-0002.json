@@ -1,0 +1,40 @@
+{
+  "id": "EA-2025-0002",
+  "headline": "Thank you for the excellent service",
+  "body": "The process was smooth and efficient, and I received my documents well before the deadline.",
+  "rating": 4.5,
+  "language": "en",
+  "datePublished": "2025-09-18",
+  "url": "/reviews/ea-2025-0002/",
+  "author": {
+    "type": "Person",
+    "name": "Manivannan",
+     "designation": "Researcher",
+    "organization": "Chungnam National University",
+    "profileUrl": "",
+    "avatar": ""
+  },
+  "service": { "slug": "document-apostille", "name": "Document Apostille" },
+  "location": { "name": "Daejeon, South Korea", "city": "Daejeon", "countryCode": "KR" },
+  "verifiedPurchase": true,
+  "orderNumber": "EA-58231",
+  "pros": ["Good communication"],
+  "cons": [],
+   "target": { "type": "Service", "name": "Marksheet Apostille", "url": "/services/marksheet-apostille/" },
+  "media": [
+    {
+      "type": "image",
+      "url": "",
+      "width": 1280,
+      "height": 720,
+      "alt": "Delivery confirmation screenshot"
+    }
+  ],
+  "ownerResponse": {
+    "date": "2025-09-20",
+    "text": "Thanks for the kind words! Happy to help again anytime.",
+    "responder": "EasyApostille"
+  },
+  "helpful": 18,
+  "notHelpful": 0
+}

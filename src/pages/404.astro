@@ -1,40 +1,67 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import type { HeadProps } from '../types/HeadProps';
-import { siteDefaults } from '../config/siteDefaults';
+// src/pages/404.astro
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { HeadProps } from '@/types/HeadProps';
 
-// Define HeadProps for 404 page
+import { siteDefaults } from '@/config/siteDefaults';
+import NotFoundContent from '@/content/pages/NotFound.astro';
+
+type NotFoundConfig = {
+  title: string;
+  description: string;
+  enabled: boolean;
+  index: boolean;
+  sitemap: boolean;
+  path: string;
+};
+
+const notFoundRaw = siteDefaults.pages.notFound;
+const cfg: NotFoundConfig = notFoundRaw && typeof notFoundRaw.enabled === "boolean"
+  ? {
+      title: notFoundRaw.title ?? 'Page Not Found',
+      description: notFoundRaw.description ?? 'The page you\'re looking for could not be found.',
+      enabled: Boolean(notFoundRaw.enabled),
+      index: typeof notFoundRaw.index === "boolean" ? notFoundRaw.index : false,
+      sitemap: typeof notFoundRaw.sitemap === "boolean" ? notFoundRaw.sitemap : false,
+      path: notFoundRaw.path ?? '/404/'
+    }
+  : {
+  title: 'Page Not Found',
+  description: 'The page you’re looking for could not be found.',
+  enabled: true,
+  index: false,
+  sitemap: false,
+  path: '/404/'
+};
+
+// ✅ SSR redirect if this page is disabled in config
+if (cfg.enabled === false) {
+  // 307 preserves method; adjust to 302 if you prefer
+  return Astro.redirect('/', 307);
+}
+
+// NOTE: Astro serves this file as /404/. Keep the filename as 404.astro.
+// We still use cfg.path for canonical URL and nav consistency.
+const PATH = cfg.path ?? '/404/';
+
 const pageSeo: HeadProps = {
-  title: '404 - Page Not Found | nViewsWEB Astro Theme',
-  description: 'The page you are looking for does not exist. It may have been moved or deleted.',
-  image: '/images/astro-theme-nviewsweb-main.png',
-  type: 'webpage',
-  url: `${siteDefaults.siteUrl}/404`,
-  canonicalUrl: `${siteDefaults.siteUrl}/404`,
+  title: cfg.title,
+  description: cfg.description,
+  image: '',
+  type: 'website',
+  url: `${siteDefaults.siteUrl}${PATH}`,
+  canonicalUrl: `${siteDefaults.siteUrl}${PATH}`,
   siteName: siteDefaults.siteName,
   authors: [],
-  index: false // 404 pages should not be indexed
+  index: false, // 🔒 404 must never be indexed
 };
 ---
-<style>
-  main{
-    min-height: 60vh;
-  }
-</style>
+
 <BaseLayout headProps={pageSeo}>
-  <Fragment slot="headContent-top"></Fragment>
-  <Fragment slot="headContent-bottom"></Fragment>    
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
 
-  <main class="flex flex-col jc-center ai-center mx-w-content mi-auto full-width ta-center page-content ">
-    <h1>404 - Page Not Found</h1>
-    <p class="text-xl">
-      The page you're looking for doesn't exist or may have been moved.
-    </p>
+  <NotFoundContent title={pageSeo.title} description={pageSeo.description} />
 
-    <div class="mi-auto ta-center mb-2">
-      <a href="/" class="col-base-00 p-1 td-none bg-primary-lighter col-base-100 br">← Go back to homepage</a>
-    </div>
-  </main>
-
-  <Fragment slot="extraScripts"></Fragment>
+  <Fragment slot="extraScripts" />
 </BaseLayout>

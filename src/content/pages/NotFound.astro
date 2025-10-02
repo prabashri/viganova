@@ -1,0 +1,36 @@
+---
+import HeroPages from '@/components/ui/HeroPages.astro';
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const props = Astro.props as Props;
+---
+<section class="page-content w-full flex flex-col jc-center ai-center mi-auto ta-center mn-h-70vh pi-1 pb-2">
+     <HeroPages
+        variant="simple"
+        title="404"
+        description={props.description}
+        headingClass="text-5rem mb-05"
+        descriptionClass="mx-w-featured text-xl mb-1"
+        containerClass='mx-w-featured'
+    />
+    {/*-- Simple client-side search hook */}
+    <div id="search" class="search-box mt-1 mn-w-320 w-full mx-w-content mb-3" role="search">
+      <input
+        type="search"
+        id="search-input"
+        class="search-input text-l"
+        placeholder="Search articles, pages…"
+        autocomplete="off"
+      />
+      <ul id="search-results" class="no-bullets ta-left"></ul>
+    </div>
+
+    <div class="mi-auto ta-center mb-2 mx-w-content">
+        <a href="/" class="col-base-00 p-1 td-none bg-primary-lighter col-base-100 br">
+        ← Go back to homepage
+        </a>
+    </div>
+</section>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
+import { siteImages } from '../../config/siteImages';
 import type { HeadProps } from '../../types/HeadProps';
 
 import type { EntryMetaProps } from '../../types/EntryMetaProps';
@@ -60,15 +61,14 @@ const mergedEntries = [...knownEntries, ...unknownEntries];
 const headProps: HeadProps = {
   title: `All ${entry.charAt(0).toUpperCase() + entry.slice(1)} | ${siteDefaults.siteName}`,
   description: `Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`,
-  image: siteDefaults.image,
+  image: siteImages.image,
   canonicalUrl: `${siteDefaults.siteUrl}/${entry}/`,
   index: true,
   keywords: mergedEntries.map(c => c.name),
   type: 'collection',
   url: `${siteDefaults.siteUrl}/${entry}/`,
   authors: [],
-  authorName: siteDefaults.authorName,
-  authorUrl: siteDefaults.authorUrl,
+  
 };
 
 // Map to cards
@@ -102,7 +102,7 @@ const mergedCards: CardProps[] = mergedEntries.map((item, index) => mapToCardPro
   <HeroCollections
     title={`All ${entry.charAt(0).toUpperCase() + entry.slice(1)}`}
     description={`Browse all ${entry} for tools, guides, and blog posts on ${siteDefaults.siteName}.`}
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
 
   />

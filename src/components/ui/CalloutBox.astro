@@ -1,0 +1,231 @@
+---
+/**
+  * CalloutBox.astro
+  * - Uses local SVG icons (CSP-safe)
+  * - Type-based styling via your status tokens
+  * - MDX-friendly: default slot is body; optional named slots remain supported
+  * - Supports custom icons via the `iconSrc` prop
+  * - css: src/styles/main/utilities.css (bg-*, br-left-*)
+  * - css: src/styles/components/callout.css (base styles)
+  * 
+  * Example usage:
+  * import CalloutBox from '@/components/ui/CalloutBox.astro';
+  *
+  * <CalloutBox type="note" heading="Pro Tip">
+  *   content goes here...
+  * </CalloutBox>
+  *
+  * <CalloutBox type="error" dense>
+  *   <span slot="heading">custom heading</span>
+  *   content goes here...
+  * </CalloutBox>
+ *
+ * TYPES (aliases → canonical style):
+ *   - Info group   → note:    "note","info","hint","important","details"
+ *   - Success grp  → tip:     "tip","success","idea","ok","check","done"
+ *   - Warning grp  → alert:   "alert","warning","caution","attention"
+ *   - Error group  → error:   "error","danger","bug","fail","issue","stop"
+ *   - Brand/CTA    → promo/cta: "promo","cta","cta-primary","cta-secondary"
+ *
+ * Default headings (auto):
+ *   note→"Note", info→"Info", hint→"Hint", important→"Important", details→"Details"
+ *   tip→"Tip", success→"Success", idea→"Tip", ok/check/done→"Success"
+ *   alert→"Caution", warning→"Warning", caution→"Caution", attention→"Attention"
+ *   error→"Error", danger→"Danger", bug/issue→"Error", fail→"Failed", stop→"Error"
+ *   promo→"Announcement", cta/cta-primary→"Take Action", cta-secondary→"Learn More"
+ *
+ * ARIA:
+ *   - Auto role: "alert" for alert/error; "region" for others.
+ *   - Override via `roleOverride` prop if needed (e.g., "status").
+ *
+ * BRAND TONES (promo/cta only):
+ *   - `brandTone`: "base" | "light" | "lighter" | "dark" | "darker" | "darker-x"
+ *   - Applies `bg-primary-{tone}` and auto text contrast `col-base-95` on dark tones.
+ */
+
+ interface Props {
+   id?: string;
+  /**
+   * Visual type (aliases allowed). Aliases normalize to canonical:
+   * - note/info/hint/important/details → note
+   * - tip/success/idea/ok/check/done   → tip
+   * - alert/warning/caution/attention  → alert
+   * - error/danger/bug/fail/issue/stop → error
+   * - promo/cta/cta-primary/cta-secondary → brand lanes (promo/cta styles)
+   */
+  type?:
+    | 'note' | 'info' | 'hint' | 'important' | 'details'
+    | 'tip' | 'success' | 'idea' | 'ok' | 'check' | 'done'
+    | 'alert' | 'warning' | 'caution' | 'attention'
+    | 'error' | 'danger' | 'bug' | 'fail' | 'issue' | 'stop'
+    | 'promo' | 'cta' | 'cta-primary' | 'cta-secondary';
+   heading?: string;
+   wrapperClass?: string;
+   headingClass?: string;
+   bodyClass?: string;
+   showIcon?: boolean;
+   dense?: boolean;
+   iconSrc?: string; // optional explicit icon override
+  /**
+   * Brand tone for promo/cta variants. Ignored for note/tip/alert/error.
+   * bg-primary-{tone} is applied automatically.
+   */
+  brandTone?: 'base' | 'light' | 'lighter' | 'dark' | 'darker' | 'darker-x';
+  /**
+   * Override the computed ARIA role. Defaults:
+   * - "alert" for alert/error, "region" otherwise.
+   */
+  roleOverride?: 'alert' | 'region' | 'status';
+ }
+
+ const {
+   id,
+   type = 'note',
+   heading,
+   wrapperClass = '',
+   headingClass = '',
+   bodyClass = '',
+   showIcon = true,
+   dense = false,
+   iconSrc,
+   brandTone: brandToneProp,
+   roleOverride
+ } = Astro.props as Props;
+
+// Canonical variants we style: note, tip, alert, error, promo, ctaPrimary, ctaSecondary
+type Canonical = 'note' | 'tip' | 'alert' | 'error' | 'promo' | 'ctaPrimary' | 'ctaSecondary';
+
+// Map aliases → canonical + default heading to display
+const aliasMap: Record<string, { canonical: Canonical; defaultHeading: string }> = {
+   // info group → note
+   note: { canonical: 'note', defaultHeading: 'Note' },
+   info: { canonical: 'note', defaultHeading: 'Info' },
+   hint: { canonical: 'note', defaultHeading: 'Hint' },
+   important: { canonical: 'note', defaultHeading: 'Important' },
+   details: { canonical: 'note', defaultHeading: 'Details' },
+
+   // success group → tip
+   tip: { canonical: 'tip', defaultHeading: 'Tip' },
+   success: { canonical: 'tip', defaultHeading: 'Success' },
+   idea: { canonical: 'tip', defaultHeading: 'Tip' },
+   ok: { canonical: 'tip', defaultHeading: 'Success' },
+   check: { canonical: 'tip', defaultHeading: 'Success' },
+   done: { canonical: 'tip', defaultHeading: 'Success' },
+
+   // warning group → alert
+   alert: { canonical: 'alert', defaultHeading: 'Caution' },
+   warning: { canonical: 'alert', defaultHeading: 'Warning' },
+   caution: { canonical: 'alert', defaultHeading: 'Caution' },
+   attention: { canonical: 'alert', defaultHeading: 'Attention' },
+
+   // error group → error
+   error: { canonical: 'error', defaultHeading: 'Error' },
+   danger: { canonical: 'error', defaultHeading: 'Danger' },
+   bug: { canonical: 'error', defaultHeading: 'Error' },
+   fail: { canonical: 'error', defaultHeading: 'Failed' },
+   issue: { canonical: 'error', defaultHeading: 'Error' },
+   stop: { canonical: 'error', defaultHeading: 'Error' },
+
+  // brand group → promo/cta lanes
+  promo: { canonical: 'promo', defaultHeading: 'Announcement' },
+  cta: { canonical: 'ctaPrimary', defaultHeading: 'Take Action' },
+  'cta-primary': { canonical: 'ctaPrimary', defaultHeading: 'Take Action' },
+  'cta-secondary': { canonical: 'ctaSecondary', defaultHeading: 'Learn More' },
+ };
+
+// Style/icon per canonical variant.
+// NOTE: bg-* and br-left-* utility classes must exist in your CSS.
+const typeConfig: Record<'note'|'tip'|'alert'|'error', {
+  svg: string; baseClass: string; borderClass: string; textClass: string;
+}> = {
+  note:  { svg: '/icons/note.svg',   baseClass: 'bg-note-light',    borderClass: 'br-left-note',    textClass: '' },
+  tip:   { svg: '/icons/idea-2.svg', baseClass: 'bg-success-light',  borderClass: 'br-left-success', textClass: '' },
+  alert: { svg: '/icons/alert.svg',  baseClass: 'bg-alert-light',    borderClass: 'br-left-alert',   textClass: '' },
+  error: { svg: '/icons/error.svg',  baseClass: 'bg-error-light',    borderClass: 'br-left-error',   textClass: '' },
+};
+
+// Brand tones for promo/cta
+const BRAND_TONES = new Set(['base','light','lighter','dark','darker','darker-x'] as const);
+const DARKISH = new Set(['base','dark','darker','darker-x']);
+const defaultToneFor: Record<Canonical, typeof BRAND_TONES extends Set<infer T> ? T : any> = {
+  note: 'light',
+  tip: 'light',
+  alert: 'light',
+  error: 'light',
+  promo: 'light',
+  ctaPrimary: 'base',
+  ctaSecondary: 'lighter',
+} as any;
+
+ // Normalize the requested type
+ const requested = String(type).toLowerCase();
+ const norm = aliasMap[requested] ?? aliasMap['note'];
+const canonical: Canonical = norm.canonical;
+
+// Compute config (standard vs brand)
+let cfg: { svg: string; baseClass: string; borderClass: string; textClass: string };
+if (canonical === 'promo' || canonical === 'ctaPrimary' || canonical === 'ctaSecondary') {
+  const tone = (brandToneProp && BRAND_TONES.has(brandToneProp as any))
+    ? (brandToneProp as any)
+    : defaultToneFor[canonical];
+  const baseClass = `bg-primary-${tone}`;
+  const borderClass = 'br-left-primary';
+  const textClass = DARKISH.has(tone) ? 'col-base-95' : '';
+  const svg =
+    canonical === 'promo' ? '/icons/megaphone.svg'
+    : canonical === 'ctaPrimary' ? '/icons/bolt.svg'
+    : '/icons/arrow-right.svg';
+  cfg = { svg, baseClass, borderClass, textClass };
+} else {
+  cfg = typeConfig[canonical];
+}
+
+ const padding = dense ? 'p-05' : 'p-1';
+ const finalHeading = heading ?? norm.defaultHeading;
+ const ariaLabel = `${finalHeading}`;
+ const finalIcon = iconSrc ?? cfg.svg;
+ const hasHeadingSlot = await Astro.slots.has('heading');
+ const hasBodySlot = await Astro.slots.has('body');
+
+// ARIA role: alert for alert/error, region otherwise (overridable)
+const computedRole = (canonical === 'alert' || canonical === 'error') ? 'alert' : 'region';
+const roleAttr = roleOverride ?? computedRole;
+ ---
+
+ <div
+   {...(id ? { id } : {})}
+  class={`callout br ${padding} mb-1 ${cfg.baseClass} ${cfg.borderClass} ${wrapperClass}`}
+  role={roleAttr}
+   aria-label={ariaLabel}
+   data-type={requested}
+   data-variant={canonical}
+  {...((canonical === 'promo' || canonical === 'ctaPrimary' || canonical === 'ctaSecondary') ? { 'data-tone': (brandToneProp ?? defaultToneFor[canonical]) } : {})}
+ >
+   <div class="flex flex-row ai-center gap">
+     {showIcon && (
+       <img
+         src={finalIcon}
+         alt=""
+         width="24"
+         height="24"
+         class="h-1-5 w-1-5"
+         loading="lazy"
+         aria-hidden="true"
+       />
+     )}
+
+     {hasHeadingSlot ? (
+      <div class={`bold ${cfg.textClass} ${headingClass}`}>
+         <slot name="heading" />
+       </div>
+     ) : (
+       <div class={`bold ${cfg.textClass} ${headingClass}`}>
+         {finalHeading}
+       </div>
+     )}
+   </div>
+
+  <div class={`mt-05 ${bodyClass} ${cfg.textClass}`}>
+     {hasBodySlot ? <slot name="body" /> : <slot />}
+   </div>
+ </div>

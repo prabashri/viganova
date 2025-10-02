@@ -2,39 +2,64 @@
 /* faq css */
 .faq-item {
     margin-bottom: 1rem;
-    border: 1px solid var(--primary-color-light, #ddd);
+    border: 1px solid var(--primary-light, #ddd);
     border-radius: 6px;
-    background: var(--base-10);
+    /* background: var(--base-10); */
     overflow: hidden;
     transition: 0.3s;
 }
+
 .faq-item[open] .faq-answer {
     max-height: 500px;
-    padding: 0px 1rem 1rem;
+    padding: 1rem;
 }
 .faq-item summary {
-    font-weight: var(--font-weight-regular);
-    font-size: var(--cg-font-base);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-base);
     cursor: pointer;
     position: relative;
     padding: 1rem;
+    padding-right: 3rem;
     list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--base-00);
 }
+
+
 .faq-item summary::after {
     content: "+";
     position: absolute;
+    color: var(--base-00);
     right: 1rem;
-    font-size: 1.2rem;
+    border-radius: 50%;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-base);
+    font-size: var(--font-size-base);
     transition: transform 0.3s;
+    margin-left: 1rem;
 }
 .faq-item[open] summary::after {
     content: "-";
 }
 .faq-answer {
     max-height: 0px;
-    color: var(--cg-text-secondary, #666);
+    /* color: var(--cg-text-secondary, #666); */
     overflow: hidden;
     padding: 0px 1rem;
+    border-top: 1px solid var(--primary-lighter, #ddd);
+    background-color: var(--primary-lighter-x);
     transition: max-height 0.3s, padding 0.3s;
 	color: var(--base-90);
+}
+
+
+.tab-button.active {
+  border-color: var(--base-100);
+  color: var(--base-100);
 }

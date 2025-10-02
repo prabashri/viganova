@@ -1,66 +1,133 @@
 ---
-// src/components/Analytics.astro
-// 🚫 disable automatic pageview (we send manually for PWA) by using send_page_view: false
-import {siteFunctions} from '../config/siteFunctions';
+/* src/components/Analytics.astro */
+import { siteFunctions } from '../config/siteFunctions';
 const analyticsId = siteFunctions.analyticsId;
-const cloudflareAnalyticsId = siteFunctions.cloudflareAnalyticsId;
-
+const cloudflareAnalyticsId = siteFunctions.cloudflareAnalyticsId; // ideally your CF beacon token
+const ahrefId = siteFunctions.ahrefAnalyticsId;
 ---
-{/*-- Google tag: fast, async, non-blocking, also, load only we have analytics id --*/}
+
+{/* Cloudflare Web Analytics (optional) */}
 {
   typeof cloudflareAnalyticsId === "string" && cloudflareAnalyticsId.trim() && (
-    <script 
+    <script
       data-category="analytics"
-      defer
+      async
       type="text/javascript"
-      src={`https://static.cloudflareinsights.com/beacon.min.js`} data-cf-beacon='{"token": "5583179e635941e390608e36b79fd756"}'>
-    </script>
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={JSON.stringify({ token: cloudflareAnalyticsId })}
+    ></script>
   )
 }
+
+{/* Ahrefs Web Analytics (optional) */}
+{
+  typeof ahrefId === "string" && ahrefId.trim() && (
+    <script
+      data-category="analytics"
+      async
+      type="text/javascript"
+      src="https://analytics.ahrefs.com/analytics.js"
+      data-key={JSON.stringify({ token: ahrefId })}
+    ></script>
+  )
+}
+
+{/* Google tag (GA4) */}
 {
   typeof analyticsId === "string" && analyticsId.trim() && (
     <>
-      <script 
+      <script
         data-category="analytics"
-        defer
-        data-src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}>
-      </script>
+        async
+        src={`https://www.googletagmanager.com/gtag/js?id=${analyticsId}`}
+      ></script>
 
-
-      <script 
-          data-category="analytics"
-          defer
-          type="text/javascript"
-          define:vars={{analyticsId: analyticsId}}
-        >
+      <script
+        data-category="analytics"
+        type="text/javascript"
+        define:vars={{ analyticsId }}
+      >
+        // ---- GA bootstrap ----
         window.dataLayer = window.dataLayer || [];
         function gtag(){ dataLayer.push(arguments); }
-
-        // Ensure pageview is sent as early as possible
+        window.gtag = window.gtag || gtag; // ensure global
         gtag('js', new Date());
-        gtag('config', analyticsId, {
-          send_page_view: true
-        });
+        gtag('config', analyticsId, { send_page_view: true });
 
-        // Safe: interaction tracking once DOM is interactive
-        document.addEventListener('DOMContentLoaded', () => {
-          document.addEventListener('click', (e) => {
-            const el = e.target.closest('[data-action]');
-            if (!el || typeof gtag !== 'function') return;
+        // ---- Helpers ----
+        const getText = (el) => (el?.innerText || el?.textContent || '').trim();
+        const getAttr = (el, name) => el?.getAttribute?.(name) || '';
+        const getHref = (el) => (el?.tagName === 'A' && getAttr(el, 'href')) || '';
+        const isAnchor = (el) => el?.tagName === 'A';
+        const isButton = (el) => el?.tagName === 'BUTTON';
+        const isForm   = (el) => el?.tagName === 'FORM';
 
-            const action = el.getAttribute('data-action');
-            const label = el.getAttribute('data-label') || el.innerText || el.getAttribute('href') || location.pathname;
+        // Resolve unified tracking payload
+        function buildPayload(el, defaults = {}) {
+          // read dataset first
+          const id     = el.dataset.id || getAttr(el, 'data-id') || defaults.id || '';
+          const action = el.dataset.action || getAttr(el, 'data-action') || defaults.action || '';
+          const label  = el.dataset.label || getAttr(el, 'data-label') ||
+                         getAttr(el, 'aria-label') || getText(el) || getHref(el) || defaults.label || '';
 
-            gtag('event', action, {
+          const href   = getHref(el);
+          const role   = getAttr(el, 'role') || (isAnchor(el) ? 'link' : isButton(el) ? 'button' : '');
+
+          return {
+            action,
+            params: {
               event_category: 'interaction',
               event_label: label,
+              cta_id: id || undefined,
+              cta_action: action || undefined,
+              cta_label: label || undefined,
+              link_url: href || undefined,
+              role: role || undefined,
               value: 1,
-            });
-          });
+            }
+          };
+        }
+
+        // Queue events until gtag is available
+        const sendGA = (name, params) => {
+          try { window.gtag?.('event', name, params); } catch(e) { /* no-op */ }
+        };
+
+        // Deduplicate rapid double clicks
+        let lastSentKey = '';
+        let lastSentAt = 0;
+        function safeSend(name, params) {
+          const key = name + JSON.stringify(params);
+          const now = Date.now();
+          if (key === lastSentKey && (now - lastSentAt) < 400) return; // 400ms guard
+          lastSentKey = key;
+          lastSentAt = now;
+          sendGA(name, params);
+        }
+
+        // ---- Delegated listeners ----
+        document.addEventListener('click', (e) => {
+          const el = e.target.closest('[data-id], [data-action], [data-label], a, button');
+          if (!el) return;
+
+          // default actions by element type
+          const defaults =
+            isAnchor(el) ? { action: 'link_click' } :
+            isButton(el) ? { action: 'button_click' } :
+            { action: 'ui_click' };
+
+          const { action, params } = buildPayload(el, defaults);
+          if (!action) return;
+          safeSend(action, params);
+        }, { passive: true });
+
+        document.addEventListener('submit', (e) => {
+          const el = e.target;
+          if (!el || !isForm(el)) return;
+          const { action, params } = buildPayload(el, { action: 'form_submit', label: getAttr(el, 'name') || getAttr(el, 'id') || 'form' });
+          safeSend(action, params);
         });
       </script>
     </>
   )
 }
-
-

@@ -14,9 +14,9 @@
  * 
  * currently used in baseHead.astro and ResponsiveImage.astro
  */
-import imageMetadataJson from '../data/image-format-details.json';
-import { siteDefaults } from '../config/siteDefaults';
-import { siteImages } from '../config/siteImages';
+import imageMetadataJson from '@/data/image-format-details.json';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
 
 const DEFAULT_FORMAT_ORDER = ['webp', 'png', 'jpg', 'jpeg', 'avif'];
 

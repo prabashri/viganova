@@ -1,16 +1,35 @@
 ---
 // src/components/ui/CardCollections.astro
-import Card from './Card.astro';
-import type { CardProps } from '../../types/CardProps';
+import Card from '@/components/ui/Card.astro';
+import type { CardProps } from '@/types/CardProps';
 
 interface Props {
   cards: CardProps[];
   wrapper?: 'div' | 'ul';
   roleType?: 'article' | 'list' | 'none';
   entry?: string;
+
+  /** New: layout + styling hooks */
+  orientation?: 'horizontal' | 'vertical';
+  wrapperClass?: string;
+  itemClass?: string;
+  cardClass?: string;
+  imageClass?: string;
 }
 
-let { cards, wrapper = 'div', roleType = 'none', entry } = Astro.props;
+let {
+  cards,
+  wrapper = 'div',
+  roleType = 'none',
+  entry,
+
+  // NEW
+  orientation,
+  wrapperClass = '',
+  itemClass = '',
+  cardClass = '',
+  imageClass = ''
+} = Astro.props as Props;
 
 // 🔹 Auto-adjust roleType if wrapper is UL
 if (wrapper === 'ul' && roleType === 'article') {
@@ -25,23 +44,37 @@ const wrapperLabel = wrapper === 'ul' && entry ? `${entry} list` : undefined;
 const itemRole = wrapper === 'ul' && roleType === 'list' ? 'listitem' : undefined;
 ---
 
-<WrapperTag 
-  class="card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-f-start"
-  role={wrapperRole} 
+<WrapperTag
+  class={`card-collection flex wrap gap-2 no-bullets mi-auto jc-center ai-f-start ${wrapperClass}`}
+  role={wrapperRole}
   aria-label={wrapperLabel}
 >
   {cards.map((card) => {
+    const computedOrientation = orientation ?? card.orientation ?? 'horizontal';
+    const mergedCardClass = [card.className ?? '', cardClass].filter(Boolean).join(' ');
+    const mergedImageClass = [card.imageClassName ?? '', imageClass].filter(Boolean).join(' ');
+
     if (wrapper === 'div' && roleType === 'article') {
       return (
-        <article class="card-item">
-          <Card {...card} />
+        <article class={`card-item ${itemClass}`}>
+          <Card
+            {...card}
+            orientation={computedOrientation}
+            className={mergedCardClass}
+            imageClassName={mergedImageClass}
+          />
         </article>
       );
     }
 
     return (
-      <InnerTag class="card-item" role={itemRole}>
-        <Card {...card} />
+      <InnerTag class={`card-item ${itemClass}`} role={itemRole}>
+        <Card
+          {...card}
+          orientation={computedOrientation}
+          className={mergedCardClass}
+          imageClassName={mergedImageClass}
+        />
       </InnerTag>
     );
   })}

@@ -29,6 +29,7 @@
   --font-family-mono: 'Roboto Mono', monospace;
 
   --font-weight-regular: 400;
+  --font-weight-medium: 400;
   --font-weight-bold: 700;
 
   /* Layout sizing */
@@ -36,7 +37,7 @@
   --max-width: 1280px;
   --featured-image-width: 960px;
   --site-width: 1280px;
-  --content-width: 640px;
+  --content-width: 720px;
   --sidebar-width: 360px;
   --toc-width: 320px;
 
@@ -84,7 +85,7 @@ html, body {
   font-family: var(--font-family-base);  
   line-height: 1.6;
   color: var(--text-color);
-  background-color: var(--background-color);
+  background-color: var(--primary-lighter-x, hsla(230, 100%, 99%, 1.00));
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -92,45 +93,69 @@ html, body {
 /* ================================
    ✍️ Typography (Direct Values)
 ================================ */
+:root{
+  /* Headings / display scale */
+
+  --font-size-5xl: clamp(1.6rem, 1.455rem + 0.727vw, 2rem);   /* h1 */
+  --font-size-4xl: clamp(1.5rem, 1.364rem + 0.682vw, 1.88rem); /* h2 */
+  --font-size-3xl: clamp(1.4rem, 1.273rem + 0.636vw, 1.75rem); /* h3 */
+  --font-size-2xl: clamp(1.3rem, 1.182rem + 0.591vw, 1.63rem); /* h4 */
+  --font-size-xl:  clamp(1.2rem, 1.091rem + 0.545vw, 1.5rem);  /* h5 */
+  --font-size-lg:  clamp(1.1rem, 1.000rem + 0.500vw, 1.38rem); /* h6 */
+
+  /* Body/base */
+  --font-size-base: clamp(1rem, 0.909rem + 0.455vw, 1.25rem);
+
+  /* Small text scale */
+  --font-size-sm:   clamp(0.88rem, 0.795rem + 0.398vw, 1.09rem);
+  --font-size-xs:   clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
+  --font-size-2xs:  clamp(0.625rem, 0.591rem + 0.295vw, 0.78rem);
+  --font-size-smaller: clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
+
+}
+.text-5rem {
+  font-size: clamp(2.50rem, calc(1.591rem + 4.545vw), 5.00rem);
+}
 h1, .text-5xl {
-  font-size: clamp(1.6rem, 1.455rem + 0.727vw, 2rem);
+  font-size: var(--font-size-5xl);
 }
 h2, .text-4xl {
-  font-size: clamp(1.5rem, 1.364rem + 0.682vw, 1.88rem);
+  font-size: var(--font-size-4xl);
 }
 h3, .text-3xl {
-  font-size: clamp(1.4rem, 1.273rem + 0.636vw, 1.75rem);
+  font-size: var(--font-size-3xl);
 }
 h4, .text-2xl {
-  font-size: clamp(1.3rem, 1.182rem + 0.591vw, 1.63rem);
+  font-size: var(--font-size-2xl);
 }
 h5, .text-xl {
-  font-size: clamp(1.2rem, 1.091rem + 0.545vw, 1.5rem);
+  font-size: var(--font-size-xl);
 }
-h6, .text-l {
-  font-size: clamp(1.1rem, 1.000rem + 0.500vw, 1.38rem);
+h6, .text-l, .text-lg {
+  font-size: var(--font-size-lg);
 }
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family-heading);
   font-weight: var(--font-weight-bold);
   line-height: 1.4;
-  margin-block: 0.5em;
+  margin-top: clamp(1rem, calc(0.571rem + 1.905vw), 2rem);
+  margin-bottom: clamp(0.5rem, calc(0.286rem + 0.952vw), 1rem);
 }
 body, p, .text-base {
-  font-size: clamp(1rem, 0.909rem + 0.455vw, 1.25rem);
-  
+  font-size: var(--font-size-base);
 }
 
 small, .text-small, .text-s {
-  font-size: clamp(0.88rem, 0.795rem + 0.398vw, 1.09rem);
+  font-size: var(--font-size-sm);
 }
-.text-xs{
-  font-size: clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
+.text-xs, .text-smaller {
+  font-size: var(--font-size-xs);
   line-height: 1.2;
 }
 .text-2xs {
-  font-size: clamp(0.625rem, 0.591rem + 0.295vw, 0.78rem);
+  font-size: var(--font-size-2xs);
 }
+
 strong, b, .bold {
   font-weight: var(--font-weight-bold);
 }
@@ -140,12 +165,10 @@ em, i, .italic {
 body, .regular {
   font-weight: var(--font-weight-regular);
 }
-.text-smaller {
-  font-size: clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
-}
+
 
 .post-content p {
-    margin-block: 1rem;
+    margin-block: 0.5rem;
     padding-block: 0.5rem;
     line-height: 1.6;
 }
@@ -292,15 +315,29 @@ button::after {
 }
 /* visually hidden for screen readers - Accessibility */
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
   border: 0;
+	padding: 0;
+	margin: 0;
+	position: absolute !important;
+	height: 1px;
+	width: 1px;
+	overflow: hidden;
+  clip: rect(0 0 0 0);
+  /* clip: rect(1px 1px 1px 1px);*/
+  /* clip: rect(1px, 1px, 1px, 1px);*/
+  clip-path: inset(50%);
+  white-space: nowrap;  
 }
 
-
+mark, .highlight {
+  background-color: #ffe500;
+  padding: 2px 8px;
+  color: black;
+  border-radius: 5px;
+}
+.sidebar-right:is(:empty, :not(:has(> :not(script,style,template)))) {
+  display: none !important;
+}
+.sidebar-left:is(:empty, :not(:has(> :not(script,style,template)))) {
+  display: none !important;
+}

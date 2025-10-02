@@ -1,456 +1,100 @@
 ---
+// src/pages/contact-us.astro
 import BaseLayout from '../layouts/BaseLayout.astro';
+import type { HeadProps } from '../types/HeadProps';
+
 import { siteDefaults } from '../config/siteDefaults';
 import { siteFunctions } from '../config/siteFunctions';
-import type { HeadProps } from '../types/HeadProps';
-import assetsManifest from '../data/assets-manifest.json';
+
+import Contact from '@/content/pages/Contact.astro';
+import ContactFormHead from '@/components/forms/ContactFormHead.astro';
+
+import assetsManifest from '@/data/assets-manifest.json';
+
+// NEW utils
+import { lastModifiedRaw } from '@/utils/last-modified';
+import { toMachineDate, toHumanDate, machineAndHuman } from '@/utils/date-format';
 
 const isDev = import.meta.env.DEV;
 
-// Safely access contact-form.js if it exists
-const contactForm = 'contact-form.js' in assetsManifest.js ? assetsManifest.js['contact-form.js'] : undefined;
+// Page config (centralized)
+const cfg = siteDefaults.pages.contact ?? {
+  title: 'Contact',
+  description: 'Get in touch with us.',
+  enabled: true,
+  index: true,
+  sitemap: true,
+  path: '/contact-us/',
+};
 
-// Config values
-const contactFormHandler = siteFunctions.contactFormHandler;
-const turnstileSitekey = siteFunctions.turnstileSitekey;
-const adminEmail = siteDefaults.admin.email 
-  || siteDefaults.organization.incharge.email 
-  || siteDefaults.organization.email 
-  || `contact@${siteDefaults.siteUrl.replace(/^https?:\/\//, '')}` 
-  || `contact@${Astro.url.hostname}`;
+// ✅ SSR redirect if disabled
+if (!cfg.enabled) {
+  return Astro.redirect('/', 307);
+}
 
-// HeadProps
+// Use configured path purely for canonical/OG (Astro route stays this file)
+const PATH = cfg.path ?? '/contact-us/';
+
+// Resolve last-modified (generator key 'contact' → fallback 'contact-us' → publishedDate)
+const rawLastMod = lastModifiedRaw(['contact', 'contact-us'], siteDefaults.publishedDate);
+
+// Machine (ISO) for SEO/meta; Human for UI (honor siteFunctions.dateFormat if provided)
+// const updatedAtISO = toMachineDate(rawLastMod, 'now');
+// const updatedAtHuman = toHumanDate(rawLastMod, 'now');
+const { iso: updatedAtISO, human: updatedAtHuman } = machineAndHuman(rawLastMod, 'now');
+
+
+// Derive form script (dev vs. prod, tolerate either manifest shape)
+const man: any = assetsManifest as any;
+const contactFormSrc = isDev
+  ? '/scripts/contact-form.js'
+  : (man?.js?.['contact-form.js'] || man?.['contact-form.js'] || '/scripts/contact-form.js');
+
+// Turnstile + handler availability
+const isFormAvailable = Boolean(siteFunctions.contactFormHandler && siteFunctions.turnstileSitekey);
+
+// SEO
 const pageSeo: HeadProps = {
-  title: `Contact us`,
-  description: `Get in touch with the ${siteDefaults.siteName} team for any inquiries or support.`,
-  type: 'website',
-  url: `${siteDefaults.siteUrl}/contact-us/`,
-  canonicalUrl: `${siteDefaults.siteUrl}/contact-us/`,
+  title: cfg.title,
+  description: cfg.description,
+  image: '',
+  type: 'contact',
+  url: `${siteDefaults.siteUrl}${PATH}`,
+  canonicalUrl: `${siteDefaults.siteUrl}${PATH}`,
   siteName: siteDefaults.siteName,
   authors: [],
   publishedAt: siteDefaults.publishedDate,
-  updatedAt: siteDefaults.publishedDate,
-  index: true,
+  updatedAt: updatedAtISO,
+  index: cfg.index ?? true,
   keywords: [...siteDefaults.keywords, 'Contact'],
-  showBreadcrumb: true
+  showBreadcrumb: false,
 };
-
-// Flag to determine form availability
-const isFormAvailable = contactFormHandler && turnstileSitekey;
 ---
 
 <BaseLayout headProps={pageSeo}>
+  {/* Head slot: preconnect + scripts via the small head helper */}
   <Fragment slot="headContent-top">
-    {isFormAvailable && (
-      <>
-        <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
-        <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
-      </>
-    )}
+    <ContactFormHead
+      enableTurnstile={isFormAvailable}
+      turnstileSitekey={siteFunctions.turnstileSitekey}
+      placeScript="top"
+    />
   </Fragment>
 
   <Fragment slot="headContent-bottom">
-    {isFormAvailable && (
-      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
-    )}
-    { isDev && <script src="/scripts/contact-form.js" defer></script>}
-    { !isDev && contactForm && <script id="contact-form" data-src={contactForm} defer></script>}
+    <ContactFormHead
+      enableTurnstile={isFormAvailable}
+      turnstileSitekey={siteFunctions.turnstileSitekey}
+      formScriptSrc={contactFormSrc}
+      placeScript="bottom"
+    />
   </Fragment>
-<style>
-  /* Contact Form Base */
-.contact-form {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 420px;
-  margin: 0 auto;
-  gap: 0.75rem;
-}
 
-/* Form Group */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.form-control {
-  padding: 0.5rem;
-  border: 1px solid var(--base-100);
-  border-radius: 4px;
-  font-size: 0.95rem;
-  color: var(--base-80);
-  background: var(--base-00);
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(var(--primary-rgb), 0.2);
-}
-
-/* Labels & Required */
-label {
-  font-size: 0.85rem;
-  color: var(--base-80);
-}
-
-.required {
-  color: var(--error);
-}
-
-/* Honeypot Hidden */
-.honeypot {
-  display: none !important;
-}
-
-/* Conditional Fields */
-.conditional-fields.hidden {
-  display: none !important;
-}
-
-/* Submit Button */
-.form-submit {
-  background: var(--primary);
-  color: var(--base-00);
-  font-weight: bold;
-  padding: 0.75rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.form-submit:hover {
-  background: var(--primary-dark);
-}
-
-/* Status Messages */
-.form-status {
-  font-size: 0.85rem;
-  text-align: center;
-  margin-top: 0.5rem;
-}
-
-.success-box {
-  background: var(--success-light);
-  color: var(--success-dark);
-  padding: 0.75rem;
-  border-radius: 4px;
-}
-
-.error {
-  color: var(--error);
-}
-
-.display-none {
-  display: none !important;
-}
-
-</style>
-  <article>
-    <header class="mx-w-content mi-auto">
-      <h1 class="ta-center">{pageSeo.title}</h1>
-      <p class="ta-center">Reach out with your feedback, questions, or suggestions.</p>
-      <p class="ta-center">We're just a mail away...</p>
-    </header>
-
-    {isFormAvailable ? (
-      <section id="contact-form-container">
-        <div id="success-box" class="form-status success-box display-none"></div>
-
-        <form id="contact-form" novalidate class="contact-form" aria-label="Contact Form" autocomplete="on">
-          <!-- Honeypot anti-spam -->
-          <div class="form-group honeypot" aria-hidden="true">
-            <label for="website">Form name</label>
-            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" />
-          </div>
-
-          <!-- Hidden technical fields -->
-          <input type="hidden" name="token" />
-          <input type="hidden" name="postUrl" value="" />
-          <input type="hidden" name="postTitle" value="" />
-          <input type="hidden" name="adminEmail" value={adminEmail} />
-          <input type="hidden" name="brand" value={siteDefaults.siteName} />
-          <input type="hidden" name="handler" value={contactFormHandler} />
-
-          <!-- Name -->
-          <div class="form-group">
-            <label for="name">Name <span class="required">*</span></label>
-            <input id="name" name="name" type="text" class="form-control" required autocomplete="name" />
-          </div>
-
-          <!-- Email -->
-          <div class="form-group">
-            <label for="email">Email <span class="required">*</span></label>
-            <input id="email" name="email" type="email" class="form-control" required autocomplete="email" />
-          </div>
-
-          <!-- Subject -->
-          <div class="form-group">
-            <label for="subject">Subject <span class="required">*</span></label>
-            <select id="subject" name="subject" class="form-control" required>
-              <option value="">Select</option>
-              <option>Support</option>
-              <option>Feedback</option>
-              <option>Suggestions</option>
-              <option>Business Enquiries</option>
-              <option>Reviews</option>
-              <option>Comment</option>
-              <option>Security</option>
-            </select>
-          </div>
-
-          <!-- Conditional Fields -->
-          <fieldset id="review-fields" class="conditional-fields hidden">
-            <legend class="sr-only">Review Details</legend>
-            <div class="form-group">
-              <label for="affiliation">Affiliation <span class="required">*</span></label>
-              <input id="affiliation" name="affiliation" type="text" class="form-control" />
-            </div>
-            <div class="form-group">
-              <label for="reviewScore">How do you rate us? <span class="required">*</span></label>
-              <select id="reviewScore" name="reviewScore" class="form-control">
-                <option value="1">1 - Poor</option>
-                <option value="2">2 - Fair</option>
-                <option value="3" selected>3 - Good</option>
-                <option value="4">4 - Very Good</option>
-                <option value="5">5 - Excellent</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="isPublicReview">
-                <input type="checkbox" id="isPublicReview" name="isPublicReview" checked /> Use my review publicly with name.
-              </label>
-            </div>
-          </fieldset>
-
-          <fieldset id="comment-fields" class="conditional-fields hidden">
-            <legend class="sr-only">Comment Visibility</legend>
-            <div class="form-group">
-              <label for="isPublicComment">
-                <input type="checkbox" id="isPublicComment" name="isPublicComment" checked /> Make my comment public
-              </label>
-            </div>
-          </fieldset>
-
-          <!-- Message -->
-          <div class="form-group">
-            <label for="message">Message <span class="required">*</span></label>
-            <textarea id="message" name="message" class="form-control" rows="3" required></textarea>
-          </div>
-
-          {turnstileSitekey && (
-            <div class="form-group">
-              <div id="cf-turnstile" class="cf-turnstile" data-sitekey={turnstileSitekey}></div>
-            </div>
-          )}
-
-          <!-- Submit -->
-          <button type="submit" class="form-submit">Send</button>
-          <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
-        </form>
-      </section>
-    ) : (
-      <section class="mx-w-content mi-auto ta-center">
-        <p>⚠️ The contact form is temporarily unavailable.</p>
-        <p>Please reach us directly at <a href={`mailto:${adminEmail}`} class="link">{adminEmail}</a></p>
-      </section>
-    )}
-  </article>
-
-  <Fragment slot="extraScripts"></Fragment>
+  {/* Page content (Contact includes the form internally) */}
+  <Contact
+    title={cfg.title}
+    description={cfg.description}
+    updatedAt={updatedAtHuman}
+    isFormAvailable={isFormAvailable}    
+  />
 </BaseLayout>
- {/** Contact Form container Section end  */}
- {/*
-      <script type="module">
-          document.addEventListener("DOMContentLoaded", function () {
-            const LOCAL_STORAGE_KEY = "contact_form_last_submitted";
-            const COOLDOWN_MINUTES = 3; // Cooldown period in minutes
-
-            const form = document.getElementById('contact-form');
-            if (!form) return;
-
-            const statusBox = document.getElementById("form-status");
-            const successBox = document.getElementById("success-box");
-            const subjectSelect = document.getElementById("subject");
-            const reviewFields = document.getElementById("review-fields");
-            const commentFields = document.getElementById("comment-fields");
-
-            const validSubjects = [
-              "Support", "Feedback", "Suggestions", "Business Enquiries",
-              "Reviews", "Comment", "Security"
-            ];
-
-            const subjectAliases = {
-              support: "Support",
-              feedback: "Feedback",
-              suggestions: "Suggestions",
-              suggestion: "Suggestions",
-              business: "Business Enquiries",
-              businessenquiry: "Business Enquiries",
-              "business-enquiry": "Business Enquiries",
-              businessenquiries: "Business Enquiries",
-              "business-enquiries": "Business Enquiries",
-              reviews: "Reviews",
-              review: "Reviews",
-              comment: "Comment",
-              comments: "Comment",
-              security: "Security"
-            };
-
-            // Handle subject change
-            subjectSelect?.addEventListener("change", (e) => {
-              const val = e.target.value;
-              reviewFields?.style.setProperty("display", val === "Reviews" ? "block" : "none");
-              commentFields?.style.setProperty("display", val === "Comment" ? "block" : "none");
-
-              reviewFields?.setAttribute("aria-hidden", val !== "Reviews");
-              commentFields?.setAttribute("aria-hidden", val !== "Comment");
-            });
-
-            // Prefill subject from query params
-            const params = new URLSearchParams(window.location.search);
-            const querySubject = params.get("subject");
-            const queryPost = params.get("post");
-            const queryTitle = params.get("title");
-
-            if (querySubject) {
-              const normalized = querySubject.trim().toLowerCase().replace(/[^a-z]/g, "");
-              const matched = subjectAliases[normalized];
-              if (matched && subjectSelect) {
-                subjectSelect.value = matched;
-                subjectSelect.dispatchEvent(new Event("change"));
-              }
-            }
-
-            if (queryPost) form.querySelector("[name='postUrl']").value = decodeURIComponent(queryPost);
-            if (queryTitle) form.querySelector("[name='postTitle']").value = decodeURIComponent(queryTitle);
-
-            // Cooldown check
-            const runCooldownCheck = () => {
-              const last = localStorage.getItem(LOCAL_STORAGE_KEY);
-              if (!last) return false;
-
-              const now = Date.now();
-              const diff = now - parseInt(last, 10);
-              const remaining = COOLDOWN_MINUTES * 60 * 1000 - diff;
-
-              if (remaining > 0) {
-                const mins = Math.floor(remaining / 60000);
-                const secs = Math.floor((remaining % 60000) / 1000);
-                successBox.textContent = `
-                  ✅ Message sent successfully!<br/>
-                  ⏳ Please wait <strong>${mins}:${secs.toString().padStart(2, "0")}</strong> before sending another message.
-                `;
-                successBox.style.display = "block";
-                form.style.display = "none";
-                setTimeout(runCooldownCheck, 1000);
-                return true;
-              } else {
-                localStorage.removeItem(LOCAL_STORAGE_KEY);
-                return false;
-              }
-            };
-
-            if (runCooldownCheck()) {
-              return; // Block re-submission
-            }
-
-            // Form submission
-            form.addEventListener("submit", async (e) => {
-              e.preventDefault();
-              statusBox.textContent = "Sending...";
-
-              const formData = new FormData(form);
-
-              // Honeypot
-              if (formData.get("website")) {
-                statusBox.textContent = "You are not allowed to submit now, try later.";
-                return;
-              }
-
-              const sanitize = (str) => str?.replace(/<[^>]*>?/gm, "").trim() || "";
-
-              const token = formData.get("token") || formData.get("cf-turnstile-response");
-              if (!token) {
-                statusBox.textContent = "❌ Please complete the CAPTCHA.";
-                return;
-              }
-
-              const name = sanitize(formData.get("name"));
-              const email = sanitize(formData.get("email"));
-              const subject = sanitize(formData.get("subject"));
-              const messageInput = sanitize(formData.get("message"));
-              const adminEmail = sanitize(formData.get("adminEmail")) || "praba@nviewsweb.com";
-
-              if (!name || !email || !subject || !messageInput) {
-                statusBox.textContent = "❌ All required fields must be filled.";
-                return;
-              }
-
-              if (!/^[\w\s.@+-]+$/.test(email)) {
-                statusBox.textContent = "❌ Invalid email format.";
-                return;
-              }
-
-              const postUrl = formData.get("postUrl");
-              const postTitle = formData.get("postTitle");
-              const isPublic =
-                formData.get("isPublicReview") === "on" ||
-                formData.get("isPublicComment") === "on";
-
-              const rawReviewScore = formData.get("reviewScore");
-              const reviewScore =
-                subject === "Reviews" && /^[1-5]$/.test(rawReviewScore)
-                  ? Number(rawReviewScore)
-                  : null;
-
-              const affiliation = sanitize(formData.get("affiliation")) || "";
-              let message = messageInput;
-
-              if (subject === "Reviews") {
-                message += `\n\nReview Score: ${reviewScore}/5`;
-              } else if (subject === "Comment") {
-                message += `\n\nComment on: ${postTitle} (${postUrl || "Unknown"})\nVisibility: ${isPublic ? "Public" : "Private"}`;
-              }
-
-              const payload = {
-                name,
-                email,
-                subject,
-                message,
-                token,
-                adminEmail,
-                brand: "ClampGenerator",
-                reviewScore,
-                isPublic,
-                affiliation,
-                postTitle,
-                postUrl,
-              };
-
-              try {
-                const res = await fetch("https://nviewsweb-email-handler.nviews.workers.dev/", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload),
-                });
-                
-                if (res.ok) {
-                  localStorage.setItem(LOCAL_STORAGE_KEY, Date.now().toString());
-                  form.reset();
-                  successBox.textContent = `✅ Message sent successfully!<br/>⏳ Please wait before submitting again.`;
-                  successBox.style.display = "block";
-                  form.style.display = "none";
-                } else {
-                  statusBox.textContent = "❌ Server error. Please try again.";
-                }
-              } catch (err) {
-                console.error("Network error", err);
-                statusBox.textContent = "❌ Network error. Please try again.";
-              }
-            });
-        });
-      </script>
- */}

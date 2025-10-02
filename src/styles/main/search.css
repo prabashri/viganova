@@ -1,0 +1,10 @@
+.search-results li {
+    margin: 0.5rem 0;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.5rem;
+}
+
+.search-results h3 {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+}

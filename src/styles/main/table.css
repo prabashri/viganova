@@ -1,0 +1,151 @@
+/* ==============================
+   Scoped, stable tables
+   (No global selectors; no :root edits; no :has)
+   ============================== */
+
+/* Wrapper */
+.table-scroll {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  margin: 0.75rem 0;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  scrollbar-gutter: stable both-edges;
+  contain: inline-size paint; /* isolate layout on mobile */
+
+  /* Palette (scoped defaults; can inherit from your theme tokens) */
+  --tbl-bg:        var(--base-00, #fff);
+  --tbl-fg:        var(--text-color, CanvasText);
+  --tbl-border:    var(--base-30, #d6dbe1);
+  --tbl-head-bg:   var(--primary-lighter-x, #e8f0fe);
+  --tbl-head-fg:   var(--primary-darker-x, #0b3d91);
+  --tbl-zebra:     var(--base-05, #f7f9fc);
+  --tbl-hover:     var(--base-10, #eef4ff);
+  --tbl-radius:    var(--border-radius, 8px);
+  --tbl-line:      1px;
+  --tbl-pad-y:     .65rem;
+  --tbl-pad-x:     1rem;
+  --tbl-minw:      40rem; /* overridden per instance via inline style */
+
+  border: var(--tbl-line) solid var(--tbl-border);
+  border-radius: var(--tbl-radius);
+  background: var(--tbl-bg);
+
+  /* Edge-fade hint that it scrolls (disabled on tiny screens below) */
+  --fade: 12px;
+  -webkit-mask-image:
+    linear-gradient(to right,
+      transparent 0, black var(--fade),
+      black calc(100% - var(--fade)), transparent 100%);
+          mask-image:
+    linear-gradient(to right,
+      transparent 0, black var(--fade),
+      black calc(100% - var(--fade)), transparent 100%);
+}
+
+/* Caption */
+.table-caption {
+  display: block;
+  text-align: left;
+  padding: .75rem 1rem .5rem;
+  color: color-mix(in oklab, CanvasText 55%, transparent);
+  font-size: var(--font-size-sm, 0.875rem);
+  font-style: italic;
+  user-select: none;
+}
+
+/* Table */
+.table-scroll :is(table) {
+  width: 100%;
+  min-width: var(--tbl-minw);
+  margin: 0;
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed; /* stable columns */
+  background: transparent;
+  color: var(--tbl-fg);
+}
+
+/* Header cells */
+.table-scroll :is(th) {
+  background: var(--tbl-head-bg);
+  color: var(--tbl-head-fg);
+  text-align: left;
+  font-weight: var(--font-weight-bold, 700);
+  vertical-align: top;
+  padding: var(--tbl-pad-y) var(--tbl-pad-x);
+  border-bottom: calc(var(--tbl-line) * 2) solid var(--tbl-border);
+  white-space: pre-wrap;
+}
+
+/* Body cells */
+.table-scroll :is(td) {
+  padding: var(--tbl-pad-y) var(--tbl-pad-x);
+  vertical-align: top;
+  border-bottom: var(--tbl-line) solid var(--tbl-border);
+}
+
+/* Vertical grid lines */
+.table-scroll :is(th:not(:last-child), td:not(:last-child)) {
+  border-right: var(--tbl-line) solid var(--tbl-border);
+}
+
+/* Last row cleanup */
+.table-scroll :is(tbody tr:last-child > th, tbody tr:last-child > td) { border-bottom: 0; }
+
+/* Zebra & hover */
+.table-scroll :is(tbody tr:nth-child(odd)) { background: var(--tbl-zebra); }
+.table-scroll :is(tbody tr:hover) { background: var(--tbl-hover); }
+
+/* Sticky header (opt-in via .table--stickyhead) */
+.table--stickyhead :is(thead th) {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+/* Compact density (opt-in) */
+.table--compact {
+  --tbl-pad-y: .5rem;
+  --tbl-pad-x: .75rem;
+}
+
+/* Custom thin scrollbar */
+.table-scroll { scrollbar-width: thin; }
+.table-scroll { scrollbar-color:
+  color-mix(in oklab, var(--tbl-border) 80%, transparent)
+  color-mix(in oklab, var(--tbl-bg) 100%, transparent);
+}
+.table-scroll::-webkit-scrollbar { height: 8px; }
+.table-scroll::-webkit-scrollbar-track { background: transparent; }
+.table-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--tbl-border) 90%, transparent);
+  border-radius: 999px;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px){
+  .table-scroll { --tbl-pad-y: .5rem; --tbl-pad-x: .75rem; }
+}
+@media (max-width: 480px){
+  /* Avoid rare WebKit mask/height bug that can collapse siblings */
+  .table-scroll { -webkit-mask-image: none; mask-image: none; }
+}
+
+/* Dark mode hooks (scoped) */
+@media (prefers-color-scheme: dark) {
+  .table-scroll {
+    --tbl-bg: color-mix(in oklab, Canvas 6%, transparent);
+    --tbl-fg: CanvasText;
+    --tbl-border: color-mix(in oklab, CanvasText 22%, transparent);
+    --tbl-head-bg: color-mix(in oklab, var(--primary-darker, #0b3d91) 60%, black);
+    --tbl-head-fg: #fff;
+    --tbl-zebra: color-mix(in oklab, Canvas 10%, transparent);
+    --tbl-hover: color-mix(in oklab, Canvas 16%, transparent);
+  }
+}

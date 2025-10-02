@@ -1,0 +1,91 @@
+---
+import Anchor from '@/components/ui/Anchor.astro';
+
+type EntryLike = {
+  id?: string;
+  slug?: string;          // allow direct slug on object (optional)
+  title?: string;         // allow direct title on object (optional)
+  data?: {
+    slug?: string;
+    title?: string;
+  };
+};
+
+interface Props {
+  prevItem?: EntryLike | null;
+  nextItem?: EntryLike | null;
+
+  /** e.g. "blog/" or "videos/". Should NOT start with a slash; trailing slash optional. */
+  collectionBase: string;
+
+  /** Wrapper classes (optional) */
+  class?: string;
+
+  /** Button variants for the links */
+  prevVariant?: 'primary' | 'secondary' | 'ghost' | 'nav' | 'plain';
+  nextVariant?: 'primary' | 'secondary' | 'ghost' | 'nav' | 'plain';
+}
+
+const {
+  prevItem = null,
+  nextItem = null,
+  collectionBase,
+  class: wrapperClass = 'footerNav flex footer-nav post-navigation mb-05 p-05 w-full mi-auto jc-center bg',
+  prevVariant = 'secondary',
+  nextVariant = 'secondary',
+} = Astro.props as Props;
+
+/* helpers */
+const slugOf = (it?: EntryLike | null) =>
+  it?.data?.slug || (it as any)?.slug || it?.id;
+
+const titleOf = (it?: EntryLike | null) =>
+  it?.data?.title || (it as any)?.title || slugOf(it) || '';
+
+const safeBase = collectionBase.endsWith('/') ? collectionBase : `${collectionBase}/`;
+
+const prevSlug = slugOf(prevItem);
+const nextSlug = slugOf(nextItem);
+
+const prevHref = prevSlug ? `/${safeBase}${prevSlug}/` : '';
+const nextHref = nextSlug ? `/${safeBase}${nextSlug}/` : '';
+---
+
+{(prevSlug || nextSlug) && (
+  <nav class={wrapperClass} aria-label="Post navigation">
+    <ul class="flex flex-row mx-w-featured w-full wrap gap-2 jc-space-between no-list-style-type no-margin">
+      <li class="w-50-1 ta-start bg-primary-lighter br">
+        {prevSlug && (
+          <Anchor
+            href={prevHref}
+            type="button"
+            variant={prevVariant}
+            className="prev-post flex flex-col bg-primary-light p-05 gap-05 br ai-f-start"
+            ariaLabel={`Go to previous: ${titleOf(prevItem)}`}
+            rel="prev"
+            data-action="prev_click"
+          >
+            <span class="arrow-icon text-2xs uppercase">← previous</span>
+            <span class="post-title text-s">{titleOf(prevItem)}</span>
+          </Anchor>
+        )}
+      </li>
+      <li class="w-50-1 ta-end bg-primary-lighter br">
+        {nextSlug && (
+          <Anchor
+            href={nextHref}
+            type="button"
+            variant={nextVariant}
+            className="next-post flex flex-col bg-primary-light p-05 br gap-05 ai-f-end"
+            ariaLabel={`Go to next: ${titleOf(nextItem)}`}
+            rel="next"
+            data-action="next_click"
+          >
+            <span class="arrow-icon text-2xs uppercase">→ next</span>
+            <span class="post-title text-s">{titleOf(nextItem)}</span>
+          </Anchor>
+        )}
+      </li>
+    </ul>
+  </nav>
+)}

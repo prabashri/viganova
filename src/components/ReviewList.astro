@@ -1,0 +1,379 @@
+---
+// src/components/ReviewList.astro
+/**
+ * Usage examples:
+ * <ReviewList reviews={allReviews} />                             // all reviews, full list
+ * <ReviewList reviews={allReviews} reviewsCount={3} />               // recent 3
+ * <ReviewList reviews={allReviews} reviewsCount={3} matchSlug={Astro.params.slug} />
+ * <ReviewList reviews={allReviews} positiveOnly />                // only ≥4★
+ * <ReviewList reviews={allReviews} showRating showRatingSchema />
+ * <ReviewList reviews={allReviews} reviewsCount={3} matchSlug={Astro.params.slug} positiveOnly aggregateRating showRatingSchema={false} reviewSchema={false} />
+ */
+
+import type { Review } from "@/utils/reviews";
+import { siteDefaults } from "@/config/siteDefaults";
+import { toRelativeUrl, toAbsoluteUrl, idFor } from "@/utils/urls";
+import ResponsiveImage from "@/components/ResponsiveImage.astro";
+import Anchor from "@/components/ui/Anchor.astro";
+import StarRating from '@/components/ui/StarRating.astro';
+import { buildOrganizationSchema } from "@/utils/schemaOrganization";
+const { node: organizationNode, orgId, brandNode, parentNode } = buildOrganizationSchema();
+
+/* ---------- Props ---------- */
+const {
+  reviews,
+  reviewCount,
+
+  // service matching (optional)
+  matchSlug,
+  matchUrl,
+
+  // NEW: filter & aggregate controls
+  positiveOnly = false,           // show only ≥4★ if true (default: false => all)
+  showRating = false, 
+  showReview = true,       // show visible badge
+  showRatingSchema = true,  // emit Organization AggregateRating JSON-LD
+  reviewSchema = true,           // per-item Review JSON-LD (default OFF)
+
+  // NEW: wrapper controls
+  wrapper = 'ul',                 // 'ul' | 'div'
+  className = '',                 // extra classes for wrapper
+} = Astro.props as {
+  reviews: Review[];
+  reviewCount?: number;
+  matchSlug?: string;
+  matchUrl?: string;
+  positiveOnly?: boolean;
+  showRating?: boolean;
+  showReview?: boolean;
+  showRatingSchema?: boolean;
+  reviewSchema?: boolean;
+  wrapper?: 'ul' | 'div';
+  className?: string;
+};
+
+/* ---------- UI classes ---------- */
+const baseClasses = 'card mn-w-sidebar mx-w-sidebar w-full border-primary-light hover-border-primary br bg-base-00 box-shadow p-05';
+const orientationClass = 'flex flex-col big-flex-row big-flex-1 gap';
+const contentWrapperClass = 'flex flex-col flex-1 p-05';
+const tagClass = 'tag-link bg-primary-lighter col-base-100 br text-xs pi-05 pb-02';
+
+/* ---------- Helpers ---------- */
+function serviceLabel(r: Review) {
+  return r?.target?.name || r?.service?.name || 'Service';
+}
+function serviceUrl(r: Review) {
+  return r?.target?.url
+    ? toRelativeUrl(r.target.url, { cdn: 'never' })
+    : r?.service?.slug
+      ? toRelativeUrl(`/services/${r.service.slug}/`, { cdn: 'never' })
+      : undefined;
+}
+function firstInitial(name?: string) {
+  const s = (name || '').trim();
+  return s ? s[0].toUpperCase() : '?';
+}
+function relOrEmpty(u?: string) {
+  if (!u) return '';
+  const rel = toRelativeUrl(u, { cdn: 'never' });
+  return rel.startsWith('/') ? rel : '';
+}
+function getLastDate(r: Review): string | undefined {
+  // @ts-ignore optional
+  return (r as any)?.dateModified || r?.datePublished || undefined;
+}
+function normalizeRel(u?: string) {
+  if (!u) return '';
+  const rel = toRelativeUrl(u, { cdn: 'never' }).replace(/[#?].*$/, '');
+  return rel.replace(/\/+$/, '');
+}
+function extractServiceSlugFromUrl(u?: string): string | null {
+  if (!u) return null;
+  const rel = normalizeRel(u);
+  const m = rel.match(/^\/services\/([^\/]+)$/i);
+  return m ? m[1].toLowerCase() : null;
+}
+function matchesService(r: Review): boolean {
+  if (matchSlug) {
+    const wanted = matchSlug.toLowerCase();
+    const slug1 = (r?.service?.slug || '').toLowerCase();
+    const slug2 = extractServiceSlugFromUrl(r?.target?.url || '');
+    return (slug1 !== '' && slug1 === wanted) || (slug2 !== null && slug2 === wanted);
+  }
+  if (matchUrl) {
+    const wanted = normalizeRel(matchUrl);
+    const tRel = normalizeRel(r?.target?.url || '');
+    const sRel = r?.service?.slug ? normalizeRel(`/services/${r.service.slug}/`) : '';
+    return (tRel !== '' && tRel === wanted) || (sRel !== '' && sRel === wanted);
+  }
+  return true;
+}
+/** Stable DOM id used in fragment URLs & JSON-LD */
+function buildAnchorId(r: Review, idx: number) {
+  const raw = r.id || (r as any)?.slug || `${r.headline || 'review'}-${r.datePublished || ''}`.toLowerCase();
+  let cleaned = String(raw).replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+  if (!cleaned) cleaned = `review-${idx + 1}`;
+  if (!/^[a-z]/.test(cleaned)) cleaned = `r-${cleaned}`;
+  return cleaned;
+}
+
+/* ---------- Filter, sort, slice ---------- */
+const filtered = reviews
+  .filter((r) => (r as any)?.draft !== true)
+  .filter((r) => (positiveOnly ? (Number((r as any)?.rating) || 0) >= 4 : true))
+  .filter((r) => matchesService(r));
+
+/* ---------- Aggregate (computed from the full filtered set) ---------- */
+const aggCount = filtered.length;
+const aggValue = aggCount ? +(filtered.reduce((s, r) => s + (Number((r as any)?.rating) || 0), 0) / aggCount).toFixed(2) : null;
+
+/* ---------- Filter, sort, slice ---------- */
+// Base set = drafts removed, service match applied (NO positive filter)
+const baseSet = reviews
+  .filter((r) => (r as any)?.draft !== true)
+  .filter((r) => matchesService(r));
+
+// Visible set = what we render (respects positiveOnly)
+const visibleSet = positiveOnly
+  ? baseSet.filter((r) => (Number((r as any)?.rating) || 0) >= 4)
+  : baseSet;
+
+// Sort newest → oldest
+const sorted = visibleSet.sort((a, b) => {
+  const ad = new Date(getLastDate(a) ?? 0).valueOf();
+  const bd = new Date(getLastDate(b) ?? 0).valueOf();
+  return bd - ad;
+});
+
+const showAll = typeof reviewCount !== 'number';
+const shown = showAll ? sorted : sorted.slice(0, reviewCount as number);
+
+/* ---------- Aggregates ---------- */
+// UI aggregate (shows exactly what user sees => respects positiveOnly)
+const uiCount = visibleSet.length;
+const uiValue = uiCount ? +(visibleSet.reduce((s, r) => s + (Number((r as any)?.rating) || 0), 0) / uiCount).toFixed(2) : null;
+
+// Schema aggregate (SEO-safe => from full entity set, ignores positiveOnly and reviewsCount)
+const schemaCount = baseSet.length;
+const schemaValue = schemaCount ? +(baseSet.reduce((s, r) => s + (Number((r as any)?.rating) || 0), 0) / schemaCount).toFixed(2) : null;
+
+// Decide schema type + item based on whether we're filtering to a single service
+const isServiceContext = Boolean(matchSlug || matchUrl);
+const schemaType = isServiceContext ? 'Product' : 'Organization';
+const schemaItemId = isServiceContext ? idFor('product') : orgId;
+
+// Try to derive service name/url from first base item when in service context
+const first = baseSet[0];
+const firstServiceRelUrl = first ? (first?.target?.url
+  ? toRelativeUrl(first.target.url, { cdn: 'never' })
+  : first?.service?.slug
+    ? toRelativeUrl(`/services/${first.service.slug}/`, { cdn: 'never' })
+    : undefined) : undefined;
+
+const schemaItemName = isServiceContext
+  ? (first ? (first?.target?.name || first?.service?.name || (matchSlug as string)) : (matchSlug as string))
+  : siteDefaults.siteName;
+
+const schemaItemUrlAbs = toAbsoluteUrl(
+  isServiceContext
+    ? (firstServiceRelUrl || (matchSlug ? `/services/${matchSlug}/` : '/'))
+    : siteDefaults.siteUrl,
+  { cdn: 'never' }
+);
+
+
+
+const aggregateJsonLd = (showRatingSchema && schemaValue != null && schemaCount > 0)
+  ? {
+      "@context": "https://schema.org",
+      "@type": schemaType,
+      "@id": schemaItemId,
+      "name": schemaItemName,
+      "url": schemaItemUrlAbs,
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": schemaValue,
+        "reviewCount": schemaCount
+      }
+    }
+  : null;
+
+/* ---------- Wrapper tags ---------- */
+const WrapperTag = wrapper;
+const ItemTag = wrapper === 'ul' ? 'li' : 'div';
+const wrapperRole = wrapper === 'ul' ? 'list' : undefined;
+const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
+---
+{showRating && uiValue != null && uiCount > 0 && (
+  <div class="flex flex-row text-xl bold ta-center border-secondary bg-base-00 col-base-100 br mb-2 p-1 w-fit mi-auto">
+    <StarRating rating={uiValue} showNumber />
+    <span class="opacity-75">/ 5 from {uiCount} reviews</span>
+  </div>
+)}
+
+{showReview && (
+  <WrapperTag class={`no-bullets flex wrap gap-2 jc-center mb-2 mi-auto ${className}`} role={wrapperRole}>
+    {shown.map((r, i) => {
+      const anchor = buildAnchorId(r, i);
+      const badgeText = (r as any)?.target?.type || 'Service';
+      const serviceHref = serviceUrl(r);
+
+      // canonical fragment URL for this review (points to /reviews/#id)
+      const reviewUrl = toAbsoluteUrl(`/reviews/#${anchor}`, { cdn: 'never' });
+
+      // avatar / initial
+      const avatarPath = relOrEmpty((r as any)?.author?.avatar);
+      const hasAvatarRI = !!avatarPath;
+      const nameText = (r as any)?.author?.name || 'Anonymous';
+      const profileHref = (r as any)?.author?.profileUrl ? toRelativeUrl((r as any).author.profileUrl, { cdn: 'never' }) : undefined;
+
+      return (
+        <ItemTag class={`${baseClasses} ${orientationClass}`} id={anchor} role={itemRole}>
+          {/* headline | target.type */}
+          <div class={`${contentWrapperClass} pt-05 pb-0`}>
+            <h3 class="text-base bold clamp-2 h-60">
+              <Anchor href={`#${anchor}`} className="td-none underline">
+                {r.headline}
+              </Anchor>
+            </h3>
+
+            {/* rating | type tag */}
+            <div class="text-base jc-space-between ai-center flex wrap gap-2 mt-02 pb-05">
+              <StarRating rating={r.rating} showNumber />
+              <span class={tagClass}>{badgeText}</span>
+            </div>
+
+            {/* service name + verified */}
+            <div class="text-xs mt-02 ai-center jc-space-between flex wrap gap-05">
+              {serviceHref
+                ? <Anchor href={serviceHref} className="td-none underline opacity-75">{serviceLabel(r)}</Anchor>
+                : <span class="opacity-75">{serviceLabel(r)}</span>
+              }
+              {(r as any).verifiedPurchase && <span class="tick col-success-dark bold">Verified</span>}
+            </div>
+
+            {/* body */}
+            <p class="text-s pb-05 clamp-8">{r.body}</p>
+
+            {/* pros */}
+            {(r as any).pros?.length ? (
+              <div class="mt-05">
+                <span class="text-s block bold mb-02">Customers loved</span>
+                <ul class="no-bullets flex wrap gap-05">
+                  {(r as any).pros.map((p: string) => (
+                    <li class="tag-link bold bg-success-light col-base-100 br text-xs pi-05 pb-02">{p}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+
+            {/* LAST ROW */}
+            <div class="flex ai-start gap-05 mt-1 hr">
+              {hasAvatarRI ? (
+                <ResponsiveImage
+                  src={avatarPath}
+                  alt={nameText}
+                  sizes={24}
+                  width={24}
+                  height={24}
+                  breakpoints={{ mobile: 24, desktop: 24 }}
+                  imageClassName="round b-thin-primary-light br-unset"
+                  className="w-1-5 h-1-5"
+                  loading="lazy"
+                />
+              ) : (
+                <div
+                  class="w-1-5 h-1-5 round bg-primary-lighter b-thin-primary-light flex ai-center jc-center text-xs bold col-base-900"
+                  aria-label={`Reviewer initial ${firstInitial(nameText)}`}
+                >
+                  {firstInitial(nameText)}
+                </div>
+              )}
+
+              <div class="flex flex-col text-xs ai-start gap-02">
+                <div>
+                  {profileHref ? (
+                    <Anchor href={profileHref} className="td-none underline text-s bold">{nameText}</Anchor>
+                  ) : (
+                    <span class="text-s bold">{nameText}</span>
+                  )}
+                </div>
+
+                {((r as any).author?.designation || (r as any).author?.organization) && (
+                  <div class="mt-02 opacity-80">
+                    {(r as any).author?.designation ?? ''}
+                    {(r as any).author?.designation && (r as any).author?.organization ? ' at ' : ''}
+                    {(r as any).author?.organization ?? ''}
+                  </div>
+                )}
+
+                {((r as any).location?.name || (r as any).location?.city) && (
+                  <div class="mt-02 opacity-80">
+                    {(r as any).location?.name || (r as any).location?.city}
+                    {(r as any).location?.countryCode ? `, ${(r as any).location.countryCode}` : ''}
+                  </div>
+                )}
+
+                {r.datePublished && (
+                  <time class="opacity-75" datetime={new Date(r.datePublished).toISOString()}>
+                    {r.datePublished}
+                  </time>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Per-item Review JSON-LD (fragment URL + DOM id) */}
+          {reviewSchema && (
+          <script
+            is:inline
+            type="application/ld+json"
+            set:html={JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Review',
+              '@id': reviewUrl,
+              url: reviewUrl,
+              name: r.headline,
+              reviewBody: r.body,
+              inLanguage: r.language || 'en',
+              datePublished: r.datePublished,
+              reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5, worstRating: 1 },
+              author: (r as any).author?.name ? {
+                '@type': (r as any).author?.type || 'Person',
+                name: (r as any).author.name,
+                url: (r as any).author?.profileUrl ? toAbsoluteUrl((r as any).author.profileUrl, { cdn: 'never' }) : undefined,
+                image: (r as any).author?.avatar ? toAbsoluteUrl((r as any).author.avatar, { cdn: 'never' }) : undefined,
+                ...((r as any).author?.designation ? { jobTitle: (r as any).author.designation } : {}),
+                ...((r as any).author?.organization ? { worksFor: { '@type': 'Organization', name: (r as any).author.organization } } : {})
+              } : undefined,
+              itemReviewed: {
+                '@type': (r as any)?.target?.type || 'Service',
+                name: serviceLabel(r),
+                url: serviceHref ? toAbsoluteUrl(serviceHref, { cdn: 'never' }) : undefined
+              },
+              publisher: {
+                '@type': 'Organization',
+                '@id': orgId,
+                name: siteDefaults.siteName,
+                url: toAbsoluteUrl('/', { cdn: 'never' })
+              },
+              location: ((r as any).location?.name || (r as any).location?.city || (r as any).location?.countryCode) ? {
+                '@type': 'Place',
+                name: (r as any).location?.name || (r as any).location?.city,
+                address: ((r as any).location?.city || (r as any).location?.countryCode) ? {
+                  '@type': 'PostalAddress',
+                  addressLocality: (r as any).location?.city,
+                  addressCountry: (r as any).location?.countryCode
+                } : undefined
+              } : undefined
+            })}
+          />)}
+        </ItemTag>
+      );
+    })}
+  </WrapperTag>
+)}
+
+{aggregateJsonLd && (
+  <script id="review-aggregate" type="application/ld+json" set:html={JSON.stringify(aggregateJsonLd)} />
+)}

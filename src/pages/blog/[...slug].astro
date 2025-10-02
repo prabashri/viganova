@@ -1,9 +1,9 @@
 ---
 // src/pages/blog/[...slug].astro
 import { getEntry, getCollection, render } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
-import { siteDefaults } from '../../config/siteDefaults';
-import modifiedDatesJson from '../../data/modified-dates.json';
+import PostLayout from '@/layouts/PostLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import modifiedDatesJson from '@/data/modified-dates.json';
 
 import type { CollectionEntry } from 'astro:content';
 

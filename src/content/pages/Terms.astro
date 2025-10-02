@@ -1,0 +1,271 @@
+---
+// src/content/pages/Terms.astro
+import { siteDefaults } from '@/config/siteDefaults';
+import HeroPages from '@/components/ui/HeroPages.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+
+const refundPath =
+  (siteDefaults as any)?.pages?.refundPolicy?.path || '/refund-policy/';
+
+interface Props {
+  title?: string;
+  description?: string;
+  updatedAt?: string;
+  updatedAtISO?: string;
+}
+
+const { title, description, updatedAt, updatedAtISO } = Astro.props as Props;
+
+/* ---------- Site / Org ---------- */
+const siteName = siteDefaults.siteName;
+
+const orgName =
+  siteDefaults.parentOrganization?.legalName ||
+  siteDefaults.legalName ||
+  siteDefaults.parentOrganization?.name ||
+  siteDefaults.siteName ||
+  '';
+
+const orgUrl =
+  siteDefaults.siteUrl ||
+  siteDefaults.parentOrganization?.url ||
+  (siteDefaults.domainName ? `https://${siteDefaults.domainName}` : '');
+
+/* ---------- Contact resolution (email / phone / WhatsApp) ---------- */
+type MaybeContact = { email?: string; phone?: string; whatsapp?: string } | undefined;
+
+const primaryContact: MaybeContact =
+  siteDefaults.contact
+  ?? siteDefaults.parentOrganization?.contact
+  ?? siteDefaults.incharge?.contact;
+
+function cleanTel(v?: string) {
+  return v ? v.replace(/[^\d+]/g, '') : undefined;
+}
+function cleanWa(v?: string) {
+  return v ? v.replace(/[^\d]/g, '') : undefined; // wa.me expects digits only
+}
+
+const fallbackEmail =
+  siteDefaults.admin?.email
+  ?? siteDefaults.incharge?.email
+  ?? siteDefaults.parentOrganization?.email
+  ?? (siteDefaults.domainName ? `contact@${siteDefaults.domainName}` : undefined)
+  ?? `contact@${(siteDefaults.siteUrl || '').replace(/^https?:\/\//, '').replace(/\/.*/, '')}`;
+
+const email    = primaryContact?.email
+  || fallbackEmail;
+
+const phone    = primaryContact?.phone
+  || siteDefaults.incharge?.contact?.phone
+  || siteDefaults.parentOrganization?.contact?.phone;
+
+const whatsapp = primaryContact?.whatsapp
+  || siteDefaults.incharge?.contact?.whatsapp
+  || siteDefaults.parentOrganization?.contact?.whatsapp;
+
+const telHref = phone ? `tel:${cleanTel(phone)}` : undefined;
+const waHref  = whatsapp ? `https://wa.me/${cleanWa(whatsapp)}` : undefined;
+
+/* ---------- Jurisdiction (top-level first, fallback to parentOrganization) ---------- */
+const rawCountry =
+  (siteDefaults.jurisdictionCountry || siteDefaults.parentOrganization?.jurisdictionCountry || '').trim();
+
+const rawRegion  =
+  (siteDefaults.jurisdictionRegion  || siteDefaults.parentOrganization?.jurisdictionRegion  || '').trim();
+
+const hasJurisdiction = Boolean(rawCountry || rawRegion);
+
+/* ---------- Links to policy pages if configured ---------- */
+const privacyPath =
+  (siteDefaults as any)?.pages?.privacyPolicy?.path || '/privacy-policy/';
+---
+<article class="prose mi-auto w-full" itemscope itemtype="https://schema.org/TermsOfService">
+    <HeroPages
+        variant="post"
+        title={`Terms & Conditions of ${siteName}`}
+        description={description}
+        meta={false}        
+        headingClass="mb-05 mi-auto"
+        class='mb-2 mn-h-230 jc-center'
+        descriptionClass="mx-w-featured text-xl mb-1"
+        
+    />
+ 
+
+  <div class="mx-w-content pi-1 pb-2 mi-auto">
+
+    {updatedAtISO && updatedAt && (
+      <p class="mb-2">
+        <strong>Last updated:</strong>{' '}
+        <time datetime={updatedAtISO}>{updatedAt}</time>
+      </p>
+    )}
+
+    <p>
+      These Terms govern your use of <strong>{siteName}</strong> (“we”, “us”, “our”) for facilitation of
+      <strong> Notary</strong>, <strong>Sub-Divisional Magistrate (SDM)</strong>, and
+      <strong> Ministry of External Affairs (MEA)</strong> apostille/attestation steps. We are an independent
+      assistance service and are <em>not</em> the Government/MEA.
+    </p>
+
+    <h2 id="1-services-scope">1. Services &amp; Scope</h2>
+    <ul>
+      <li>Document checklists, filing preparation, queue/slot coordination, and submission via authorised partners.</li>
+      <li>Where permitted, acceptance of <strong>scanned copies</strong> (PDF/PNG/JPG/email/WhatsApp) for printing and submission; otherwise, originals as required by the relevant authority.</li>
+      <li>Logistics for secure pickup/return delivery using reputable couriers.</li>
+    </ul>
+
+    <h2 id="2-your-authorisation">2. Your Authorisation</h2>
+    <p>
+      You authorise us and our authorised/representative partners to handle, transport, reproduce (print),
+      and submit your documents to Notary, SDM, and MEA as necessary to complete the requested service.
+      If documents relate to a minor or a third party, you confirm you are lawfully authorised to act on their behalf.
+    </p>
+
+    <h2 id="3-your-responsibilities">3. Your Responsibilities</h2>
+    <ul>
+      <li>Provide accurate, complete, and lawful information and documents.</li>
+      <li>Ensure documents are genuine and unaltered. Submission of forged or misleading documents is prohibited.</li>
+      <li>Comply with any additional requirements (translations, notarised affidavits, photographs, etc.).</li>
+      <li>Promptly respond to clarifications and pay applicable fees/charges when due.</li>
+    </ul>
+
+    <h2 id="4-fees-payments">4. Fees &amp; Payments</h2>
+    <ul>
+      <li>Quotes typically exclude <strong>government fees</strong> and <strong>courier/ancillary costs</strong> unless stated.</li>
+      <li>Government/office fees may change without notice; any difference will be payable prior to submission/release.</li>
+      <li>Payment gateways process your payment; we do not store full card details. Taxes apply where required.</li>
+    </ul>
+
+    <h2 id="5-timelines-no-guarantee">5. Timelines &amp; No Guarantee</h2>
+    <p>
+      Processing times at Notary, SDM, and MEA depend on their schedules, workload, and policies.
+      <strong>We cannot guarantee</strong> specific turnaround times or outcomes. Public holidays, system outages,
+      administrative changes, or additional scrutiny may extend timelines.
+    </p>
+
+    <h2 id="6-third-parties-government">6. Third Parties &amp; Government Offices</h2>
+    <p>
+      Notary offices, SDM, MEA, their outsourced service providers, couriers, payment gateways, hosting/CDN,
+      and email/analytics vendors are independent third parties with their own terms and policies. We share only the
+      minimum necessary information to complete your service and exercise due care in partner selection, but we cannot
+      control their internal handling.
+    </p>
+
+    <h2 id="7-doc-scan-printing">7. Document Scans, Printing &amp; Disposal</h2>
+    <ul>
+      <li>We may accept scans via secure upload, <strong>email</strong>, or <strong>WhatsApp</strong> for printing and submission where allowed.</li>
+      <li>Email/messaging apps are third-party channels and may not be end-to-end encrypted by default; use them at your discretion.</li>
+      <li>We print only what is necessary and securely dispose/shred prints after use.</li>
+      <li>We do <strong>not sell</strong> or publicly disclose your documents and do <strong>not</strong> use them to train AI models.</li>
+      <li>Retention practices are described in our <Anchor href={privacyPath}><strong>Privacy Policy</strong></Anchor>.</li>
+    </ul>
+
+    <h2 id="8-logistics-risk">8. Logistics &amp; Risk of Loss</h2>
+    <p>
+      We use reputable couriers with tracking and maintain internal chain-of-custody steps. Risk of loss or damage in transit,
+      or at Government offices, cannot be fully eliminated. Consider keeping certified copies and informing us if you need
+      insured transit (where available).
+    </p>
+
+    <h2 id="9-cancellations-refunds">9. Cancellations &amp; Refunds</h2>
+    <p>
+        Refunds are governed by our <a href={refundPath}><strong>Refund Policy</strong></a>, which is incorporated into these Terms.
+        In brief:
+    </p>
+    <ul>
+        <li><strong>No refund</strong> once Notary processing has <em>started</em> (handover/queueing confirmed).</li>
+        <li><strong>Before Notary start</strong> (physical documents received): refund of <strong>75% of service fee</strong>,less any courier/logistics actually incurred; government/office fees are non-refundable.</li>
+        <li><strong>Before Notary start</strong> (only scanned copies, no third-party costs): refund of <strong>75% of service fee</strong>.</li>
+        <li>Payment gateway charges, if non-refundable by the gateway, may be deducted.</li>
+    </ul>
+    <p>
+    For eligibility, method, and timelines, please read the full <Anchor href={refundPath}><strong>Refund Policy</strong></Anchor>.
+    </p>
+
+    <h2 id="10-acceptable-use">10. Acceptable Use</h2>
+    <p>
+      You agree not to use our services for unlawful purposes, to submit forged/altered documents, or to infringe
+      the rights of others. We may suspend or refuse service where we reasonably suspect non-compliance.
+    </p>
+
+    <h2 id="11-privacy">11. Privacy</h2>
+    <p>
+      Your privacy is important to us. Please review our <Anchor href={privacyPath}><strong>Privacy Policy</strong></Anchor> for details on
+      collection, use, sharing, retention, and your choices.
+    </p>
+
+    <h2 id="12-limitation-liability">12. Limitation of Liability</h2>
+    <p>
+      To the maximum extent permitted by law, our total liability for any claims arising out of or related to the services
+      shall not exceed the total service fees you paid to us for the specific order giving rise to the claim. We are not
+      liable for indirect, incidental, special, punitive, or consequential damages, nor for delays or actions of Government offices or third parties.
+    </p>
+
+    <h2 id="13-indemnity">13. Indemnity</h2>
+    <p>
+      You agree to indemnify and hold us harmless from claims, losses, and expenses arising from your misuse of the services,
+      provision of false/unauthorised documents, or violation of these Terms.
+    </p>
+
+    <h2 id="14-force-majeure">14. Force Majeure</h2>
+    <p>
+      We are not responsible for delays or failures caused by events beyond our reasonable control, including natural disasters,
+      strikes, lockdowns, epidemics, regulatory actions, or service outages.
+    </p>
+
+    <h2 id="15-intellectual-property">15. Intellectual Property</h2>
+    <p>
+      Website content, trademarks, logos, and materials are owned by {orgName || siteName} or its licensors.
+      Your documents remain your property; we use them solely to provide the requested service.
+    </p>
+
+    <h2 id="16-communications">16. Communications</h2>
+    <p>
+      We may contact you by email, phone, or WhatsApp strictly for service updates, clarifications, and delivery coordination.
+      Marketing communications, if any, are sent only with consent and include opt-out options.
+    </p>
+
+    <h2 id="17-governing-law">17. Governing Law &amp; Dispute Resolution</h2>
+    {hasJurisdiction ? (
+      <p>
+        These Terms are governed by the laws of <strong>{rawCountry}</strong>
+        {rawRegion && <> ({rawRegion})</>}. You agree to the exclusive jurisdiction and venue of competent courts there,
+        unless otherwise required by applicable law.
+      </p>
+    ) : (
+      <p>
+        These Terms are governed by applicable laws at your place of residence or service delivery, subject to mandatory legal protections.
+      </p>
+    )}
+
+    <h2 id="18-changes">18. Changes to These Terms</h2>
+    <p>
+      We may update these Terms to reflect changes in law or services. The “Last updated” date above indicates the current version.
+      Continued use of the services constitutes acceptance of the updated Terms.
+    </p>
+
+    <h2 id="19-contact">19. Contact</h2>
+    <p>If you have questions or concerns, contact us:</p>
+    {(email || telHref || waHref) && (
+      <p>
+        {email && <>📧 <Anchor href={`mailto:${email}`}><strong>{email}</strong></Anchor><br /></>}
+        {telHref && <>📞 <Anchor href={telHref}><strong>{phone}</strong></Anchor><br /></>}
+        {waHref && <>💬 <Anchor href={waHref} rel="nofollow"><strong>{whatsapp}</strong></Anchor></>}
+      </p>
+    )}
+
+    {(orgName || orgUrl) && (
+      <>
+        <h2 id="20-company">20. Company Information</h2>
+        <p>
+          <strong>
+            {orgName || siteName}
+            {orgUrl && <> (<Anchor href={orgUrl} rel="nofollow">{new URL(orgUrl).hostname}</Anchor>)</>}
+          </strong>
+        </p>
+      </>
+    )}
+  </div>
+</article>

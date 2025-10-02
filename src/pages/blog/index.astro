@@ -1,10 +1,11 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import { siteDefaults } from '../../config/siteDefaults';
-import type { HeadProps } from '../../types/HeadProps';
-import HeroCollections from '../../components/ui/HeroCollections.astro';
-import CardCollections from '../../components/ui/CardCollections.astro';
-import type { CardProps } from '../../types/CardProps';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages'; 
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import type { CardProps } from '@/types/CardProps';
 import { getCollection } from 'astro:content';
 
 // =========================
@@ -31,15 +32,13 @@ const posts = (await getCollection(entry))
 const headProps: HeadProps = {
   title: `All Blog Posts | ${siteDefaults.siteName}`,
   description: `Browse all blog posts for tools, guides, and tutorials on ${siteDefaults.siteName}.`,
-  image: siteDefaults.image,
+  image: siteImages.image,
   canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
   index: true,
   keywords: posts.map(p => p.data.title),
   type: 'collection',
   url: `${siteDefaults.siteUrl}${basePath}/`,
-  authors: [],
-  authorName: siteDefaults.authorName,
-  authorUrl: siteDefaults.authorUrl,
+  authors: []
 };
 
 // =========================
@@ -71,9 +70,9 @@ const blogCards: CardProps[] = posts.map((post, index) => mapToCardProps(post, i
   <HeroCollections
     title="All Blog Posts"
     description={`Browse all blog posts for tools, guides, and tutorials on ${siteDefaults.siteName}.`}
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
-    image={siteDefaults.image}
+    image={siteImages.image}
     imageAlt="Blog Hero Image"
     imageLoading="delay"
   />

@@ -1,91 +1,116 @@
 ---
 // src/pages/team/[...slug].astro
-import { getEntry, getCollection, render } from 'astro:content';
+import { getEntry, getCollection, render, type CollectionEntry } from 'astro:content';
 import TeamLayout from '../../layouts/TeamLayout.astro';
 import { siteDefaults } from '../../config/siteDefaults';
-import type { DataEntryMap } from 'astro:content';
 import LoadMorePosts from '../../components/LoadMorePosts.astro';
 import Card from '../../components/ui/Card.astro';
 import type { CardProps } from '../../types/CardProps';
 
-
+// ---------------------
+// 1) Params + guard
+// ---------------------
 const { slug } = Astro.params;
 const slugId = Array.isArray(slug) ? slug.join('/') : slug;
 
-if (!slugId || slugId === '_team-member' || slugId === '_team') {
+if (!slugId || slugId === '_team-member' || slugId === '_team' || slugId.startsWith('_')) {
   throw Astro.redirect('/404/');
 }
 
+// Team entry
 const post = await getEntry('team', slugId);
 if (!post) throw Astro.redirect('/404/');
 
 const { Content } = await render(post);
 
-// Get collections with authors
-const collectionsWithAuthors = Object.entries(siteDefaults.collections)
-  .filter(([_, config]) => typeof config === 'object' && 'authors' in config && config.authors === true)
-  .map(([key]) => key);
+// ---------------------
+// 2) Authorable collections (type-safe)
+//    These are the ones that use baseSchema (have authors, slug, heroImage, etc.)
+// ---------------------
+const AUTHORABLE_KEYS = ['blog', 'service', 'resource', 'post'] as const;
+type AuthorableKey = typeof AUTHORABLE_KEYS[number];
 
-  // 2. Collect authored posts across all matching collections
-  const authoredPosts: {
-    title: string;
-    description: string;
-    slug: string;
-    collection: string;
-    collectionBase: string;
-    heroImage?: string | null;
-    heroImageAlt?: string;
-    lastModified?: string;
-    draft?: boolean;
-  }[] = [];
+type CollectionsMap = typeof siteDefaults.collections;
+type CfgFor<K extends keyof CollectionsMap> = CollectionsMap[K];
 
-  
+// Build base path from siteDefaults (type-safe)
+function baseFor(key: AuthorableKey): string {
+  const cfg = siteDefaults.collections[key] as CfgFor<AuthorableKey>;
+  const base = (cfg?.base ?? String(key)).replace(/^\/|\/$/g, '');
+  return base ? `${base}/` : '';
+}
 
-  for (const coll of collectionsWithAuthors) {
-    // 👇 Ensure proper typing with keyof DataEntryMap
-    const posts = await getCollection(coll as keyof DataEntryMap); 
+// Runtime author matcher that works for string or {id} refs
+function authorMatches(authors: unknown, wantedId: string): boolean {
+  const arr = Array.isArray(authors) ? authors : [];
+  return arr.some((a: any) => (typeof a === 'string' ? a === wantedId : a?.id === wantedId));
+}
 
-    for (const entry of posts) {
-        // 🔁 Skip draft posts
-      if ('draft' in entry.data && entry.data.draft === true) {
-        continue;
-      }
+// Normalize last-modified (fallback to published)
+function getLastModified(e: CollectionEntry<AuthorableKey>): string {
+  // baseSchema has publishedDate; lastModified is optional
+  return (e.data as any).lastModified || (e.data as any).updatedDate || e.data.publishedDate;
+}
 
-      // 🔁 Skip file names starting with `_` (e.g., _post.md)
-      if (entry.data.slug?.startsWith('_')) {
-        continue;
-      }
-      const authors = 'authors' in entry.data ? entry.data.authors : undefined;
+// ---------------------
+// 3) Collect authored posts (type-safe per key)
+// ---------------------
+type AuthoredPost = {
+  title: string;
+  description: string;
+  slug: string;
+  collection: AuthorableKey;
+  collectionBase: string;
+  heroImage?: string | null;
+  heroImageAlt?: string;
+  lastModified?: string;
+};
 
-      const collectionConfig = siteDefaults.collections[entry.collection as keyof typeof siteDefaults.collections];
-      const base = collectionConfig?.base?.replace(/^\/|\/$/g, '') || '';
-      const collectionBase = base ? `${base}/` : '';
+const authoredPosts: AuthoredPost[] = [];
 
+async function collectFrom(key: AuthorableKey) {
+  // getCollection is fully typed with this literal key
+  const entries = await getCollection(key);
 
-      const isMatch =
-        Array.isArray(authors) &&
-        authors.some((author) => typeof author === 'object' && author?.id === slugId);
+  const collectionBase = baseFor(key);
 
-      if (isMatch && 'title' in entry.data && 'description' in entry.data) {
-        
-        authoredPosts.push({
-          title: entry.data.title ?? 'Untitled',
-          description: entry.data.description ?? '',
-          slug: entry.data.slug ?? '',
-          collection: entry.collection,
-          collectionBase,
-          heroImage: entry.data.heroImage ?? null,
-          heroImageAlt: entry.data.heroImageAlt ?? '',
-          lastModified: "lastModified" in entry.data ? entry.data.lastModified : entry.data.publishedDate ?? '',
-        });
-      }
-    }
+  for (const entry of entries) {
+    // Skip draft/frontmatter guards
+    if (entry.data.draft === true) continue;
+    if (entry.id.startsWith('_') || entry.data.slug.startsWith('_')) continue;
+
+    // Must have an authors array referencing this team member
+    if (!slugId || typeof slugId !== 'string' || !authorMatches((entry.data as any).authors, slugId)) continue;
+
+    authoredPosts.push({
+      title: entry.data.title,
+      description: entry.data.description,
+      slug: entry.data.slug,
+      collection: key,
+      collectionBase,
+      // baseSchema fields
+      heroImage: (entry.data as any).heroImage ?? null,
+      heroImageAlt: (entry.data as any).heroImageAlt ?? entry.data.title,
+      lastModified: getLastModified(entry),
+    });
   }
+}
+
+// Collect across all authorable collections
+for (const key of AUTHORABLE_KEYS) {
+  await collectFrom(key);
+}
+
+// ---------------------
+// 4) Slice for initial view
+// ---------------------
 const postDisplay = 6;
-// limit authored posts to 3 for initial load
 const initialPosts = authoredPosts.slice(0, postDisplay);
 const hasMore = authoredPosts.length > postDisplay;
-// Team props
+
+// ---------------------
+// 5) Team props
+// ---------------------
 const {
   name,
   prefix = '',
@@ -107,7 +132,12 @@ const {
   useImage = false,
   useInitial = false,
   initialText = '',
-  image = '',
+  image = '',                  // 1:1 headshot (avatar)
+  imageAlt = '',               // 4:3 profile background/cover for ProfilePage/WebPage
+  profileImage = '',
+  profileImageAlt = '',
+  profileImageCaption = '',
+  profileImageTitle = '',
   social = {} as Record<string, string>,
   featured = false,
 } = post.data;
@@ -132,14 +162,22 @@ const teamProps = {
   gravatarEmail,
   useImage,
   useInitial,
-  initialText,
-  photo: image,
+  initialText,  
+  photo: image, // Keep the 1:1 photo exclusively for the Person node/avatar
+  imageAlt, // Pass the 4:3 profile image so Schema.astro (via TeamLayout) can use it
+  profileImage,
+  profileImageAlt,
+  profileImageCaption,
+  profileImageTitle,
   social,
   featured,
   slug: post.data.slug ?? slugId,
   id: slugId,
 };
 
+// ---------------------
+// 6) Cards
+// ---------------------
 const authorCards: CardProps[] = initialPosts.map((p) => ({
   link: `/${p.collectionBase}${p.slug}/`,
   linkAriaLabel: `Read post: ${p.title}`,
@@ -150,9 +188,7 @@ const authorCards: CardProps[] = initialPosts.map((p) => ({
   title: p.title,
   description: p.description,
 
-  date: p.lastModified
-    ? new Date(p.lastModified).toLocaleDateString()
-    : undefined,
+  date: p.lastModified ? new Date(p.lastModified).toLocaleDateString() : undefined,
 
   orientation: 'vertical',
   imageSize: 320,
@@ -162,14 +198,12 @@ const authorCards: CardProps[] = initialPosts.map((p) => ({
   className: 'w-full mn-w-320',
   imageClassName: '',
 
-  otherEntries: []
+  otherEntries: [],
 }));
-
 ---
 
 <TeamLayout {...teamProps}>
   <Content />
-  <!-- Posts go in a named slot -->
   <Fragment slot="posts">
     {authorCards.length > 0 && (
       <section id="author-posts-section" class="mx-w-site w-full mi-auto mb-1 pb-1">
@@ -187,7 +221,7 @@ const authorCards: CardProps[] = initialPosts.map((p) => ({
             loaded={initialPosts.length}
             total={authoredPosts.length}
             sort="lastmodified"
-            collections={collectionsWithAuthors}
+            collections={AUTHORABLE_KEYS as unknown as string[]}
           />
         )}
       </section>

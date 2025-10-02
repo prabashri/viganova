@@ -1,0 +1,716 @@
+---
+// src/content/pages/Home.astro
+
+import { siteDefaults } from '@/config/siteDefaults';
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+import FaqList from '@/components/ui/FaqList.astro';
+import { Icon } from 'astro-icon/components';
+import { buildWhatsAppLink } from '@/utils/whatsapp';
+import { getAllReviews, getGlobalAggregate } from "@/utils/reviews";
+
+import StarRating from '@/components/ui/StarRating.astro';
+
+import ReviewList from "@/components/ReviewList.astro";
+import ReviewSchema from "@/components/schema/ReviewSchema.astro";
+
+import { inr, price } from '@/config/pricing';
+
+const all = await getAllReviews();
+const agg = await getGlobalAggregate();
+
+const waStartHref = buildWhatsAppLink({
+  phone: '',
+  text: 'Hi EasyApostille! I want to start the apostille process by sharing my certificates/documents.',
+  source: 'Hero • Start Apostille',
+});
+
+const waQuoteHref = buildWhatsAppLink({
+  phone: '',
+  text: 'Hi EasyApostille! I need a consultation and price/timeline quote for apostille services.',
+  source: 'Hero • Free Quote',
+});
+
+// Contact details (with safe fallbacks)
+const email = siteDefaults.contact?.email || `contact@${siteDefaults.domainName}`;
+const tel1  = siteDefaults.contact?.phone || '';
+const tel2  = siteDefaults.contact?.phone2 || '';
+const wa1   = (siteDefaults.contact?.whatsapp || '').replace(/[^\d]/g, '');
+const wa2   = (siteDefaults.contact?.whatsapp2 || '').replace(/[^\d]/g, '');
+
+// HREFs
+const telHref1 = tel1 ? `tel:${tel1.replace(/[^\d+]/g, '')}` : '';
+
+const waHref1  = wa1 ? buildWhatsAppLink({
+  phone: '',
+  text: 'Hi EasyApostille! I need a consultation and price/timeline quote for apostille services.',
+  source: 'home-contact',
+}) : '';
+
+
+const faq = [
+  {
+    question: "Is a scan enough?",
+    answer: "Yes—for many personal documents we can start with scans. We'll confirm if originals are required."
+  },
+  {
+    question: "What is the EasyApostille cost of MEA apostille in India?",
+    answer: `EasyApostille offers a transparent SDM bundle for many personal/education cases: ${inr(price('sdmBundle'))} per document (Notary + SDM (Delhi) + MEA + premium return). Multi-document discounts apply; HRD/CoC, if required, are quoted after route confirmation.`,
+    speakable: true
+  },
+  {
+    question: "How long does it take?",
+    answer: "Typically 2-3 working days for most personal documents; commercial docs may vary."
+  },
+  {
+    question: "Do you cover all Indian states?",
+    answer: "Yes, we provide nationwide service across all states and union territories in India."
+  },
+  {
+    question: "Where are you based?",
+    answer: "Johnson Complex, Rajaji Nagar, Thanjavur, Tamil Nadu 613004 — India. Open in Maps"
+  },
+  {
+    question: "Is my data safe?",
+    answer: "Absolutely. We follow strict privacy controls and secure disposal policies."
+  },
+  {
+    question: "Can you arrange pickup/delivery?",
+    answer: "Yes, we can arrange secure pickup and delivery anywhere in India."
+  },
+  {
+    question: "Is the apostille valid abroad?",
+    answer: "Yes, apostilles issued by the MEA are recognized in all Hague Convention member countries."
+  },
+  {
+    question: "Which documents can be apostilled?",
+    answer: "Common documents for apostille include educational certificates (degrees, diplomas), birth and marriage certificates, power of attorney, affidavits, and commercial documents like invoices and agreements."
+  },
+  {
+    question: "How long does the apostille process take?",
+    answer: "The apostille process typically takes 2-3 working days for most personal documents. However, timelines may vary based on document type and issuing state."
+  },
+  {
+    question: "What are the costs involved in getting a document apostilled?",
+    answer: "Costs vary depending on the type of document and the number of documents. We offer transparent pricing with no hidden charges and discounts for multiple documents."
+  },
+  {
+    question: "Can I send scanned copies of my documents for apostille?",
+    answer: "Yes, we accept both physical and scanned copies of documents. We will guide you through the process based on your preference."
+  },
+  {
+    question: "Is there a way to track the status of my apostille request?",
+    answer: "Yes, we provide real-time tracking and proactive updates at each step of the apostille process."
+  },
+  {
+    question: "What if I need an urgent apostille service?",
+    answer: "We understand that some situations require urgency. Please contact us directly to discuss expedited options based on your specific needs."
+  }
+];
+---
+<style>
+.feature-list {
+  list-style: none;       
+  margin: 1rem 0;
+  padding: 0;
+}
+.hero-image {
+    margin-block: -2rem;
+}
+.mb-0-2{
+	margin-block: -2rem;
+}
+
+
+</style>
+<article id="post-layout">
+  <header id="post-header" class="post-header mx-w-full w-full mi-auto ta-center bg-primary-darker relative overflow-hidden">
+        <div id="hero-section" class="flex flex-col md-flex-row lg-flex-row mx-w-site mi-auto w-full pb-2 pi-1 ai-start gap-2 hero-wrap relative">
+            <!-- Left: Text -->
+            <div class="hero-text mx-w-content flex-1 relative col-base-00 ta-start">
+                <h1 class="post-title regular text-xs">
+                    EasyApostille - Fast & Secure Certificate, Document Attestation in India
+                </h1>
+
+                <h2 class="text-5xl">
+                👉 Get your documents apostilled end-to-end — from Notary → SDM → MEA — with proactive updates and safe return delivery.
+                </h2>
+
+                <ul class="feature-list" aria-label="Easy Apostille key features">
+                    <li class="tick"><Anchor href="/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc" className='highlight'><mark>SDM bundle {inr(price('sdmBundle'))}</mark></Anchor></li>
+                    <li class="tick">5 - 10% Discount for 1+ Certificates/Documents</li>
+                    <li class="tick">Physical &amp; Scanned Copies Accepted</li>
+                    <li class="tick">Quick Service (2-3 working days)*</li>
+                    <li class="tick">Nationwide free delivery</li>                  
+                    <li class="tick">100% Genuine</li>	
+                    <li class="tick">100% Satisfaction &amp; Privacy Guarantee</li>
+                </ul>
+                <small class="">*Timelines vary by document type and issuing state.</small>
+
+                <div class="cta-container flex flex-col gap ai-f-start">
+                    <Anchor
+                        href={waStartHref}
+                        type="button"
+                        variant="primary"
+                        ariaLabel="Start Apostille Process on WhatsApp"
+                        title="Share certificates or documents securely on WhatsApp to begin"
+                        dataId="cta-wa-start"
+                        className="cta-button"
+                        dataAction="link_click"
+                        dataLabel="WhatsApp • Start Apostille"
+                    >
+                        <Icon
+                            slot="icon-left"
+                            name="whatsapp"
+                            id="hero-cta-1"
+                            class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                            aria-hidden="true"
+                            focusable="false"
+                        />
+                        Share Certificates or Documents (Start Apostille)
+                    </Anchor>
+
+
+                    <Anchor
+                        href={waQuoteHref}
+                        type="button"
+                        variant="secondary"
+                        ariaLabel="Get a free consultation and quote via WhatsApp"
+                        title="Request a free consultation and quote on WhatsApp"
+                        dataId="cta-wa-quote" data-action="link_click" data-label="WhatsApp • Get a Free Consultation"
+                        className="cta-button secondary"
+                    >
+                        <Icon
+                            slot="icon-left"
+                            name="whatsapp"
+                            id="hero-cta-2"
+                            class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                            aria-hidden="true"
+                            focusable="false"
+                        />
+                        Get a Free Consultation & Quote
+                    </Anchor>
+                </div>				
+            </div>
+            <!-- Right: Image -->
+            <ResponsiveImage
+                src="document-with-notary-sdm-attestation-mea-ministry-external-affairs-apostille-stamp-open-from-cover.png"
+                alt="MEA-approved apostille sticker on an Indian document—secure, verified example used by Easy Apostille across India"
+                title="Easy Apostille - MEA-Approved Certificate Attestation in India"
+                width="640"
+                addSchema={true}
+                className="hero-image mx-w-content big-absolute right-0-100 top-0 bottom-0 opacity-90 md-opacity-50 mi-auto flex-1 mb-0-2"
+                loading="eager"
+                variant="desktop" 
+                id="hero-image"
+            />
+        </div>
+    </header>
+
+    <section class="mx-w-site w-full mi-auto mb-2 p-2">
+        <h2 class="mi-auto pb-1 ta-center">Read our customers' words</h2>
+        <p class="bold ta-center">Don't just take our word for it—hear what our customers have to say!</p>
+        <div class="flex flex-row text-xl bold ta-center border-secondary bg-base-00 col-base-100 br mb-1 p-1 w-fit mi-auto">
+            <StarRating rating={agg.ratingValue} showNumber />
+            <span class="opacity-75">/ 5 from {agg.reviewCount} reviews</span>
+        </div>
+        <Anchor
+            href={waStartHref}
+            type="button"
+            variant="primary"
+            ariaLabel="Start Apostille Process on WhatsApp"
+            title="Share certificates or documents securely on WhatsApp to begin"
+            dataId="cta-wa-start"
+            className="cta-button mb-2 w-fit mi-auto ta-center"
+            dataAction="link_click"
+            dataLabel="WhatsApp • Start Apostille"
+        >
+            <Icon
+                slot="icon-left"
+                name="whatsapp"
+                id="home-cta-1"
+                class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                aria-hidden="true"
+                focusable="false"
+            />
+            Start Now - Share Certificates or Documents
+        </Anchor>
+
+        <ReviewList reviews={all} reviewCount={3} />
+        <Anchor
+            href="/reviews/"
+            type="button"
+            variant="secondary"
+            ariaLabel="Read all reviews"
+            title="Read all reviews"
+            dataId="cta-read-all-reviews"
+            className="cta-button secondary mb-2 w-fit mi-auto ta-center"
+            dataAction="link_click"
+            dataLabel="Read All Reviews"
+        >
+        Read All Reviews
+        </Anchor>
+
+        <Anchor
+            href={waStartHref}
+            type="button"
+            variant="primary"
+            ariaLabel="Start Apostille Process on WhatsApp"
+            title="Share certificates or documents securely on WhatsApp to begin"
+            dataId="cta-wa-start"
+            className="cta-button mb-2 w-fit mi-auto ta-center"
+            dataAction="link_click"
+            dataLabel="WhatsApp • Start Apostille"
+        >
+            <Icon
+                slot="icon-left"
+                name="whatsapp"
+                id="home-cta-2"
+                class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                aria-hidden="true"
+                focusable="false"
+            />
+            We are ready when you are! Start Now
+        </Anchor>
+    </section>
+    
+    <section class="mx-w-full w-full mi-auto mb-2 p-2 howitworks bg-base-00">
+        <h2 class="mi-auto ta-center pb-1">
+            Know How Your Apostille Gets Done (Sticker or e-Apostille QR)
+        </h2>
+        <p class="mi-auto ta-center"><Anchor href="/resources/what-is-apostille-meaning-process-certificate/">Complete guide to the apostille process in India</Anchor></p>
+
+        <div class="mx-w-site w-full mi-auto mb-1 how-timeline" role="list">
+            {/* 1: Contact + Plan */}
+            <div class="how-item right" role="listitem">
+                <div class="how-node" aria-hidden="true"><span>1</span></div>
+                <div class="how-content">
+                    <h3 class="text-l bold mb-0">Contact & Plan Finalization</h3>
+                    <p class="text-s opacity-90">
+                    Chat with us on WhatsApp/phone or via the form. We confirm and finalize the
+                    <span class="bold">handover</span> (<em>scan</em> vs <em>physical</em>) and <strong>apostille type</strong> —
+                    <em>General</em> (MEA apostille sticker) or <em>e-Apostille</em> (MEA apostille with <strong>QR code</strong>).
+                    You'll get an all-inclusive price and clear timeline.
+                    </p>
+                </div>
+            </div>
+
+            {/* !-- 2: Payment & handover -- */}
+            <div class="how-item left" role="listitem">
+                <div class="how-content ta-right">
+                    <h3 class="text-l bold mb-0">Payment & Handover</h3>
+                    <p class="text-s opacity-90">
+                    Pay securely via <strong>UPI</strong> or <span class="bold">bank transfer</span> (GST invoice available on request).
+                    </p>
+                    <p class="text-s opacity-90">
+                    Upload scans or schedule pickup/courier of originals as advised. You'll receive an order ID and WhatsApp/email updates.
+                    </p>
+                </div>
+                <div class="how-node" aria-hidden="true"><span>2</span></div>
+            </div>
+
+            {/* !-- 3: Notary --*/}
+            <div class="how-item right" role="listitem">
+                <div class="how-node" aria-hidden="true"><span>3</span></div>
+                <div class="how-content">
+                    <h3 class="text-l bold mb-0">Notary Attestation</h3>
+                    <p class="text-s opacity-90">
+                    Government-approved notary attestation completed where required for your document category.
+                    </p>
+                </div>
+            </div>
+
+            {/* !-- 4: SDM / State --*/}
+            <div class="how-item left" role="listitem">
+                <div class="how-content ta-right">
+                    <h3 class="text-l bold mb-0">SDM / State Attestation</h3>
+                    <p class="text-s opacity-90">
+                    Sub-Divisional Magistrate (SDM) / State authentication done as applicable to meet MEA submission norms.
+                    </p>
+                </div>
+                <div class="how-node" aria-hidden="true"><span>4</span></div>
+            </div>
+
+            {/* !-- 5: MEA --*/}
+            <div class="how-item right" role="listitem">
+                <div class="how-node" aria-hidden="true"><span>5</span></div>
+                <div class="how-content">
+                    <h3 class="text-l bold mb-0">MEA Apostille</h3>
+                    <p class="text-s opacity-90">
+                    Submission to the Ministry of External Affairs for your choice of
+                    <strong>General Apostille</strong> (sticker affixed) or
+                    <strong>e-Apostille</strong> (digital apostille with <strong>QR code</strong>), per your selection.
+                    </p>
+                </div>
+            </div>
+
+            {/* !-- 6: Instant digital copy --*/}
+            <div class="how-item left" role="listitem">
+                <div class="how-content ta-right">
+                    <h3 class="text-l bold mb-0">Instant Digital Copy</h3>
+                    <p class="text-s opacity-90">
+                    We share a scanned apostille page (or e-Apostille PDF and verification link) via WhatsApp/email for immediate use.
+                    </p>
+                </div>
+                <div class="how-node" aria-hidden="true"><span>6</span></div>
+            </div>
+
+            {/* !-- 7: Delivery --*/}
+            <div class="how-item right" role="listitem">
+                <div class="how-node" aria-hidden="true"><span>7</span></div>
+                <div class="how-content">
+                    <h3 class="text-l bold mb-0">Secure Home Delivery</h3>
+                    <p class="text-s opacity-90">
+                    Originals couriered safely to your address anywhere in India with tracking and insurance coverage (tamper-evident packaging).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="what-to-apostille" class="mx-w-site w-full mi-auto mb-2 p-2">
+        <h2 class="ta-center mb-05">What to Apostille?</h2>
+
+        <div class="flex flex-row wrap gap-2 jc-center mb-2">
+            { /*-- Educational -- */}
+            <div class="ap-card ap-edu" role="group" aria-label="Educational documents">
+                <div class="ap-head">
+                    <span class="text-3xl" aria-hidden="true">🎓</span>
+                    <h3 class="m-0">Educational Documents</h3>
+                </div>
+
+                {/* <span class="ap-presignal" title="Typical pre-attestation">
+                    Included: HRD / University verification
+                </span> */}
+
+                <ul class="ap-list ap-sublinks">
+                    <li><Anchor className="td-none" href="/services/degree-certificate-apostille/">Degree / Diploma</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/marksheets-apostille/">Marksheet (Sem / Consolidated)</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/transfer-certificate-apostille/">Transfer / Leaving Certificate</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/provisional-certificate-apostille/">Provisional Certificate</Anchor></li>
+                </ul>
+
+                {/* <Anchor href="/services/education-documents-apostille/" className="ap-cta td-none">Get timeline & next steps →</Anchor> */}
+            </div>
+
+            { /*-- Personal --*/ }
+            <div class="ap-card ap-personal" role="group" aria-label="Personal/civil documents">
+                <div class="ap-head">
+                    <span class="text-3xl" aria-hidden="true">🧾</span>
+                    <h3 class="m-0">Personal (Civil) Documents</h3>
+                </div>
+
+                { /* <span class="ap-presignal" title="Typical pre-attestation">
+                    Included: SDM / Notary
+                </span> */ }
+
+                <ul class="ap-list ap-sublinks">
+                    <li><Anchor className="td-none" href="/services/birth-certificate-apostille/">Birth Certificate</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/marriage-certificate-apostille/">Marriage Certificate</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/pcc-apostille/">PCC (Police Clearance)</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/affidavit-apostille/">Affidavits / Name Change</Anchor></li>
+                </ul>
+                {/* <Anchor href="/services/personal-documents-apostille/" className="ap-cta td-none">Check eligibility →</Anchor> */}
+            </div>
+
+            { /*-- Commercial --*/ }
+            <div class="ap-card ap-commercial" role="group" aria-label="Commercial/business documents">
+                <div class="ap-head">
+                    <span class="text-3xl" aria-hidden="true">🏢</span>
+                    <h3 class="m-0">Commercial / Business</h3>
+                </div>
+
+                { /* <span class="ap-presignal" title="Typical pre-attestation">
+                    Included: Chamber of Commerce
+                </span> */ }
+
+                <ul class="ap-list ap-sublinks">
+                    <li><Anchor className="td-none" href="/services/business-document-apostille/#invoice">Invoice / Packing List / COO</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/business-document-apostille/#board">Board Resolutions</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/business-document-apostille/#agreements">Agreements / MoU</Anchor></li>
+                    <li><Anchor className="td-none" href="/services/business-document-apostille/#other">Other Commercial Documents</Anchor></li>
+                </ul>
+
+                {/* <Anchor href="/services/business-document-apostille/" className="ap-cta td-none">Talk to an expert →</Anchor> */}
+            </div>
+
+            
+        </div>
+        { /*-- Ask --*/ }
+        <div class="flex flex-col bg-base-00 mb-2 pb-2 pi-1 br ta-center" role="group" aria-label="Don't see your document? Ask us">
+            <div class="ap-head ta-center mi-auto">
+                <span class="text-3xl" aria-hidden="true">💬</span>
+                <h3 class="m-0">Don't see your document? No worries!</h3>
+            </div>
+            <p class="text-s opacity-90">Share a scan on WhatsApp or contact us to get started quick yes/no and a real ETA.</p>
+            <div class="flex flex-row gap ai-center jc-center flex-wrap">
+                <Anchor href={buildWhatsAppLink({
+                    phone: '',
+                    text: 'Hi EasyApostille! check my documents.',
+                    source: 'Home-What-to-Apostille',
+                    })} className="ap-ask td-none mb-1 ta-center" ariaLabel="Don't see your document? Ask us" variant='primary'>
+                Share a Scan on WhatsApp → 
+                </Anchor>
+                <Anchor href="/contact/"
+                className="ap-ask td-none mb-1 ta-center" ariaLabel="Don't see your document? Contact us" variant='secondary'>
+                Contact us via email for Help →
+                </Anchor>
+            </div>
+        </div>
+        
+
+        <p class="text-xs opacity-80 mt-1 ta-center">
+            Note: e-Apostille (QR) or Sticker is issued by MEA following the included process or SDM attestation.  
+            For non-Hague countries, embassy/consulate attestation may be needed.
+        </p>
+    </section>
+
+    <section id="what-you-need" class="w-full bg-base-00 mi-auto mb-2 p-2">
+        <h2 class="ta-center mb-05">What you'll need to get an Apostille in India</h2>
+        <p class="ta-center opacity-80 mb-1">
+            Keep these ready to start your MEA apostille — sticker or e-Apostille (QR). This helps us share an accurate price & ETA fast.
+        </p>
+
+        <div class="flex flex-col gap-2 mb-2 mx-w-featured mi-auto req-list" role="list">
+            {/* Clear scans */}
+            <div class="req-item col-base-90">
+                <div class="req-icon">✓</div>
+                <div class="req-body">
+                    <h3 class="text-base bold mb-02">Clear scan / photo or Original document</h3>
+                    <ul class="flex-col gap-05 text-s opacity-90">
+                        <li>Full page, color, high-resolution (PDF/JPG). Avoid crops/blur.</li>
+                        <li>Will arrange pickup if needed.</li>
+                        <li>e-Apostille works great with clean scans; we'll confirm eligibility.</li>
+                    </ul>
+                </div>
+            </div>
+
+            {/* ID proof */}
+            <div class="req-item col-base-90">
+                <div class="req-icon">📝</div>
+                <div class="req-body">
+                    <h3 class="text-base bold mb-02">ID proof of applicant</h3>
+                    <ul class="flex-col gap-05 text-s opacity-90">
+                        <li>Copy of Passport or Aadhaar (front & back if applicable).</li>
+                        <li>Declaration letter</li>
+                    </ul>
+                </div>
+            </div>
+
+
+            {/* Pickup / courier */}
+            <div class="req-item col-base-90">
+                <div class="req-icon">🚚</div>
+                <div class="req-body">
+                    <h3 class="text-base bold mb-02">Pickup address (only if originals are needed)</h3>
+                    <ul class="flex-col gap-05 text-s opacity-90">
+                        <li>For sticker apostille or SDM/Notary requirements, we arrange secure door-to-door courier.</li>
+                        <li>For e-Apostille (QR), scans usually suffice.</li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="flex wrap gap-05 mt-1 ta-center jc-center">
+           <Anchor href={buildWhatsAppLink({
+                    phone: '',
+                    text: 'Hi EasyApostille! check my documents.',
+                    source: 'Home-What-you-need',
+                    })} className="" ariaLabel="Check my documents?" variant='primary'>
+                    <Icon
+                        slot="icon-left"
+                        name="whatsapp"
+                        id="home-cta-3"
+                        class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                        aria-hidden="true"
+                        focusable="false"
+                    />Share & Get ETA</Anchor>
+            <Anchor href="/contact/" className="td-none" variant='secondary'>See pricing options & timeline</Anchor>
+        </div>
+
+        <p class="text-xs opacity-70 ta-center mt-1">
+            Requirements vary by document & destination. We'll confirm HRD/SDM/Chamber pre-attestation,
+            and whether <strong>e-Apostille (QR)</strong> or <strong>sticker apostille</strong> fits your case.
+        </p>
+    </section>
+
+
+<section id="why-easyapostille" class="mx-w-site w-full mi-auto mb-2 p-2">
+  <h2 class="ta-center mb-05">Why everyone choose <span class="nowrap">EasyApostille</span></h2>
+  <p class="mx-w-featured w-full mi-auto ta-center opacity-90 mb-1">
+    Fast, <strong>MEA-compliant apostille & attestation</strong> across India — choose
+    <strong>e-Apostille (QR)</strong> or <strong>sticker apostille</strong> with tracked delivery.
+  </p>
+
+  <div class="flex flex-row wrap gap-2 mb-2 mx-w-featured mi-auto jc-center req-list" role="list">
+    <div class="req-item w-sidebar info bg-color-warn">
+      <div class="req-icon">✅</div>
+      <div class="req-body">
+        <p class="req-title">MEA-ready process</p>
+        <p class="req-desc">We <strong>pre-check your paperwork</strong> before submission (Notary → SDM/State → MEA) to avoid rejections.</p>
+      </div>
+    </div>
+
+    <div class="req-item w-sidebar ok bg-color-warn">
+      <div class="req-icon">💬</div>
+      <div class="req-body">
+        <p class="req-title">Dedicated case manager</p>
+        <p class="req-desc">One point of contact on WhatsApp/email from document review to delivery.</p>
+      </div>
+    </div>
+
+    <div class="req-item w-sidebar info bg-color-warn">
+      <div class="req-icon">⚡</div>
+      <div class="req-body">
+        <p class="req-title">On-time delivery</p>
+        <p class="req-desc">Typical turnaround for personal documents is <strong>~2–3 working days</strong> (queue-dependent). Live ETA shared upfront.</p>
+      </div>
+    </div>
+
+    <div class="req-item w-sidebar warn bg-color-warn">
+      <div class="req-icon">₹</div>
+      <div class="req-body">
+        <p class="req-title">Clear pricing</p>
+        <p class="req-desc"><strong>No hidden charges</strong>. Multi-document <strong>discounts 5–15%</strong>. Pickup/return courier options.</p>
+      </div>
+    </div>
+
+    <div class="req-item w-sidebar info bg-color-warn">
+      <div class="req-icon">📦</div>
+      <div class="req-body">
+        <p class="req-title">Door-to-door service</p>
+        <p class="req-desc">Upload scans or send originals via secure courier. <strong>Pan-India pickup & tracked delivery</strong>.</p>
+      </div>
+    </div>
+
+    <div class="req-item w-sidebar ok bg-color-warn">
+      <div class="req-icon">🔒</div>
+      <div class="req-body">
+        <p class="req-title">Privacy & security</p>
+        <p class="req-desc">Strict document handling, secure storage, and safe disposal after completion.</p>
+      </div>
+    </div>
+  </div>
+
+    <div class="mx-w-featured w-full mi-auto flex wrap jc-center gap-05 mb-2 ta-center">
+        <Anchor href={buildWhatsAppLink({
+                        phone: '',
+                        text: 'Hi EasyApostille!',
+                        source: 'Home-What-you-need',
+                        })} 
+                className="" ariaLabel="Hi there in whatsapp?" variant='primary'
+        >
+            <Icon
+                slot="icon-left"
+                name="whatsapp"
+                id="home-cta-4"
+                class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                aria-hidden="true"
+                focusable="false"
+            />
+            Chat on WhatsApp →
+        </Anchor>
+        <Anchor href="/contact/" className="" ariaLabel="email - Hi there?" variant='secondary'>
+            <Icon
+                slot="icon-left"
+                name="email"
+                id="home-cta-4"
+                class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                aria-hidden="true"
+                focusable="false"
+            />
+            Email us →
+        </Anchor>
+
+    </div>
+
+    <p class="mx-w-featured w-full mi-auto opacity-80 w-full mt-05 ta-center">Free document pre-check • MEA-approved flow • e-Apostille (QR) &amp; sticker options</p>
+  </div>
+</section>
+
+
+   
+
+    {Array.isArray(faq) && faq.length > 0 && (
+        <FaqList
+          items={faq}
+          id="faq"
+          class="post-faq bg-base-00 w-full mi-auto mb-2 p-2"
+          headingClass="mx-w-featured mi-auto ta-center"   
+          listClass='mx-w-featured mi-auto'
+          questionClass='text-base bold'
+          answerClass='bg-primary-lighter-x'
+          heading="Frequently Asked Questions"
+          headingTag="h2"
+          openAll={true}
+          addSchema={true}
+          addSpeakableSchema={true}
+          htmlAnswers={false}
+        />
+    )}
+
+
+    <section id="home-contact" class="w-full mi-auto mb-2 p-2 ta-center">
+        <h2 class="mb-05">Still have questions?</h2>
+        <p class="opacity-80 mb-1">Prefer WhatsApp or a quick call? We're happy to help.</p>
+
+        <div class="flex wrap jc-center gap-05">
+            <Anchor href={waHref1} className="" variant="primary"> <Icon
+                slot="icon-left"
+                name="whatsapp"
+                id="home-cta-5"
+                class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+                aria-hidden="true"
+                focusable="false"
+            />Open WhatsApp</Anchor>
+        </div>
+
+        <p class="mt-1">
+           <Anchor href={telHref1} className="td-none">Call {tel1}</Anchor>         
+           <span> &nbsp;•&nbsp; </span>
+           <Anchor href={`mailto:${email}`} className="td-none">{email}</Anchor>
+        </p>
+    </section>
+    <section id="home-compliance" class="w-full bg-base-00 mi-auto p-2">
+        <h2 class="mb-05 ta-center">Compliance &amp; Assurance</h2>
+
+        <div class="flex flex-row wrap gap-2 mb-2 mx-w-featured mi-auto jc-center req-list">
+            <div class="box block w-sidebar">✅ <strong>MEA-compliant apostille</strong> via authorized channels — <em>sticker</em> &amp; <em>e-Apostille (QR verification)</em>.</div>
+            <div class="box block w-sidebar">✅ Correct chain handled end-to-end: <strong>Notary → SDM/State → MEA</strong> (as applicable).</div>
+            <div class="box block w-sidebar">✅ <strong>Acceptance guidance</strong> for university admissions, immigration, visa &amp; HR.</div>
+            <div class="box block w-sidebar">✅ <strong>GST invoice</strong> available on request.</div>
+            <div class="box block w-sidebar">✅ <strong>Secure pickup &amp; tracked delivery</strong> across India; privacy-first document handling.</div>
+        </div>
+
+        <div class="flex flex-row wrap gap-2 mb-2 mx-w-featured mi-auto jc-center">
+            <Anchor
+                href={buildWhatsAppLink({
+                    phone: '',
+                        text: 'Hi EasyApostille! I need MEA apostille help. Please share eligibility, ETA & all-inclusive quote.',
+                        source: 'Home-Compliance-CTA',
+                        })}
+                    className="mt-1 inline-flex ai-center gap-05 w-full"
+                    ariaLabel="Start your apostille on WhatsApp"
+                    variant="primary" dataId='home-compliance-whatsapp' dataAction='link_click' dataLabel='Start Apostille in whatsapp chat'
+                >
+                <Icon
+                    slot="icon-left"
+                    name="whatsapp"
+                    class="block bg-base-00 round w-1-5 h-1-5"
+                    aria-hidden="true"
+                    focusable="false"
+                />
+                Start your apostille on WhatsApp →
+            </Anchor>
+        </div>
+   
+        <p class="mt-1 ta-center">
+            Prefer email? <Anchor className="td-none underline" href={`mailto:${email}`} dataAction='link_click' dataId='home-compliance-email'>{email}</Anchor>
+        </p>        
+
+        <p class="text-xs opacity-80 mt-05 ta-center">
+            Typical timeline for many personal documents: <strong>~2–3 working days</strong> (we confirm your exact ETA before payment).
+        </p>
+    </section>   
+</article>

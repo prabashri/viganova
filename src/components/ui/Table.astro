@@ -1,0 +1,58 @@
+---
+/**
+ * // src/components/ui/Table.astro
+ * Table wrapper with optional caption, sticky header, compact mode, and horizontal scrolling.
+ * props:
+ * - caption: optional caption text shown above the table
+ * - ariaLabel: ARIA label for the scroll region (falls back to caption or 'Table')
+ * - minWidth: min width that triggers horizontal scrolling (e.g., '40rem', '720px')
+ * - stickyHeader: make header row sticky while scrolling horizontally/vertically
+ * - compact: compact density (smaller cell padding)
+ * - id: optional id for anchor linking
+ */
+export interface Props {
+  /** Optional caption shown above the table (plain text). */
+  caption?: string;
+
+  /** ARIA label for the scroll region (falls back to caption or 'Table'). */
+  ariaLabel?: string;
+
+  /** Min width that triggers horizontal scrolling (e.g., '40rem', '720px'). */
+  minWidth?: string;
+
+  /** Make header row sticky while scrolling horizontally/vertically. */
+  stickyHeader?: boolean;
+
+  /** Compact density (smaller cell padding). */
+  compact?: boolean;
+
+  /** Optional id for anchor linking. */
+  id?: string;
+}
+
+const {
+  caption,
+  ariaLabel,
+  minWidth = '40rem',
+  stickyHeader = false,
+  compact = false,
+  id,
+} = Astro.props;
+---
+
+<figure
+  id={id}
+  class:list={[
+    'table-scroll',
+    compact && 'table--compact',
+    stickyHeader && 'table--stickyhead'
+  ]}
+  role="region"
+  aria-label={ariaLabel ?? caption ?? 'Table'}
+>
+  {caption && <figcaption class="table-caption">{caption}</figcaption>}
+
+  {/* !-- Slot your Markdown/HTML table here --*/}
+  <slot />
+
+</figure>

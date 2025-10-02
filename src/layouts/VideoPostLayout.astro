@@ -1,0 +1,621 @@
+---
+/* src/layouts/VideoPostLayout.astro */
+import BaseLayout from './BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps, VideoMeta } from '@/types/HeadProps';
+import modifiedDatesJson from '@/data/modified-dates.json';
+
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+
+import { buildOrganizationSchema } from '@/utils/schemaOrganization';
+import { idFor, toAbsoluteUrl } from '@/utils/urls';
+
+import ShareLink from '@/components/ShareLink.astro';
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+import Button from '@/components/ui/Button.astro';
+import FaqList from '@/components/ui/FaqList.astro';
+import TagList from '@/components/ui/TagList.astro';
+import PrevNextNav from '@/components/ui/PrevNextNav.astro';
+import Sidebar from '@/components/ui/Sidebar.astro';
+
+import type { ImageMetaSlim } from '@/types/images';
+import { getImageMeta, constructUrl } from '@/utils/getImage';
+import { parseImageDims } from '@/utils/imageHelpers';
+
+import type { CollectionEntry } from 'astro:content';
+
+
+const { orgId } = buildOrganizationSchema();
+
+
+/* ── Props ─────────────────────────────────────────────── */
+interface Props {
+  doc: CollectionEntry<'videos'>;
+  allVideos?: CollectionEntry<'videos'>[];
+}
+const { doc, allVideos = [] } = Astro.props as Props;
+const d = doc.data;
+
+/* ── Paths & canonical ─────────────────────────────────── */
+const base = siteDefaults.collections['videos']?.base ?? 'videos';
+const collectionBase = base ? `${base}/` : '';
+const defaultWatchUrl = `${siteDefaults.siteUrl}/${collectionBase}${d.slug}/`;
+const canonicalUrl = d.watchPageUrl?.startsWith('http') ? d.watchPageUrl : defaultWatchUrl;
+
+/* ── Dates ─────────────────────────────────────────────── */
+const modifiedDates = modifiedDatesJson as Record<string, string>;
+const relativeKey = `videos/${d.slug}`;
+const lastModifiedRaw = modifiedDates[relativeKey] || d.updatedDate || d.publishDate;
+const lastModified = lastModifiedRaw
+  ? new Date(lastModifiedRaw).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : null;
+
+/* ── Prev/Next ─────────────────────────────────────────── */
+const currentIndex = allVideos.findIndex(v => (v.data?.slug || v.id) === d.slug);
+const prevItem = currentIndex > 0 ? allVideos[currentIndex - 1] : null;
+const nextItem = currentIndex < allVideos.length - 1 ? allVideos[currentIndex + 1] : null;
+
+/* ── Helpers ───────────────────────────────────────────── */
+type Aspect = `${number}:${number}`;
+const isAspect = (s: unknown): s is Aspect => typeof s === 'string' && /^\d+:\d+$/.test(s);
+const gcd = (a:number,b:number):number => b===0 ? Math.abs(a) : gcd(b, a % b);
+const toAspectFromDims = (w?:number,h?:number):Aspect|undefined => {
+  if (!w || !h || w<=0 || h<=0) return undefined;
+  const g = gcd(w,h); return `${Math.round(w/g)}:${Math.round(h/g)}` as Aspect;
+};
+const ytEmbed = (id?: string) => (id ? `https://www.youtube-nocookie.com/embed/${id}` : undefined);
+const vmEmbed = (id?: string) => (id ? `https://player.vimeo.com/video/${id}` : undefined);
+const ytWatch = (id?: string) => (id ? `https://www.youtube.com/watch?v=${id}` : undefined);
+const vmWatch = (id?: string) => (id ? `https://vimeo.com/${id}` : undefined);
+
+const toAbs = (u?: string) => {
+  if (!u) return undefined;
+  if (u.startsWith('http://') || u.startsWith('https://')) return u;
+  if (u.startsWith('#')) return `${canonicalUrl}${u}`;
+  return `${siteDefaults.siteUrl}${u}`;
+};
+
+/* ── Dimensions / aspect for CLS safety ────────────────── */
+const videoWidth  = d.videoWidth ?? (d as any).width;
+const videoHeight = d.videoHeight ?? (d as any).height;
+const aspectRatio: Aspect | undefined =
+  isAspect(d.aspectRatio) ? (d.aspectRatio as Aspect) : toAspectFromDims(videoWidth, videoHeight);
+const cssAspect = aspectRatio ? aspectRatio.replace(':',' / ') : (videoWidth && videoHeight ? `${videoWidth} / ${videoHeight}` : '16 / 9');
+
+/* ── Embed URL (for iframe providers) ──────────────────── */
+const embedSrc =
+  d.embedUrl ||
+  (d.provider === 'youtube' ? ytEmbed(d.youtubeId) :
+   d.provider === 'vimeo'   ? vmEmbed(d.vimeoId)   :
+   undefined);
+
+/* ── Unified hero image (poster + social) ──────────────── */
+const heroImageKey = (d as any).image || siteImages.image;
+const heroImageMeta: ImageMetaSlim | null = heroImageKey ? getImageMeta(heroImageKey as string) : null;
+const heroImage: string | undefined = heroImageMeta
+  ? (constructUrl(heroImageMeta, 'full', 'png') as string)
+  : undefined;
+const heroImageAlt = (d as any).imageAlt || d.title;
+const dims = heroImage ? parseImageDims(heroImage) : null;
+const heroImageWidth = dims?.width;
+const heroImageHeight = dims?.height;
+
+/* ── Schema helpers (absolute urls) ────────────────────── */
+const transcriptAbs = toAbs((d as any).transcriptUrl);
+/* ── Schema helpers (absolute urls) ────────────────────── */
+const chaptersAbs = Array.isArray(d.chapters)
+  ? d.chapters.map((c: { name: string; start: number; end?: number }) => ({
+      name: c.name,
+      start: c.start,
+      ...(typeof c.end === 'number' ? { end: c.end } : {}),
+      // Optional: provide an absolute deeplink for richer schema/preview
+      url: `${canonicalUrl}?t=${Math.max(0, c.start | 0)}`,
+    }))
+  : undefined;
+
+
+/* ── Build VideoMeta (used by BaseLayout schema) ───────── */
+const videoMeta: VideoMeta = {
+  provider: d.provider,
+  watchPageUrl: canonicalUrl,
+  contentUrl: (d as any).contentUrl,
+  contentUrlHls: (d as any).contentUrlHls,
+  contentUrlDash: (d as any).contentUrlDash,
+  encodingFormat: (d as any).encodingFormat,
+  contentSizeBytes: (d as any).contentSizeBytes,
+  embedUrl: embedSrc,
+  youtubeId: (d as any).youtubeId,
+  vimeoId: (d as any).vimeoId,
+  ogVideoUrl: embedSrc ?? (d as any).contentUrl,
+  ogVideoSecureUrl: embedSrc?.replace('http://', 'https://'),
+  ogVideoType: embedSrc ? 'text/html' : ((d as any).encodingFormat ?? 'video/mp4'),
+  ogVideoWidth: videoWidth,
+  ogVideoHeight: videoHeight,
+  twitterPlayerUrl: embedSrc,
+  twitterPlayerWidth: videoWidth,
+  twitterPlayerHeight: videoHeight,
+  name: d.title,
+  description: d.description,
+  uploadDate: d.uploadDate ?? d.publishDate,
+  durationSeconds: d.durationSeconds,
+  isLive: (d as any).isLive ?? false,
+  isFamilyFriendly: (d as any).isFamilyFriendly ?? true,
+  isAccessibleForFree: (d as any).isAccessibleForFree ?? true,
+  requiresSubscription: (d as any).requiresSubscription ?? false,
+
+  poster: heroImage,
+  posterAlt: heroImageAlt,
+  posterWidth: heroImageWidth,
+  posterHeight: heroImageHeight,
+
+  width: videoWidth,
+  height: videoHeight,
+  aspectRatio,
+  captions: (d as any).captions,
+  transcriptUrl: transcriptAbs,
+  chapters: chaptersAbs,
+  regionsAllowed: (d as any).regionsAllowed,
+  sameAs: (d as any).sameAs,
+  platform: {
+    youtube: (d as any).platform?.youtube ?? ytWatch((d as any).youtubeId),
+    vimeo:   (d as any).platform?.vimeo   ?? vmWatch((d as any).vimeoId),
+    dailymotion: (d as any).platform?.dailymotion,
+    bilibili:    (d as any).platform?.bilibili,
+    rumble:      (d as any).platform?.rumble,
+  },
+  bitrateKbps: (d as any).bitrateKbps,
+  frameRate: (d as any).frameRate,
+  isMainEntity: true,
+};
+
+/* ── HeadProps for BaseLayout (SEO) ────────────────────── */
+const headProps: HeadProps = {
+  title: d.title,
+  description: d.description,
+  image: heroImage,
+  imageAlt: heroImageAlt,
+  imageWidth: heroImageWidth,
+  imageHeight: heroImageHeight,
+  type: 'video',
+  canonicalUrl,
+  url: canonicalUrl,
+  index: d.index ?? true,
+  keywords: d.keywords?.length ? d.keywords : d.tags,
+  publishedAt: d.publishDate,
+  updatedAt: lastModified ?? undefined,
+  showBreadcrumb: true,
+  video: videoMeta,
+};
+
+/* Chapter seek deeplink for history only (no visible link) */
+const chapterHref = (start: number) =>
+  `${canonicalUrl}?t=${Math.max(0, start | 0)}`;
+
+/* Build “download/watch” buttons */
+const downloads: Array<{ label: string; href: string; external?: boolean; variant?: 'primary'|'secondary' }> = [];
+if (heroImage) {
+  const labelWH = heroImageWidth && heroImageHeight ? ` (${heroImageWidth}x${heroImageHeight})` : '';
+  downloads.push({ label: `Poster${labelWH}`, href: toAbs(heroImage)!, variant: 'secondary' });
+}
+if ((d as any).contentUrl)     downloads.push({ label: 'Video (MP4)', href: toAbs((d as any).contentUrl)!,     variant: 'primary' });
+if ((d as any).contentUrlHls)  downloads.push({ label: 'HLS (.m3u8)', href: toAbs((d as any).contentUrlHls)!,  variant: 'secondary' });
+if ((d as any).contentUrlDash) downloads.push({ label: 'DASH (.mpd)',  href: toAbs((d as any).contentUrlDash)!, variant: 'secondary' });
+
+((d as any).captions || []).forEach((t: any) => {
+  if (t?.url) {
+    downloads.push({
+      label: `Captions (${t.label || (t.lang || '').toUpperCase() || 'track'})`,
+      href: toAbs(t.url)!,
+      variant: 'secondary',
+      external: true,
+    });
+  }
+});
+
+if ((d as any).platform?.youtube) downloads.push({ label: 'Watch on YouTube', href: (d as any).platform.youtube, external: true, variant: 'primary' });
+if ((d as any).platform?.vimeo)   downloads.push({ label: 'Watch on Vimeo',   href: (d as any).platform.vimeo,   external: true, variant: 'primary' });
+
+/* unique ids */
+const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
+const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
+
+/* --- helpers for JSON-LD --- */
+const iso = (d?: string | Date) => (d ? new Date(d).toISOString() : undefined);
+const toISODuration = (secs?: number) => {
+  if (!secs || secs <= 0) return undefined;
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = Math.floor(secs % 60);
+  return `PT${h ? `${h}H` : ''}${m ? `${m}M` : ''}${s ? `${s}S` : ''}`;
+};
+
+/** Build VideoObject + ids (keeps page + org wiring consistent) */
+
+  const videoId   = idFor("video", toAbsoluteUrl(videoMeta.watchPageUrl || canonicalUrl));
+  const webPageId = idFor("webpage", toAbsoluteUrl(canonicalUrl));
+  const thumbnailUrlArr = heroImage ? [toAbsoluteUrl(heroImage)] : undefined;
+
+  const hasPart: any[] = [];
+  if (Array.isArray(videoMeta.chapters) && videoMeta.chapters.length) {
+    hasPart.push(
+      ...videoMeta.chapters.map((c: any) => ({
+        "@type": "Clip",
+        name: c.name,
+        ...(typeof c.start === "number" ? { startOffset: Math.max(0, c.start|0) } : {}),
+        ...(c.url ? { url: toAbsoluteUrl(c.url) } : {})
+      }))
+    );
+  }
+  if (videoMeta.transcriptUrl) {
+    hasPart.push({
+      "@type": "DigitalDocument",
+      name: `${d.title} — Transcript`,
+      url: toAbsoluteUrl(videoMeta.transcriptUrl)
+    });
+  }
+
+  const videoSchema = {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    "@id": videoId,
+
+    name:        videoMeta.name || d.title,
+    description: videoMeta.description || d.description,
+
+    // Images
+    ...(thumbnailUrlArr ? { thumbnailUrl: thumbnailUrlArr } : {}),
+    ...(heroImage ? {
+      image: {
+        "@type": "ImageObject",
+        url: toAbsoluteUrl(heroImage),
+        ...(heroImageWidth  ? { width:  heroImageWidth }  : {}),
+        ...(heroImageHeight ? { height: heroImageHeight } : {})
+      }
+    } : {}),
+
+    // Where to watch
+    ...(videoMeta.embedUrl   ? { embedUrl:   toAbsoluteUrl(videoMeta.embedUrl) }   : {}),
+    ...(videoMeta.contentUrl ? { contentUrl: toAbsoluteUrl(videoMeta.contentUrl) } : {}),
+    uploadDate: iso(videoMeta.uploadDate),
+    ...(videoMeta.durationSeconds ? { duration: toISODuration(videoMeta.durationSeconds) } : {}),
+    ...(videoMeta.width  ? { width:  videoMeta.width }  : {}),
+    ...(videoMeta.height ? { height: videoMeta.height } : {}),
+
+    // Link it into your graph
+    isPartOf: [{ "@id": webPageId }],
+    publisher: { "@id": orgId },
+    mainEntityOfPage: toAbsoluteUrl(canonicalUrl),
+
+    // Policies (keep only what you actually set)
+    ...(videoMeta.isFamilyFriendly !== undefined     ? { isFamilyFriendly:        !!videoMeta.isFamilyFriendly } : {}),
+    ...(videoMeta.isAccessibleForFree !== undefined  ? { isAccessibleForFree:     !!videoMeta.isAccessibleForFree } : {}),
+    ...(videoMeta.requiresSubscription !== undefined ? { requiresSubscription:    !!videoMeta.requiresSubscription } : {}),
+
+    // Optional extras
+    ...(videoMeta.encodingFormat ? { encodingFormat: videoMeta.encodingFormat } : {}),
+    ...(videoMeta.sameAs         ? { sameAs: videoMeta.sameAs }                 : {}),
+    ...(videoMeta.regionsAllowed ? { regionsAllowed: videoMeta.regionsAllowed } : {}),
+    ...(hasPart.length ? { hasPart } : {})
+  };
+
+
+---
+
+<BaseLayout headProps={headProps}>
+  <Fragment slot="headContent-top">
+    {/* Preconnects for faster video boot */}
+    {embedSrc?.includes('youtube') && (
+      <>
+        <link rel="preconnect" href="https://www.youtube-nocookie.com" />
+        <link rel="preconnect" href="https://i.ytimg.com" />
+        <link rel="dns-prefetch" href="https://www.youtube-nocookie.com" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
+      </>
+    )}
+    {embedSrc?.includes('vimeo') && (
+      <>
+        <link rel="preconnect" href="https://player.vimeo.com" />
+        <link rel="preconnect" href="https://i.vimeocdn.com" />
+        <link rel="preconnect" href="https://f.vimeocdn.com" />
+        <link rel="dns-prefetch" href="https://player.vimeo.com" />
+        <link rel="dns-prefetch" href="https://i.vimeocdn.com" />
+        <link rel="dns-prefetch" href="https://f.vimeocdn.com" />
+      </>
+    )}
+
+    {/* Smart preloads */}
+    {heroImage && <link rel="preload" as="image" href={toAbs(heroImage)} />}
+
+    {/* Self-hosted media preloads */}
+    {d.provider === 'self' && (d as any).contentUrl && (
+      <link rel="preload" as="video" href={toAbs((d as any).contentUrl)} type={(d as any).encodingFormat || 'video/mp4'} />
+    )}
+    {d.provider === 'self' && (d as any).contentUrlHls && (
+      <link rel="preload" as="fetch" href={toAbs((d as any).contentUrlHls)} type="application/x-mpegURL" crossorigin="anonymous" />
+    )}
+    {d.provider === 'self' && (d as any).contentUrlDash && (
+      <link rel="preload" as="fetch" href={toAbs((d as any).contentUrlDash)} type="application/dash+xml" crossorigin="anonymous" />
+    )}
+  </Fragment>
+
+  <Fragment slot="headContent-bottom">
+    {/* rel=prev/next help crawlers understand pagination/series */}
+    {prevItem && <link rel="prev" href={`/${collectionBase}${prevItem.data?.slug || prevItem.id}/`} />}
+    {nextItem && <link rel="next" href={`/${collectionBase}${nextItem.data?.slug || nextItem.id}/`} />}
+
+    {/* Video-specific metadata */}
+    {/* OpenGraph video (self-hosted or embed) */}
+    {videoMeta.ogVideoUrl && (
+      <>
+        <meta property="og:type" content="video.other" />
+        <meta property="og:video" content={toAbs(videoMeta.ogVideoUrl)} />
+        {videoMeta.ogVideoSecureUrl && <meta property="og:video:secure_url" content={toAbs(videoMeta.ogVideoSecureUrl)} />}
+        {videoMeta.ogVideoType && <meta property="og:video:type" content={videoMeta.ogVideoType} />}
+        {videoMeta.ogVideoWidth && <meta property="og:video:width" content={String(videoMeta.ogVideoWidth)} />}
+        {videoMeta.ogVideoHeight && <meta property="og:video:height" content={String(videoMeta.ogVideoHeight)} />}
+      </>
+    )}
+
+    {/* Twitter Player card for embeds */}
+    {videoMeta.twitterPlayerUrl && (
+      <>
+        <meta name="twitter:card" content="player" />
+        <meta name="twitter:player" content={videoMeta.twitterPlayerUrl} />
+        {videoMeta.twitterPlayerWidth && <meta name="twitter:player:width" content={String(videoMeta.twitterPlayerWidth)} />}
+        {videoMeta.twitterPlayerHeight && <meta name="twitter:player:height" content={String(videoMeta.twitterPlayerHeight)} />}
+      </>
+    )}
+
+    {/* Alternates: transcript and streaming manifests */}
+    {transcriptAbs && (
+      <link rel="alternate" type="text/plain" href={transcriptAbs} title={`${d.title} – Transcript`} />
+    )}
+    {(d as any).contentUrlHls && (
+      <link rel="alternate" type="application/x-mpegURL" href={toAbs((d as any).contentUrlHls)} title={`${d.title} – HLS`} />
+    )}
+    {(d as any).contentUrlDash && (
+      <link rel="alternate" type="application/dash+xml" href={toAbs((d as any).contentUrlDash)} title={`${d.title} – MPEG-DASH`} />
+    )}
+
+    {/* oEmbed discovery hints for platforms (helps rich embeds in some clients) */}
+    {d.provider === 'youtube' && (d as any).youtubeId && (
+      <link
+        rel="alternate"
+        type="application/json+oembed"
+        href={`https://www.youtube.com/oembed?url=${encodeURIComponent(ytWatch((d as any).youtubeId)!)}`}
+        title={`${d.title} – oEmbed`}
+      />
+    )}
+    {d.provider === 'vimeo' && (d as any).vimeoId && (
+      <link
+        rel="alternate"
+        type="application/json+oembed"
+        href={`https://vimeo.com/api/oembed.json?url=${encodeURIComponent(vmWatch((d as any).vimeoId)!)}`}
+        title={`${d.title} – oEmbed`}
+      />
+    )}
+  </Fragment>
+
+  <style id="video-layout-styles" is:inline>
+.video-layout{grid-template-columns:minmax(0,1fr); grid-template-areas:"header" "player" "sidebar-left" "content" "sidebar-right" "footer" "footerNav"}
+.video-header{grid-area:header}
+.video-player{grid-area:player}
+.video-content{grid-area:content}
+.sidebar-left{grid-area:sidebar-left}
+.sidebar-right{grid-area:sidebar-right}
+.video-footer{grid-area:footer}
+.footer-nav{grid-area:footerNav}
+.player-shell iframe, .player-shell video{width:100%; height:100%; display:block; border:0}
+.sidebar-left:empty, .sidebar-right:empty{
+  display:none;
+}
+.ts{
+  font-variant-numeric:tabular-nums;
+}
+
+@media (min-width: 1024px) and (max-width:1279px){
+.video-layout{grid-template-columns:2fr 1fr; grid-template-areas:"header header" "player player" "content sidebar-left" "content sidebar-right" "footer sidebar-right" "footerNav footerNav"}
+}
+
+@media (min-width: 1280px){
+.video-layout{grid-template-columns:1fr minmax(auto, var(--content-width)) 1fr; grid-template-areas:"header header header" "player player player" "sidebar-left content sidebar-right" "sidebar-left footer sidebar-right" "footerNav footerNav footerNav"}
+.sidebar-left, .sidebar-right{max-height:calc(100vh - 5rem)}
+}
+  </style>
+
+  <article id="video-layout" class="video-layout grid jc-center gap w-full" itemscope itemtype="https://schema.org/Article">
+    {/* Header */}
+    <header class="video-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
+      <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={d.title} breadcrumbs={headProps.breadcrumbs} />
+      <div class="mx-w-site mi-auto ta-center mb-2">
+        <h1 class="post-title">{d.title}</h1>
+        {d.description && <p class="post-desc">{d.description}</p>}
+        <div class="post-meta text-s mb-1">
+          {(d.publishDate || lastModified) && (
+            <div class="post-dates text-s">
+              {d.publishDate && <time datetime={d.publishDate}>📅 on {new Date(d.publishDate).toLocaleDateString()}</time>}
+              {lastModified && <span class="last-updated-on">Updated: {new Date(lastModified).toLocaleDateString()}</span>}
+              {d.durationSeconds && <span class="ml-05">• ⏱ {Math.round(d.durationSeconds/60)} min</span>}
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+
+    {/* Hero image + play overlay → player */}
+    <section class="video-player mx-w-content mb-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
+      <div
+        class="player-shell bg-base-10 br overflow-hidden relative"
+        id={`${uid}-shell`}
+        data-vp-root
+        data-uid={uid}
+        data-provider={(d.provider as string)?.toLowerCase?.() || d.provider}
+        data-canonical-url={canonicalUrl}
+        data-embed-src={embedSrc || ''}
+      >
+        {heroImage && heroImageMeta && (
+          <div class="poster-wrap w-full h-full" id={`${uid}-poster-wrap`}>
+            <ResponsiveImage
+              src={heroImageKey}
+              imageMeta={heroImageMeta}
+              alt={heroImageAlt}
+              title={d.imageTitle}
+              caption={d.imageCaption}
+              width={heroImageWidth ? String(heroImageWidth) : undefined}
+              height={heroImageHeight}
+              id={`${uid}-poster-img`}
+              loading="eager"
+              className="w-full h-full object-cover block"
+              variant="desktop"
+              addSchema={true}
+            />
+          </div>
+        )}
+
+        <button id={`${uid}-play`} class="play-btn absolute inset-0 grid place-items-center pointer base-00 text-xl" aria-label="Play video">▶</button>
+
+        {/* Self-hosted video (hidden until play) */}
+        {d.provider === 'self' && (
+          <video
+            id={`${uid}-video`}
+            class="hide"
+            controls
+            preload="metadata"
+            playsinline
+            poster={heroImage || undefined}
+          >
+            {(d as any).contentUrlHls  && <source src={(d as any).contentUrlHls}  type="application/x-mpegURL" />}
+            {(d as any).contentUrlDash && <source src={(d as any).contentUrlDash} type="application/dash+xml" />}
+            {d.contentUrl && <source src={d.contentUrl} type={(d as any).encodingFormat || 'video/mp4'} />}
+            {((d as any).captions || []).map((t: any) => (
+              <track
+                kind={t.kind || 'subtitles'}
+                src={t.url}
+                srclang={t.lang}
+                label={t.label || t.lang}
+                default={t.default}
+              />
+            ))}
+            Your browser does not support the video tag.
+          </video>
+        )}
+
+        {/* Iframe slot for YouTube/Vimeo/embed */}
+        <div id={`${uid}-iframe-slot`} class="hide"></div>
+      </div>
+
+      {/* Transcript link via Anchor */}
+      {(d as any).transcriptUrl && (
+        <Anchor href={(d as any).transcriptUrl} variant="plain" className="text-s mb-05 w-fit">
+          View transcript
+        </Anchor>
+      )}
+    </section>
+
+    {/* Content */}
+    <div class="video-content mx-w-content mi-auto mb-05 p-1  bg border-primary-light br" itemprop="articleBody">
+      <slot />
+    </div>
+
+    {/* Sidebar LEFT: Download / Watch buttons */}
+    <Sidebar variant='left'>
+      {downloads.length > 0 && (
+        <section class="video-downloads">
+          <h3 class="text-xs uppercase mb-05">Download Links</h3>
+          <ul class="no-bullets flex flex-row full-flex-col wrap gap-05">
+            {downloads.map((dwn) => (
+              <li>
+                <Anchor
+                  href={dwn.href}
+                  variant={dwn.variant || 'secondary'}
+                  target={dwn.external ? '_blank' : undefined}
+                  rel={dwn.external ? 'noopener' : undefined}
+                >
+                  {dwn.label}
+                </Anchor>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </Sidebar>
+
+    {/* Sidebar RIGHT: Chapters as buttons (no href) */}
+    <Sidebar variant='right'>
+      {Array.isArray(d.chapters) && d.chapters.length > 0 && (
+        <section class="video-chapters">
+          <h3 class="text-xs uppercase mb-05">Chapters</h3>
+          <ul class="chapter-list no-bullets">
+            {d.chapters.map((c, i) => (
+              <li>
+                <Button
+                  id={`chap-${d.slug}-${i}`}
+                  label={`Seek to ${ts(c.start)} — ${c.name}`}
+                  type="button"
+                  variant="plain"
+                  className="chapter-link inline-flex gap-05 p-05 br bg-transparent pointer hover-bg-primary-lighter-x"
+                  data-seek={c.start}
+                  data-href={chapterHref(c.start)}
+                  ariaLabel={`Seek to ${ts(c.start)} — ${c.name}`}
+                  dataAction="chapter_seek"
+                  dataLabel={c.name}
+                >
+                  <span class="ts">{ts(c.start)}</span>
+                  <span>{c.name}</span>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </Sidebar>
+
+    {/* Footer: share, FAQ, tags, prev/next */}
+    <footer id="video-footer" class="video-footer mx-w-content w-full mi-auto mb-05 p-05">
+      <ShareLink id="video-footer-share-links" className="mb-05 p-05" title="share" />
+
+      {Array.isArray(d.faq) && d.faq.length > 0 && (
+         <FaqList
+            items={d.faq}
+            id="faq"
+            class="video-faq mb-05 p-05"
+            headingClass=''
+            listClass=''
+            heading="Frequently Asked Questions"
+            headingTag="h2"
+            openAll={true}
+            addSchema={true}
+            addSpeakableSchema={true}
+            htmlAnswers={false}
+        />
+      )}
+
+      {Array.isArray(d.tags) && d.tags.length > 0 && (
+        <TagList
+          items={d.tags}
+          heading="Keywords"
+          baseHref="/tags/"
+          dedupe={true}
+          sort="asc"
+        />
+      )}
+    </footer>
+    
+  </article>
+  {(prevItem || nextItem) && (
+      <PrevNextNav
+        prevItem={prevItem}
+        nextItem={nextItem}
+        collectionBase={collectionBase}
+        prevVariant="secondary"
+        nextVariant="secondary"
+      />
+    )}
+
+  <Fragment slot="extraScripts">
+    <script id="video-schema" type="application/ld+json" set:html={JSON.stringify(videoSchema)}></script>
+    <script type="module" data-src="/scripts/video-watch.js" async></script>
+  </Fragment>
+</BaseLayout>

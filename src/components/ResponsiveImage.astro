@@ -1,18 +1,30 @@
 ---
-import imageMetadataJson from '../data/image-format-details.json';
-import { registerPreloadImage } from '../utils/preloadRegistry';
-import { registerSchemaImage } from '../utils/registerSchemaImage';
-import { siteDefaults } from '../config/siteDefaults';
-import { siteImages } from '../config/siteImages';
-import { toAbsoluteUrl } from '../utils/toAbsoluteUrl';
-import type { ImageFormat, ImageVariant, ImageVariants, ImageBreakpoints } from '../types/imageProps';
+// src/components/ResponsiveImage.astro
+import { registerPreloadImage } from '@/utils/preloadRegistry';
+import { registerSchemaImage } from '@/utils/registerSchemaImage';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
 
+// ⬇️ use just these
+import { toAbsoluteUrl, toRelativeUrl } from '@/utils/urls';
+
+import type {
+  ImageFormat,
+  ImageVariant,
+  ImageVariants,
+  ImageBreakpoints,
+  ImageMetaSlim
+} from '@/types/imageProps';
+
+import { getImageMeta, constructUrl } from '@/utils/getImage';
 
 interface Props {
   src: string;
+  imageMeta?: ImageMetaSlim | null;
   alt: string;
   title?: string;
   caption?: string;
+  sizes?: number | string;
   id?: string;
   className?: string;
   imageClassName?: string;
@@ -21,11 +33,13 @@ interface Props {
   width?: number | string;
   height?: number;
   addSchema?: boolean;
+  breakpoints?: { mobile: number; desktop: number };
   objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
 }
 
 const {
   src,
+  imageMeta,
   alt,
   title,
   caption,
@@ -40,17 +54,13 @@ const {
   addSchema = true,
 } = Astro.props as Props;
 
-const metadata = imageMetadataJson as Record<string, any>;
-const data = metadata[src];
-const origin = siteDefaults.siteUrl.replace(/\/$/, '');
-const folderPath = siteImages.outputImageBase?.replace(/^\.\/public\//, '') || 'images';
-
 const variants: ImageVariants = siteImages.variants;
 const breakpoints: ImageBreakpoints = siteImages.breakpoints;
 
-let imageBaseName = src.replace(/^.*[\/]/, '').replace(/\.[^.]+$/, '');
-let hasData = !!data;
-let basePath = '';
+// meta (either from props or util)
+const meta = imageMeta ?? getImageMeta(src);
+const hasData = !!meta;
+
 let defaultAspect = '';
 let formats: string[] = [];
 let aspectClass = '';
@@ -60,51 +70,71 @@ let sizesAttr = '';
 let fallbackSrc = '';
 let imageMaxUrl = '';
 let preloadWidths: number[] = [];
-let primaryFormat = 'jpeg';
+let primaryFormat: ImageFormat = 'jpeg';
 
-if (hasData) {
-  basePath = `/${folderPath}${data.path}`;
-  defaultAspect = data.aspect;
+function pickLE(available: number[], target?: number): number | undefined {
+  if (!target) return undefined;
+  const asc = [...available].sort((a,b) => a-b);
+  for (let i = asc.length - 1; i >= 0; i--) {
+    if (asc[i] <= target) return asc[i];
+  }
+  return asc[0]; // if all are > target, use smallest to avoid upscaling in CSS
+}
 
+if (hasData && meta) {
+  defaultAspect = meta.aspect;
 
+  // format priority (webp > avif > png > jpeg/jpg)
   const formatPriority: Record<ImageFormat, number> = { webp: 1, avif: 2, png: 3, jpeg: 4, jpg: 4 };
-
-  const formats: ImageFormat[] = [...data.format].sort(
-    (a: keyof typeof formatPriority, b: keyof typeof formatPriority) =>
-      (formatPriority[a] ?? 99) - (formatPriority[b] ?? 99)
+  formats = [...meta.formats].sort(
+    (a, b) => (formatPriority[a as ImageFormat] ?? 99) - (formatPriority[b as ImageFormat] ?? 99)
   );
+  
+  const availableWidths: number[] = meta.sizes.map(Number).sort((a, b) => a - b);
 
-  const availableWidths: number[] = data.variants.map(Number).sort((a: number, b: number) => a - b);
+  const wMobile  = pickLE(availableWidths, variants.mobile)  ?? availableWidths[0];
+  const wTablet  = variants.tablet ? pickLE(availableWidths, Number(variants.tablet)) : undefined;
+  const wDesktop = pickLE(availableWidths, variants.desktop) ?? wTablet ?? wMobile;
+  const wFull    = pickLE(availableWidths, variants.full)    ?? wDesktop;
+  const wFeatured= pickLE(availableWidths, variants.featured)?? wFull;
+  const wThumb   = pickLE(availableWidths, variants.thumbnail)?? availableWidths[0];
 
+  primaryFormat = (formats[0] as ImageFormat) || 'jpeg';
 
-  const wMobile = availableWidths.find((w: number) => w >= variants.mobile) ?? availableWidths[0];
-  const wTablet = variants.tablet ? availableWidths.find((w: number) => w >= Number(variants.tablet)) : undefined;
-  const wDesktop = availableWidths.find((w: number) => w >= variants.desktop) ?? wTablet ?? wMobile;
-  const wFull = availableWidths.find((w: number) => w >= variants.full) ?? wDesktop;
-  const wFeatured = availableWidths.find((w: number) => w >= variants.featured) ?? wFull;
-  const wThumb = availableWidths.find((w: number) => w >= variants.thumbnail) ?? availableWidths[0];
+  // Build a path with leading slash, then map via URL helpers
+  const buildPath = (w: number, fmt: string) =>
+    `/${meta.path.replace(/^\/?/, '')}-w${w}-a${defaultAspect}.${fmt}`;
 
-  let primaryFormat: ImageFormat = formats[0];
+  const buildRelOrCdn = (w: number, fmt: string) =>
+    toRelativeUrl(buildPath(w, fmt)); // cdn:auto → CDN absolute if configured, else relative
 
-  const buildSrc = (w: number, fmt: string) => `${basePath}${imageBaseName}-w${w}-a${defaultAspect}.${fmt}`;
-
-  // --- Responsive sources
+  // --- Responsive sources (preserve your switch logic) ---
   switch (variant) {
-    case 'thumbnail':
-      fallbackSrc = buildSrc(wThumb, primaryFormat);
-      imageMaxUrl = toAbsoluteUrl(fallbackSrc);
-      srcSetList = `${buildSrc(wThumb, primaryFormat)} ${wThumb}w, ${buildSrc(wTablet ?? wDesktop, primaryFormat)} ${(wTablet ?? wDesktop)}w`;
-      sizesAttr = `(max-width: ${breakpoints.mobileMax}px) ${wThumb}px, ${(wTablet ?? wDesktop)}px`;
+    case 'thumbnail': {
+      fallbackSrc = buildRelOrCdn(wThumb, primaryFormat);
+
+      // Schema must use site-absolute (never CDN)
+      imageMaxUrl = toAbsoluteUrl(buildPath(wFull, primaryFormat), { cdn: false });
+
+      const bigW = (wTablet ?? wDesktop);
+      srcSetList = `${buildRelOrCdn(wThumb, primaryFormat)} ${wThumb}w, ${buildRelOrCdn(bigW, primaryFormat)} ${bigW}w`;
+      sizesAttr = `(max-width: ${breakpoints.mobileMax}px) ${wThumb}px, ${bigW}px`;
       preloadWidths = [wThumb];
       break;
+    }
 
     case 'mobile':
     case 'desktop':
     case 'featured':
     case 'auto':
-    default:
-      fallbackSrc = buildSrc(wMobile, primaryFormat);
-      imageMaxUrl = toAbsoluteUrl(buildSrc(wFull, primaryFormat));
+    default: {
+      fallbackSrc = buildRelOrCdn(wMobile, primaryFormat);
+
+      // Prefer constructUrl if provided → normalize to path → site-absolute for schema
+      const constructed = (constructUrl(meta, 'full', primaryFormat) as string | undefined);
+      const fullPath = constructed ? `/${constructed.replace(/^\/?/, '')}` : buildPath(wFull, primaryFormat);
+      imageMaxUrl = toAbsoluteUrl(fullPath, { cdn: false });
+
       const seenWidths = new Set<number>();
       srcSetList = [wMobile, wTablet, wDesktop, wFull]
         .filter((w): w is number => {
@@ -112,29 +142,20 @@ if (hasData) {
           seenWidths.add(w);
           return true;
         })
-        .map((w) => `${buildSrc(w, primaryFormat)} ${w}w`)
+        .map((w) => `${buildRelOrCdn(w, primaryFormat)} ${w}w`)
         .join(', ');
 
-      // --- Responsive sizes
+      // Responsive sizes (unchanged)
       const sizesList: string[] = [];
-
-      if (wMobile) {
-        sizesList.push(`(max-width: ${breakpoints.mobileMax}px) ${wMobile}px`);
-      }
-
-      if (wTablet) {
-        sizesList.push(`(max-width: ${breakpoints.tabletMax}px) ${wTablet}px`);
-      }
-
-      if (wDesktop) {
-        sizesList.push(`(max-width: ${breakpoints.fullMin - 1}px) ${wDesktop}px`);
-      }
-
+      if (wMobile)  sizesList.push(`(max-width: ${breakpoints.mobileMax}px) ${wMobile}px`);
+      if (wTablet)  sizesList.push(`(max-width: ${breakpoints.tabletMax}px) ${wTablet}px`);
+      if (wDesktop) sizesList.push(`(max-width: ${breakpoints.fullMin - 1}px) ${wDesktop}px`);
       sizesList.push(`${wFull}vw`);
       sizesAttr = sizesList.join(', ');
 
       preloadWidths = [wMobile, wFull, wTablet ?? wDesktop];
       break;
+    }
   }
 
   // Deduplicate preload widths
@@ -142,7 +163,7 @@ if (hasData) {
   const finalPreloadWidths = preloadWidths.filter(w => !seen.has(w) && seen.add(w));
 
   // Preload logic (always includes mobile and full)
-  if (loading === 'eager' || loading === 'delay') {
+  if (loading === 'eager' ) {
     const priority = loading === 'eager' ? 'high' : 'low';
     for (const w of finalPreloadWidths) {
       let media: string | undefined;
@@ -155,34 +176,24 @@ if (hasData) {
         const maxW = breakpoints.fullMin - 1;
         media = `(min-width: ${minW}px) and (max-width: ${maxW}px)`;
       }
-      registerPreloadImage({ src: buildSrc(w, primaryFormat), media, fetchPriority: priority });
+      // Preload using toRelativeUrl (CDN absolute if configured, else relative)
+      registerPreloadImage({
+        src: toRelativeUrl(buildPath(w, primaryFormat)),
+        media,
+        fetchPriority: priority
+      });
     }
   }
 
   if (addSchema) {
-    registerSchemaImage(imageMaxUrl);
+    registerSchemaImage(imageMaxUrl); // site-absolute, SEO-safe
   }
 
   aspectClass = `a-${defaultAspect}`;
 }
 ---
-{addSchema && hasData && (
-  <script is:inline type="application/ld+json" set:html={JSON.stringify({
-    '@context': 'https://schema.org',
-    '@type': 'ImageObject',
-    '@id': imageMaxUrl,
-    contentUrl: imageMaxUrl,
-    url: imageMaxUrl,
-    caption: caption || title || alt,
-    description: alt,
-    representativeOfPage: true,
-    width: width ?? 640,
-    height: height ?? Math.round((640 * Number(defaultAspect.split('x')[1])) / Number(defaultAspect.split('x')[0])),
-  })} />
-)}
-
 {!hasData ? (
-  <div class={`flex ai-center jc-center bg-primary-lighter ${aspectClass} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit ${className}`}>
+  <div class={`flex ai-center jc-center bg-primary-lighter br ${aspectClass} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit ${className}`}>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-full h-auto ${imageClassName} ${objectFitClass}`}>
       <rect width="400" height="225" fill="#00000000"></rect>
     </svg>
@@ -248,4 +259,21 @@ if (hasData) {
     </figure>
   )
 )}
-
+{addSchema && hasData && (
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'ImageObject',
+      '@id': imageMaxUrl,      // site absolute
+      contentUrl: imageMaxUrl, // site absolute
+      url: imageMaxUrl,        // site absolute
+      caption: caption || title || alt,
+      description: alt,
+      representativeOfPage: true,
+      width: width ?? 640,
+      height: height ?? Math.round((640 * Number((defaultAspect || '16x9').split('x')[1])) / Number((defaultAspect || '16x9').split('x')[0])),
+    })}
+  />
+)}

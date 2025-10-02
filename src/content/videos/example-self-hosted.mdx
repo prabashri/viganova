@@ -1,0 +1,147 @@
+---
+# ─────────────────────────────────────────────────────────────
+# Page basics (this page is the canonical watch page)
+# ─────────────────────────────────────────────────────────────
+title: "Self-Hosted Video Example: Complete Watch Page + Transcript"
+description: "Sample self-hosted video watch page using MP4 source, captions, chapters, and a full transcript embedded below."
+slug: "self-hosted-video-example"
+publishDate: "2025-04-22T14:00:00Z"
+updatedDate: "2025-05-10T10:00:00Z"
+image: "featured/easy-apostille-service.png"   # optional hero, separate from poster
+imageAlt: "Hero image for the self-hosted video example"
+imageTitle: "Self-Hosted Video Example"
+imageCaption: "A self-hosted video example showcasing various features."
+tags: ["video", "self-hosted", "mp4", "accessibility"]
+keywords: ["self hosted video", "mp4", "captions", "chapters", "transcript", "video seo"]
+categories: ["Guides"]
+featured: false
+draft: false
+index: true
+
+# ─────────────────────────────────────────────────────────────
+# Canonical video metadata (single source of truth)
+# ─────────────────────────────────────────────────────────────
+provider: "self"                                       # 'self' | 'youtube' | 'vimeo' | 'embed'
+watchPageUrl: "https://example.com/videos/self-hosted-video-example/"  # optional override
+
+# Sources / IDs
+contentUrl: "https://cdn.example.com/videos/self-hosted-video-example.mp4"
+
+# Core info
+uploadDate: "2025-04-20T09:00:00Z"
+durationSeconds: 615
+isLive: false
+isFamilyFriendly: true
+
+# Player/video dimensions (NOT thumbnails)
+videoWidth: 1920
+videoHeight: 1080
+aspectRatio: "16:9"     # if omitted, layout computes from videoWidth/videoHeight
+
+# Tracks & chapters
+captions:
+  - url: "https://cdn.example.com/captions/self-hosted-video-example.en.vtt"
+    lang: "en"
+    kind: "subtitles"
+    label: "English"
+    default: true
+  - url: "https://cdn.example.com/captions/self-hosted-video-example.es.vtt"
+    lang: "es"
+    kind: "subtitles"
+    label: "Español"
+
+# Link directly to the transcript section on this page
+transcriptUrl: "/videos/self-hosted-video-example/#transcript"
+
+chapters:
+  - name: "Welcome & Overview"
+    start: 0
+    end: 60
+    url: "/videos/self-hosted-video-example/?t=0"
+  - name: "File Formats & Hosting"
+    start: 60
+    end: 210
+    url: "/videos/self-hosted-video-example/?t=60"
+  - name: "Captions & Accessibility"
+    start: 210
+    end: 360
+    url: "/videos/self-hosted-video-example/?t=210"
+  - name: "Chapters & Deep Links"
+    start: 360
+    end: 510
+    url: "/videos/self-hosted-video-example/?t=360"
+  - name: "Publishing Checklist"
+    start: 510
+    end: 615
+    url: "/videos/self-hosted-video-example/?t=510"
+
+# FAQ shown on the same watch page
+faq:
+  - question: "Can I host MP4 and still use captions and chapters?"
+    answer: "Yes. Provide a `contentUrl` for the MP4, `captions` tracks in .vtt, and a `chapters` array. The layout renders tracks and deep links."
+    speakable: true
+  - question: "Is a transcript necessary if I already have captions?"
+    answer: "Captions help during playback; a full transcript improves accessibility, search, and lets users scan or quote the content."
+    speakable: false
+
+# Access / regions
+requiresSubscription: false
+regionsAllowed: [] #"US", "CA", "GB", "AU"
+
+# Cross-links (optional for self-hosted)
+platform: {}
+sameAs: []
+relatedArticles:
+  - "/blog/self-hosting-video-best-practices/"
+  - "/blog/add-captions-and-transcripts/"
+---
+
+> **Note:** This file is named `_example-self-hosted.mdx` so it’s hidden by your list/route filters.
+> Copy it, rename without the leading `_`, and adjust URLs to your CDN/site.
+
+## Overview
+
+This page demonstrates a **self-hosted** video using `contentUrl` (MP4), optional captions, chapters with deep links, and a complete transcript below.
+
+---
+
+## Resources
+
+- **MP4 Source:** `contentUrl`
+- **Captions:** WebVTT files linked in frontmatter
+- **Chapters:** Rendered in the sidebar; links jump using `?t=seconds`
+- **Transcript:** Embedded below for searchability and accessibility
+
+---
+
+## Transcript <a id="transcript"></a>
+
+> Tip: Your `transcriptUrl` in frontmatter points to this section (`/videos/self-hosted-video-example/#transcript`).
+
+**[00:00] Host:** Welcome! In this video we'll walk through hosting your own MP4, adding captions and chapters, and publishing a watch page that’s optimized for SEO and accessibility.
+
+**[00:18] Host:** First, the **file format**. MP4 with H.264/AAC is widely compatible. Store it on a CDN and expose a stable HTTPS `contentUrl`. If you can, enable range requests and good caching headers.
+
+**[00:42] Host:** For **poster art**, include a `poster` image and, optionally, multiple `thumbnails`. The layout will use `poster` for social previews and can use `thumbnails` in UI components.
+
+**[01:03] Host:** Next up: **captions**. Provide WebVTT tracks in the `captions` array. Each track takes a `url`, `lang`, optional `label`, and `default`. This enables accessible playback and improves engagement.
+
+**[01:28] Host:** **Chapters** help viewers jump to the exact section they need. Add a `chapters` array with `name`, `start` (seconds), and optional `end`/`url`. The layout renders deep links like `?t=210`.
+
+**[01:55] Host:** For **dimensions**, set `videoWidth` and `videoHeight`. If you leave `aspectRatio` empty, the layout can compute `16:9` or another ratio based on those dimensions.
+
+**[02:16] Host:** The **watch page** should be canonical for the video. That's why we use `watchPageUrl` and set the `VideoObject` as `mainEntity` via `HeadProps.video.isMainEntity = true` in the layout.
+
+**[02:38] Host:** Include an **FAQ** section in the same page if you can. Short Q&A entries can be output as structured data to answer common queries directly in search.
+
+**[03:00] Host:** Before publishing, test **load time** and **buffering**. A global CDN, proper caching, and compressed poster images make a big difference. If bandwidth spikes are a concern, consider adding HLS later.
+
+**[03:22] Host:** That's it! You now have a self-hosted video watch page with captions, chapters, and a complete transcript. Happy publishing.
+
+---
+
+### Download Links
+
+- Poster (1280x720): `/images/videos/self-hosted/poster.jpg`  
+- Captions (EN): `https://cdn.example.com/captions/self-hosted-video-example.en.vtt`  
+- Captions (ES): `https://cdn.example.com/captions/self-hosted-video-example.es.vtt`

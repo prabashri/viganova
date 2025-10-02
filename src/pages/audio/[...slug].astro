@@ -1,0 +1,63 @@
+---
+// src/pages/audio/[...slug].astro
+import { getEntry, getCollection, render } from 'astro:content';
+import AudioPostLayout from '@/layouts/audioPostLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+
+import type { CollectionEntry } from 'astro:content';
+
+// Params: for [...slug], Astro.params.slug can be string | string[]
+const raw = Astro.params.slug;
+const parts = Array.isArray(raw) ? raw : [raw].filter(Boolean);
+const slug = parts.join('/');
+
+// Hide entries where ANY segment starts with "_"
+const isHiddenPath = (s?: string) =>
+  !!s && s.split('/').some(seg => seg.startsWith('_'));
+
+// Collection base (e.g., "audio/")
+const base = siteDefaults.collections['audio']?.base ?? 'audio';
+const collectionBase = base ? `${base}/` : '';
+
+/* Validate slug (exclude "_" segments) */
+if (!slug || typeof slug !== 'string' || isHiddenPath(slug)) {
+  throw Astro.redirect('/404');
+}
+
+/* Fetch entry */
+let audioDoc: CollectionEntry<'audio'>;
+try {
+  const entry = await getEntry('audio', slug);
+  if (!entry) throw Astro.redirect('/404');
+  audioDoc = entry;
+} catch {
+  throw Astro.redirect('/404');
+}
+
+/* Exclude drafts & hidden slugs/ids */
+if (
+  audioDoc.data?.draft === true ||
+  isHiddenPath(audioDoc.data?.slug) ||
+  isHiddenPath(audioDoc.id)
+) {
+  throw Astro.redirect('/404');
+}
+
+/* Optional markdown body for the listen page */
+const { Content } = await render(audioDoc);
+
+/* Build prev/next pool (exclude drafts + hidden) */
+const allAudio = await getCollection('audio');
+const sortedItems = allAudio
+  .filter((v) => !v.data?.draft && !isHiddenPath(v.data?.slug) && !isHiddenPath(v.id))
+  .sort((a, b) =>
+    new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime()
+  );
+---
+
+<AudioPostLayout
+  doc={audioDoc}
+  allItems={sortedItems}
+>
+  <Content />
+</AudioPostLayout>

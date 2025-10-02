@@ -6,10 +6,16 @@ import { siteDefaults } from '../config/siteDefaults';
 interface Props {
   id?: string;
   className?: string;
+  itemClass?: string;
   iconSize?: string;
 }
 
-const { id = 'social-links', className = '', iconSize = 'w-1-5 h-1-5' } = Astro.props;
+const { 
+  id = 'social-links', 
+  className = '', 
+  itemClass = '', 
+  iconSize = 'w-1-5 h-1-5' 
+} = Astro.props;
 
 const links = siteDefaults.socialLinks;
 
@@ -23,10 +29,8 @@ function getHref(key: string, value: string): string {
   return `https://${value}`;
 }
 
-const baseClass = 'social-links flex gap-05 mi-0 ai-center';
-const combinedClass = `${baseClass} ${className}`.trim();
 ---
-<nav aria-label="Social media links" id={id} class="social-media-links flex wrap gap-05">
+<nav aria-label="Social media links" id={id} class={`social-media-links flex wrap gap-05 mi-0 ai-center ${className}`}>
   {Object.entries(links).map(([key, value]) => {
     if (!value) return null;
 
@@ -40,7 +44,7 @@ const combinedClass = `${baseClass} ${className}`.trim();
         rel="noopener noreferrer"
         aria-label={label}
         title={label}
-        class="icon-link flex ai-center jc-center p-02 br lh-0 focus-visible"
+        class={`icon-link flex ai-center jc-center p-02 br lh-0 focus-visible bg-primary-lighter-x ${itemClass}`}
       >
         <Icon name={key} class={iconSize} />
         <span class="sr-only">{label}</span>

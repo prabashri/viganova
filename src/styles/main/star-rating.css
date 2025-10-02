@@ -1,0 +1,33 @@
+/* /css/stars.css */
+.stars{
+  --size: 20px;
+  --count: 5;
+  --filled: #ffc107;   /* gold */
+  --empty:  #9aa0a6;   /* gray */
+
+  display:inline-block;
+  width: calc(var(--count) * var(--size));
+  height: var(--size);
+
+  background:
+    linear-gradient(90deg, var(--filled) var(--pct,0%), transparent 0) left / 100% 100% no-repeat,
+    var(--empty);
+
+  -webkit-mask: url("/icons/star.svg") repeat left / var(--size) var(--size);
+          mask: url("/icons/star.svg") repeat left / var(--size) var(--size);
+}
+
+.stars--00 { --pct:   0%; }
+.stars--05 { --pct:  10%; }
+.stars--10 { --pct:  20%; }
+.stars--15 { --pct:  30%; }
+.stars--20 { --pct:  40%; }
+.stars--25 { --pct:  50%; }
+.stars--30 { --pct:  60%; }
+.stars--35 { --pct:  70%; }
+.stars--40 { --pct:  80%; }
+.stars--45 { --pct:  90%; }
+.stars--50 { --pct: 100%; }
+
+.stars__value{ font-weight:500; margin-left:.4rem; }
+[data-theme="dark"] .stars { --empty:#6b7280; }

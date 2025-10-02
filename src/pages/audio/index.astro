@@ -1,0 +1,128 @@
+---
+// src/pages/audio/index.astro
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import type { CardProps } from '@/types/CardProps';
+import { getCollection } from 'astro:content';
+
+// =========================
+// 🔹 Constants
+// =========================
+const entry = 'audio'; // collection id
+const entryConfig = siteDefaults.collections[entry];
+const basePath = entryConfig?.base ? `/${entryConfig.base}` : ``;
+
+// hide files/entries that start with "_" (e.g., "_example")
+const isHiddenId = (id: string) => id.startsWith('_');
+const isHiddenSlug = (slug?: string) => !!slug && slug.startsWith('_');
+
+// =========================
+// 🔹 Get audio items (listen pages)
+// =========================
+const items = (await getCollection(entry))
+  .filter(a =>
+    !isHiddenId(a.id) &&
+    !isHiddenSlug(a.data?.slug) &&
+    a.data?.draft !== true
+  )
+  .sort(
+    (a, b) =>
+      new Date(b.data.publishDate).valueOf() - new Date(a.data.publishDate).valueOf()
+  );
+
+// =========================
+// 🔹 Helpers
+// =========================
+function formatDuration(totalSeconds?: number): string {
+  if (!totalSeconds || totalSeconds <= 0) return '';
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = Math.floor(totalSeconds % 60);
+  if (h > 0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+// =========================
+// 🔹 SEO
+// =========================
+const headProps: HeadProps = {
+  title: `All Audio | ${siteDefaults.siteName}`,
+  description: `Browse all audio from ${siteDefaults.siteName}: episodes, interviews, and explainers.`,
+  image: siteImages.image,
+  canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
+  index: true,
+  keywords: items.map(a => a.data.title),
+  type: 'collection',
+  url: `${siteDefaults.siteUrl}${basePath}/`,
+  authors: []
+};
+
+// =========================
+ // 🔹 Map audio to CardProps
+// =========================
+function mapToCardProps(a: any, index: number): CardProps {
+  const slug = a.data.slug ?? a.id;
+  const link = `${basePath}/${slug}/`;
+
+  // pick a representative image (prefer cover/poster → hero → first thumbnail → site default)
+  const thumb = (a.data.thumbnails && a.data.thumbnails[0]) || null;
+  const image =
+    a.data.cover ??
+    a.data.poster ??
+    a.data.image ??
+    (thumb ? thumb.url : '') ??
+    siteImages.image;
+
+  const imageAlt =
+    a.data.coverAlt ??
+    a.data.posterAlt ??
+    (thumb && thumb.alt) ??
+    a.data.title;
+
+  const date = a.data.publishDate
+    ? new Date(a.data.publishDate).toLocaleDateString()
+    : '';
+
+  const dur = formatDuration(a.data.durationSeconds ?? a.data.duration);
+  const afterDescription = [date, dur ? `⏱ ${dur}` : ''].filter(Boolean).join(' • ');
+
+  return {
+    link,
+    linkAriaLabel: `Listen to: ${a.data.title}`,
+    image,
+    imageAlt,
+    title: a.data.title,
+    description: a.data.description ?? '',
+    afterDescription,
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy'
+  };
+}
+
+const audioCards: CardProps[] = items.map((a, i) => mapToCardProps(a, i));
+---
+
+<BaseLayout headProps={headProps}>
+  <HeroCollections
+    title="All Audio"
+    description={`Browse all audio from ${siteDefaults.siteName}: episodes, interviews, and explainers.`}
+    bgColorClass="bg-secondary-base"
+    textColorClass="col-base-00"
+    image={siteImages.image}
+    imageAlt="Audio Hero Image"
+    imageLoading="delay"
+  />
+
+  {audioCards.length > 0 && (
+    <section class="mx-w-site mi-auto mb-2 pb-2">
+      <CardCollections cards={audioCards} wrapper="ul" roleType="list" entry={entry} />
+    </section>
+  )}
+</BaseLayout>

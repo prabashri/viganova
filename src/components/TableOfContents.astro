@@ -27,26 +27,24 @@ const {
 const allowedLevels = depth === 'h2' ? [2] : [2, 3];
 ---
 
-{toc.length > 0 && (
-    <aside id="table-of-contents" class={`w-full p-05 ${props.className}`}>
-      <details id="toc-details" class="toc-details block lg:[open]" open>
-        <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
-          <h2 class="text-base bold no-margin">{heading}</h2>      
-          <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
-        </summary>
-        <nav id="toc-nav" class="toc-nav text-s p-02 overflow-y-auto mx-h-80vh">
-            <ul id="toc-list" class="toc-list text-s no-bullets">
-                {props.toc
-                    .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
-                    .map(item => (
-                    <li class={item.level === 3 ? 'ml-4' : 'ml-0'}>
-                        <a class="block no-bb pi-05 pb-02" href={`#${item.id}`}>{item.text}</a>
-                    </li>
-                ))}
-            </ul>
-        </nav>
-      </details>
-    </aside>
+{toc.length > 0 && (    
+    <details id="toc-details" class={`toc-details ${props.className} block lg:[open]`} open>
+      <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
+        <h2 class="text-base bold no-margin">{heading}</h2>      
+        <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
+      </summary>
+      <nav id="toc-nav" class="toc-nav text-s p-02 overflow-y-auto mx-h-80vh">
+          <ul id="toc-list" class="toc-list text-s no-bullets">
+              {props.toc
+                  .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
+                  .map(item => (
+                  <li class={item.level === 3 ? 'ml-4' : 'ml-0'}>
+                      <a class="block no-bb pi-05 pb-02" href={`#${item.id}`}>{item.text}</a>
+                  </li>
+              ))}
+          </ul>
+      </nav>
+    </details>    
 )}
 
 

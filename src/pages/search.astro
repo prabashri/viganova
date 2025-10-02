@@ -1,76 +1,57 @@
 ---
 // src/pages/search.astro
-// export const prerender = true;
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { HeadProps } from '@/types/HeadProps';
 
-import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import SearchContent from '@/content/pages/Search.astro';
 
-const pageSeo = {
-  title: 'Search Results | nViewsWEB Astro Theme',
-  description: 'Find content in the website using the search functionality.',
-  authors: [],
+const cfg = siteDefaults.pages.search ?? {
+  title: 'Search',
+  description: `Find articles, guides, and resources.`,
+  enabled: true,
+  index: false,
+  sitemap: false,
+  path: '/search/'
 };
 
+// SSR redirect if the page is disabled
+if (!cfg.enabled) {
+  return Astro.redirect('/', 307);
+}
 
-// Get query from URL
+// Canonical path (route file stays here)
+const PATH = cfg.path ?? '/search/';
+
+// Query from URL
 const url = new URL(Astro.request.url);
-const query = url.searchParams.get('q')?.toLowerCase() ?? '';
+const q = url.searchParams.get('q')?.toLowerCase() ?? '';
 
-
+const pageSeo: HeadProps = {
+  title: cfg.title,
+  description: cfg.description,
+  image: '',
+  type: 'search',
+  url: `${siteDefaults.siteUrl}${PATH}`,
+  canonicalUrl: `${siteDefaults.siteUrl}${PATH}`,
+  siteName: siteDefaults.siteName,
+  authors: [],
+  index: cfg.index ?? false,
+  keywords: [...siteDefaults.keywords, 'Search'],
+  showBreadcrumb: false
+};
 ---
-<BaseLayout headProps={pageSeo} >
-  <Fragment slot="headContent-top"></Fragment>  
-  <Fragment slot="headContent-bottom"></Fragment>
-      <h1 class="cc-h3">
-        {query ? `Search Results for: "${query}"` : 'Search ...'}
-      </h1>
-            
-      <style>
-        .search-box { margin-bottom: 1rem; }
-        .search-input {
-          width: 100%;
-          padding: 0.5rem;
-          font-size: 1rem;
-        }
-        .search-results li {
-          margin: 0.5rem 0;
-          border-bottom: 1px solid #ddd;
-          padding-bottom: 0.5rem;
-        }
-        mark {
-        background-color: #ffeb3b;
-        color: inherit;
-        padding: 0 2px;
-      }
-      .search-results {
-        list-style: none;
-        padding: 0;
-      }
-      .search-results h3 {
-        margin-top: 1rem;
-        font-size: 1.1rem;
-      }
 
-      </style>
+<BaseLayout headProps={pageSeo}>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
 
-      <div id="search" class="search-box">
-        <input
-          type="search"
-          id="search-input"
-          class="search-input"
-          placeholder="Search articles, pages…"
-          value=""
-          autocomplete="off"
-        />
-        <ul id="search-results"></ul>
-      </div>
-      <!-- Load Fuse globally -->
+  <SearchContent
+    title={cfg.title}
+    description={cfg.description}
+    query={q}
+    indexPath={siteDefaults.searchIndexPath}
+  />
 
-
-
-
-
-
-
-
-  <Fragment slot="extraScripts"></Fragment>
+  <Fragment slot="extraScripts" />
 </BaseLayout>

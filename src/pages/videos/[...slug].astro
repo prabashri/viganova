@@ -1,0 +1,53 @@
+---
+// src/pages/videos/[slug].astro
+import { getEntry, getCollection, render } from 'astro:content';
+import VideoPostLayout from '@/layouts/VideoPostLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+
+import type { CollectionEntry } from 'astro:content';
+
+const { slug } = Astro.params;
+
+// helper: hide slugs that start with "_" (e.g., "_example", "_draft", etc.)
+const isHiddenSlug = (s?: string) => !!s && s.startsWith('_');
+
+// Collection base (e.g., "videos/")
+const base = siteDefaults.collections['videos']?.base ?? 'videos';
+const collectionBase = base ? `${base}/` : '';
+
+/* Validate slug (exclude "_" & "_example..." etc.) */
+if (!slug || typeof slug !== 'string' || isHiddenSlug(slug)) {
+  throw Astro.redirect('/404');
+}
+
+/* Fetch entry */
+let videoDoc: CollectionEntry<'videos'>;
+try {
+  const entry = await getEntry('videos', slug);
+  if (!entry) throw Astro.redirect('/404');
+  videoDoc = entry;
+} catch {
+  throw Astro.redirect('/404');
+}
+
+/* Exclude drafts & hidden */
+if (videoDoc.data?.draft === true || isHiddenSlug(videoDoc.data?.slug) || isHiddenSlug(videoDoc.id)) {
+  throw Astro.redirect('/404');
+}
+
+/* Optional markdown body for the watch page */
+const { Content } = await render(videoDoc);
+
+/* Build prev/next pool (exclude drafts + hidden) */
+const allVideos = await getCollection('videos');
+const sortedVideos = allVideos
+  .filter((v) => !v.data.draft && !isHiddenSlug(v.data?.slug) && !isHiddenSlug(v.data?.slug))
+  .sort((a, b) => new Date(a.data.publishDate).getTime() - new Date(b.data.publishDate).getTime());
+---
+
+<VideoPostLayout
+  doc={videoDoc}
+  allVideos={sortedVideos}
+>
+  <Content />
+</VideoPostLayout>

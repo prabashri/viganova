@@ -1,0 +1,409 @@
+---
+/* src/components/schema/Schema.astro */
+import { siteDefaults } from '@/config/siteDefaults';
+import type { HeadProps } from '@/types/HeadProps';
+import { getImage } from '@/utils/getImage.ts';
+import { parseImageDims } from '@/utils/imageHelpers';
+
+import { buildOrganizationSchema } from "@/utils/schemaOrganization";
+import { buildWebsiteSchema } from "@/utils/schemaWebsite";
+
+// URL helpers
+import { toAbsoluteUrl, idFor } from '@/utils/urls';
+import SchemaLocalBusiness from './SchemaLocalBusiness.astro';
+
+/** 1) Organization / Website */
+const { node: organizationNode, orgId, brandNode, parentNode } = buildOrganizationSchema();
+const { node: websiteNode, websiteId } = buildWebsiteSchema();
+
+/** 2) Props (keeps listItems in signature but they are ignored for schema) */
+const props = Astro.props as HeadProps & {
+  videoWatchPageUrl?: string;
+  videoContentUrl?: string;
+  audioListenPageUrl?: string;
+  audioContentUrl?: string;
+  listItemType?: 'Service' | 'Article' | 'Product' | 'CreativeWork'; // not used in schema now
+};
+const {
+  title,
+  description,
+  image,
+  imageAlt,
+  imageWidth,
+  imageHeight,
+  type,
+  url,
+
+  authors: incomingAuthors = [],
+  publishedAt,
+  updatedAt,
+
+  faq = [],
+  // The next two are intentionally ignored for schema on collection/list pages
+  listItems = [],
+  listItemType,
+
+  // minimal media
+  videoWatchPageUrl,
+  videoContentUrl,
+  audioListenPageUrl,
+  audioContentUrl,
+
+  serviceOffers = [],
+} = props;
+
+/** 3) Helpers & IDs */
+const pageUrl   = toAbsoluteUrl(url || '/');
+const webPageId = idFor('webpage', pageUrl);
+const articleId = idFor('article', pageUrl);
+const faqId     = idFor('faq', pageUrl);
+
+const isServicePage = type === 'service' || type === 'product';
+const isArticleLike = (type === 'article' || type === 'service'); // treat service like article
+
+// Media targets (absolute) and stable ids
+const videoWatchAbs = videoWatchPageUrl ? toAbsoluteUrl(videoWatchPageUrl) : undefined;
+const audioListenAbs = audioListenPageUrl ? toAbsoluteUrl(audioListenPageUrl) : undefined;
+const videoId  = idFor('video',  videoWatchAbs || pageUrl);
+const audioId  = idFor('audio',  audioListenAbs || pageUrl);
+
+/** 4) Hero image */
+function toImageObject(abs?: string, alt?: string) {
+   if (!abs) return undefined;
+   const dims = parseImageDims(abs);
+   return {
+     '@type': 'ImageObject',
+     url: abs,
+     ...(dims?.width  ? { width:  dims.width }  : {}),
+     ...(dims?.height ? { height: dims.height } : {}),
+     ...(alt ? { caption: alt } : {})
+   };
+ }
+
+let heroAbs  = image ? toAbsoluteUrl(image) : undefined;
+ let heroObj  = heroAbs ? toImageObject(heroAbs, imageAlt) : undefined;
+ // On profile pages, if no head image was provided, fall back to the author's 4:3 profileImage
+ // (keeps 1:1 avatar exclusively for Person schema)
+ if (!heroObj && (Astro.props?.type === 'person')) {
+   const first = (Array.isArray(incomingAuthors) ? incomingAuthors[0] : undefined) as MiniAuthor | undefined;
+   const d = first?.data || {};
+   const profileKey = d.profileImage;
+   const profileAbs = profileKey ? toAbsoluteUrl(getImage(profileKey) || profileKey) : undefined;
+   heroObj = toImageObject(profileAbs, d.profileImageAlt || d.profileImageTitle || d.profileImageCaption);
+
+  // NEW: If there's no 4:3 profile image, fall back to the 1:1 avatar.
+  if (!heroObj) {
+    const avatarKey = d.image; // expected 1:1
+    const avatarAbs = avatarKey ? toAbsoluteUrl(getImage(avatarKey) || avatarKey) : undefined;
+    heroObj = toImageObject(avatarAbs, d.imageAlt);
+  }
+  // IMPORTANT: no further fallback (do NOT use any site/global image here)
+ }
+
+
+/** 5) Fallback authors from siteDefaults */
+type MiniAuthor = { name: string; url?: string; data?: Record<string, any> };
+function authorFromDefaults(p?: any): MiniAuthor | undefined {
+  if (!p?.name) return undefined;
+  return {
+    name: p.name,
+    url: p.url || siteDefaults.siteUrl,
+    data: {
+      internalId: p.internalId,
+      slug: p.slug,
+      prefix: p.prefix || p.addressing,
+      role: p.jobTitle,
+      highestDegree: p.highestDegree,
+      affiliation: p.affiliation,
+      expertise: p.expertise,
+      awards: p.awards,
+       // Avatar (1:1) must ONLY come from person avatar, never from profile/cover.
+      image: p.image,
+      // Keep profile fields separate for the WebPage image logic:
+      profileImage: p.profileImage,
+      profileImageAlt: p.profileImageAlt,
+      profileImageTitle: p.profileImageTitle,
+      profileImageCaption: p.profileImageCaption,
+      social: p.social,
+      email: p.email ?? p.contact?.email
+    }
+  };
+}
+function fallbackAuthorsFromSite(): MiniAuthor[] {
+  const s = siteDefaults as any;
+  const chain: (MiniAuthor | undefined)[] = [
+    authorFromDefaults(s.incharge),
+    authorFromDefaults(s.founder),
+    authorFromDefaults(s.parentOrganization?.incharge),
+    authorFromDefaults(s.parentOrganization?.founder),
+  ];
+  return chain.filter(Boolean) as MiniAuthor[];
+}
+
+/** 6) Decide effective authors based on page type */
+const isPerson  = type === 'person';
+const isArticle = type === 'article';
+const isWatch   = type === 'watch' || type === 'video' || type === 'watchpage';
+const isListen  = type === 'listen' || type === 'audio' || type === 'listenpage';
+
+let effectiveAuthors: MiniAuthor[] = [];
+if ( isPerson || isArticleLike ) {
+  effectiveAuthors = (Array.isArray(incomingAuthors) && incomingAuthors.length)
+     ? (incomingAuthors as MiniAuthor[])
+     : fallbackAuthorsFromSite();
+} else {
+  const f = fallbackAuthorsFromSite();
+  effectiveAuthors = f.length ? [f[0]] : [];
+}
+
+/** 7) Inline Person schema builder */
+function sameAsFromSocial(social?: Record<string, string | undefined>) {
+  if (!social) return undefined;
+  const vals = Object.values(social).filter(Boolean) as string[];
+  return vals.length ? vals : undefined;
+}
+
+function personUrlFromAuthor(a: MiniAuthor): string {
+  const d = a.data || {};
+  const fallback =
+    d?.slug ? `/team/${d.slug}/` :
+    d?.internalId ? (d.internalId.startsWith('/') ? d.internalId : `/${d.internalId}`) :
+    '/';
+  return toAbsoluteUrl(a.url || fallback);
+}
+// Map "highestDegree" → EducationalOccupationalCredential
+function degreeToCredential(deg?: string) {
+  if (!deg) return undefined;
+  const d = String(deg);
+  const lc = d.toLowerCase();
+  let educationalLevel: string | undefined;
+  if (/ph\.?d|doctor/i.test(lc)) educationalLevel = "Doctoral";
+  else if (/master|m\.?s|m\.?sc|m\.?tech/i.test(lc)) educationalLevel = "Masters";
+  else if (/bachelor|b\.?e|b\.?tech|b\.?sc/i.test(lc)) educationalLevel = "Bachelors";
+
+  return {
+    "@type": "EducationalOccupationalCredential",
+    name: d,
+    credentialCategory: "degree",
+    ...(educationalLevel ? { educationalLevel } : {})
+  };
+}
+
+function buildPersonNode(a: MiniAuthor): { node: any, ref: { '@id': string } } {
+  const d = a.data || {};
+  const absUrl = personUrlFromAuthor(a);
+  const personId = idFor('person', absUrl);
+  const sameAsSocial = sameAsFromSocial(d.social) || [];
+  const sameAs = [...sameAsSocial, ...(d.website ? [String(d.website)] : [])];
+
+  // pick 1:1 avatar for Person
+  const avatarKey = d.image;              // expected 1:1
+  const avatarAbs = avatarKey ? toAbsoluteUrl(getImage(avatarKey) || avatarKey) : undefined;
+  const avatarObj = toImageObject(avatarAbs, d.imageAlt);
+
+  const node: any = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': personId,
+    name: (d.prefix ? `${d.prefix} ${a.name}` : a.name) || a.name,
+    url: absUrl,
+    ...(orgId ? { worksFor: { '@id': orgId } } : {}),
+    ...(d.role ? { jobTitle: d.role } : {}),
+    ...(d.prefix ? { honorificPrefix: d.prefix } : {}),
+    ...(d.affiliation ? { affiliation: d.affiliation } : {}),
+    ...(degreeToCredential(d.highestDegree) ? { hasCredential: [degreeToCredential(d.highestDegree)!] } : {}),
+    ...(Array.isArray(d.expertise) && d.expertise.length ? { knowsAbout: d.expertise } : {}),
+    ...(Array.isArray(d.awards) && d.awards.length ? { award: d.awards } : {}),
+    ...(sameAs.length ? { sameAs } : {}),
+    ...(d.hasOccupation
+       ? { hasOccupation: d.hasOccupation }
+        : (d.role ? { hasOccupation: { '@type': 'Occupation', name: d.role } } : {})),
+  };
+  // attach 1:1 avatar (and thumbnailUrl for Google’s older consumers)
+  if (avatarObj) {
+    node.image = avatarObj;
+    // node.thumbnailUrl = avatarObj.url;
+  }
+  return { node, ref: { '@id': personId } };
+}
+
+// Build person nodes/refs
+const personNodes: any[] = [];
+const authorRefs: Array<{ '@id': string }> = [];
+for (const a of effectiveAuthors) {
+  const { node, ref } = buildPersonNode(a);
+  personNodes.push(node);
+  authorRefs.push(ref);
+}
+
+/** 8) WebPage type mapping — collection & list now both WebPage */
+function webPageTypeFor(t?: HeadProps['type']) {
+  if (isPerson) return 'ProfilePage';
+  switch (t) {
+    case 'about':          return 'AboutPage';
+    case 'contact':        return 'ContactPage';
+    case 'collection':     return 'WebPage';           // ← changed
+    case 'list':           return 'WebPage';           // ← changed
+    case 'faq':            return 'FAQPage';
+    case 'search':         return 'SearchResultsPage';
+    case 'item':           return 'ItemPage';
+    case 'qa':             return 'QAPage';
+    case 'medical':        return 'MedicalWebPage';
+    case 'profile':        return 'ProfilePage';
+    case 'watch':
+    case 'video':
+    case 'watchpage':
+    case 'listen':
+    case 'audio':
+    case 'listenpage':     return 'WebPage';
+    case 'article':        return 'WebPage';
+    case 'service':        return 'WebPage';
+    default:               return 'WebPage';
+  }
+}
+const webPageType = webPageTypeFor(type);
+
+/** 9) Authors & accountable person */
+let webAuthorProp: any = undefined;
+let accountablePersonRef: any = undefined;
+
+if (isPerson) {
+  webAuthorProp = { '@id': orgId };
+  if (authorRefs?.length) accountablePersonRef = authorRefs[0];
+} else if (isArticleLike) {
+  webAuthorProp = (authorRefs?.length ? (authorRefs.length === 1 ? authorRefs[0] : authorRefs) : { '@id': orgId });
+} else {
+  webAuthorProp = { '@id': orgId };
+  if (authorRefs?.length) accountablePersonRef = authorRefs[0];
+}
+
+/** 10) Main entity & hasPart */
+let mainEntityId: string | undefined;
+const hasPart: Array<{ '@id': string }> = [];
+const samePage = (a?: string) => a && a.replace(/#.*$/, '') === pageUrl.replace(/#.*$/, '');
+
+if (isPerson && authorRefs?.length) {
+  mainEntityId = (authorRefs[0] as any)['@id'];
+}
+if (isArticleLike) mainEntityId = articleId;
+if (isWatch)   mainEntityId = videoId;
+if (isListen)  mainEntityId = audioId;
+// NOTE: no ItemList/CollectionPage main entity anymore
+
+// Attach media when their watch/listen URL points here
+if (!isWatch && videoWatchAbs && samePage(videoWatchAbs)) hasPart.push({ '@id': videoId });
+if (!isListen && audioListenAbs && samePage(audioListenAbs)) hasPart.push({ '@id': audioId });
+
+/** 11) WebPage node */
+const webpageSchema: any = {
+  '@context': 'https://schema.org',
+  '@type': webPageType,
+  '@id': webPageId,
+  url: pageUrl,
+  name: title || siteDefaults.title,
+  description: description || siteDefaults.description,
+  isPartOf: { '@id': websiteId },
+  ...(type !== '404' ? { publisher: { '@id': orgId } } : {}),
+  ...(webAuthorProp ? { author: webAuthorProp } : {}),
+  ...(accountablePersonRef ? { accountablePerson: accountablePersonRef } : {}),
+  ...(heroObj ? { image: heroObj, primaryImageOfPage: heroObj } : {}),
+  ...(hasPart.length ? { hasPart } : {}),
+  ...(mainEntityId ? { mainEntity: { '@id': mainEntityId } } : {}),
+};
+
+/** 12) Page Entities + Media attachments */
+const extraNodes: any[] = [];
+
+// Article entity (attach media via associatedMedia if provided)
+if (isArticleLike) {
+  const associated: Array<{ '@id': string }> = [];
+  if (videoWatchAbs) associated.push({ '@id': videoId });
+  if (audioListenAbs) associated.push({ '@id': audioId });
+
+  extraNodes.push({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    '@id': articleId,
+    headline: title || siteDefaults.title,
+    description: description || siteDefaults.description,
+    url: pageUrl,
+    ...(heroObj ? { image: [heroObj] } : {}),
+    datePublished: publishedAt || siteDefaults.publishedDate,
+    dateModified: updatedAt   || publishedAt || siteDefaults.publishedDate,
+    author: (authorRefs?.length ? (authorRefs.length === 1 ? authorRefs[0] : authorRefs) : { '@id': orgId }),
+    publisher: { '@id': orgId },
+    mainEntityOfPage: pageUrl,
+    articleSection: 'Service',
+    ...(associated.length ? { associatedMedia: associated } : {}),
+  });
+}
+
+// Minimal media nodes (attach to WebSite via isPartOf)
+if (!isWatch && videoWatchAbs) {
+  extraNodes.push({
+    '@context': 'https://schema.org',
+    '@type': 'VideoObject',
+    '@id': videoId,
+    url: videoId,
+    ...(videoContentUrl ? { contentUrl: videoContentUrl } : {}),
+    isPartOf: { '@id': websiteId },
+    publisher: { '@id': orgId }
+  });
+}
+if (!isListen && audioListenAbs) {
+  extraNodes.push({
+    '@context': 'https://schema.org',
+    '@type': 'AudioObject',
+    '@id': audioId,
+    url: audioId,
+    ...(audioContentUrl ? { contentUrl: audioContentUrl } : {}),
+    isPartOf: { '@id': websiteId },
+    publisher: { '@id': orgId }
+  });
+}
+
+// FAQPage entity (unchanged)
+if (type === 'faq' && Array.isArray(faq) && faq.length) {
+  extraNodes.push({
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': faqId,
+    mainEntity: faq.map((q: { question: string; answer: string }) => ({
+      '@type': 'Question',
+      name: q.question,
+      acceptedAnswer: { '@type': 'Answer', text: q.answer }
+    }))
+  });
+}
+---
+
+{/* Organization / Brand / Parent */}
+<script id="organization-schema" type="application/ld+json" set:html={JSON.stringify(organizationNode)}></script>
+{brandNode && <script id="brand-schema" type="application/ld+json" set:html={JSON.stringify(brandNode)}></script>}
+{parentNode && <script id="parent-org-schema" type="application/ld+json" set:html={JSON.stringify(parentNode)}></script>}
+
+{/* WebSite */}
+<script id="website-schema" type="application/ld+json" set:html={JSON.stringify(websiteNode)}></script>
+
+{/* WebPage */}
+<script id="webpage-schema" type="application/ld+json" set:html={JSON.stringify(webpageSchema)}></script>
+
+{/* Page entities (Article/FAQ/Media attachments) */}
+{extraNodes.map((n, i) => (
+  <script type="application/ld+json" id={`entity-${i}`} set:html={JSON.stringify(n)}></script>
+))}
+
+{/* Authors (emit full Person nodes once, built inline) */}
+{ (personNodes || []).map((p: any, i: number) => (
+  <script id={`person-schema-${i}`} type="application/ld+json" set:html={JSON.stringify(p)}></script>
+))}
+
+{/* LocalBusiness (if service/product page) */}
+<SchemaLocalBusiness 
+  pageType={type}
+  orgId={orgId}
+  websiteId={websiteId}
+  offers={serviceOffers}
+  offerUrl={url}
+  title={title}
+/>

@@ -1,0 +1,83 @@
+---
+// src/components/ui/Sidebar.astro
+interface Props {
+  /** Which sidebar variant to render */
+  variant?: 'left' | 'right' | 'generic'; // default: 'right'
+
+  /** Add sticky positioning classes */
+  sticky?: boolean; // default: true
+
+  /** Top offset class used when sticky (e.g., "top-20") */
+  stickyTopClass?: string; // default: 'top-20'
+
+  /** Extra classes to append */
+  class?: string;
+
+  id?: string;
+  ariaLabel?: string;
+
+  // Forward any extra attributes (data-*, etc.)
+  [key: string]: any;
+}
+
+const {
+  variant = 'right',
+  sticky = true,
+  stickyTopClass = 'top-20',
+  stickyTopLeftClass = 'top-0 full-mx-h-95vh',
+  stickyTopRightClass = 'lg-top-42vh full-mx-h-95vh full-sticky full-top-0',
+  class: className = '',
+  id,
+  ariaLabel,
+  ...rest
+} = Astro.props as Props;
+
+/** Base class maps (exact strings from your spec) */
+const baseMap = {
+  left:
+    'sidebar-left bg b-top-solid-primary mx-w-content lg-mx-w-sidebar full-mx-w-sidebar lg-mx-h-40vh sm-w-90-0 w-full br ml-auto mr-auto full-mr-unset as-f-start mb-05 p-05 overflow-auto',
+  right:
+    'sidebar-right bg b-top-solid-primary mx-w-content lg-mx-w-sidebar full-mx-w-sidebar lg-mx-h-60vh sm-w-90-0 w-full br mi-auto mr-auto full-ml-unset as-f-start mb-05 p-05 overflow-auto',
+  generic:
+    'sidebar bg b-top-solid-primary mx-w-content lg-mx-w-sidebar full-mx-w-sidebar sm-w-90-0 w-full mi-auto as-f-start mb-05 p-05 overflow-auto',
+} as const;
+
+/** Sticky class maps (variant-specific) */
+const stickyMap = {
+  left: `lg-sticky full-sticky ${stickyTopLeftClass}`,
+  right: `lg-sticky full-sticky ${stickyTopRightClass}`,
+  generic: `full-sticky ${stickyTopClass}`,
+} as const;
+
+const classes = [
+  baseMap[variant],
+  sticky ? stickyMap[variant] : '',
+  className,
+].join(' ').trim();
+
+/*
+Right sidebar (sticky by default)
+<Sidebar variant="right">
+  <!-- content -->
+</Sidebar>
+
+<!-- Left sidebar, non-sticky -->
+<Sidebar variant="left" sticky={false}>
+  <!-- content -->
+</Sidebar>
+
+<!-- Right sidebar with custom top offset -->
+<Sidebar variant="right" stickyTopClass="top-16">
+  <!-- content -->
+</Sidebar>
+*/
+---
+
+<aside
+  id={id}
+  class={classes}
+  aria-label={ariaLabel}
+  {...rest}
+>
+  <slot />
+</aside>

@@ -1,0 +1,32 @@
+---
+// src/content/pages/Search.astro
+interface Props {
+  title?: string;
+  description?: string;
+  query?: string;
+  indexPath?: string; // e.g., siteDefaults.searchIndexPath
+}
+const { title = 'Search', description = '', query = '', indexPath = '/search-index.json' } = Astro.props as Props;
+---
+
+<article class="mx-w-content mi-auto">
+  <header class="mb-1 ta-center">
+    <h1 class="cc-h3">{query ? `Search Results for: "${query}"` : title}</h1>
+    {description && <p class="text-xl">{description}</p>}
+  </header>
+
+  <section class="m-bottom-1 pi-1 pb-2">
+    <div id="search" class="search-box" data-index={indexPath}>
+      <input
+        type="search"
+        id="search-input"
+        class="search-input w-full p-05 text-base"
+        placeholder="Search articles, pages…"
+        value={query}
+        autocomplete="off"
+        aria-label="Search"
+      />
+      <ul id="search-results" class="search-results no-list-style-type p-0"></ul>
+    </div>
+  </section>
+</article>

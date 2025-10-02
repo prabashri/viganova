@@ -46,6 +46,7 @@ const {
   dataAction,
   dataLabel,
   dataTargets,
+  ...rest // forward extra attributes, including any data-* you didn’t explicitly type
 } = Astro.props;
 
 const variantClassMap = {
@@ -93,6 +94,7 @@ Icon-only button
   class={computedClass}
   disabled={disabled}
   {...Object.fromEntries(Object.entries(extraAttributes).filter(([_, val]) => val !== undefined))}
+  {...rest}
 >
   <slot name="icon-left" />
   <slot />

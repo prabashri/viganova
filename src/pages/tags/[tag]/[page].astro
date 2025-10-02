@@ -1,25 +1,26 @@
 ---
-import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PaginationSeo from '../../../components/PaginationSeo.astro';
-import PaginationRedirect from '../../../components/PaginationRedirect.astro';
-import Pagination from '../../../components/Pagination.astro';
-import CardCollections from '../../../components/ui/CardCollections.astro';
-import HeroCollections from '../../../components/ui/HeroCollections.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import PaginationSeo from '@/components/PaginationSeo.astro';
+import PaginationRedirect from '@/components/PaginationRedirect.astro';
+import Pagination from '@/components/Pagination.astro';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
 
 import { getCollection } from 'astro:content';
-import { siteDefaults } from '../../../config/siteDefaults';
-import { paginate } from '../../../utils/paginate';
-import type { HeadProps } from '../../../types/HeadProps';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import { paginate } from '@/utils/paginate';
+import type { HeadProps } from '@/types/HeadProps';
 
-import modifiedDatesJson from '../../../data/modified-dates.json';
-import { getCollectionUrl } from '../../../utils/getCollectionUrl';
-import { mapEntryToCard } from '../../../utils/mapEntryToCard';
-import type { CardProps } from '../../../types/CardProps';
+import modifiedDatesJson from '@/data/modified-dates.json';
+import { getCollectionUrl } from '@/utils/getCollectionUrl';
+import { mapEntryToCard } from '@/utils/mapEntryToCard';
+import type { CardProps } from '@/types/CardProps';
 
 // 🔄 🔄 🔄 CHANGEABLE VARIABLES 🔄 🔄 🔄
 const entryType = "tags"; // "tags" or "categories"
 const currentEntryParam = Astro.params.tag?.toLowerCase() ?? 'unknown';
-import { tagMeta as entryMeta } from '../../../config/tagMeta'; 
+import { tagMeta as entryMeta } from '@/config/tagMeta'; 
 const fieldName = 'tags';
 const metaMap = new Map<string, { name: string; title?: string; description?: string; image?: string; url?: string }>(
   Object.entries(entryMeta).map(([name, meta]) => [name.toLowerCase(), { name, ...meta }])
@@ -85,8 +86,8 @@ const baseUrl = `/${entryType}/${currentEntryParam}`;
 const pageSeo: HeadProps = {
   title: `${meta.title} | ${siteDefaults.siteName}`,
   description: meta.description,
-  image: meta.image || siteDefaults.image,
-  breadcrumb: [
+  image: meta.image || siteImages.image,
+  breadcrumbs: [
     { name: 'Home', url: '/' },
     { name: siteDefaults.fieldCollections[entryType].title, url: `/${entryType}/` },
     { name: meta.title ?? currentEntryParam, url: `${baseUrl}/` }
@@ -112,7 +113,7 @@ const postCards: CardProps[] = paginatedEntries.map((entry, idx) =>
    <HeroCollections
     title={meta.title ?? currentEntryParam}
     description={meta.description}
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
   />
 

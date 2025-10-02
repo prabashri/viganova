@@ -1,6 +1,6 @@
 ---
 import { siteDefaults } from '../../config/siteDefaults';
-import { siteLogo } from '../../config/siteLogo';
+import { siteImages } from '../../config/siteImages';
 import Anchor from '../ui/Anchor.astro';
 import { Icon } from 'astro-icon/components';
 import manifest from '../../data/assets-manifest.json';
@@ -22,15 +22,15 @@ const mobileAlt = `${siteDefaults.siteName} Mobile Logo`;
 >
   {hasDesktopSvg ? (
     <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
-  ) : siteLogo.desktopLogo ? (
-    <img src={siteLogo.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
+  ) : siteImages.desktopLogo ? (
+    <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
   ) : (
     <span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
   )}
 
   {hasMobileSvg ? (
     <Icon name="MobileLogo" class="h-60 w-auto sm-display-inherit br" aria-label={mobileAlt} title={mobileAlt} />
-  ) : siteLogo.mobileLogo ? (
-    <img src={siteLogo.mobileLogo} alt={mobileAlt} title={mobileAlt} class="h-60 w-auto sm-display-inherit br" />
+  ) : siteImages.mobileLogo ? (
+    <img src={siteImages.mobileLogo} alt={mobileAlt} title={mobileAlt} class="h-60 w-auto sm-display-inherit br" />
   ) : null}
 </Anchor>

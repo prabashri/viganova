@@ -99,7 +99,7 @@ className?: string; // Additional classes for the button
  * Navigation style and behavior
  */
 export type NavStyleConfig = {
-  mode: 'default' | 'glassy' | 'transparent' | 'primary-light' | 'primary-dark' | 'custom'; // Visual style of the nav background
+  mode: 'default' | 'glassy' | 'transparent' | 'base-00' | 'base-90' | 'primary-lighter-x' | 'primary-lighter' | 'primary-darker' | 'primary-darker-x' | 'custom'; // Visual style of the nav background
   width: 'sitewidth' | 'fullwidth';             // Layout container width
   position: 'static' | 'sticky' | 'fixed';      // CSS position of nav
   scrollBehavior?: 'none' | 'hide-on-scroll' | 'show-on-scroll-up'; // Optional scroll behavior

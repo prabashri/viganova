@@ -1,0 +1,40 @@
+{
+  "id": "EA-2025-0003",
+  "headline": "Good service and communication",
+  "body": "For my marksheet apostille, EasyApostille's Prabakaran was very helpful.",
+  "rating": 4,
+  "language": "en",
+  "datePublished": "2025-09-20",
+  "url": "/reviews/ea-2025-0003/",
+  "author": {
+    "type": "Person",
+    "name": "Yoganathan MS",
+    "designation": "Language Student",
+    "organization": "Kyungsung University",
+    "profileUrl": "",
+    "avatar": ""
+  },
+  "service": { "slug": "document-apostille", "name": "Document Apostille" },
+  "location": { "name": "Busan, South Korea", "city": "Busan", "countryCode": "KR" },
+  "verifiedPurchase": true,
+  "orderNumber": "EA-58231",
+  "pros": ["Good communication"],
+  "cons": [],
+   "target": { "type": "Service", "name": "Marksheet Apostille", "url": "/services/marksheet-apostille/" },
+  "media": [
+    {
+      "type": "image",
+      "url": "",
+      "width": 1280,
+      "height": 720,
+      "alt": "Delivery confirmation screenshot"
+    }
+  ],
+  "ownerResponse": {
+    "date": "2025-09-20",
+    "text": "Thanks for the kind words! Happy to help again anytime.",
+    "responder": "EasyApostille"
+  },
+  "helpful": 18,
+  "notHelpful": 0
+}

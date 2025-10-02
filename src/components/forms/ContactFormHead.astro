@@ -1,0 +1,37 @@
+---
+/**
+ * Head-only companion for the contact form.
+ * Drop this into <Fragment slot="headContent-top/bottom"> from the PAGE that uses BaseLayout.
+ */
+interface Props {
+  enableTurnstile?: boolean;
+  turnstileSitekey?: string;
+  formScriptSrc?: string;        // built/hashed contact-form.js (prod) or /scripts/contact-form.js (dev)
+  placeScript?: 'top' | 'bottom' // where to inject the scripts
+}
+
+const {
+  enableTurnstile = false,
+  turnstileSitekey,
+  formScriptSrc,
+  placeScript = 'bottom'
+} = Astro.props as Props;
+
+const isTop = placeScript === 'top';
+---
+
+{enableTurnstile && isTop && (
+  <>
+    <link rel="dns-prefetch" href="https://challenges.cloudflare.com" />
+    <link rel="preconnect" href="https://challenges.cloudflare.com" crossorigin />
+  </>
+)}
+
+{!isTop && (
+  <>
+    {enableTurnstile && (
+      <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" defer></script>
+    )}
+    {formScriptSrc && <script src={formScriptSrc} defer></script>}
+  </>
+)}

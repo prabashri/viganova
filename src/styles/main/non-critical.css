@@ -9,17 +9,7 @@
 	/* Border-only (for custom outlines or hover borders) */
 	--transition-border: border-color 0.2s ease;
 
-	--success-light:rgb(163, 255, 176);
-  	--success:rgb(0, 200, 0);
-  	--success-dark:rgb(0, 100, 0);
 
-  	--error:rgb(255, 52, 37);
-  	--error-light:rgb(255, 191, 186);
-  	--error-dark:rgb(151, 10, 0);
-
-  	--alert:rgb(211, 153, 5);
-  	--alert-light:rgb(255, 228, 137);
-  	--alert-dark:rgb(172, 74, 0);
 }
 /* Inter Italic */
   @font-face {
@@ -119,4 +109,7 @@ pre {
 
 .icon-link:hover .icon-primary {
   fill: revert-layer !important;
+}
+.transition-common {
+  transition: var(--transition-common);
 }

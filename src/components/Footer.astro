@@ -1,69 +1,120 @@
 ---
 const today = new Date();
-import SocialLink from './SocialLink.astro';
-import ShareLink from './ShareLink.astro';
-import { siteDefaults } from '../config/siteDefaults';
-import { Icon } from 'astro-icon/components';
-import { siteLogo } from '../config/siteLogo';
 
-import manifest from '../data/assets-manifest.json';
+import SocialLink from './SocialLink.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { Icon } from 'astro-icon/components';
+import { siteImages } from '@/config/siteImages';
+import Anchor from '@/components/ui/Anchor.astro';
+import manifest from '@/data/assets-manifest.json';
 
 const manifestLogos = manifest?.logos?.files || {};
-
-// Check for Desktop SVG in manifest
 const hasDesktopSvg = Boolean(manifestLogos.desktopLogoSvg);
 
-const desktopAlt = `${siteDefaults.siteName} Desktop Logo`;
+const siteName = siteDefaults.siteName || 'EasyApostille';
+const siteTitle = siteDefaults.title || '';
+const siteUrl = (siteDefaults.siteUrl || 'https://easyapostille.in/').replace(/\/?$/, '/');
 
+// Build address string: prefer brand address, then parent org address
+const brandAddr = siteDefaults.address;
+const parentAddr = (siteDefaults as any)?.parentOrganization?.address;
+const addr = brandAddr || parentAddr || null;
+const location = addr
+  ? [
+      addr.streetAddress,
+      addr.addressLocality,
+      addr.addressRegion,
+      addr.postalCode,
+      (addr.addressCountryCode || addr.addressCountry)
+    ].filter(Boolean).join(', ')
+  : '';
+
+// Contact (primary + optional secondary)
+const email = siteDefaults.contact?.email || `contact@${(siteDefaults.domainName || 'easyapostille.in')}`;
+const phone = siteDefaults.contact?.phone || '';
+const waDigits = (siteDefaults.contact?.whatsapp || '').replace(/\D/g, '');
+const waHref = waDigits ? `https://wa.me/${waDigits}` : undefined;
+
+const phone2 = siteDefaults.contact?.phone2 || '';
+const waDigits2 = (siteDefaults.contact?.whatsapp2 || '').replace(/\D/g, '');
+const waHref2 = waDigits2 ? `https://wa.me/${waDigits2}` : undefined;
+
+// Logo alt
+const desktopAlt = `${siteName} Desktop Logo`;
 ---
 
-<footer class="site-footer text-s pb-2 pi-1">
-  <div class="footer-columns mx-w-site w-full mi-auto pb-05 pi-1 grid gap-2 ta-start hr">
-    {/* Column 1: Site Info & Contact */}
-    <div class="footer-col sm-hr">
-      {hasDesktopSvg ? (
-        <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
-      ) : siteLogo.desktopLogo ? (
-        <img src={siteLogo.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
-      ) : (
-        <span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
+<footer class="site-footer bg-primary-darker-x col-base-10 text-small pb-2 pi-1" itemscope itemtype="https://schema.org/WPFooter">
+  <div class="footer-columns mx-w-site w-full mi-auto pb-05 pi-1 grid gap-2 ta-start">
+
+    {/* Column 1: Site / brand (annotated as WebSite for itemprop="name") */}
+    <div class="footer-col sm-hr" itemscope itemtype="https://schema.org/WebSite" itemid={`${siteUrl}#website`}>
+      {/* url + name for the WebSite node */}
+      <meta itemprop="url" content={siteUrl} />
+      <a href={siteUrl} class="inline-flex ai-center gap-05 td-none br bg-primary-lighter-x">
+        {hasDesktopSvg ? (
+          <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
+        ) : siteImages.desktopLogo ? (
+          <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
+        ) : (
+          <span class="bold big-display-inherit col-primary hover-col-base-100" itemprop="name">{siteName}</span>
+        )}
+      </a>
+
+      {/* If the logo image is shown, also expose the name for microdata */}
+      {!siteImages.desktopLogo && !hasDesktopSvg && null}
+      { (siteImages.desktopLogo || hasDesktopSvg) && (
+        <p class="bold" itemprop="name">{siteName}</p>
       )}
-        <p class="text-s bold">{siteDefaults.siteName}</p>
-        <p class="text-xs">{siteDefaults.title}</p>
-        <p class="text-2xs pb-05">
-          &copy; {today.getFullYear()} {siteDefaults.siteName}. All rights reserved.
-        </p>
-        <hr />
-        <p class="text-xs bold uppercase">connect with us</p>
-        <SocialLink id="footer-social-links" />
+
+      <p class="text-base">{siteTitle}</p>
+      <p class="pb-05">&copy; {today.getFullYear()} {siteName}. All rights reserved.</p>
     </div>
 
-    {/* Column 2: Main Pages */}
+    {/* Column 2: Services (popular) */}
     <div class="footer-col sm-hr">
-      <p class="text-2xs bold uppercase">Main Pages</p>
+      <p class="bold uppercase"><Anchor href="/services/">Apostille Services</Anchor></p>
       <ul class="no-bullets">
-        <li class="text-xs mb-05 pb-02"><a href="/">Home</a></li>
-        <li class="text-xs mb-05 pb-02"><a href="/about/">About</a></li>
-        <li class="text-xs mb-05 pb-02"><a href="/contact/">Contact</a></li>
-        <li class="text-xs mb-05 pb-02"><a href="/privacy-policy/">Privacy Policy</a></li>
-        <li class="text-xs mb-05 pb-02"><a href="/terms/">Terms of Service</a></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/degree-certificate-apostille/">Degree Certificate</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/marksheets-apostille/">Marksheets</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/birth-certificate-apostille/">Birth Certificate</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/marriage-certificate-apostille/">Marriage Certificate</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/pcc-apostille/">PCC (Police Clearance)</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/affidavit-apostille/">Affidavit / POA</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/services/business-document-apostille/">Business Documents</Anchor></li>
       </ul>
     </div>
 
-    {/* <!-- Column 3: Social Links -->*/}
+    {/* Column 3: Main pages */}
     <div class="footer-col sm-hr">
-      <p class="text-2xs bold uppercase">Portfolio to look around</p>
+      <p class="bold uppercase">Main Pages</p>
       <ul class="no-bullets">
-    	  <li class="text-xs mb-05 pb-02"><a href="/portfolio/clampgenerator/" target="_self" title="clampGenerator for css clamp font-size & layout properties">ClampGenerator</a></li>
-		    <li class="text-xs mb-05 pb-02"><a href="/portfolio/individual/" target="_self" title="Individual Portfolio">Individuals site</a></li>
+        <li class="mb-05 pb-02"><Anchor href="/">Home</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/resources/">Resources</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/about/">About</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/contact/">Contact</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/privacy-policy/">Privacy Policy</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/refund-policy/">Refund Policy</Anchor></li>
+        <li class="mb-05 pb-02"><Anchor href="/terms/">Terms</Anchor></li>
+      </ul>
+    </div>
+
+    {/* Column 4: Social + Contact */}
+    <div class="footer-col sm-hr">
+      <p class="bold uppercase">Connect with us</p>
+      <SocialLink id="footer-social-links" />
+      <ul class="no-bullets">
+        { email && <li class="mb-05 pb-02"><Anchor href={`mailto:${email}`}>{email}</Anchor></li> }
+        { phone && <li class="mb-05 pb-02"><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`}>{phone}</Anchor></li> }   
+        { location && <li class="mb-05 pb-02">{location}</li> }
       </ul>
     </div>
   </div>
 
-  <!-- Bottom bar -->
-  <div class="footer-bottom ta-center text-xs pb-1 hr">    
-    <p class="text-xs">
-      Built using <a href="https://astro.build" target="_blank">Astro Framework</a>, by <a href="https://nviewsweb.com" target="_blank">NViewsWEB's AstroWEB theme</a>.
+  {/* Bottom bar */}
+  <div class="footer-bottom ta-center pb-1 hr">
+    <p class="text-small">
+      Built with <Anchor href="https://astro.build" target="_blank" rel="noopener">Astro</Anchor> • Theme by
+      {' '}<Anchor href="https://nviewsweb.com" target="_blank" rel="noopener">NViewsWEB</Anchor>.
     </p>
   </div>
 </footer>

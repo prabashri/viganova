@@ -1,20 +1,21 @@
 ---
 // src/pages/tags/[tag]/index.astro
-import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { paginate } from '../../../utils/paginate';
-import Pagination from '../../../components/Pagination.astro';
-import PaginationSeo from '../../../components/PaginationSeo.astro';
-import PaginationRedirect from '../../../components/PaginationRedirect.astro';
-import { siteDefaults } from '../../../config/siteDefaults';
-import type { HeadProps } from '../../../types/HeadProps';
-import HeroCollections from '../../../components/ui/HeroCollections.astro';
+import { paginate } from '@/utils/paginate';
+import Pagination from '@/components/Pagination.astro';
+import PaginationSeo from '@/components/PaginationSeo.astro';
+import PaginationRedirect from '@/components/PaginationRedirect.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
 
-import modifiedDatesJson from '../../../data/modified-dates.json';
-import { getCollectionUrl } from '../../../utils/getCollectionUrl';
-import CardCollections from '../../../components/ui/CardCollections.astro';
-import { mapEntryToCard } from '../../../utils/mapEntryToCard';
-import type { CardProps } from '../../../types/CardProps';
+import modifiedDatesJson from '@/data/modified-dates.json';
+import { getCollectionUrl } from '@/utils/getCollectionUrl';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import { mapEntryToCard } from '@/utils/mapEntryToCard';
+import type { CardProps } from '@/types/CardProps';
 
 
 // 🔄 🔄 🔄 CHANGE THESE FOR DIFFERENT ENTRY TYPES 🔄 🔄 🔄
@@ -86,13 +87,13 @@ const meta = metaMap.get(currentEntryParam) ?? {
 const pageSeo: HeadProps = {
   title: `${meta.title} | ${siteDefaults.siteName}`,
   description: meta.description,
-  image: meta.image || siteDefaults.image,
+  image: meta.image || siteImages.image,
   listItems: paginatedEntries.map(p => ({
     name: "title" in p.data ? p.data.title : 'Untitled',
     url: getCollectionUrl(p.collection, "slug" in p.data && typeof p.data.slug === "string" ? p.data.slug : String(p.id))
   })),
   type: 'collection',
-  breadcrumb: [
+  breadcrumbs: [
     { name: 'Home', url: '/' },
     { name: siteDefaults.fieldCollections[entryType].title, url: `/${entryType}/` },
     { name: meta.title ?? currentEntryParam, url: `/${entryType}/${currentEntryParam}/` }
@@ -113,7 +114,7 @@ const postCards: CardProps[] = paginatedEntries.map((entry, idx) =>
   <HeroCollections
     title={meta.title ?? currentEntryParam}
     description={meta.description}
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
   />
 

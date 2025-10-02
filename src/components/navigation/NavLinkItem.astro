@@ -1,14 +1,14 @@
 ---
-import Anchor from '../ui/Anchor.astro';
+import Anchor from '@/components/ui/Anchor.astro';
 import { Icon } from 'astro-icon/components';
 
 const { item, index = 0, isActive = false } = Astro.props;
 
 // Size classes
 const iconSize =
-  item.iconSize === 'small' ? 'w-1-0' :
-  item.iconSize === 'medium' ? 'w-1-5' :
-  item.iconSize === 'large' ? 'w-2-0' : 'w-1-5';
+  item.iconSize === 'small' ? 'w-1-0 h-1-0' :
+  item.iconSize === 'medium' ? 'w-1-5 h-1-5' :
+  item.iconSize === 'large' ? 'w-2-0 h-2-0' : 'w-1-5 h-1-5';
 
 const imageSize =
   item.imageSize === 'thumbnail' ? 'w-150' :
@@ -31,7 +31,7 @@ const dataId = index ? `nav-link-item-${index}` : undefined;
 
 <Anchor
   href={item.href}
-  className={`nav-link-item flex ai-start gap-05 pi-05 pb-02 ${isCard ? 'card-style' : ''} ${item.className || ''}`}
+  className={`nav-link-item flex ai-center gap-05 pi-05 pb-02 ${isCard ? 'card-style' : ''} ${item.className || ''}`}
   rel={item.external ? 'noopener noreferrer' : undefined}
   ariaLabel={item.ariaLabel || item.label}
   title={item.title || item.label}
@@ -44,10 +44,10 @@ const dataId = index ? `nav-link-item-${index}` : undefined;
   {(showIconLeft || showIconRight) && iconPosition && (
     <div slot={iconPosition} class={`p-02 inline-flex ai-center jc-center ${iconSize} ${iconClass}`}>
       {item.image && (
-        <img src={item.image} alt={item.altText || item.label} class={imageSize} />
+        <img delay-image="true" data-src={item.image} alt={item.altText || item.label} loading="lazy" class={imageSize} />
       )}
       {!item.image && item.iconUrl && (
-        <img src={item.iconUrl} alt={item.altText || item.label} class={iconSize} />
+        <img delay-image="true" data-src={item.iconUrl} alt={item.altText || item.label} loading="lazy" class={iconSize} />
       )}
       {!item.image && item.iconName && (
         <Icon name={item.iconName} class={`${iconSize} fill-current`} />

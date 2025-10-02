@@ -1,10 +1,4 @@
-.site-footer {
-  background: linear-gradient(
-    to bottom,
-    var(--base-00),
-    var(--base-10)
-  );
-}
+
 .footer-columns {    
     grid-template-columns: repeat(auto-fit,minmax(220px,1fr));    
 }

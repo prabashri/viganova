@@ -1,12 +1,13 @@
 ---
 // src/pages/team/alumni.astro
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-import { siteDefaults } from '../../config/siteDefaults';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
 import { Icon } from 'astro-icon/components';
-import gravatarHashesJson from '../../data/email-hash.json';
-import type { HeadProps } from '../../types/HeadProps';
-import HeroCollections from '../../components/ui/HeroCollections.astro';
+import gravatarHashesJson from '@/data/email-hash.json';
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
 
 const gravatarHashes: Record<string, string> = Object.fromEntries(
   Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
@@ -60,7 +61,7 @@ const headProps: HeadProps = {
   title: 'Our Alumni',
   description: 'A tribute to former team members who shaped our journey.',
   url: `${siteDefaults.siteUrl}/team/alumni/`,
-  image: siteDefaults.image,
+  image: siteImages.image,
   index: true,
   authors: [],
   // authorName: siteDefaults.authorName,
@@ -147,7 +148,7 @@ const headProps: HeadProps = {
     title={headProps.title}
     description={headProps.description}
     content="We thank you sincerely for your valuable contributions to our success."
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
   />
  

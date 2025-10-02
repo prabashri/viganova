@@ -1,0 +1,119 @@
+---
+/* src/components/ui/TagList.astro */
+import Anchor from '@/components/ui/Anchor.astro';
+
+type ItemShape =
+  | string
+  | { label?: string; name?: string; slug?: string; url?: string };
+
+interface Props {
+  items: ItemShape[];
+
+  /* UI */
+  heading?: string;                 // default: "Keywords"
+  id?: string;                      // default: "tag-list"
+  class?: string;                   // container classes
+  ulClass?: string;                 // <ul> classes
+  pillClass?: string;               // chip classes
+
+  /* Link building (when url not provided) */
+  baseHref?: string;                // e.g. "/tags/" or "/categories/"
+
+  /* Anchor styling/behavior */
+  type?: 'link' | 'button';         // forwarded to <Anchor>; default "button"
+  variant?: 'plain' | 'nav' | 'ghost' | 'primary' | 'secondary'; // default "secondary"
+
+  /* Data shaping */
+  dedupe?: boolean;                 // default true
+  sort?: 'asc' | 'desc' | 'none';   // default 'none'
+  limit?: number;                   // optional cap
+
+  /* Extra classes or data-* passed to each Anchor (optional) */
+  itemClass?: string;
+  itemDataAction?: string;
+}
+
+const {
+  items = [],
+  heading = 'Keywords',
+  id = 'tag-list',
+  class: className = 'post-tags pi-05 pb-1 mb-1 bg br',
+  ulClass = 'tag-list flex wrap gap-05 no-bullets mt-1',
+  pillClass = 'border-primary-light br pi-05 pb-02',
+
+  baseHref = '/tags/',
+
+  type = 'button',
+  variant = 'secondary',
+
+  dedupe = true,
+  sort = 'none',
+  limit,
+
+  itemClass = '',
+  itemDataAction,
+} = Astro.props as Props;
+
+/* ---------- helpers ---------- */
+const slugify = (s: string) =>
+  s.toLowerCase().trim()
+   .replace(/[\s_]+/g, '-')
+   .replace(/[^\w-]+/g, '')
+   .replace(/--+/g, '-');
+
+const toLabel = (item: ItemShape) =>
+  typeof item === 'string' ? item : (item.label ?? item.name ?? item.slug ?? item.url ?? '');
+
+const toHref = (item: ItemShape) => {
+  if (typeof item === 'string') return `${baseHref}${encodeURIComponent(slugify(item))}/`;
+  if (item.url) return item.url; // absolute or site-relative supplied
+  const slug = item.slug ?? slugify(item.label ?? item.name ?? '');
+  return `${baseHref}${encodeURIComponent(slug)}/`;
+};
+
+/* shape + dedupe + sort + limit */
+let shaped = items
+  .map((it) => ({ label: toLabel(it), href: toHref(it) }))
+  .filter((x) => x.label);
+
+if (dedupe) {
+  const seen = new Set<string>();
+  shaped = shaped.filter(({ label }) => (seen.has(label) ? false : (seen.add(label), true)));
+}
+
+if (sort !== 'none') {
+  shaped.sort((a, b) =>
+    sort === 'asc' ? a.label.localeCompare(b.label) : b.label.localeCompare(a.label)
+  );
+}
+
+if (typeof limit === 'number') shaped = shaped.slice(0, limit);
+/*
+<TagList items={d.tags} heading="Keywords" baseHref="/tags/" />
+
+for categories 
+<TagList items={d.categories ?? []} heading="Categories" baseHref="/categories/" sort="asc" />
+
+*/
+---
+{shaped.length > 0 && (
+  <div class={className}>
+    <h3 class="text-xs uppercase mb-0">{heading}</h3>
+    <ul id={id} class={ulClass} role="list">
+      {shaped.map(({ label, href }) => (
+        <li>
+          <Anchor
+            href={href}
+            type={type}
+            variant={variant}
+            className={pillClass + (itemClass ? ` ${itemClass}` : '')}
+            ariaLabel={`Browse ${label}`}
+            data-action={itemDataAction}
+          >
+            {label}
+          </Anchor>
+        </li>
+      ))}
+    </ul>
+  </div>
+)}

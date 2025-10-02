@@ -1,11 +1,11 @@
 {
-  "name": "AstroWEB by Nviews WEB",
-  "short_name": "AstroWEB",
+  "name": "EasyApostille",
+  "short_name": "EasyApostille",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#a55aff",
-  "description": "Modern, performance-first Astro theme by NViewsWeb. Perfect for looking responsive, SEO-friendly design, and a+ security.",
+  "background_color": "hsla(0, 0%, 100%, 1.00)",
+  "theme_color": "hsla(210, 100%, 35%, 1.00)",
+  "description": "Get your MEA apostille certificates, documents attestation at EasyApostille with fast, secure, discounts & free premium delivery services across India",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

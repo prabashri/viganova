@@ -1,0 +1,127 @@
+---
+# ─────────────────────────────────────────────────────────────
+# Page basics (this page is the canonical watch page)
+# ─────────────────────────────────────────────────────────────
+title: "Video SEO Example: End-to-End Watch Page"
+description: "Sample video watch page demonstrating frontmatter for VideoObject schema, OG/Twitter tags, and UI rendering."
+slug: "video-seo-example"
+publishDate: "2025-05-12T10:00:00Z"
+updatedDate: "2025-06-01T10:00:00Z"
+
+image: "/images/videos/example-hero-image-for-videos.jpg"   # optional hero, separate from poster
+imageAlt: "Hero image for the self-hosted video example"
+imageTitle: "Self-Hosted Video Example"
+imageCaption: "A self-hosted video example showcasing various features."
+
+tags: ["video", "seo", "schema", "tutorial"]
+keywords: ["video seo", "schema.org VideoObject", "open graph", "twitter player"]
+categories: ["Guides", "Engineering"]
+
+featured: false
+draft: false
+index: true
+
+# ─────────────────────────────────────────────────────────────
+# Canonical video metadata (single source of truth)
+# ─────────────────────────────────────────────────────────────
+provider: "youtube"                                     # 'self' | 'youtube' | 'vimeo' | 'embed'
+watchPageUrl: "https://example.com/videos/video-seo-example/"  # optional override (else built from site + slug)
+
+# Sources / IDs
+contentUrl: "https://cdn.example.com/videos/video-seo-example.mp4"   # optional even for youtube; helpful for schema
+youtubeId: "dQw4w9WgXcQ"
+# vimeoId: "123456789"
+# embedUrl: "https://player.example.com/embed/video-seo-example"
+
+# Core info
+uploadDate: "2025-05-01T10:00:00Z"
+durationSeconds: 734
+isLive: false
+isFamilyFriendly: true
+
+
+# Player/video dimensions (NOT thumbnails)
+videoWidth: 1920
+videoHeight: 1080
+aspectRatio: "16:9"     # if omitted, layout computes from videoWidth/videoHeight
+
+# Tracks & chapters
+captions:
+  - url: "https://cdn.example.com/captions/video-seo-example.en.vtt"
+    lang: "en"
+    kind: "subtitles"
+    label: "English"
+    default: true
+  - url: "https://cdn.example.com/captions/video-seo-example.es.vtt"
+    lang: "es"
+    kind: "subtitles"
+    label: "Español"
+
+transcriptUrl: "https://example.com/transcripts/video-seo-example.html"
+
+chapters:
+  - name: "Intro & Goals"
+    start: 0
+    end: 60
+    url: "https://example.com/videos/video-seo-example/?t=0"
+  - name: "Open Graph Essentials"
+    start: 60
+    end: 240
+  - name: "VideoObject JSON-LD"
+    start: 240
+    end: 480
+  - name: "Captions & Chapters"
+    start: 480
+    end: 660
+  - name: "Publishing Checklist"
+    start: 660
+    end: 734
+
+# FAQ on the same watch page
+faq:
+  - question: "Do I need both poster and thumbnails?"
+    answer: "Use poster for OG/Twitter primary image; add thumbnails for additional ImageObjects and responsive UI."
+    speakable: true
+  - question: "Can I provide HLS/DASH plus MP4?"
+    answer: "Yes. Add contentUrlHls and contentUrlDash fields if your player supports them."
+    speakable: false
+
+# Access / regions
+requiresSubscription: false
+regionsAllowed: ["US", "CA", "GB", "AU"]
+
+# Cross-links
+platform:
+  youtube: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  # vimeo: "https://vimeo.com/123456789"
+  # dailymotion: "https://www.dailymotion.com/video/xyz"
+  # bilibili: "https://www.bilibili.com/video/BV1xx411c7mD"
+  # rumble: "https://rumble.com/vxyz"
+
+sameAs:
+  - "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+relatedArticles:
+  - "/blog/how-to-embed-video-seo/"
+  - "/blog/schema-videoobject-guide/"
+---
+
+> **Note:** This file is named `_example.mdx` so it's intentionally hidden by your index/route filters.
+> Copy it, rename the file (remove the leading `_`), and tweak fields for a real video.
+
+## What you'll see on the watch page
+
+- A responsive player (YouTube embed in this example).
+- Poster art driving OG/Twitter images; thumbnails available for UI.
+- Chapters in a sidebar; clicking a chapter seeks in supported players or links with `?t=`.
+- Captions (VTT) for accessibility and SEO.
+- VideoObject JSON-LD emitted via `BaseLayout` from the frontmatter above.
+
+### Body Content (Optional)
+
+Use this space for extra notes, links, or resources related to the video. The layout renders this MDX below the player:
+
+- Link to the **transcript** if you host a full text.
+- Add downloadable resources.
+- Summarize key takeaways.
+

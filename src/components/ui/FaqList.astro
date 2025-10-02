@@ -1,0 +1,93 @@
+---
+// src/components/ui/FaqList.astro
+export interface FaqItem {
+  question: string;
+  answer: string;
+  speakable?: boolean;
+}
+
+interface Props {
+  items: FaqItem[];
+  id?: string;                       // default: "faq"
+  class?: string;                    // extra classes for <section>
+  headingClass?: string;             // extra classes for the heading
+  listClass?: string;                // extra classes for the <div> wrapping the list
+  questionClass?: string;          // extra classes for each question
+  answerClass?: string;              // extra classes for each answer
+  heading?: string;                  // default: "Frequently Asked Questions"
+  headingTag?: 'h2'|'h3'|'h4'|'h5';  // default: 'h2'
+  openAll?: boolean;                 // default: true
+  addSchema?: boolean;               // default: true (FAQPage JSON-LD)
+  addSpeakableSchema?: boolean;      // default: true (only if any item.speakable)
+  htmlAnswers?: boolean;             // render answers as HTML (set:html)
+}
+
+const {
+  items = [],
+  id = 'faq',
+  class: sectionClass = '',
+  headingClass = '',
+  listClass = '',
+  questionClass = '',
+  answerClass = '',
+  heading = 'Frequently Asked Questions',
+  headingTag = 'h2',
+  openAll = true,
+  addSchema = true,
+  addSpeakableSchema = true,
+  htmlAnswers = false,
+} = Astro.props as Props;
+
+const Heading = headingTag;
+
+const hasSpeakable = addSpeakableSchema && items.some(i => i.speakable);
+
+// FAQPage JSON-LD
+const faqSchema = addSchema && items.length > 0 ? {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: items.map((it) => ({
+    '@type': 'Question',
+    name: it.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: it.answer,
+    },
+  })),
+} : null;
+
+// Speakable JSON-LD (optional)
+const speakableSchema = hasSpeakable ? {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: [`#${id} .speak-head`, `#${id} .speak-text`],
+  },
+} : null;
+---
+
+{items.length > 0 && (
+  <section id={id} class={`faq w-full bg br mb-1 pb-1 ${sectionClass}`} aria-labelledby={`${id}-heading`}>
+    {heading && <Heading id={`${id}-heading`} class={`text-xl mb-0 ${headingClass}`}>{heading}</Heading>}
+    <div class={`faq-list mx-w-content mt-1 ${listClass}`}>
+      {items.map((item, index) => (
+        <details data-key={index} class="faq-item" open={openAll}>
+          <summary class={`faq-question ${item.speakable ? 'speak-head' : ''} ${questionClass}`}>{item.question}</summary>
+          <div class={`faq-answer ${answerClass} ${item.speakable ? 'speak-text' : ''}`}>
+            {htmlAnswers
+              ? <p set:html={item.answer} />
+              : <p>{item.answer}</p>}
+          </div>
+        </details>
+      ))}
+    </div>
+
+    {faqSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+    )}
+    {speakableSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(speakableSchema)} />
+    )}
+  </section>
+)}

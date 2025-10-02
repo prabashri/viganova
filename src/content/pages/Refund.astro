@@ -1,0 +1,117 @@
+---
+import HeroPages from '@/components/ui/HeroPages.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+
+interface Props {
+  updatedAt?: string | number | Date;
+    updatedAtISO?: string;
+  publishedAt?: string | number | Date;
+    publishedAtISO?: string;
+  title?: string;
+  description?: string;
+}
+
+const props = Astro.props as Props;
+
+const pageTitle =
+  props.title ?? `Refund Policy of ${siteDefaults.siteName}`;
+const pageDesc =
+  props.description ??
+  `This Refund Policy explains when refunds are available for ${siteDefaults.siteName}'s apostille & document attestation facilitation in India (Notary → SDM → MEA) via authorised partners.`;
+
+// Handy links
+const termsPath =
+  (siteDefaults as any)?.pages?.terms?.path || '/terms/';
+---
+
+<article class="prose mi-auto" itemscope itemtype="https://schema.org/RefundPolicy">
+  <HeroPages
+    variant="post"
+    title={pageTitle}
+    description={pageDesc}
+    meta={false}
+    publishedAt={props.publishedAt}
+    publishedAtISO={props.publishedAtISO}
+    updatedAt={props.updatedAt}
+    updatedAtISO={props.updatedAtISO}
+    class="mn-h-230 jc-center"
+  />
+
+  <div class="mx-w-content pi-1 pb-2 mi-auto">    
+    <p class="mb-2">
+    <strong>Effective date:</strong>{' '}
+    <time datetime={props.updatedAtISO}>{props.updatedAt}</time>
+    </p>
+    
+
+    <p>
+      We facilitate apostille and document attestation steps in India by coordinating with
+      <strong> Notary</strong>, <strong>Sub-Divisional Magistrate (SDM)</strong>, and the
+      <strong> Ministry of External Affairs (MEA)</strong> via authorised/representative partners.
+      Refunds depend on the <span class="bold">stage</span> of your order, as detailed below.
+    </p>
+
+    <h2 id="definitions">1) Definitions</h2>
+    <ul>
+      <li><strong>“Start of Notary”</strong> means your file is formally handed over for notarisation or placed in the Notary queue (whichever occurs first).</li>
+      <li><strong>“Physical Document”</strong> means an original/physical certificate provided to us for processing.</li>
+      <li><strong>“Scanned Copy”</strong> includes PDF/PNG/JPG or images sent via email/WhatsApp/other channels for printing & submission where allowed.</li>
+    </ul>
+
+    <h2 id="eligibility">2) Refund eligibility by stage</h2>
+    <ul>
+      <li>
+        <strong>After Notary has started</strong> (handover or queueing confirmed):
+        <br />➡️ <strong>No refund</strong> of service fees. Government/office fees and any third-party costs are non-refundable.
+      </li>
+      <li>
+        <strong>Before Notary has started</strong>, when we already received your
+        <em>physical document</em> and initiated coordination with partners:
+        <br />➡️ Refund of <strong>75% of the service fee</strong> (we retain <strong>25%</strong> as service/administration),
+        <em>plus</em> deduction of actual <strong>courier/logistics</strong> already incurred.
+        Government/office fees, if already paid on your behalf, are non-refundable.
+      </li>
+      <li>
+        <strong>Before Notary has started</strong>, if only <em>scanned copies</em> were shared and no third-party costs incurred:
+        <br />➡️ Refund of <strong>75% of the service fee</strong> (25% retained as service/administration).
+      </li>
+    </ul>
+    <p class="text-s col-base-70">
+      Note: There is no mandated “standard” retention; <strong>25%</strong> is our service/administration charge to cover consultation,
+      document checks, file preparation, coordination, and operational overheads.
+    </p>
+
+    <h2 id="nonrefundable">3) Always non-refundable</h2>
+    <ul>
+      <li><strong>Government/office fees</strong> (Notary, SDM, MEA, outsourced counters).</li>
+      <li><strong>Courier/logistics</strong> already used (pickup/return/transfer between offices).</li>
+      <li><strong>Third-party expenses</strong> already incurred (e.g., translations, photos, true-copy/affidavits, printing).</li>
+      <li><strong>Payment gateway charges</strong> where non-refundable by the gateway (if any).</li>
+    </ul>
+
+    <h2 id="howto">4) How to request a refund</h2>
+    <ol>
+      <li>Email us from your registered email with <span class="bold">Order ID</span>, applicant name, and phone.</li>
+      <li>If physical documents are with us, we will arrange return (charges apply) before finalising the refund.</li>
+      <li>We'll confirm the processing <span class="bold">stage</span> and eligible amount per this policy.</li>
+    </ol>
+
+    <h2 id="method-time">5) Refund method &amp; timeline</h2>
+    <ul>
+      <li>Refunds are made to the <span class="bold">original payment method</span>; if unavailable, via <span class="bold">bank transfer (NEFT/IMPS)</span> to the payer.</li>
+      <li>Processing typically within <span class="bold">7-10 business days</span> after eligibility confirmation (bank/gateway timelines may vary).</li>
+    </ul>
+
+    <h2 id="chargebacks">6) Chargebacks/Disputes</h2>
+    <p>
+      Please contact us first for a faster resolution. Bank chargebacks opened in parallel may delay processing while we provide documentation to the bank.
+    </p>
+
+    <h2 id="changes">7) Changes</h2>
+    <p>
+      We may update this Refund Policy to reflect changes in law or services. The Effective date above indicates the latest version.
+      This policy is incorporated by reference into our <Anchor href={termsPath}><strong>Terms &amp; Conditions</strong></Anchor>.
+    </p>
+  </div>
+</article>

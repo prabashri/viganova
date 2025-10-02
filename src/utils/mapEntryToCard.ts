@@ -1,5 +1,5 @@
 import { getCollectionUrl } from './getCollectionUrl';
-import { siteDefaults } from '../config/siteDefaults';
+import { siteImages } from '../config/siteImages';
 import modifiedDatesJson from '../data/modified-dates.json';
 import type { CardProps } from '../types/CardProps';
 
@@ -51,7 +51,7 @@ const otherEntries: OtherEntry[] = (entry.data?.[fieldName] as string[] || [])
       typeof entry.data.slug === "string" ? entry.data.slug : String(entry.id)
     ),
     linkAriaLabel: `View post: ${entry.data?.title ?? "Untitled"}`,
-    image: entry.data?.heroImage ?? siteDefaults.image,
+    image: entry.data?.heroImage ?? siteImages.image,
     imageAlt: entry.data?.heroImageAlt ?? entry.data?.title ?? 'Post image',
     otherEntries,
     title: entry.data?.title ?? 'Untitled',

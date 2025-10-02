@@ -14,16 +14,24 @@ const modeMap = {
   default: '',
   glassy: 'bg-transparent backdrop-blur',
   transparent: 'bg-transparent',
-  'primary-light': 'bg-primary-light col-base-100',
-  'primary-dark': 'bg-primary-dark col-base-00',
+  'primary-lighter-x': 'bg-primary-lighter-x col-base-100',
+  'primary-lighter': 'bg-primary-lighter col-base-100',
+  'primary-darker' :  'bg-primary-darker col-base-00',
+  'primary-darker-x': 'bg-primary-darker-x col-base-00',
+  'base-00': 'bg-base-00 col-base-100',
+  'base-90': 'bg-base-90 col-base-00',
   custom: ''
 }
  const modeMapNav = {
   default: '',
   glassy: 'big-bg-glass big-border-glass big-box-shadow',
   transparent: 'bg-transparent',
-  'primary-light': 'bg-primary-light col-base-100',
-  'primary-dark': 'bg-primary-dark col-base-00',
+'primary-lighter-x': 'bg-primary-lighter-x col-base-100',
+  'primary-lighter': 'bg-primary-lighter col-base-100',
+  'primary-darker' :  'bg-primary-darker col-base-00',
+  'primary-darker-x': 'bg-primary-darker-x col-base-00',
+  'base-00': 'bg-base-00 col-base-100',
+  'base-90': 'bg-base-90 col-base-00',
   custom: ''
 }
 
@@ -39,7 +47,7 @@ const separatorMap = {
   none: 'box-shadow-bottom'
 }
 
-const commonHeaderClasses = 'flex flex-col ai-center jc-center gap mi-auto pi-1 pb-05';
+const commonHeaderClasses = 'flex flex-col ai-center jc-center gap-05 mi-auto pi-1 pb-05';
 const headerClasses = [
   commonHeaderClasses,
   modeMap[headerStyle.mode],
@@ -79,12 +87,58 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
       </Button>
     </div>
 
-    {/* NAV ITEMS */}
+    
+    {/* Primary CTA Button */}
+    {primaryCTA.length > 0 && ( 
+      <div 
+        id="main-nav-cta" 
+        class="flex flex-col big-flex-row br sm-bg w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
+        aria-label="Primary Call to Action"
+      >  
+        <div class="flex flex-row gap ai-center jc-center">
+          {/* Search Icon */}
+          {searchIconEnable && (
+            <SearchIcon />
+          )}
+          {/* Theme Toggle */}
+          <ThemeLightDark />
+        </div>           
+        
+        <div class="flex flex-row gap ai-center jc-center">
+          {/* Loop through primaryCTA items */}
+          {primaryCTA.map((cta) => (
+            <Anchor
+              href={cta.href}
+              title={cta.title || cta.label}
+              variant={cta.variant || 'primary'}
+              ariaLabel={cta.ariaLabel || cta.label}
+              className={cta.icon ? 'flex ai-center ac-center gap-05' : ''}
+            >
+              {cta.icon && <Icon
+								slot="icon-left"
+								name={cta.icon}
+								id="hero-cta-2"
+								class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+								aria-hidden="true"
+								focusable="false"
+							/> }
+              {cta.label}
+            </Anchor>
+          ))}
+        </div>
+      </div>
+    )}
+     
+   
+    
+  </div>
+  {/* 
+  modified version for customized navigation
+  */}
     {siteNav.length > 0 && (
     <nav 
       id="main-nav" 
-      class={`main-nav sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 full-p-05 gap br full-br-1 col-base-100 z-1000 big-display-inherit ${navOrder}`} 
-      itemscope itemtype="https://schema.org/SiteNavigationElement" 
+      class={`main-nav relative mx-w-site w-full sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 gap br full-br-1 col-base-100 z-100 big-display-inherit ${navOrder}`} 
       aria-label="Primary site navigation"
       >
       {/* Logo for Desktop */}
@@ -92,7 +146,6 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
       {/* Loop through siteNav items */}
       {Array.isArray(siteNav) && siteNav.map((item, navIndex) => (           
           <li
-            itemprop="name"
             class={`nav-item${item.type === 'dropdown' || item.type === 'mega' ? ' dropdown' : ''}${item.type === 'link' ? ' nav-link' : ''}${item.href === Astro.url.pathname ? ' active-page' : ''}`}
             data-id={`nav-item-${navIndex}`}
           >
@@ -163,51 +216,13 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
       </ul>
     </nav>
     )}
-    {/* Primary CTA Button */}
-    {primaryCTA.length > 0 && ( 
-      <div 
-        id="main-nav-cta" 
-        class="flex flex-col big-flex-row br sm-bg w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
-        aria-label="Primary Call to Action"
-      >  
-        <div class="flex flex-row gap ai-center jc-center">
-          {/* Search Icon */}
-          {searchIconEnable && (
-            <SearchIcon />
-          )}
-          {/* Theme Toggle */}
-          <ThemeLightDark />
-        </div>           
-        
-        <div class="flex flex-row gap ai-center jc-center">
-          {/* Loop through primaryCTA items */}
-          {primaryCTA.map((cta) => (
-            <Anchor
-              href={cta.href}
-              title={cta.title || cta.label}
-              variant={cta.variant || 'primary'}
-              ariaLabel={cta.ariaLabel || cta.label}
-              className={cta.icon ? 'flex ai-center ac-center gap-05' : ''}
-            >
-              {cta.icon && <img src={cta.icon} alt={cta.altText || cta.label} width="24" class="w-20 inline" />}
-              {cta.label}
-            </Anchor>
-          ))}
-        </div>
-      </div>
-    )}
-     
-   
-    
-  </div>
   {/* SECONDARY NAVIGATION (Optional) */}
   {secondaryNavigation.length > 0 && (
-    <nav id="secondary-nav" class="secondary-nav sm-bg flex flex-row text-xs p-05 br gap z-10 mx-w-site w-full desktop-box-shadow-bottom big-display-inherit" aria-label="Secondary site navigation" itemscope itemtype="https://schema.org/SiteNavigationElement">
+    <nav id="secondary-nav" class="secondary-nav sm-bg flex flex-row text-xs p-05 br gap z-10 mx-w-site w-full desktop-box-shadow-bottom big-display-inherit" aria-label="Secondary site navigation">
       {/* Loop through secondaryNavigation items */}
       <ul class="nav-list flex ai-center no-bullets gap sm-flex-col sm-ai-start">
         {Array.isArray(secondaryNavigation) && secondaryNavigation.map((item, navIndex) => (
           <li
-            itemprop="name"
             class={`sec-nav-item${item.type === 'dropdown' || item.type === 'mega' ? ' dropdown' : ''}${item.type === 'link' ? ' nav-link' : ''}${item.href === Astro.url.pathname ? ' active-page' : ''}`}
             data-id={`sec-nav-item-${navIndex}`}
           >

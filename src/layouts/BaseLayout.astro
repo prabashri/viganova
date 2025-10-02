@@ -1,13 +1,13 @@
 ---
 // src/layouts/BaseLayout.astro
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-//import Analytics from '../components/Analytics.astro';
-import type { HeadProps } from '../types/HeadProps';
-import Breadcrumb from '../components/ui/Breadcrumb.astro';
-import Analytics from '../components/Analytics.astro';
-import InlineScript from '../components/InlineScript.astro';
+import BaseHead from '@/components/BaseHead.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+//import Analytics from '@/components/Analytics.astro';
+import type { HeadProps } from '@/types/HeadProps';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import Analytics from '@/components/Analytics.astro';
+import InlineScript from '@/components/InlineScript.astro';
 
 interface Props {
   headProps?: HeadProps;
@@ -41,7 +41,9 @@ const {
 
     <main id="main-content">
       {/*-- src/layouts/BaseLayout.astro --*/}
-      <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={headProps.title} />
+      
+
+
 
       <slot />
     </main>

@@ -1,0 +1,39 @@
+---
+// src/components/ui/StarRating.astro
+interface Props {
+  rating: number;        // e.g., 4.5
+  max?: number;          // default 5
+  showNumber?: boolean;  // show "4.5" next to stars
+  wrapperClass?: string; // extra classes for wrapper div
+  class?: string;        // extra classes from parent
+  ariaLabel?: string;    // override aria label
+}
+
+const {
+  rating,
+  max = 5,
+  showNumber = false,
+  wrapperClass = '',
+  class: extraClass = '',
+  ariaLabel
+} = Astro.props as Props;
+
+// Return suffix like "00", "05", "10", ..., "50"
+function ratingSuffix(value: number, max = 5): string {
+  const v = Number.isFinite(value) ? value : 0;
+  const clamped = Math.min(Math.max(v, 0), max);
+  const rounded = Math.round(clamped * 2) / 2;    // nearest 0.5
+  const pct = Math.round((rounded / max) * 100);  // 0..100 in 10% steps
+  const suffix = Math.round(pct / 2);             // 0..50 (steps of 5)
+  return String(suffix).padStart(2, '0');
+}
+
+const safe = Number.isFinite(rating) ? Math.min(Math.max(rating, 0), max) : 0;
+const suffix = ratingSuffix(safe, max);           // e.g., "45" for 4.5
+const classes = `stars stars--${suffix}${extraClass ? ' ' + extraClass : ''}`;
+const label = ariaLabel ?? `Rating ${safe.toFixed(1)} out of ${max}`;
+---
+<div class={`flex flex-row gap-05 ai-center ${wrapperClass}`}>
+    <span class={classes} role="img" aria-label={label}></span>
+    {showNumber && <b class="stars__value">{safe.toFixed(1)}</b>}
+</div>

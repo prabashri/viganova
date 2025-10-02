@@ -1,0 +1,284 @@
+---
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { getEntry } from 'astro:content';
+import type { VideoMeta } from '@/types/HeadProps';
+
+type Aspect = `${number}:${number}`;
+
+interface MinimalSource {
+  provider?: 'self' | 'youtube' | 'vimeo' | 'embed';
+  contentUrl?: string;
+
+  // URL support
+  youtubeUrl?: string;
+  vimeoUrl?: string;
+
+  // ID/embed support
+  youtubeId?: string;
+  vimeoId?: string;
+  embedUrl?: string;
+
+  // optional media hints
+  encodingFormat?: string;
+  contentUrlHls?: string;
+  contentUrlDash?: string;
+}
+
+interface Props {
+  // Full meta (watch page) if available
+  video?: VideoMeta;
+
+  // Lightweight references (embeds elsewhere)
+  watchSlug?: string;              // e.g. "my-video"
+  watchPageUrl?: string;           // "/videos/my-video/" or absolute
+  source?: MinimalSource;          // can pass only a youtube/vimeo URL here
+
+  posterOverride?: string;
+
+  canonicalUrl?: string;
+  class?: string;
+  preload?: 'none' | 'metadata' | 'auto';
+}
+
+/* ───────────────── helpers / inputs ───────────────── */
+const {
+  video,
+  watchSlug,
+  watchPageUrl,
+  source = {},
+  posterOverride,
+  canonicalUrl,
+  class: className = '',
+  preload = 'metadata',
+} = Astro.props as Props;
+
+const gcd = (a:number,b:number):number => b===0 ? Math.abs(a) : gcd(b, a % b);
+const toAspectFromDims = (w?:number,h?:number):Aspect|undefined => {
+  if (!w || !h || w<=0 || h<=0) return undefined;
+  const g = gcd(w,h);
+  return `${Math.round(w/g)}:${Math.round(h/g)}` as Aspect;
+};
+
+const videosBase = siteDefaults.collections['videos']?.base || 'videos';
+const pageCanonical =
+  canonicalUrl || video?.watchPageUrl || `${siteDefaults.siteUrl}${Astro.url.pathname}`;
+
+/* Resolve slug from a watch URL */
+const parseSlugFromWatchUrl = (u?: string): string | undefined => {
+  if (!u) return undefined;
+  try {
+    const path = u.startsWith('http') ? new URL(u).pathname : u;
+    const parts = path.split('/').filter(Boolean);
+    const idx = parts.indexOf(videosBase);
+    if (idx === -1 || idx === parts.length - 1) return undefined;
+    const s = parts[idx + 1];
+    return s?.startsWith('_') ? undefined : s;
+  } catch { return undefined; }
+};
+
+/* ───────────────── YouTube/Vimeo URL parsers → embed ───────────────── */
+const parseYTTimeToSeconds = (t?: string): number | undefined => {
+  if (!t) return undefined;
+  if (/^\d+$/.test(t)) return parseInt(t, 10);
+  if (/^\d+s$/.test(t)) return parseInt(t, 10);
+  const m = /(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?/i.exec(t);
+  if (!m) return undefined;
+  const h = parseInt(m[1] || '0', 10);
+  const min = parseInt(m[2] || '0', 10);
+  const s = parseInt(m[3] || '0', 10);
+  const total = h*3600 + min*60 + s;
+  return total > 0 ? total : undefined;
+};
+
+const toYouTubeEmbedFromUrlOrId = (input?: string) => {
+  if (!input) return { embed: undefined, start: undefined, id: undefined };
+  let id: string | undefined;
+  let start: number | undefined;
+
+  if (/^[\w-]{6,}$/.test(input) && !input.includes('http')) {
+    id = input;
+  } else {
+    try {
+      const u = new URL(input, 'https://youtube.com');
+      const host = u.hostname.replace(/^www\./,'');
+      if (host.endsWith('youtube.com') && (u.pathname === '/watch' || u.pathname === '/watch/')) {
+        id = u.searchParams.get('v') || undefined;
+        start = parseYTTimeToSeconds(u.searchParams.get('t') || u.searchParams.get('start') || undefined);
+      } else if (host.endsWith('youtube.com') && /^\/(shorts|embed)\/([^/]+)/.test(u.pathname)) {
+        const m = u.pathname.match(/^\/(?:shorts|embed)\/([^/]+)/);
+        id = m?.[1];
+        start = parseYTTimeToSeconds(u.searchParams.get('t') || u.searchParams.get('start') || undefined);
+      } else if (host === 'youtu.be') {
+        id = u.pathname.split('/').filter(Boolean)[0];
+        start = parseYTTimeToSeconds(u.searchParams.get('t') || u.searchParams.get('start') || undefined);
+      }
+    } catch {
+      id = input;
+    }
+  }
+  const embed = id ? `https://www.youtube-nocookie.com/embed/${id}` : undefined;
+  return { embed, start, id };
+};
+
+const toVimeoEmbedFromUrlOrId = (input?: string) => {
+  if (!input) return { embed: undefined, anchor: undefined, id: undefined };
+  let id: string | undefined;
+  let anchor: string | undefined;
+
+  if (/^\d{5,}$/.test(input) && !input.includes('http')) {
+    id = input;
+  } else {
+    try {
+      const u = new URL(input, 'https://vimeo.com');
+      const host = u.hostname.replace(/^www\./,'');
+      if (host.endsWith('vimeo.com')) {
+        const parts = u.pathname.split('/').filter(Boolean);
+        const last = parts[parts.length - 1];
+        if (/^\d{5,}$/.test(last)) id = last;
+        if (u.hash && /^#t=/i.test(u.hash)) anchor = u.hash;
+      }
+      if (host === 'player.vimeo.com' && /^\/video\/\d+/.test(u.pathname)) {
+        id = u.pathname.split('/').filter(Boolean)[1];
+        if (u.hash && /^#t=/i.test(u.hash)) anchor = u.hash;
+      }
+    } catch {
+      id = input;
+    }
+  }
+  const embed = id ? `https://player.vimeo.com/video/${id}` : undefined;
+  return { embed, anchor, id };
+};
+
+/* ───────────────── resolve canonical watch doc (optional) ───────────────── */
+let doc: any | null = null;
+
+if (!video) {
+  const slugFromUrl = parseSlugFromWatchUrl(watchPageUrl);
+  const finalSlug = watchSlug || slugFromUrl;
+  if (finalSlug) {
+    try {
+      const entry = await getEntry('videos', finalSlug);
+      if (entry?.data && !(entry.data?.draft === true) && !(entry.data?.slug || entry.id || entry.filePath || '').startsWith('_')) {
+        doc = entry.data;
+      }
+    } catch {}
+  }
+}
+
+/* ───────────────── choose data source (doc → video → source) ───────────────── */
+const provider: 'self'|'youtube'|'vimeo'|'embed' =
+  (video?.provider
+    ?? doc?.provider
+    ?? source.provider
+    ?? (source.youtubeUrl || source.youtubeId ? 'youtube'
+      : source.vimeoUrl || source.vimeoId ? 'vimeo'
+      : source.embedUrl ? 'embed'
+      : source.contentUrl ? 'self'
+      : 'embed'));
+
+const ytFrom = toYouTubeEmbedFromUrlOrId(video?.youtubeId ?? doc?.youtubeId ?? source.youtubeId ?? source.youtubeUrl);
+const vmFrom = toVimeoEmbedFromUrlOrId(video?.vimeoId   ?? doc?.vimeoId   ?? source.vimeoId   ?? source.vimeoUrl);
+
+const explicitEmbed = video?.embedUrl ?? doc?.embedUrl ?? source.embedUrl;
+const embedSrc =
+  explicitEmbed
+  || (provider === 'youtube' ? ytFrom.embed
+      : provider === 'vimeo' ? vmFrom.embed
+      : undefined);
+
+const startSeconds = ytFrom.start;          // for YouTube
+const vimeoAnchor  = vmFrom.anchor;         // keep #t=… if present
+
+const width  = video?.width  ?? doc?.videoWidth ?? doc?.width;
+const height = video?.height ?? doc?.videoHeight ?? doc?.height;
+const aspectRatio = (video?.aspectRatio ?? doc?.aspectRatio) as Aspect | undefined;
+const cssAspect = aspectRatio
+  ? aspectRatio.replace(':',' / ')
+  : (width && height ? `${width} / ${height}` : '16 / 9');
+
+const firstThumb = (video?.thumbnails ?? doc?.thumbnails ?? [])[0];
+const poster = (video?.poster || doc?.poster || posterOverride || firstThumb?.url || doc?.image) as string | undefined;
+const posterAlt = (video?.posterAlt || firstThumb?.alt || video?.name || doc?.title || 'Video poster') as string;
+const posterW = (video?.posterWidth || firstThumb?.width || 960) as number | undefined;
+const posterH = (video?.posterHeight || firstThumb?.height) as number | undefined;
+
+const contentUrl     = video?.contentUrl     ?? doc?.contentUrl     ?? source.contentUrl;
+const contentUrlHls  = (video as any)?.contentUrlHls ?? doc?.contentUrlHls ?? (source as any)?.contentUrlHls;
+const contentUrlDash = (video as any)?.contentUrlDash ?? doc?.contentUrlDash ?? (source as any)?.contentUrlDash;
+const encodingFormat = video?.encodingFormat ?? doc?.encodingFormat ?? source.encodingFormat;
+const captions = (video?.captions ?? doc?.captions ?? []) as any[];
+
+/* unique ids per instance */
+const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
+---
+
+<style is:inline>
+/* Component-local shell; aspect is set via inline style attr for accuracy */
+.player-shell iframe, .player-shell video { width: 100%; height: 100%; display: block; border: 0; }
+
+.video-poster-wrap { width: 100%; height: 100%; }
+.video-play-btn { background: linear-gradient(0deg, rgba(0,0,0,.35), rgba(0,0,0,.35));  }
+.video-play-btn:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
+.hide { display: none !important; }
+</style>
+
+<div class={`video-player ${className}`}>
+  <div
+    class="player-shell w-full bg-base-10 br overflow-hidden relative"
+    id={`${uid}-shell`}    
+    data-vp-root
+    data-uid={uid}
+    data-provider={provider}
+    data-canonical-url={pageCanonical}
+    data-embed-src={embedSrc || ''}
+    data-start-seconds={typeof startSeconds === 'number' ? String(startSeconds) : ''}
+    data-vimeo-anchor={vimeoAnchor || ''}
+  >
+    {/* Poster (ResponsiveImage) + Play overlay */}
+    {poster && (
+      <div id={`${uid}-poster-wrap`} class="video-poster-wrap">
+        <ResponsiveImage
+          src={poster}
+          alt={posterAlt}
+          title={video?.name || doc?.title || posterAlt}
+          caption=""
+          width={String(posterW || 960)}
+          height={posterH}
+          id={`${uid}-poster-img`}
+          loading="eager"
+          className="w-full h-full object-cover block"
+          variant="desktop"
+          addSchema={false}
+        />
+      </div>
+    )}
+
+    <button id={`${uid}-play`} class="video-play-btn absolute inset-0 grid place-items-center pointer col-base-00 text-xl border-0" aria-label="Play video">▶</button>
+
+    {/* Self-hosted */}
+    {provider === 'self' && (
+      <video id={`${uid}-video`} class="hide" controls preload={preload} playsinline poster={poster}>
+        {contentUrlHls  && <source src={contentUrlHls}  type="application/x-mpegURL" />}
+        {contentUrlDash && <source src={contentUrlDash} type="application/dash+xml" />}
+        {contentUrl     && <source src={contentUrl}     type={encodingFormat || 'video/mp4'} />}
+        {captions.map((t) => (
+          <track kind={t.kind || 'subtitles'} src={t.url} srclang={t.lang} label={t.label || t.lang} default={t.default} />
+        ))}
+        Your browser does not support the video tag.
+      </video>
+    )}
+
+    {/* Iframe slot for YouTube/Vimeo/embed */}
+    <div id={`${uid}-iframe-slot`} class="hide"></div>
+  </div>
+
+  <noscript>
+    {provider === 'self'
+      ? <video controls poster={poster} width={width ?? undefined} height={height ?? undefined}>
+          {contentUrl && <source src={contentUrl} type={encodingFormat || 'video/mp4'} />}
+        </video>
+      : <a href={watchPageUrl || pageCanonical} target="_blank" rel="noopener">Watch this video</a>}
+  </noscript>
+</div>
+<script type="module" data-src="/scripts/video-watch.js" async></script>

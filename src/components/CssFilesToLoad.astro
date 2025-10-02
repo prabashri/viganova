@@ -1,0 +1,64 @@
+---
+import manifest from "@/data/assets-manifest.json";
+
+type FileItem = {
+  name: string;                       // base name without .css (e.g. 'home', 'faq')
+  preload?: boolean;                  // default: false (prod only)
+  media?: string;                     // e.g. '(max-width: 768px)'
+  nonCritical?: boolean;              // if true -> use data-src (no href)
+  fetchPriority?: 'high' | 'low' | 'auto'; // default: 'high'
+};
+
+interface Props {
+  files: FileItem[];
+}
+
+const { files } = Astro.props as Props;
+
+const isDev = import.meta.env.DEV;
+const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
+
+function resolveHref(name: string) {
+  if (isDev) {
+    // DEV: load directly from /src for HMR
+    return `/src/styles/pages/${name}.css?t=${bust}`;
+  }
+  // PROD: from manifest, fallback to /styles/<name>.css
+  const entry = (manifest as any)?.css?.[`pages:${name}`];
+  const href = typeof entry === "string" ? entry : entry?.file;
+  return href || `/styles/${name}.css`;
+}
+---
+
+{files.map((f) => {
+  const href = resolveHref(f.name);
+  const mediaAttr = f.media ? { media: f.media } : {};
+  const fp = f.fetchPriority ?? 'high';
+
+  return (
+    <>
+      {/* Preload (prod only) — skip for nonCritical since it defers anyway */}
+      {!isDev && f.preload && !f.nonCritical && (
+        <link rel="preload" as="style" href={href} fetchpriority={fp} {...mediaAttr} />
+      )}
+
+      {/* Stylesheet link */}
+      {f.nonCritical ? (
+        // defer: your global JS will set href=data-src later
+        <link
+          rel="stylesheet"
+          data-src={href}
+          data-css-noncritical="1"
+          {...mediaAttr}
+        />
+      ) : (
+        <link
+          rel="stylesheet"
+          href={href}
+          {...(!isDev && f.preload ? { fetchpriority: fp } : {})}
+          {...mediaAttr}
+        />
+      )}
+    </>
+  );
+})}

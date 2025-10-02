@@ -1,7 +1,8 @@
 ---
-import ResponsiveImage from '../ResponsiveImage.astro';
+// src/components/ui/Card.astro
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
 import { Icon } from 'astro-icon/components';
-import type { CardProps } from '../../types/CardProps';
+import type { CardProps } from '@/types/CardProps';
 
 const {
   link,
@@ -22,7 +23,7 @@ const {
   afterAuthor,
   lastRow,
   orientation = 'horizontal',
-  imageSize = 320,
+  imageSize,
   roleType = 'none',
   loading = 'lazy', // default lazy
   className = '', // ✅ new prop
@@ -35,7 +36,7 @@ const baseClasses = `card border-primary-light hover-border-primary br bg-base-0
 const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap mx-w-content w-320 big-w-full';
 const verticalClass = 'flex flex-col w-320';
 const orientationClass = orientation === 'horizontal' ? horizontalClass : verticalClass;
-
+const imageSizeFinal = imageSize || (orientation === 'horizontal' ? 160 : 320); // default sizes  
 // Content wrapper classes
 const contentWrapperClass =
   orientation === 'horizontal'
@@ -70,12 +71,12 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
       <ResponsiveImage
         src={image}
         alt={imageAlt ?? title}
-        sizes={`${imageSize}px`}
-        width={imageSize}
-        height={Math.round(imageSize * 0.56)}
+        sizes={imageSizeFinal}
+        width={imageSizeFinal}
+        height={Math.round(imageSizeFinal * 0.56)}
         className={className}
-        imageClassName={`b-thin-base05 br-unset ${imageClassName}`}
-        breakpoints={{ mobile: imageSize, desktop: imageSize }}
+        imageClassName={`b-thin-primary-light br-unset ${imageClassName}`}
+        breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
         loading={loading}
       />
     )

@@ -11,12 +11,14 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^12.6.7",
-    "@astrojs/mdx": "^4.3.4",
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/cloudflare": "^12.6.9",
+    "@astrojs/mdx": "^4.3.6",
     "@astrojs/rss": "^4.0.12",
-    "astro": "^5.13.5",
+    "astro": "^5.13.10",
     "astro-icon": "^1.1.5",
-    "fuse.js": "^7.1.0"
+    "fuse.js": "^7.1.0",
+    "typescript": "^5.9.2"
   },
   "devDependencies": {
     "@types/html-to-text": "^9.0.4",

@@ -1,0 +1,115 @@
+---
+// src/pages/blog/[...slug].astro
+import { getEntry, getCollection, render } from 'astro:content';
+import PostLayout from '@/layouts/PostLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import modifiedDatesJson from '@/data/modified-dates.json';
+
+import type { CollectionEntry } from 'astro:content';
+
+const { slug } = Astro.params;
+const base = siteDefaults.collections['resource']?.base ?? '';
+const collectionBase = base ? `${base}/` : '';
+const modifiedDates = modifiedDatesJson as Record<string, string>;
+
+// ✅ Validate slug
+if (!slug || typeof slug !== 'string' || slug.startsWith('0-example-')) {
+  throw Astro.redirect('/404');
+}
+
+// ✅ Get the post entry
+let post: CollectionEntry<'resource'>;
+try {
+  const entry = await getEntry('resource', slug);
+  if (!entry) throw Astro.redirect('/404');
+  post = entry;
+} catch {
+  throw Astro.redirect('/404');
+}
+
+if (post.data?.draft === true) {
+  throw Astro.redirect('/404');
+}
+
+// ✅ Render markdown and extract headings
+const { Content, headings } = await render(post);
+const toc = headings
+  .filter((h) => h.depth === 2)
+  .map((h) => ({ id: h.slug, text: h.text, level: h.depth }));
+
+// ✅ Modified date
+const relativeKey = `blog/${post.data.slug}`;
+const lastModifiedRaw = modifiedDates[relativeKey] || post.data.publishedDate;
+const lastModified = lastModifiedRaw
+  ? new Date(lastModifiedRaw).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : null;
+
+// ✅ Load authors from 'team' collection using authors frontmatter
+const authorsRaw = post.data.authors ?? []; // expected: [{ id: 'prabakaran-shankar' }]
+const authors = await Promise.all(
+  authorsRaw.map(async ({ id }) => {
+    try {
+      const entry = await getEntry('team', id);
+      return entry
+        ? {
+            id,
+            slug: entry.data.slug,
+            url: `/team/${entry.data.slug}/`,
+            name: entry.data.name ?? entry.data.name ?? id,
+            data: entry.data
+          }
+        : null;
+    } catch {
+      return null;
+    }
+  })
+).then((list) => list.filter(Boolean));
+
+// ✅ Canonical URL
+const canonicalUrl = post.data?.canonicalUrl?.startsWith('http')
+  ? post.data.canonicalUrl
+  : `${siteDefaults.siteUrl}${post.data?.canonicalUrl || `/${collectionBase}${slug}/`}`;
+
+// ✅ Load all posts for prev/next/related
+const allPosts = await getCollection('resource');
+const sortedPosts = allPosts
+  .filter((p) => !p.data.draft)
+  .sort((a, b) => new Date(a.data.publishedDate).getTime() - new Date(b.data.publishedDate).getTime());
+---
+
+<PostLayout  
+  title={post.data.title}
+  description={post.data.description}
+  slug={slug}
+  canonicalUrl={canonicalUrl}
+  index={post.data.index ?? true}
+  publishedDate={post.data.publishedDate}
+  lastModified={lastModified}
+  authors={authors.filter(Boolean).map(a => ({ id: a!.id }))}
+  tags={post.data.tags}
+  categories={post.data.categories}
+  keywords={post.data.keywords}
+  featured={post.data.featured ?? false}
+  draft={post.data.draft ?? false}
+  heroImage={post.data.heroImage}
+  toc={toc}
+  collection="blog"
+  collectionBase={collectionBase}
+  allPosts={sortedPosts}
+  relatedPosts={post.data.relatedPosts?.map(f => ({
+    title: f.title,
+    url: f.url,
+  })) ?? []}
+  faq={
+    post.data.faq?.map(f => ({
+      question: f.question,
+      answer: f.answer,
+      speakable: typeof f.speakable === 'boolean' ? f.speakable : false
+    })) ?? []
+  }
+  heroImageAlt={post.data.heroImageAlt}
+  heroImageTitle={post.data.heroImageTitle}
+  heroImageCaption={post.data.heroImageCaption}
+>
+  <Content />
+</PostLayout>

@@ -1,0 +1,12 @@
+/* MDX prose reset inside callouts (override p-1 / m-1 defaults from prose) */
+.callout :where(p){ 
+    margin: 0 !important; 
+    padding: 0 !important; 
+}
+.callout :where(p + p){ 
+    margin-top: .5rem !important; 
+}
+.callout :where(ul,ol){ 
+    margin: .25rem 0 0 !important; 
+    padding-left: 1.25rem !important; 
+}

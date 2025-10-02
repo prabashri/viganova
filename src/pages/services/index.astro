@@ -1,0 +1,111 @@
+---
+// src/pages/services/index.astro
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
+import HeroCollections from '@/components/ui/HeroCollections.astro';
+import CardCollections from '@/components/ui/CardCollections.astro';
+import type { CardProps } from '@/types/CardProps';
+import { getCollection } from 'astro:content';
+import modifiedDatesJson from '@/data/modified-dates.json';
+import { toHuman } from '@/utils/date-format';
+
+const entry = 'service';
+const entryCfg = siteDefaults.collections[entry];
+const base = entryCfg?.base ?? 'services';
+const basePath = `/${base}`;
+
+const modifiedDates = modifiedDatesJson as Record<string, string>;
+
+function getLastModified(post: any): string | undefined {
+  const slug = post.data.slug ?? post.id;
+  const key = `${base}/${slug}`;
+  return (
+    modifiedDates[key] ||
+    post.data.lastModified ||
+    post.data.updatedDate ||
+    post.data.publishedDate ||
+    undefined
+  );
+}
+
+// 1) Load & exclude drafts
+const all = (await getCollection(entry)).filter(
+  (p) => !p.id.startsWith('_') && p.data?.draft !== true
+);
+
+// 2) Sort by most recent date using getLastModified()
+const posts = all.sort((a, b) => {
+  const ad = new Date(getLastModified(a) ?? 0).valueOf();
+  const bd = new Date(getLastModified(b) ?? 0).valueOf();
+  return bd - ad;
+});
+
+// 3) Split into featured vs non-featured
+const featuredPosts = posts.filter((p) => p.data?.featured === true);
+const otherPosts = posts.filter((p) => p.data?.featured !== true);
+
+const heroTitle = `Apostille & attestation services by ${siteDefaults.siteName}`;
+const metaDescription =
+  `Browse apostille and attestation services—birth, degree, and marriage certificates—requirements, timelines, and support from ${siteDefaults.siteName}.`;
+
+const headProps: HeadProps = {
+  title: heroTitle,
+  description: metaDescription,
+  image: siteImages.image,
+  canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
+  index: true,
+  keywords: posts.map((p) => p.data.title),
+  type: 'collection',
+  url: `${siteDefaults.siteUrl}${basePath}/`,
+  authors: []
+};
+
+function mapToCardProps(post: any, index: number): CardProps {
+  const postSlug = post.data.slug ?? post.id;
+  const lastMod = getLastModified(post);
+  return {
+    link: `${basePath}/${postSlug}/`,
+    linkAriaLabel: `Read service: ${post.data.title}`,
+    image: post.data.heroImage ?? '',
+    imageAlt: post.data.heroImageAlt ?? post.data.title,
+    title: post.data.title,
+    description: post.data.description ?? '',
+    afterDescription: lastMod ? toHuman(lastMod) ?? '' : '',
+    orientation: 'vertical',
+    imageSize: 320,
+    roleType: 'list',
+    loading: index < 3 ? 'eager' : 'lazy'
+  };
+}
+
+const featuredCards: CardProps[] = featuredPosts.map((p, i) => mapToCardProps(p, i));
+const otherCards: CardProps[] = otherPosts.map((p, i) => mapToCardProps(p, i));
+---
+
+<BaseLayout headProps={headProps}>
+  <HeroCollections
+    title={heroTitle}
+    description={metaDescription}
+    bgColorClass="bg-secondary-base"
+    textColorClass="col-base-00"
+    image=""    
+    imageAlt="Services Hero Image"
+    imageLoading="delay"
+  />
+
+  {featuredCards.length > 0 && (
+    <section class="mx-w-site mi-auto mb-1 pb-1">
+      <h2 class="ta-center m-bottom-2">Documents/Certificates Classification</h2>
+      <CardCollections cards={featuredCards} wrapper="ul" roleType="list" entry={entry} />
+    </section>
+  )}
+
+  {otherCards.length > 0 && (
+    <section class="mx-w-site mi-auto mb-2 pb-2">
+      <h2 class="ta-center mb-1">Individual Apostille Services</h2>
+      <CardCollections cards={otherCards} wrapper="ul" roleType="list" entry={entry} />
+    </section>
+  )}
+</BaseLayout>

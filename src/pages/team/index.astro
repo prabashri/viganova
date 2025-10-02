@@ -6,6 +6,7 @@ import { Icon } from 'astro-icon/components';
 import gravatarHashesJson from '../../data/email-hash.json';
 import type { HeadProps } from '../../types/HeadProps';
 import HeroCollections from '../../components/ui/HeroCollections.astro';
+import { siteImages } from '@/config/siteImages';
 
 const gravatarHashes: Record<string, string> = Object.fromEntries(
   Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
@@ -79,7 +80,7 @@ const headProps: HeadProps = {
   title: 'Our Team',
   description: 'Meet our team of experts dedicated to delivering the best solutions and secret to success.',
   url: `${siteDefaults.siteUrl}/team/`,
-  image: siteDefaults.image,
+  image: siteImages.image,
   index: true,
   keywords: ['team', 'experts', 'professionals', 'staff'],
   // authorName: siteDefaults.authorName,
@@ -198,7 +199,7 @@ const headProps: HeadProps = {
    <HeroCollections
     title={headProps.title}
     description={headProps.description}
-    bgColorClass="bg-secondary-lighter-x"
+    bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
   />
 

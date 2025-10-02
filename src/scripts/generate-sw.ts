@@ -1,34 +1,84 @@
 // src/scripts/generate-sw.ts
 import fs from 'fs/promises';
 import path from 'path';
+import crypto from 'crypto';
 import { siteDefaults } from '../config/siteDefaults';
-import manifest from '../data/assets-manifest.json';
 
 const swPath = path.resolve('./public/sw.js');
 const offlineHtmlPath = path.resolve('./public/offline.html');
 
-// Cache name
-const cacheNameSlug = (siteDefaults.siteName || 'site').replace(/\s+/g, '-').toLowerCase();
-const cacheVersion = Math.random().toString(36).substring(2, 8);
+// ---- paths for modified-time tracking ----
+const assetsManifestPath = path.resolve('./src/data/assets-manifest.json');
+const siteDefaultsPath = path.resolve('./src/config/siteDefaults.ts');
+
+// ---- read/write helpers ----
+async function readJson<T = any>(p: string): Promise<T> {
+  const raw = await fs.readFile(p, 'utf8');
+  return JSON.parse(raw) as T;
+}
+
+async function writeJson(p: string, data: any) {
+  await fs.writeFile(p, JSON.stringify(data, null, 2) + '\n', 'utf8');
+}
+
+async function getMTimeMs(p: string): Promise<number> {
+  const s = await fs.stat(p);
+  return Math.floor(s.mtimeMs);
+}
+
+// ---- ensure configModified.siteDefaults is up-to-date ----
+const manifest = await readJson<any>(assetsManifestPath);
+manifest.configModified ||= {};
+
+const lastRecorded = Number(manifest.configModified.siteDefaults || 0);
+const currentMTime = await getMTimeMs(siteDefaultsPath);
+
+if (!lastRecorded || currentMTime > lastRecorded) {
+  manifest.configModified.siteDefaults = currentMTime;
+  await writeJson(assetsManifestPath, manifest);
+  console.log(
+    `📝 Updated assets-manifest.json: configModified.siteDefaults=${currentMTime}`
+  );
+}
+
+// ---- build a stable cache version from configModified ----
+const cfg = manifest.configModified || {};
+const cacheSeed = [
+  cfg.siteDefaults,
+  cfg.siteLogo,
+  cfg.siteColors,
+  cfg.siteImages,
+].filter(Boolean).join('|');
+
+const cacheVersion =
+  (cacheSeed &&
+    crypto.createHash('md5').update(String(cacheSeed)).digest('hex').slice(0, 8)) ||
+  // fallback (should rarely be used)
+  Math.random().toString(36).slice(2, 10);
+
+const cacheNameSlug = (siteDefaults.siteName || 'site')
+  .replace(/\s+/g, '-')
+  .toLowerCase();
 const CACHE_NAME = `${cacheNameSlug}-cache-${cacheVersion}`;
 
-// CDN prefix
+// ---- CDN prefix ----
 const cdn = (siteDefaults.cdnPath || '').replace(/\/+$/, '');
 
-// Utility: Add CDN prefix if local path
 function addCDNPrefix(p: string): string {
   if (!p) return '';
   if (cdn && !/^https?:\/\//.test(p)) return `${cdn}${p}`;
   return p;
 }
 
-// Utility: Get asset file paths
-function extractPaths(section: Record<string, { file: string }> | undefined): string[] {
+// ---- asset helpers ----
+// NOTE: we re-read the manifest from disk above so it’s current.
+function extractPaths(
+  section: Record<string, { file?: string }> | undefined
+): string[] {
   if (!section) return [];
-  return Object.values(section).map(entry => entry.file).filter(Boolean);
+  return Object.values(section).map((e) => e.file).filter(Boolean) as string[];
 }
 
-// Utility: Check if public file exists
 async function fileExists(publicPath: string): Promise<boolean> {
   const fullPath = path.resolve('./public', publicPath.replace(/^\//, ''));
   try {
@@ -39,7 +89,7 @@ async function fileExists(publicPath: string): Promise<boolean> {
   }
 }
 
-// Ensure offline.html exists
+// ---- ensure offline.html exists (uses siteDefaults) ----
 async function ensureOfflineHtml() {
   try {
     await fs.access(offlineHtmlPath);
@@ -73,8 +123,7 @@ async function ensureOfflineHtml() {
   <p>${description}</p>
   <p>Please check your internet connection.</p>
 </body>
-</html>
-    `.trim();
+</html>`.trim();
     await fs.writeFile(offlineHtmlPath, html, 'utf8');
     console.log('📝 Created fallback offline.html');
   }
@@ -83,24 +132,25 @@ async function ensureOfflineHtml() {
 // === Generate and write SW ===
 await ensureOfflineHtml();
 
-const jsPaths = extractPaths((manifest as any).js);
-const cssPaths = [
-  ...extractPaths((manifest as any).css?.main),
-  ...extractPaths((manifest as any).css?.nonCritical),
-  ...extractPaths((manifest as any).css?.preload)
-];
+// Optional: pre-cache lists from manifest (kept minimal here)
+// const jsPaths = extractPaths(manifest.js);
+// const cssPaths = [
+//   ...extractPaths(manifest.css?.main),
+//   ...extractPaths(manifest.css?.nonCritical),
+//   ...extractPaths(manifest.css?.preload),
+// ];
 
 const additionalPaths = siteDefaults.serviceWorkerPaths ?? [];
 
 const allPaths = [
-  '/',
-  '/offline.html',
+  '/',                // homepage
+  '/offline.html',    // offline fallback
   // ...cssPaths,
   // ...jsPaths,
-  // ...additionalPaths
+  ...additionalPaths,
 ];
 
-// Filter to include only existing files (for local, not remote)
+// Keep only existing local files
 const filteredPaths = await Promise.all(
   allPaths.map(async (p) => {
     if (/^https?:\/\//.test(p)) return p;
@@ -109,7 +159,8 @@ const filteredPaths = await Promise.all(
   })
 );
 
-const precachePaths = [...new Set(filteredPaths.filter((p): p is string => Boolean(p)))].map(addCDNPrefix);
+const precachePaths = [...new Set(filteredPaths.filter(Boolean) as string[])]
+  .map(addCDNPrefix);
 
 const swContent = `
 // ✅ Auto-generated by generate-sw.ts
@@ -157,12 +208,10 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const req = event.request;
 
-  // Only handle GET requests
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
 
-  // Ignore cross-origin requests
   if (url.origin !== self.location.origin) return;
 
   if (req.destination === 'font') {
@@ -176,24 +225,18 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (req.mode === 'navigate') {
-    event.respondWith(
-      fetch(req).catch(() => caches.match('/offline.html'))
-    );
+    event.respondWith(fetch(req).catch(() => caches.match('/offline.html')));
     return;
   }
 
-  event.respondWith(
-    fetch(req).catch(() => caches.match(req))
-  );
+  event.respondWith(fetch(req).catch(() => caches.match(req)));
 });
 
 async function staleWhileRevalidate(req) {
   const cache = await caches.open(CACHE_NAME);
   const cached = await cache.match(req);
   const networkFetch = fetch(req).then(res => {
-    if (res.ok) {
-      cache.put(req, res.clone());
-    }
+    if (res.ok) cache.put(req, res.clone());
     return res;
   }).catch(() => null);
   return cached || networkFetch;
@@ -212,7 +255,6 @@ async function staticCache(req) {
   }
 }
 `;
-
 
 await fs.writeFile(swPath, swContent.trimStart(), 'utf8');
 console.log(`✅ Service Worker generated at: ${swPath}`);

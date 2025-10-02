@@ -1,0 +1,631 @@
+---
+// src/layouts/audioPostLayout.astro
+import BaseLayout from './BaseLayout.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
+import type { CollectionEntry } from 'astro:content';
+
+import { buildOrganizationSchema } from '@/utils/schemaOrganization';
+import { idFor, toAbsoluteUrl } from '@/utils/urls';
+
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+import Sidebar from '@/components/ui/Sidebar.astro';
+import Button from '@/components/ui/Button.astro';
+import ShareLink from '@/components/ShareLink.astro';
+import FaqList from '@/components/ui/FaqList.astro';
+import TagList from '@/components/ui/TagList.astro';
+import PrevNextNav from '@/components/ui/PrevNextNav.astro';
+
+import modifiedDatesJson from '@/data/modified-dates.json';
+import type { ImageMetaSlim } from '@/types/images';
+import { getImageMeta, constructUrl } from '@/utils/getImage';
+import { parseImageDims } from '@/utils/imageHelpers';
+
+import type { AudioMeta } from '@/types/HeadProps';
+// Optional local AudioMeta if not in your shared types
+
+interface Props {
+  doc: CollectionEntry<'audio'>;           // rename if your collection differs
+  allItems?: CollectionEntry<'audio'>[];   // prev/next source
+}
+
+const { doc, allItems = [] } = Astro.props as Props;
+const d = doc.data as any;
+
+
+const { orgId } = buildOrganizationSchema();
+
+/* ── Paths & canonical ─────────────────────────────────── */
+const base =
+  siteDefaults.collections['audio']?.base  ?? 'audio';
+const collectionBase = base ? `${base}/` : '';
+const defaultListenUrl = `${siteDefaults.siteUrl}/${collectionBase}${d.slug}/`;
+const canonicalUrl = d.listenPageUrl?.startsWith('http') ? d.listenPageUrl : defaultListenUrl;
+
+/* ── Dates ─────────────────────────────────────────────── */
+const modifiedDates = modifiedDatesJson as Record<string, string>;
+const relativeKey = `${base}/${d.slug}`;
+const lastModifiedRaw = modifiedDates[relativeKey] || d.updatedDate || d.publishDate;
+const lastModified = lastModifiedRaw
+  ? new Date(lastModifiedRaw).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+  : null;
+
+/* ── Prev/Next ─────────────────────────────────────────── */
+const currentIndex = allItems.findIndex(v => (v.data?.slug || v.id) === d.slug);
+const prevItem = currentIndex > 0 ? allItems[currentIndex - 1] : null;
+const nextItem = currentIndex < allItems.length - 1 ? allItems[currentIndex + 1] : null;
+
+/* ── Helpers ───────────────────────────────────────────── */
+type Aspect = `${number}:${number}`;
+const isAspect = (s: unknown): s is Aspect => typeof s === 'string' && /^\d+:\d+$/.test(s);
+const gcd = (a:number,b:number):number => b===0 ? Math.abs(a) : gcd(b, a % b);
+const toAspectFromDims = (w?:number,h?:number):Aspect|undefined => {
+  if (!w || !h || w<=0 || h<=0) return undefined;
+  const g = gcd(w,h); return `${Math.round(w/g)}:${Math.round(h/g)}` as Aspect;
+};
+const toAbs = (u?: string) => {
+  if (!u) return undefined;
+  if (u.startsWith('http://') || u.startsWith('https://')) return u;
+  if (u.startsWith('#')) return `${canonicalUrl}${u}`;
+  return `${siteDefaults.siteUrl}${u}`;
+};
+
+// Spotify: open → embed
+const toSpotifyEmbed = (url?: string) => {
+  if (!url) return undefined;
+  try {
+    const u = new URL(url);
+    if (u.hostname.includes('open.spotify.com')) {
+      u.pathname = `/embed${u.pathname}`; // /episode/ID → /embed/episode/ID
+      return u.toString();
+    }
+  } catch {}
+  return undefined;
+};
+
+/* ── Dimensions / aspect for CLS safety ────────────────── */
+const mediaWidth  = d.audioWidth ?? d.width;
+const mediaHeight = d.audioHeight ?? d.height;
+const aspectRatio: Aspect | undefined =
+  isAspect(d.aspectRatio) ? (d.aspectRatio as Aspect) : toAspectFromDims(mediaWidth, mediaHeight);
+const cssAspect = aspectRatio ? aspectRatio.replace(':',' / ') : (mediaWidth && mediaHeight ? `${mediaWidth} / ${mediaHeight}` : '16 / 9');
+
+/* ── Embed URL (for iframe providers) ──────────────────── */
+const embedSrc =
+  d.embedUrl
+  ?? (d.provider === 'spotify' ? toSpotifyEmbed(d.platform?.spotify) : undefined);
+
+/* ── Unified hero image (cover/poster/social) ────────────
+   Use the SAME image across poster/social/preview like Video layout.
+   Supports optional:
+     image, imageAlt, imageTitle, imageCaption
+----------------------------------------------------------------- */
+const heroImageKey: string  = (d as any).image || siteImages.image; // metadata key e.g. "featured/foo.png"
+const heroImageMeta: ImageMetaSlim | null = heroImageKey ? getImageMeta(heroImageKey) : null;
+const heroImage: string | undefined = heroImageMeta
+  ? (constructUrl(heroImageMeta, 'full', 'png') as string)
+  : undefined;
+const heroImageAlt: string = (d as any).imageAlt || d.title;
+const heroDims = heroImage ? parseImageDims(heroImage) : null;
+const heroImageWidth = heroDims?.width;
+const heroImageHeight = heroDims?.height;
+
+/* ── Schema helpers (absolute urls) ────────────────────── */
+const transcriptAbs = toAbs((d as any).transcriptUrl);
+const chaptersAbs = Array.isArray(d.chapters)
+  ? d.chapters.map((c: any) => ({ ...c, url: undefined })) // compute deeplinks locally
+  : undefined;
+
+/* ── Build AudioMeta for BaseHead/Schema (full) ────────── */
+const audioMeta: AudioMeta = {
+  provider: (d.provider as any) || (d.contentUrl ? 'self' : (embedSrc ? 'embed' : undefined)),
+  listenPageUrl: canonicalUrl,
+  contentUrl: (d as any).contentUrl,                // mp3/m4a/ogg
+  encodingFormat: (d as any).encodingFormat || 'audio/mpeg',
+  embedUrl: embedSrc,
+
+  name: d.title,
+  description: d.description,
+  uploadDate: d.uploadDate ?? d.publishDate,
+  durationSeconds: d.durationSeconds,
+
+  isLive: (d as any).isLive ?? false,
+  isFamilyFriendly: (d as any).isFamilyFriendly ?? true,
+  isAccessibleForFree: (d as any).isAccessibleForFree ?? true,
+  requiresSubscription: (d as any).requiresSubscription ?? false,
+
+  // unified hero
+  image: heroImage,
+  imageAlt: heroImageAlt,
+  imageWidth: heroImageWidth,
+  imageHeight: heroImageHeight,
+  thumbnails: (d as any).thumbnails ?? [],
+
+
+  captions: (d as any).captions,
+  transcriptUrl: transcriptAbs,
+  chapters: chaptersAbs,
+
+  regionsAllowed: (d as any).regionsAllowed,
+  sameAs: (d as any).sameAs,
+
+  platform: {
+    spotify: d.platform?.spotify,
+    apple: d.platform?.apple,
+    google: d.platform?.google,
+    amazon: d.platform?.amazon,
+    youtubeMusic: d.platform?.youtubeMusic,
+    pocketCasts: d.platform?.pocketCasts,
+    overcast: d.platform?.overcast,
+    castbox: d.platform?.castbox,
+    stitcher: d.platform?.stitcher,
+    tunein: d.platform?.tunein,
+    iheartradio: d.platform?.iheartradio,
+    deezer: d.platform?.deezer,
+    rss: d.platform?.rss,
+  },
+
+  isMainEntity: true,
+};
+
+const iso = (d?: string | Date) => (d ? new Date(d).toISOString() : undefined);
+const toISODuration = (secs?: number) => {
+  if (!secs || secs <= 0) return undefined;
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = Math.floor(secs % 60);
+  return `PT${h ? `${h}H` : ''}${m ? `${m}M` : ''}${s ? `${s}S` : ''}`;
+};
+
+/** Build AudioObject JSON-LD (mirrors VideoPostLayout style) */
+const audioId   = idFor('audio', toAbsoluteUrl(audioMeta.listenPageUrl || canonicalUrl));
+const webPageId = idFor('webpage', toAbsoluteUrl(canonicalUrl));
+const thumbnailUrlArr = heroImage ? [toAbsoluteUrl(heroImage)] : undefined;
+
+const hasPart: any[] = [];
+if (Array.isArray(audioMeta.chapters) && audioMeta.chapters.length) {
+  hasPart.push(
+    ...audioMeta.chapters.map((c: any) => ({
+      '@type': 'Clip',
+      name: c.name,
+      ...(typeof c.start === 'number' ? { startOffset: Math.max(0, c.start | 0) } : {}),
+      // build a clean deeplink per chapter
+      ...(typeof c.start === 'number' ? { url: `${canonicalUrl}?t=${Math.max(0, c.start | 0)}` } : {})
+    }))
+  );
+}
+if (audioMeta.transcriptUrl) {
+  hasPart.push({
+    '@type': 'DigitalDocument',
+    name: `${d.title} — Transcript`,
+    url: toAbsoluteUrl(audioMeta.transcriptUrl)
+  });
+}
+
+const audioSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AudioObject',
+  '@id': audioId,
+
+  name:        audioMeta.name || d.title,
+  description: audioMeta.description || d.description,
+
+  // Images / thumbnails (use same poster for preview consistency)
+  ...(thumbnailUrlArr ? { thumbnailUrl: thumbnailUrlArr } : {}),
+  ...(heroImage ? {
+    image: {
+      '@type': 'ImageObject',
+      url: toAbsoluteUrl(heroImage),
+      ...(heroImageWidth  ? { width:  heroImageWidth }  : {}),
+      ...(heroImageHeight ? { height: heroImageHeight } : {})
+    }
+  } : {}),
+
+  // Where to listen
+  ...(audioMeta.embedUrl   ? { embedUrl:   toAbsoluteUrl(audioMeta.embedUrl) }   : {}),
+  ...(audioMeta.contentUrl ? { contentUrl: toAbsoluteUrl(audioMeta.contentUrl) } : {}),
+  uploadDate: iso(audioMeta.uploadDate),
+  ...(audioMeta.durationSeconds ? { duration: toISODuration(audioMeta.durationSeconds) } : {}),
+
+  // Graph links
+  isPartOf: [{ '@id': webPageId }],
+  publisher: { '@id': orgId },
+  mainEntityOfPage: toAbsoluteUrl(canonicalUrl),
+
+  // Policies (only when explicitly set)
+  ...(audioMeta.isFamilyFriendly     !== undefined ? { isFamilyFriendly:     !!audioMeta.isFamilyFriendly } : {}),
+  ...(audioMeta.isAccessibleForFree  !== undefined ? { isAccessibleForFree:  !!audioMeta.isAccessibleForFree } : {}),
+  ...(audioMeta.requiresSubscription !== undefined ? { requiresSubscription: !!audioMeta.requiresSubscription } : {}),
+
+  // Optional extras
+  ...(audioMeta.encodingFormat ? { encodingFormat: audioMeta.encodingFormat } : {}),
+  ...(audioMeta.sameAs         ? { sameAs: audioMeta.sameAs }                 : {}),
+  ...(audioMeta.regionsAllowed ? { regionsAllowed: audioMeta.regionsAllowed } : {}),
+  ...(hasPart.length ? { hasPart } : {})
+};
+
+/* ── HeadProps for BaseLayout (SEO) ────────────────────── */
+const headProps: HeadProps = {
+  title: d.title,
+  description: d.description,
+  image: heroImage || siteImages.image,
+  imageAlt: heroImageAlt,
+  imageWidth: heroImageWidth,
+  imageHeight: heroImageHeight,
+  type: 'audio',
+  canonicalUrl,
+  url: canonicalUrl,
+  index: d.index ?? true,
+  keywords: d.keywords?.length ? d.keywords : d.tags,
+  publishedAt: d.publishDate,
+  updatedAt: lastModified ?? undefined,
+  showBreadcrumb: true,
+  // Schema.astro will emit AudioObject when type==='audio' and `audio` is present.
+  audio: audioMeta as any,
+};
+
+/* Chapter seek deeplink for history only (no visible link) */
+const chapterHref = (start: number, explicit?: string) =>
+  explicit ? toAbs(explicit) : `${canonicalUrl}?t=${Math.max(0, start|0)}`;
+
+/* Build “download / listen on” buttons */
+const links: Array<{ label: string; href: string; external?: boolean; variant?: 'primary'|'secondary' }> = [];
+
+if (heroImage) {
+  const labelWH = heroImageWidth && heroImageHeight ? ` (${heroImageWidth}×${heroImageHeight})` : '';
+  links.push({ label: `Cover${labelWH}`, href: toAbs(heroImage)!, variant: 'secondary' });
+}
+
+if ((d as any).contentUrl) {
+  const ext = String((d as any).contentUrl).split('.').pop()?.toUpperCase();
+  links.push({ label: `Audio${ext ? ` (${ext})` : ''}`, href: toAbs((d as any).contentUrl)!, variant: 'primary' });
+}
+
+if (d.platform?.rss)          links.push({ label: 'RSS Feed',           href: toAbs(d.platform.rss)!,           external: true, variant: 'secondary' });
+if (d.platform?.spotify)      links.push({ label: 'Listen on Spotify',  href: d.platform.spotify,               external: true, variant: 'primary' });
+if (d.platform?.apple)        links.push({ label: 'Listen on Apple',    href: d.platform.apple,                 external: true, variant: 'primary' });
+if (d.platform?.google)       links.push({ label: 'Listen on Google',   href: d.platform.google,                external: true, variant: 'secondary' });
+if (d.platform?.amazon)       links.push({ label: 'Listen on Amazon',   href: d.platform.amazon,                external: true, variant: 'secondary' });
+if (d.platform?.youtubeMusic) links.push({ label: 'YouTube Music',      href: d.platform.youtubeMusic,          external: true, variant: 'secondary' });
+if (d.platform?.pocketCasts)  links.push({ label: 'Pocket Casts',       href: d.platform.pocketCasts,           external: true, variant: 'secondary' });
+if (d.platform?.overcast)     links.push({ label: 'Overcast',           href: d.platform.overcast,              external: true, variant: 'secondary' });
+if (d.platform?.castbox)      links.push({ label: 'Castbox',            href: d.platform.castbox,               external: true, variant: 'secondary' });
+if (d.platform?.stitcher)     links.push({ label: 'Stitcher',           href: d.platform.stitcher,              external: true, variant: 'secondary' });
+if (d.platform?.tunein)       links.push({ label: 'TuneIn',             href: d.platform.tunein,                external: true, variant: 'secondary' });
+if (d.platform?.iheartradio)  links.push({ label: 'iHeartRadio',        href: d.platform.iheartradio,           external: true, variant: 'secondary' });
+if (d.platform?.deezer)       links.push({ label: 'Deezer',             href: d.platform.deezer,                external: true, variant: 'secondary' });
+
+/* unique ids */
+const uid = `ap-${Math.random().toString(36).slice(2,9)}`;
+const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
+---
+
+<BaseLayout headProps={headProps}>
+  <Fragment slot="headContent-top">
+    {/* Preconnects for faster audio boot */}
+    {embedSrc?.includes('open.spotify.com') && (
+      <>
+        <link rel="preconnect" href="https://open.spotify.com" />
+        <link rel="preconnect" href="https://i.scdn.co" />
+        <link rel="dns-prefetch" href="https://open.spotify.com" />
+        <link rel="dns-prefetch" href="https://i.scdn.co" />
+      </>
+    )}
+
+    {/* SoundCloud embeds */}
+    {embedSrc?.includes('w.soundcloud.com') && (
+      <>
+        <link rel="preconnect" href="https://w.soundcloud.com" />
+        <link rel="preconnect" href="https://api.soundcloud.com" />
+        <link rel="dns-prefetch" href="https://w.soundcloud.com" />
+        <link rel="dns-prefetch" href="https://api.soundcloud.com" />
+        <link rel="dns-prefetch" href="https://i1.sndcdn.com" />
+      </>
+    )}
+
+    {/* Link-out platforms → dns-prefetch (lightweight) */}
+    {d.platform?.apple && (
+      <>
+        <link rel="dns-prefetch" href="https://podcasts.apple.com" />
+        <link rel="preconnect" href="https://podcasts.apple.com" />
+      </>
+    )}
+    {d.platform?.google && (
+      <>
+        <link rel="dns-prefetch" href="https://podcasts.google.com" />
+        <link rel="preconnect" href="https://podcasts.google.com" />
+      </>
+    )}
+    {d.platform?.amazon && (
+      <>
+        <link rel="dns-prefetch" href="https://music.amazon.com" />
+        <link rel="preconnect" href="https://music.amazon.com" />
+      </>
+    )}
+    {d.platform?.youtubeMusic && (
+      <>
+        <link rel="dns-prefetch" href="https://music.youtube.com" />
+        <link rel="dns-prefetch" href="https://i.ytimg.com" />
+      </>
+    )}
+    {d.platform?.pocketCasts && <link rel="dns-prefetch" href="https://pocketcasts.com" />}
+    {d.platform?.overcast && <link rel="dns-prefetch" href="https://overcast.fm" />}
+    {d.platform?.castbox && <link rel="dns-prefetch" href="https://castbox.fm" />}
+    {d.platform?.tunein && <link rel="dns-prefetch" href="https://tunein.com" />}
+    {d.platform?.iheartradio && <link rel="dns-prefetch" href="https://www.iheart.com" />}
+    {d.platform?.deezer && <link rel="dns-prefetch" href="https://www.deezer.com" />}
+
+    {/* Preloads */}
+    {heroImage && <link rel="preload" as="image" href={toAbs(heroImage)} />}
+    {d.provider === 'self' && d.contentUrl && (
+      <link rel="preload" as="audio" href={toAbs(d.contentUrl)} type={(d as any).encodingFormat || 'audio/mpeg'} />
+    )}
+  </Fragment>
+
+  <Fragment slot="headContent-bottom">
+    {/* Series hints */}
+    {prevItem && <link rel="prev" href={`/${collectionBase}${prevItem.data?.slug || prevItem.id}/`} />}
+    {nextItem && <link rel="next" href={`/${collectionBase}${nextItem.data?.slug || nextItem.id}/`} />}
+
+    {/* Audio-specific OG/Twitter/RSS metadata */}
+    {d.contentUrl && (
+      <>
+        <meta property="og:audio" content={toAbs(d.contentUrl)} />
+        <meta property="og:audio:secure_url" content={toAbs(d.contentUrl)?.replace('http://','https://')} />
+        <meta property="og:audio:type" content={(d as any).encodingFormat || 'audio/mpeg'} />
+      </>
+    )}
+    {embedSrc && (
+      <>
+        <meta name="twitter:card" content="player" />
+        <meta name="twitter:player" content={embedSrc} />
+        {mediaWidth && <meta name="twitter:player:width" content={String(mediaWidth)} />}
+        {mediaHeight && <meta name="twitter:player:height" content={String(mediaHeight)} />}
+      </>
+    )}
+    {d.platform?.rss && (
+      <link rel="alternate" type="application/rss+xml" title={`${d.title} – RSS`} href={toAbs(d.platform.rss)} />
+    )}
+  </Fragment>
+
+  <style id="audio-layout-styles" is:inline>
+.audio-layout {{
+  grid-template-columns: minmax(0,1fr);
+  grid-template-areas:
+    "header"
+    "player"
+    "sidebar-left"
+    "content"
+    "sidebar-right"
+    "footer"
+    "footerNav";
+}}
+.audio-header   {{ grid-area: header; }}
+.audio-player   {{ grid-area: player; }}
+.audio-content  {{ grid-area: content; }}
+.sidebar-left   {{ grid-area: sidebar-left; }}
+.sidebar-right  {{ grid-area: sidebar-right; }}
+.audio-footer   {{ grid-area: footer; }}
+.footer-nav     {{ grid-area: footerNav; }}
+
+/* Media */
+.player-shell iframe, .player-shell audio {{
+  width: 100%;
+  height: 100%;
+  display: block;
+  border: 0;
+}}
+
+@media (min-width: 1024px) and (max-width: 1279px) {{
+  .audio-layout {{
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      "header header"
+      "player player"
+      "content sidebar-left"
+      "content sidebar-right"
+      "footer sidebar-right"
+      "footerNav footerNav";
+  }}
+}}
+@media (min-width: 1280px) {{
+  .audio-layout {{
+    grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
+    grid-template-areas:
+      "header header header"
+      "player player player"
+      "sidebar-left content sidebar-right"
+      "sidebar-left footer sidebar-right"
+      "footerNav footerNav footerNav";
+  }}
+  .sidebar-left, .sidebar-right {{
+    max-height: calc(100vh - 5rem);
+  }}
+}}
+.sidebar-left:empty, .sidebar-right:empty {{ display: none; }}
+  </style>
+
+  <article id="audio-layout" class="audio-layout grid w-full jc-center">
+    {/* Header */}
+    <header class="audio-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
+      <div class="mx-w-site mi-auto ta-center mb-2">
+        <h1 class="post-title">{d.title}</h1>
+        {d.description && <p class="post-desc">{d.description}</p>}
+        <div class="post-meta text-s mb-1">
+          {(d.publishDate || lastModified) && (
+            <div class="post-dates text-s">
+              {d.publishDate && <time datetime={d.publishDate}>📅 on {new Date(d.publishDate).toLocaleDateString()}</time>}
+              {lastModified && <span class="last-updated-on">Updated: {new Date(lastModified).toLocaleDateString()}</span>}
+              {d.durationSeconds && <span class="ml-05">• ⏱ {Math.round(d.durationSeconds/60)} min</span>}
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
+
+    {/* Hero cover + play overlay → audio/iframe */}
+    <section class="audio-player mx-w-content mb-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
+      <div
+        class="player-shell overflow-hidden relative bg-base-10 br w-full h-full"
+        id={`${uid}-shell`}
+        data-ap-root
+        data-uid={uid}
+        data-provider={(d.provider as string)?.toLowerCase?.() || d.provider}
+        data-canonical-url={canonicalUrl}
+        data-embed-src={embedSrc || ''}
+      >
+        {heroImage && heroImageMeta && (
+          <div class="poster-wrap w-full h-full" id={`${uid}-poster-wrap`}>
+            <ResponsiveImage
+              src={heroImageKey}
+              imageMeta={heroImageMeta}
+              alt={heroImageAlt}
+              title={(d as any).imageTitle}
+              caption={(d as any).imageCaption}
+              width={heroImageWidth ? String(heroImageWidth) : undefined}
+              height={heroImageHeight}
+              id={`${uid}-poster-img`}
+              loading="eager"
+              className="w-full h-full object-cover block"
+              variant="desktop"
+              addSchema={false}
+            />
+          </div>
+        )}
+
+        <button id={`${uid}-play`} class="play-btn absolute inset-0 grid place-items-center pointer base-00 text-xl" aria-label="Play audio">▶</button>
+
+        {/* Self-hosted audio (hide until play) */}
+        {d.provider === 'self' && (
+          <audio
+            id={`${uid}-audio`}
+            class="hide"
+            controls
+            preload="metadata"
+          >
+            {d.contentUrl && <source src={d.contentUrl} type={(d as any).encodingFormat || 'audio/mpeg'} />}
+            {(d as any).altSources?.map?.((s: any) => (
+              <source src={s.src} type={s.type} />
+            ))}
+            Your browser does not support the audio element.
+          </audio>
+        )}
+
+        {/* Iframe slot for Spotify/embeds */}
+        <div id={`${uid}-iframe-slot`} class="hide"></div>
+      </div>
+
+      {/* Transcript link via Anchor (if any) */}
+      {(d as any).transcriptUrl && (
+        <Anchor href={(d as any).transcriptUrl} variant="plain" className="text-s mb-05 w-fit">
+          View transcript
+        </Anchor>
+      )}
+    </section>
+
+    {/* Content */}
+    <div class="audio-content mx-w-content mi-auto mb-05 p-1">
+      <slot />
+    </div>
+
+    {/* Sidebar LEFT: Download / Listen-on buttons */}
+    <Sidebar variant="left">
+      {links.length > 0 && (
+        <section class="audio-links">
+          <h3 class="text-xs uppercase mb-05">Listen / Download</h3>
+          <ul class="no-bullets flex flex-row full-flex-col wrap gap-05">
+            {links.map((lnk) => (
+              <li>
+                <Anchor
+                  href={lnk.href}
+                  variant={lnk.variant || 'secondary'}
+                  target={lnk.external ? '_blank' : undefined}
+                  rel={lnk.external ? 'noopener' : undefined}
+                >
+                  {lnk.label}
+                </Anchor>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </Sidebar>
+
+    {/* Sidebar RIGHT: Chapters (seek in audio) */}
+    <Sidebar variant="right">
+      {Array.isArray(d.chapters) && d.chapters.length > 0 && (
+        <section class="audio-chapters">
+          <h3 class="text-xs uppercase mb-05">Chapters</h3>
+          <ul class="chapter-list no-bullets">
+            {d.chapters.map((c: any, i: number) => (
+              <li>
+                <Button
+                  id={`chap-${d.slug}-${i}`}
+                  label={`Seek to ${ts(c.start)} — ${c.name}`}
+                  type="button"
+                  variant="plain"
+                  className="chapter-link inline-flex gap-05 td-none p-05 br bg-transparent pointer hover-bg-primary-lighter-x"
+                  data-seek={c.start}
+                  data-href={chapterHref(c.start, c.url)}
+                  ariaLabel={`Seek to ${ts(c.start)} — ${c.name}`}
+                  dataAction="chapter_seek"
+                  dataLabel={c.name}
+                >
+                  <span class="ts">{ts(c.start)}</span>
+                  <span>{c.name}</span>
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </Sidebar>
+
+    {/* Footer: share, FAQ, tags, prev/next */}
+    <footer id="audio-footer" class="audio-footer mx-w-content w-full mi-auto mb-05 p-05">
+      <ShareLink id="audio-footer-share-links" className="mb-05 p-05" title="share" />
+
+      {Array.isArray(d.faq) && d.faq.length > 0 && (
+        <FaqList
+          items={d.faq}
+          id="faq"
+          class="mb-05 p-05"
+          heading="Frequently Asked Questions"
+          headingTag="h2"
+          openAll={true}
+          addSchema={true}
+          addSpeakableSchema={true}
+          htmlAnswers={false}
+        />
+      )}
+
+      {Array.isArray(d.tags) && d.tags.length > 0 && (
+        <TagList
+          items={d.tags}
+          heading="Keywords"
+          baseHref="/tags/"
+          dedupe={true}
+          sort="asc"
+        />
+      )}
+    </footer>
+
+    {(prevItem || nextItem) && (
+      <PrevNextNav
+        prevItem={prevItem}
+        nextItem={nextItem}
+        collectionBase={collectionBase}
+        prevVariant="secondary"
+        nextVariant="secondary"
+      />
+    )}
+  </article>
+
+  <Fragment slot="extraScripts">
+    <script id="audio-schema" type="application/ld+json" set:html={JSON.stringify(audioSchema)}></script>
+    <script type="module" data-src="/scripts/audio-listen.js" async></script>
+  </Fragment>
+
+</BaseLayout>

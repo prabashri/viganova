@@ -1,168 +1,291 @@
 ---
+/* src/components/BaseHead.astro */
 import { siteDefaults } from '../config/siteDefaults';
-import { parseToIsoString } from '../utils/date-utils';
 import CssHead from './CssHead.astro';
-import type { HeadProps } from '../types/HeadProps';
+import type { HeadProps /*, VideoMeta*/ } from '@/types/HeadProps';
 import Rss from './Rss.astro';
 import ImagePreload from './ImagePreload.astro';
-import InlineScript from './InlineScript.astro';
 
+import Schema from '@/components/schema/Schema.astro';
+import SchemaLocalBusiness from '@/components/schema/SchemaLocalBusiness.astro';
+import SchemaSiteNavigation from '@/components/schema/SchemaSiteNavigation.astro';
 
-import { getImageMeta } from '../utils/getImageMeta';
-import Schema from './Schema.astro';
+import { siteImages } from '@/config/siteImages';
+import { siteColors } from '@/config/siteColors';
+import { toAbsoluteUrl } from '@/utils/urls';
+
+import { toMachineDate } from '@/utils/date-format';
+
+// image utils
+import { getImageMeta } from '@/utils/getImage';
+import { parseImageDims } from '@/utils/imageHelpers';
 
 
 const isDev = import.meta.env.DEV;
 
-// Determine fallback author(s) based on organization type
-let fallbackAuthors: { name: string; url: string }[] = [];
-
-if (siteDefaults.organization.type === 'Organization' && siteDefaults.organization.incharge?.name) {
-  fallbackAuthors = [{
-    name: siteDefaults.organization.incharge.name,
-    url: siteDefaults.organization.incharge.url ?? siteDefaults.organization.url
-  }];
-} 
-else if (siteDefaults.organization.type === 'Person') {
-  fallbackAuthors = [{
-    name: siteDefaults.organization.name,
-    url: siteDefaults.organization.url
-  }];
+/* ---------- Fallback author(s) per new siteDefaults ---------- */
+type MiniAuthor = { name: string; url?: string };
+function authorFromDefaults(p?: any): MiniAuthor | undefined {
+  if (!p?.name) return undefined;
+  return { name: p.name, url: p.url || siteDefaults.siteUrl };
 }
+const fallbacks = [
+  authorFromDefaults((siteDefaults as any).incharge),
+  authorFromDefaults((siteDefaults as any).founder),
+  authorFromDefaults((siteDefaults as any).parentOrganization?.incharge),
+  authorFromDefaults((siteDefaults as any).parentOrganization?.founder),
+].filter(Boolean) as MiniAuthor[];
 
-const props: HeadProps = {
+let fallbackAuthors: MiniAuthor[] = fallbacks.length ? [fallbacks[0]] : [];
+
+/* ---------- Collect props ---------- */
+const props: HeadProps & {
+  // minimal media handoff to Schema (page layout emits VideoObject/AudioObject)
+  videoWatchPageUrl?: string;
+  videoContentUrl?: string;
+  audioListenPageUrl?: string;
+  audioContentUrl?: string;
+} = {
   ...Astro.props,
   title: Astro.props.title ?? siteDefaults.title,
   description: Astro.props.description ?? siteDefaults.description,
   image: Astro.props.image,
+  imageAlt: Astro.props.imageAlt,
   type: Astro.props.type ?? 'webpage',
   url: Astro.props.url ?? Astro.url.toString(),
   siteName: Astro.props.siteName ?? siteDefaults.siteName,
   authors: (Astro.props.authors?.length > 0 ? Astro.props.authors : fallbackAuthors),
   publishedAt: Astro.props.publishedAt ?? siteDefaults.publishedDate,
   updatedAt: Astro.props.updatedAt,
+  publishedAtISO: Astro.props.publishedAtISO,
+  updatedAtISO: Astro.props.updatedAtISO,
   index: Astro.props.index ?? true,
   keywords: Astro.props.keywords ?? siteDefaults.keywords,
   faq: Astro.props.faq ?? [],
   listItems: Astro.props.listItems ?? [],
-  canonicalUrl: Astro.props.canonicalUrl
+  canonicalUrl: Astro.props.canonicalUrl,
+
+  // new minimal media props (optional)
+  videoWatchPageUrl: (Astro.props as any).videoWatchPageUrl,
+  videoContentUrl: (Astro.props as any).videoContentUrl,
+  audioListenPageUrl: (Astro.props as any).audioListenPageUrl,
+  audioContentUrl: (Astro.props as any).audioContentUrl,
+
+  serviceOffers: Astro.props.serviceOffers || []
 };
 
-// Canonical URL
-const canonicalURL = new URL(
-  props.canonicalUrl ?? Astro.url.pathname,
-  siteDefaults.siteUrl
-).toString();
-
-// Destructure props for use in head
+/* ---------- Canonical ---------- */
+// const canonicalURL = new URL(props.canonicalUrl ?? Astro.url.pathname, siteDefaults.siteUrl).toString();
+const rawPath = props.canonicalUrl ?? Astro.url.pathname;
+const canonicalURL = toAbsoluteUrl(rawPath, {cdn: false});
+/* ---------- Destructure ---------- */
 const {
   title,
   description,
-  image,
   type,
-  url,
+  image,
   siteName,
-  authors,
+  authors = [],
   publishedAt,
   updatedAt,
   index,
   keywords,
   faq,
-  listItems
+  listItems,
+
+  // minimal media
+  videoWatchPageUrl,
+  videoContentUrl,
+  audioListenPageUrl,
+  audioContentUrl,
+
+  serviceOffers = [],
 } = props;
 
-function getImageKeyFromPublicUrl(src?: string): string | undefined {
-  if (!src) return undefined;
-  // Remove leading slash and `/images/` directory
-  return src.replace(/^\/+/, '').replace(/^images\//, '');
+const lastModified = updatedAt || publishedAt;
+
+/* ---------- Helpers for image normalization ---------- */
+function publicPrefix(): string {
+  const pf = (siteImages as any).publicFolder ?? 'public/images';
+  return pf.replace(/^\.?\/?public\/?/, '').replace(/^\/+/, '');
+}
+const PUB_PREFIX = publicPrefix(); // e.g., "images"
+
+const PUB_RE = new RegExp(
+  `^(?:https?:\\/\\/[^/]+)?\\/?${PUB_PREFIX.replace('/', '\\/')}\\/\\d{4}\\/\\d{2}\\/[^/]+-w-?\\d+-a\\d+x\\d+\\.[a-z0-9]+(?:[?#].*)?$`,
+  'i'
+);
+
+function toRelative(pathOrUrl: string): string {
+  const noHost = pathOrUrl.replace(/^https?:\/\/[^/]+/i, '');
+  return noHost.startsWith('/') ? noHost : `/${noHost}`;
 }
 
-const imageMeta = getImageMeta(getImageKeyFromPublicUrl(image));
-const imageUrl = imageMeta?.url || '';
-const imageWidth = imageMeta?.width || 0;
-const imageHeight = imageMeta?.height || 0;
+function withPng(url: string): string {
+  return url.replace(/\.[a-z0-9]+(?:[?#].*)?$/i, '.png');
+}
 
-const datePublished = parseToIsoString(publishedAt ?? siteDefaults.publishedDate);
-const dateModified = parseToIsoString(updatedAt);
+const themeLight = String(siteColors?.primaryColor ?? '#0ea5e9');
+const themeDark  = String(siteColors?.primaryColorDark ?? themeLight);
 
-const rssEnabled = siteDefaults.rss === true;
-const sitemapEnabled = siteDefaults.sitemap === true;
+/* ---------- Normalize hero image (absolute PNG) ---------- */
+let rawCandidate: string | undefined = props.image || siteImages.image;
+let finalAlt = props.imageAlt || title;
+
+let relPublicUrl = '';
+let imageWidth = 0;
+let imageHeight = 0;
+
+if (rawCandidate && PUB_RE.test(rawCandidate)) {
+  const parsed = parseImageDims(rawCandidate);
+  if (parsed) {
+    relPublicUrl = `/${parsed.path}-w${parsed.width}-a${parsed.aspect}.png`;
+    imageWidth = parsed.width;
+    imageHeight = parsed.height;
+  } else {
+    relPublicUrl = withPng(toRelative(rawCandidate));
+  }
+} else {
+  const tryKey = rawCandidate || siteImages.image;
+  let meta = tryKey ? getImageMeta(tryKey) : null;
+
+  if (!meta && siteImages.image && tryKey !== siteImages.image) {
+    meta = getImageMeta(siteImages.image);
+    if (!finalAlt) finalAlt = siteDefaults.title;
+  }
+
+  if (meta) {
+    const widths = meta.sizes.map(Number).sort((a, b) => a - b);
+    const maxW = widths[widths.length - 1];
+    relPublicUrl = `${meta.path}-w${maxW}-a${meta.aspect}.png`;
+
+    imageWidth = maxW;
+    const [aw, ah] = meta.aspect.split('x').map(Number);
+    imageHeight = aw && ah ? Math.round(maxW * (ah / aw)) : 0;
+  } else if (rawCandidate) {
+    const coerced = withPng(toRelative(rawCandidate));
+    relPublicUrl = coerced;
+    const parsed = parseImageDims(coerced);
+    if (parsed) {
+      imageWidth = parsed.width;
+      imageHeight = parsed.height;
+    }
+  }
+}
+const imageUrlAbs = toAbsoluteUrl(relPublicUrl);
+
+/* ---------- Dates ---------- */
+const datePublished: string | undefined =
+  props.publishedAtISO ?? toMachineDate(publishedAt ?? siteDefaults.publishedDate, 'now') ?? '';
+const dateModified: string | undefined =
+  props.updatedAtISO ?? toMachineDate(updatedAt ?? 'now') ?? '';
+
+/* ---------- OG type (generic; media OG handled in layouts) ---------- */
+const isVideo = (type === 'video' || type === 'watch' || type === 'watchpage' || !!(videoContentUrl || videoWatchPageUrl));
+const isAudio = (type === 'audio' || type === 'listen' || type === 'listenpage' || !!(audioContentUrl || audioListenPageUrl));
+
+const isArticleLike = (type === 'article' || type === 'service');
+
+function ogTypeFor(t: string, isVid: boolean, isAud: boolean, isArtLike: boolean) {
+  if (isVid || isAud) return 'website';
+  if (isArtLike) return 'article';
+  return 'website';
+}
 ---
-{/** 🔹 Primary Page Title */}
+
 <title>{title}</title>
 
-{/** 🔹 Favicons & Manifest */}
+{/* Favicons & Manifest */}
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/manifest.webmanifest" />
-<meta name="theme-color" content="#0d9488" />
+
+{/* Supported schemes */}
+<meta name="color-scheme" content="light dark" />
+
+{/* Basic app meta */}
 <meta name="application-name" content={siteDefaults.siteName} />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 
-{/** 🔹 Robots & Referrer */}
-{ !isDev && <meta name="robots" content={index ? "index, follow" : "noindex, nofollow"} /> }
+{/* Robots & Referrer */}
+{ !isDev && <meta name="robots" content={props.index ? "index, follow" : "noindex, nofollow"} /> }
 <meta name="referrer" content="strict-origin-when-cross-origin" />
 
-{/** 🔹 CSS */}
+{/* CSS */}
 <CssHead />
-{/** 🔹 Preload Images */}
+
+{/* Preload small sitewide images (not hero) */}
 <ImagePreload />
 
-
-{/** 🔹 Canonical */}
+{/* Canonical */}
 <link rel="canonical" href={canonicalURL} />
 
-{/** 🔹 Primary SEO Meta */}
+{/* Primary SEO */}
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <meta name="keywords" content={(keywords ?? []).join(', ')} />
 
-{/** 🔹 Author Meta */}
+{/* Author (fallbacks use siteDefaults only, no org object assumed) */}
 {authors.length > 0
-  ? authors.map(a => <meta name="author" content={a.name} />)
+  ? authors.map((a) => <meta name="author" content={a.name} />)
   : <meta name="author" content={siteDefaults.admin.name} />}
-{authors.length > 0
-  ? authors.map(a => <meta property="article:author" content={a.url ?? siteDefaults.organization.url} />)
-  : <meta property="article:author" content={siteDefaults.organization.url} />}
 
-{/** 🔹 Open Graph */}
-<meta property="og:type" content={type} />
+{authors.length > 0
+  ? authors.map((a) => <meta property="article:author" content={a.url ?? siteDefaults.siteUrl} />)
+  : <meta property="article:author" content={siteDefaults.siteUrl} />}
+
+{/* Open Graph */}
+{!(isVideo || isAudio) && <meta property="og:type" content={ogTypeFor(type ?? 'website', isVideo, isAudio, isArticleLike)} />}
+
 <meta property="og:site_name" content={siteName} />
-<meta property="og:url" content={url} />
+<meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={imageUrl} />
-<meta property="og:image:width" content={imageWidth.toString()} />
-<meta property="og:image:height" content={imageHeight.toString()} />
-{type === 'article' && (
+{imageUrlAbs && <meta property="og:image" content={imageUrlAbs} />}
+{imageWidth > 0 && <meta property="og:image:width" content={String(imageWidth)} />}
+{imageHeight > 0 && <meta property="og:image:height" content={String(imageHeight)} />}
+{finalAlt && <meta property="og:image:alt" content={finalAlt} />}
+
+{isArticleLike && (
   <>
     <meta property="article:published_time" content={datePublished} />
-    <meta property="article:modified_time" content={dateModified} />
+    {dateModified && <meta property="article:modified_time" content={dateModified} />}
   </>
 )}
 
-{/** 🔹 Twitter */}
-<meta name="twitter:card" content="summary_large_image" />
+{/* Twitter (generic only; no player here) */}
+{!(isVideo || isAudio) && <meta name="twitter:card" content="summary_large_image" />}
 <meta name="twitter:site" content={siteDefaults.socialLinks.x} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
-<meta name="twitter:image" content={imageUrl} />
+{imageUrlAbs && <meta name="twitter:image" content={imageUrlAbs} />}
 
-{/** 🔹 Sitemap & RSS */}
-{ sitemapEnabled && <link rel="sitemap" type="application/xml" href="/sitemap.xml" /> }
-{ rssEnabled && <Rss /> }
+{/* Sitemap & RSS */}
+{ siteDefaults.sitemap && <link rel="sitemap" type="application/xml" href="/sitemap.xml" /> }
+{ siteDefaults.rss && <Rss /> }
 
-
+{/* JSON-LD (centralized). Media stays here; OG/Twitter handled in layouts) */}
 <Schema
-  type={type}
+  type={type}  
   authors={authors}
-  image={imageUrl}
+  image={imageUrlAbs}
+  imageAlt={finalAlt}
+  imageWidth={imageWidth}
+  imageHeight={imageHeight}
   title={title}
   description={description}
-  url={url}
-  publishedAt={publishedAt}
-  updatedAt={updatedAt}
+  url={canonicalURL}
+  publishedAt={datePublished}
+  updatedAt={dateModified}
   faq={faq}
   listItems={listItems}
+  videoWatchPageUrl={videoWatchPageUrl}
+  videoContentUrl={videoContentUrl}
+  audioListenPageUrl={audioListenPageUrl}
+  audioContentUrl={audioContentUrl}
+  serviceOffers={serviceOffers}
 />
+
+
+<SchemaSiteNavigation />

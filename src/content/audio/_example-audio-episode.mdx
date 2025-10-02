@@ -1,0 +1,108 @@
+---
+title: "Example Audio Episode (Template)"
+description: "Demonstration entry showing every field in the audio schema."
+slug: "_example-audio-episode"
+publishDate: "2024-07-01"
+updatedDate: "2024-07-15"
+
+# Unified hero used for poster/social/preview
+image: "featured/easy-apostille-service.png"
+imageAlt: "Easy Apostille hero cover"
+imageTitle: "Example Episode Cover"
+imageCaption: "Cover art for the example episode."
+
+tags: [podcast, example, schema]
+keywords: [apostille, audio, template]
+categories: [How-to, Guides]
+featured: false
+draft: true
+index: false
+
+# Canonical audio metadata
+provider: "self"                       # one of: self | spotify | apple | soundcloud | youtube | embed
+listenPageUrl: "https://example.com/audio/_example-audio-episode/"
+contentUrl: "/media/audio/example-episode.mp3"
+encodingFormat: "audio/mpeg"
+
+# Optional core info
+uploadDate: "2024-06-30T10:00:00Z"
+durationSeconds: 1854
+isLive: false
+isFamilyFriendly: true
+isAccessibleForFree: true
+requiresSubscription: false
+
+# Optional display hints (used by layout for aspect/CLS)
+audioWidth: 1280
+audioHeight: 720
+aspectRatio: "16:9"
+
+# Thumbnails/captions (optional)
+thumbnails:
+  - url: "/images/audio/example-cover-300.jpg"
+    width: 300
+    height: 300
+captions:
+  - url: "/captions/example-episode.en.vtt"
+    lang: "en"
+    kind: "subtitles"
+    label: "English"
+    default: true
+
+# Series / episode (optional)
+seriesTitle: "Example Series"
+seasonNumber: 2
+episodeNumber: 5
+
+# Chapters (no URL field per schema)
+chapters:
+  - name: "Intro"
+    start: 0
+    end: 90
+  - name: "Main Topic"
+    start: 90
+    end: 1500
+  - name: "Q&A"
+    start: 1500
+    end: 1790
+  - name: "Wrap-up"
+    start: 1790
+
+transcriptUrl: "/transcripts/example-episode.vtt"
+
+# Cross-links
+platform:
+  spotify: "https://open.spotify.com/episode/0exampleEpisodeId"
+  apple: "https://podcasts.apple.com/podcast/example-show/id0000000000?i=0000000000"
+  soundcloud: "https://soundcloud.com/example-user/example-episode"
+  youtube: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  rss: "/rss.xml"
+
+sameAs:
+  - "https://twitter.com/example/status/0000000000000000000"
+  - "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+
+relatedArticles:
+  - "/blog/how-to-get-docs-apostilled/"
+  - "/blog/apostille-checklist/"
+---
+
+
+import Anchor from '@/components/ui/Anchor.astro';
+
+## About this template
+
+This MDX file demonstrates **every field** available in the `audio` collection schema.  
+When creating a real episode:
+
+- Change `provider` to match your source and fill the corresponding URL/ID field:
+  - `self` → set `contentUrl`
+  - `spotify` → set `spotifyUrl`
+  - `apple` → set `applePodcastsUrl`
+  - `soundcloud` → set `soundcloudUrl`
+  - `youtube` → set `youtubeId`
+  - `embed` → set `embedUrl`
+- Update `slug`, `publishDate`, `durationSeconds`, `thumbnails`, and `chapters`.
+- Set `draft: false` and `index: true` when publishing.
+
+<Anchor href="/audio/" variant="secondary">Back to all audio</Anchor>

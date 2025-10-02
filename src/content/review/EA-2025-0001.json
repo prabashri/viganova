@@ -1,0 +1,40 @@
+{
+  "id": "EA-2025-0001",
+  "headline": "Fast, clear, and exactly on time",
+  "body": "Clear instructions, proactive updates, and delivery before the promised date.",
+  "rating": 5,
+  "language": "en",
+  "datePublished": "2025-09-19",
+  "url": "/reviews/ea-2025-0001",
+  "author": {
+    "type": "Person",
+    "name": "Ganesh Kumar M",
+     "designation": "Professor",
+    "organization": "KAIST",
+    "profileUrl": "",
+    "avatar": ""
+  },
+  "service": { "slug": "degree-certificate-apostille", "name": "Degree Certificate Apostille" },
+  "location": { "name": "Daejeon, South Korea", "city": "Daejeon", "countryCode": "KR" },
+  "verifiedPurchase": true,
+  "orderNumber": "EA-58231",
+  "pros": ["Clear communication", "On-time delivery", "Transparent pricing"],
+  "cons": [],
+  "target": { "type": "Service", "name": "Degree Certificate Apostille", "url": "/services/document-apostille/" },
+  "media": [
+    {
+      "type": "image",
+      "url": "",
+      "width": 1280,
+      "height": 720,
+      "alt": "Delivery confirmation screenshot"
+    }
+  ],
+  "ownerResponse": {
+    "date": "2025-09-20",
+    "text": "Thanks for the kind words! Happy to help again anytime.",
+    "responder": "EasyApostille"
+  },
+  "helpful": 18,
+  "notHelpful": 0
+}

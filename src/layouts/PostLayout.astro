@@ -1,13 +1,25 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import { siteDefaults } from '../config/siteDefaults';
-import type { HeadProps } from '../types/HeadProps';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteImages } from '@/config/siteImages';
+import type { HeadProps } from '@/types/HeadProps';
 import { getEntry } from 'astro:content';
-import type { DataEntryMap } from 'astro:content';
-import TableOfContents from '../components/TableOfContents.astro';
-import ResponsiveImage from '../components/ResponsiveImage.astro';
+import TableOfContents from '@/components/TableOfContents.astro';
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import Breadcrumb from '@/components/ui/Breadcrumb.astro';
+import RelatedPostsList from '@/components/ui/RelatedPostsList.astro';
 
-import ShareLink from '../components/ShareLink.astro';
+import ShareLink from '@/components/ShareLink.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+import Button from '@/components/ui/Button.astro';
+import FaqList from '@/components/ui/FaqList.astro';
+import TagList from '@/components/ui/TagList.astro';
+import PrevNextNav from '@/components/ui/PrevNextNav.astro';
+import Sidebar from '@/components/ui/Sidebar.astro';
+
+import { getImage, constructUrl, getImageMeta } from '@/utils/getImage';
+import { parseImageDims } from '@/utils/imageHelpers';
+import { machineAndHuman } from '@/utils/date-format';
 
 interface Props {
   title?: string;
@@ -15,9 +27,10 @@ interface Props {
   slug?: string;
   canonicalUrl?: string;
   index?: boolean;
-  publishedDate?: string;  
+  type?: string; // e.g. "blog" or "service"
+  publishedDate?: string;
   lastModified?: string | null;
-  authors?: { id: string }[]; // Simplified for team-only assumption
+  authors?: { id: string }[];
   tags?: string[];
   categories?: string[];
   keywords?: string[];
@@ -25,13 +38,19 @@ interface Props {
   draft?: boolean;
   faq?: { question: string; answer: string; speakable: boolean }[];
   collection?: string;
-  collectionBase?: string;
+  collectionBase?: string; // e.g. "services/"
   heroImage?: string;
   heroImageAlt?: string;
   heroImageTitle?: string;
   heroImageCaption?: string;
   toc?: { id: string; text: string; level: number }[];
-  allPosts?: any[];
+  allPosts?: any[]; // entries from getCollection()
+  relatedPosts?: { title: string; url: string }[];
+  serviceOffers?: Array<{
+    name?: string;    
+    priceKey: string; // pricing key from src/config/pricing.ts
+    buyNowLink?: string; // optional buy now / CTA link
+  }>;
 }
 
 const {
@@ -41,13 +60,14 @@ const {
   canonicalUrl,
   index = true,
   featured = false,
+  type = 'article',
   publishedDate,
   lastModified,
   authors = [],
   tags = [],
   categories = [],
   keywords = [],
-  collection = '',  
+  collection = '',
   collectionBase = '',
   heroImage,
   heroImageAlt,
@@ -55,16 +75,28 @@ const {
   heroImageCaption,
   faq = [],
   toc = [],
-  allPosts = []
+  allPosts = [],
+  relatedPosts = [],
+  serviceOffers
+
 } = Astro.props as Props;
 
-const fullCanonical = canonicalUrl || `${siteDefaults.siteUrl}${collectionBase}${slug}/`;
+// Canonical: falls back to siteUrl + collectionBase + slug
+const fullCanonical =
+  canonicalUrl ||
+  `${siteDefaults.siteUrl}${collectionBase ?? ''}${slug ?? ''}/`;
 
-const currentIndex = allPosts.findIndex(post => (post.data?.slug || post.slug) === slug);
-const prevPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
-const nextPost = currentIndex < allPosts.length - 1 ? allPosts[currentIndex + 1] : null;
+// ---- prev/next resolution (use data.slug OR entry id) ----
+const currentIndex = allPosts.findIndex(
+  (p) => (p.data?.slug || p.id) === slug
+);
+const prevItem = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
+const nextItem =
+  currentIndex >= 0 && currentIndex < allPosts.length - 1
+    ? allPosts[currentIndex + 1]
+    : null;
 
-// ✅ Always load authors from the `team` collection
+// ---- authors resolved from team collection ----
 const resolvedAuthors = await Promise.all(
   authors.map(async ({ id }) => {
     try {
@@ -74,95 +106,152 @@ const resolvedAuthors = await Promise.all(
             id,
             slug: entry.data.slug,
             url: `/team/${entry.data.slug}/`,
-            name: entry.data.name ?? entry.data.name ?? id,
-            data: entry.data,
+            name: entry.data.name ?? id,
+            data: entry.data
           }
         : null;
     } catch {
       return null;
     }
   })
-).then((entries) => entries.filter(Boolean));
+).then((xs) => xs.filter(Boolean));
 
+// ---- hero image info ----
+const imageSrc = heroImage ?? siteImages.image;
+const heroImageMeta = getImageMeta(imageSrc);
+const heroImageUrlRaw =
+  heroImageMeta && typeof heroImageMeta === 'object'
+    ? constructUrl(heroImageMeta, 'full')
+    : '';
+const heroImageUrl = Array.isArray(heroImageUrlRaw)
+  ? heroImageUrlRaw[0]
+  : heroImageUrlRaw;
+const imageInfo =
+  typeof heroImageUrl === 'string' ? parseImageDims(heroImageUrl) : undefined;
+
+// ---- dates for head ----
+const { iso: publishedAtISO, human: publishedAtHuman } = machineAndHuman(
+  publishedDate,
+  'now'
+);
+const { iso: lastModifiedISO, human: lastModifiedHuman } = machineAndHuman(
+  lastModified ?? publishedDate,
+  'now'
+);
+
+const sameDay =
+  publishedAtISO && lastModifiedISO
+    ? publishedAtISO.slice(0, 10) === lastModifiedISO.slice(0, 10)
+    : false;
+
+
+/** optional bits for publisher/logo */
+
+  
 const headProps: HeadProps = {
   title: `${title}`,
   description,
-  image: heroImage || siteDefaults.image,
-  type: 'article',
+  image: heroImageUrl,
+  imageWidth: imageInfo?.width,
+  imageHeight: imageInfo?.height,
+  imageAlt:
+    heroImageAlt || (title ? `hero image of ${title}` : '') || siteImages.imageAlt || 'Site featured image',
+  type: type === 'service' ? 'service' : 'article',
   canonicalUrl: fullCanonical,
   index,
-  keywords: tags,
-  publishedAt: publishedDate,
-  updatedAt: lastModified ?? undefined,
-  authors: resolvedAuthors.filter((a): a is NonNullable<typeof a> => a !== null),
+  keywords: tags?.length ? tags : keywords, // prefer tags if present
+  publishedAt: publishedAtHuman,
+  publishedAtISO,
+  updatedAt: lastModifiedHuman,
+  updatedAtISO: lastModifiedISO,
+  authors: resolvedAuthors as any,
   showBreadcrumb: true,
+  breadcrumbs: [],
 };
-
 ---
+
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top" />
-  <Fragment slot="headContent-bottom" />
+  <Fragment slot="headContent-bottom">
+    {/* rel=prev/next help crawlers understand pagination/series */}
+   <meta name="heroimage" content={heroImageUrl || ''} />
+    {prevItem && (
+      <link
+        rel="prev"
+        href={`/${collectionBase}${prevItem.data?.slug || prevItem.id}/`}
+      />
+    )}
+    {nextItem && (
+      <link
+        rel="next"
+        href={`/${collectionBase}${nextItem.data?.slug || nextItem.id}/`}
+      />
+    )}
+  </Fragment>
 
   <style id="post-layout-styles" is:inline>
-.post-layout {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-template-areas:
-    "header"
-    "hero"
-    "toc"
-    "content"
-    "sidebar"
-    "footer";
-  /*gap: 1rem;*/
-  width: 100%;
-}
-/* Assign grid-areas + max-widths */
-.post-header     { grid-area: header; }
-.hero-image      { grid-area: hero; width: 100%; }
-.toc             { grid-area: toc; }
-.post-content    { grid-area: content; max-width: var(--content-width); }
-.sidebar         { grid-area: sidebar; }
-.post-footer     { grid-area: footer; max-width: var(--content-width); }
-/* 🖥 Desktop: 3 columns */
-@media (min-width: 1280px) {
-  .post-layout {
-    grid-template-columns:
-      1fr minmax(auto, var(--content-width)) 1fr;
-    grid-template-areas:
-      "header header header"
-      "hero hero hero"
-      "toc content sidebar"
-      "toc footer sidebar";
-  }
-  .full-mr-unset { margin-right: unset !important; }
-  .full-ml-unset { margin-left: unset !important; }
-  /* Sticky sidebars */
-  .toc {
-    max-width: var(--toc-width);
-    position: sticky;
-    top: 5rem;
-    align-self: start;
-    max-height: calc(100vh - 5rem);
-    overflow: auto;
-    margin-inline: auto;
-  }  
-}
-/* Hide empty */
-.sidebar:empty,
-.toc:empty {
-  display: none;
-}
-.icon-link:hover {
-  background-color: var(--primary-lighter-x) !important;
-} 
-</style>
-  <article id="post-layout" class="post-layout jc-center">
+    
+    .post-layout {
+            grid-template-columns: minmax(0,1fr);
+      grid-template-areas:
+        "header"
+        "hero"
+        "sidebar-left"
+        "content"
+        "sidebar-right"       
+        "footer"
+        "footerNav";
+
+      display:grid;
+      flex-direction: column;
+    } 
+    .post-header     { grid-area: header; }
+    .hero-image      { grid-area: hero; }
+    .sidebar-left    { grid-area: sidebar-left; }
+    .post-content    { grid-area: content; }
+    .sidebar-right   { grid-area: sidebar-right; }
+    .post-footer     { grid-area: footer; }
+    .footer-nav      { grid-area: footerNav; }
+
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      .post-layout {
+        display: grid !important;
+        grid-template-columns: 2fr 1fr;
+        grid-template-areas:
+          "header header"
+          "hero hero"
+          "content sidebar-left"
+          "content sidebar-right"
+          "footer sidebar-right"
+          "footerNav footerNav";
+      }
+    }
+
+    @media (min-width: 1280px) {
+      .post-layout {
+        display: grid !important;
+        grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
+        grid-template-areas:
+          "header header header"
+          "hero hero hero"
+          "sidebar-left content sidebar-right"
+          "sidebar-left footer sidebar-right"
+          "footerNav footerNav footerNav";
+      }
+    }
+
+  </style>
+
+  <article id="post-layout" class="post-layout w-full gap jc-center" itemscope
+  itemtype="https://schema.org/Article">
     {/* Header */}
     <header class="post-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
-      <div id="post-header-content" class="mx-w-site mi-auto ta-center mb-2">
+      { /* Breadcrumb */ }
+      <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={title} breadcrumbs={headProps.breadcrumbs} />
+      <div id="post-header-content" class="mx-w-featured mi-auto ta-center mb-2 p-1">
         <h1 class="post-title">{title}</h1>
         {description && <p class="post-desc">{description}</p>}
+
         <div class="post-meta text-s mb-1">
           {resolvedAuthors.length > 0 && (
             <div class="post-authors">
@@ -173,112 +262,117 @@ const headProps: HeadProps = {
                 return (
                   <>
                     <a href={a!.url} class="author-link td-underline">{a!.name}</a>
-                    {!isLast && (
-                      resolvedAuthors.length === 2
+                    {!isLast &&
+                      (resolvedAuthors.length === 2
                         ? ' and '
                         : isSecondLast
-                          ? ', and '
-                          : ', '
-                    )}
+                        ? ', and '
+                        : ', ')}
                   </>
                 );
               })}
             </div>
           )}
+
           {(publishedDate || lastModified) && (
             <div class="post-dates text-s">
               {publishedDate && (
-                <time datetime={publishedDate}>
-                  📅 on {new Date(publishedDate).toLocaleDateString()}
-                </time>
+                <time datetime={publishedAtISO}>📅 on {publishedAtHuman}</time>
               )}
               {lastModified && (
-                <span class="last-updated-on">
-                  Updated: {new Date(lastModified).toLocaleDateString()}
-                </span>
+                <span class="last-updated-on"> • Updated: {lastModifiedHuman}</span>
               )}
             </div>
           )}
         </div>
       </div>
     </header>
-
     {/* Hero Image */}
-    {heroImage && (      
+    {heroImage && heroImageMeta && typeof heroImageMeta === 'object' ? (
+      <ResponsiveImage
+        src={heroImage}
+        imageMeta={heroImageMeta}
+        alt={heroImageAlt || ''}
+        title={heroImageTitle || ''}
+        caption={heroImageCaption || ''}
+        width="960"
+        id="hero-image"
+        loading="eager"
+        className="hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5"
+        variant="desktop"
+        addSchema={true}
+      />
+    ) : heroImage ? (
       <ResponsiveImage
         src={heroImage}
         alt={heroImageAlt || ''}
         title={heroImageTitle || ''}
         caption={heroImageCaption || ''}
-        width="960" id="hero-image"
-        loading="eager" className='hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-2'
-        variant='desktop' addSchema={true}
-      />     
-    )}
+        width="960"
+        id="hero-image"
+        loading="eager"
+        className="hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5"
+        variant="desktop"
+        addSchema={true}
+      />
+    ) : null}
 
-    {/* Table of Contents wrapped with aside & class "toc" */}
-    <TableOfContents toc={toc} heading="On This Page" depth="h2,h3" className="toc as-f-start mb-05 mx-w-content bg-base-00 br ml-auto mr-auto full-mr-unset full-sticky top-20" />
+    {/* Left Sidebar with ToC */}
+    <Sidebar variant="left">
+      <TableOfContents
+        toc={toc}
+        heading="On This Page"
+        depth="h2,h3"
+        className="toc bg br"
+      />
+    </Sidebar>
 
-    { /** Content */ }
-    <div class="post-content mx-w-content mi-auto mb-05 p-1">
+    {/* Content */}
+    <div class="post-content mx-w-content mi-auto mb-05 p-1 bg border-primary-light br" itemprop="articleBody">
       <slot />
     </div>
 
-    {/* Sidebars */}
-    <aside class="sidebar mx-w-sidebar full-mx-w-sidebar w-full ml-auto mr-auto as-f-start full-ml-unset mb-05 p-05">
-    </aside>
-    
+    {/* Right Sidebar (currently empty, but keep the region) */}
+    <Sidebar variant="right">
+      <RelatedPostsList items={relatedPosts} />
+    </Sidebar>
     <footer id="post-footer" class="post-footer mx-w-content w-full mi-auto mb-05 p-05">
-      <ShareLink id="blog-footer-share-links" className="mb-05 p-05" title='share' />
-      {faq.length > 0 && (
-        <div class="post-faq mb-05 p-05">
-          <h3>Frequently Asked Questions</h3>
-          <ul>
-            {faq.map((item) => (
-              <li>
-                <strong>{item.question}</strong>
-                <p>{item.answer}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <ShareLink id="blog-footer-share-links" className="" title="share" />
+
+      {Array.isArray(faq) && faq.length > 0 && (
+        <FaqList
+          items={faq}
+          id="faq"
+          class="post-faq mb-05 p-05"
+          heading="Frequently Asked Questions"
+          headingTag="h2"
+          openAll={true}
+          addSchema={true}
+          addSpeakableSchema={true}
+          htmlAnswers={false}
+        />
       )}
-      {tags.length > 0 && (
-        <div class="post-footer post-tags p-05 mb-05">
-          <h3 class="text-xs uppercase">Keywords</h3>
-          <ul class="tag-list flex wrap gap-05 no-bullets">
-            {tags.map((tag) => (
-              <li><a class="border-primary-light br pi-05 pb-02" href={`/tags/${tag}/`} target="_blank">{tag}</a></li>
-            ))}
-          </ul>
-        </div>
-      )}
-      {(prevPost || nextPost) && (
-        <nav class="post-navigation mb-05 p-05">
-          <ul class="flex wrap gap-2 jc-space-between no-list-style-type no-margin">
-            <li class="w-50-1 ta-start bg-primary-lighter br">
-              {prevPost && (
-                <a href={`/${collectionBase}${prevPost.data?.slug || prevPost.slug}/`} class="prev-post flex flex-col bg-primary-light p-05 br">
-                  <span class="arrow-icon text-2xs uppercase">← previous</span>
-                  <span class="post-title text-s">{prevPost.data?.title}</span> 
-                </a>
-              )}
-            </li>
-            <li class="w-50-1 ta-end bg-primary-lighter br">
-              {nextPost && (
-                <a href={`/${collectionBase}${nextPost.data?.slug || nextPost.slug}/`} class="next-post flex flex-col bg-primary-light p-05 br">
-                  <span class="arrow-icon text-2xs uppercase">→ next</span>
-                  <span class="post-title text-s">{nextPost.data?.title}</span>
-                </a>
-              )}
-            </li>
-          </ul>
-        </nav>
+
+      {Array.isArray(tags) && tags.length > 0 && (
+        <TagList
+          items={tags}
+          heading="Keywords"
+          baseHref="/tags/"
+          dedupe={true}
+          sort="asc"
+        />
       )}
     </footer>    
   </article>
+  {(prevItem || nextItem) && (
+      <PrevNextNav
+        prevItem={prevItem}
+        nextItem={nextItem}
+        collectionBase={collectionBase}
+        prevVariant="secondary"
+        nextVariant="secondary"      
+      />
+    )}
 
   <Fragment slot="extraScripts" />
 </BaseLayout>
-
-

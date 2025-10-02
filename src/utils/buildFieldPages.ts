@@ -1,6 +1,7 @@
 // src/utils/buildFieldPages.ts
 import { getCollection } from "astro:content";
 import { siteDefaults } from "../config/siteDefaults";
+import { siteImages } from "../config/siteImages";
 import { collectFieldCounts } from "./collectFieldCounts";
 import modifiedDatesJson from "../data/modified-dates.json";
 import { paginate } from "./paginate";
@@ -54,11 +55,11 @@ export async function buildFieldValuePage(fieldKey: string, fieldValue: string, 
   const headProps: HeadProps = {
     title: `${fieldValue} | ${siteDefaults.siteName}`,
     description: `Explore ${fieldKey} → ${fieldValue} on ${siteDefaults.siteName}`,
-    image: siteDefaults.image,
+    image: siteImages.image,
     index: pageItems.length > 0,
     type: "collection",
     authors: [],
-    breadcrumb: [
+    breadcrumbs: [
       { name: "Home", url: "/" },
       { name: fieldKey, url: `/${fieldKey}/` },
       { name: fieldValue, url: `/${fieldKey}/${fieldValue}/` }

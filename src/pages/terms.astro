@@ -1,96 +1,62 @@
 ---
-import { siteDefaults } from '../config/siteDefaults';
-import modifiedDates from '../data/modified-dates.json';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import type { HeadProps } from '../types/HeadProps';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { HeadProps } from '@/types/HeadProps';
 
-// ✅ Get last modified date dynamically
-const updatedAt = modifiedDates['terms']
-  ? new Date(modifiedDates['terms']).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  : siteDefaults.publishedDate;
+import { siteDefaults } from '@/config/siteDefaults';
+import TermsContent from '@/content/pages/Terms.astro';
+import { lastModifiedRaw } from '@/utils/last-modified';
+import { machineAndHuman } from '@/utils/date-format';
 
-const adminEmail = siteDefaults.admin.email 
-  || siteDefaults.organization.incharge.email 
-  || siteDefaults.organization.email 
-  || `contact@${siteDefaults.siteUrl.replace(/^https?:\/\//, '')}` 
-  || `contact@${Astro.url.hostname}`;
-
-// ✅ HeadProps for SEO
-const pageSeo: HeadProps = {
-  title: `Terms of Service | ${siteDefaults.siteName}`,
-  description: `Review the Terms of Service for purchasing and using the ${siteDefaults.siteName} theme, including pricing, licensing, and refund policy.`,
-  image: '/images/astro-theme-nviewsweb-main.png',
-  type: 'website',
-  url: `${siteDefaults.siteUrl}/terms`,
-  canonicalUrl: `${siteDefaults.siteUrl}/terms`,
-  siteName: siteDefaults.siteName,
-  authors: [ ],
-  publishedAt: siteDefaults.publishedDate,
-  updatedAt,
+// Page flags & copy
+const cfg = siteDefaults.pages.terms ?? {
+  title: 'Terms & Conditions',
+  description: 'Read the legal terms.',
+  enabled: true,
   index: true,
+  sitemap: true,
+  path: '/terms/',
+};
+
+// SSR redirect if disabled
+if (!cfg.enabled) {
+  return Astro.redirect('/', 307);
+}
+
+// Canonical path for this route
+const PATH = cfg.path ?? '/terms/';
+
+// Resolve last-modified (prefer generator key 'terms' → fallback to publishedDate)
+const rawLastMod = lastModifiedRaw(['terms'], siteDefaults.publishedDate);
+const { iso: updatedAtISO, human: updatedAtHuman } = machineAndHuman(rawLastMod, 'now');
+
+// SEO
+const pageSeo: HeadProps = {
+  title: cfg.title,
+  description: cfg.description,
+  image: '',
+  type: 'terms',
+  url: `${siteDefaults.siteUrl}${PATH}`,
+  canonicalUrl: `${siteDefaults.siteUrl}${PATH}`,
+  siteName: siteDefaults.siteName,
+  authors: [],
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt: updatedAtISO,
+  index: cfg.index ?? true,
   keywords: [...siteDefaults.keywords, 'Terms of Service', 'Theme License', 'Refund Policy'],
-  showBreadcrumb: true
+  showBreadcrumb: false,
 };
 ---
 
 <BaseLayout headProps={pageSeo}>
-  <Fragment slot="headContent"></Fragment>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
 
-  <article class="prose mx-w-width mi-auto">
-    <header class="mb-1 mx-w-content mi-auto">
-      <h1 class="pb-1 ta-center">{pageSeo.title}</h1>
-    </header>
+  <TermsContent
+    title={cfg.title}
+    description={pageSeo.description}
+    updatedAt={updatedAtHuman}
+    updatedAtISO={updatedAtISO}
+  />
 
-    <div class="mx-w-content p-1 mi-auto">
-      <hr />
-      <p><strong>Last updated:</strong> <time datetime={updatedAt}>{updatedAt}</time></p>
-
-      <p>These Terms of Service govern the purchase and usage of the <strong>{siteDefaults.siteName}</strong> theme (“the Theme”). By purchasing or using the Theme, you agree to these terms in full.</p>
-
-      <h2 id="1-theme-overview">1. Theme Overview</h2>
-      <p>{siteDefaults.siteName} is a premium Astro theme designed for speed, SEO, security, and scalability. The theme is sold for commercial and personal use.</p>
-
-      <h2 id="2-pricing-and-licenses">2. Pricing and Licenses</h2>
-      <p>The Theme is sold under two license categories:</p>
-      <ul>
-        <li><strong>Personal License:</strong> USD 39 — for use on a single personal or client project.</li>
-        <li><strong>Unlimited License:</strong> USD 79 — for use on unlimited personal or client projects.</li>
-      </ul>
-      <p>Pricing is in USD and subject to change without prior notice. Applicable taxes may apply based on your location.</p>
-
-      <h2 id="3-no-refund-policy">3. No Refund Policy</h2>
-      <p>All sales are final. We do not offer refunds once the Theme has been purchased. Buyers are encouraged to review the <strong>Theme features, documentation, and demo</strong> before purchase.</p>
-      <p>If you have questions before purchase, please contact us at <a href={`mailto:${adminEmail}`}>{adminEmail}</a>.</p>
-
-      <h2 id="4-usage-rights">4. Usage Rights</h2>
-      <p>Depending on the purchased license:</p>
-      <ul>
-        <li><strong>Personal License:</strong> Can be used for a single project, personal or client-based.</li>
-        <li><strong>Unlimited License:</strong> Can be used for unlimited projects, personal or client-based.</li>
-      </ul>
-      <p>The license is <strong>non-transferable</strong> and cannot be resold, redistributed, or sublicensed.</p>
-
-      <h2 id="5-modifications">5. Theme Modifications</h2>
-      <p>You are free to customize or modify the Theme to fit your needs. However, support will only cover the base Theme as provided at the time of purchase.</p>
-
-      <h2 id="6-support-and-updates">6. Support and Updates</h2>
-      <p>Support includes bug fixes, documentation updates, and installation guidance. Major feature requests or customizations may be subject to additional fees.</p>
-
-      <h2 id="7-disclaimer">7. Disclaimer</h2>
-      <p>The Theme is provided “as-is” without warranties of any kind. We are not responsible for any damages or losses resulting from the use or inability to use the Theme.</p>
-
-      <h2 id="8-jurisdiction">8. Jurisdiction</h2>
-      <p>These Terms are governed by the laws of <strong>India</strong>, specifically the jurisdiction of <strong>Thanjavur, Tamil Nadu</strong>.</p>
-
-      <h2 id="9-company-information">9. Company Information</h2>
-      <p>{siteDefaults.siteName} is a project by:</p>
-      <p><strong>NViews Media Private Limited (<a href="https://thenviews.com">thenviews.com</a>)</strong><br/>Registered in India<br/>📧 <a href={`mailto:${adminEmail}`}><strong>{adminEmail}</strong></a></p>
-    </div>
-  </article>
-
-  <Fragment slot="extraScripts"></Fragment>
+  <Fragment slot="extraScripts" />
 </BaseLayout>
