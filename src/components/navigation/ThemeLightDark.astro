@@ -1,134 +1,163 @@
 ---
 // src/components/navigation/ThemeLightDark.astro
-import { Icon } from 'astro-icon/components';
+import Button from "@/components/ui/Button.astro";
+import { Icon } from "astro-icon/components";
 ---
 
-<div class="theme-toggle flex relative h-2-0 w-2-0 ai-center jc-center"> 
+<div class="theme-toggle flex relative h-2-0 w-2-0 ai-center jc-center">
+  <!-- Trigger -->
+  <Button
+    id="theme-button"
+    label="Theme"
+    variant="plain"
+    className="round box-shadow-glow transition p-02"
+    ariaHasPopup="menu"
+    ariaExpanded={false}
+    ariaControls="theme-menu"
+    type="button"
+  >
+    <Icon name="bw" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+    <Icon name="light" class="w-1-5 h-1-5 display-none" aria-hidden="true" focusable="false" />
+    <Icon name="moon" class="w-1-5 h-1-5 display-none" aria-hidden="true" focusable="false" />
+  </Button>
 
-    <!-- Trigger Button -->
-    <button id="theme-button" aria-haspopup="true" aria-expanded="false"
-      class="round box-shadow-glow transition p-02">
-      <Icon name="bw" class="w-1-5 h-1-5" />
-      <Icon name="light" class="w-1-5 h-1-5 display-none" />
-      <Icon name="moon" class="w-1-5 h-1-5 display-none" />
+  <!-- Popup menu -->
+  <div
+    id="theme-menu"
+    class="relative big-absolute br border-primary bg-base-00 col-base-100 mb-05 box-shadow display-none right-0 top-100 p-05 z-1000"
+    role="menu"
+    aria-labelledby="theme-button"
+  >
+    <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+            role="menuitemradio" aria-checked="false" data-theme="system" tabindex="-1">
+      <Icon name="bw" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+      <span>OS Default</span>
     </button>
-
-    <!-- Dropdown -->
-    <div id="theme-menu"
-      class="relative big-absolute br border-primary bg-base-00 col-base-100 mb-05 box-shadow display-none right-0 top-100 p-05 z-1000">
-      <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
-        data-theme="system">
-        <Icon name="bw" class="w-1-5 h-1-5" />
-        <span>OS Default</span>
-      </button>
-      <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
-        data-theme="light">
-        <Icon name="light" class="w-1-5 h-1-5" />
-        <span>Light</span>
-      </button>
-      <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
-        data-theme="dark">
-        <Icon name="moon" class="w-1-5 h-1-5" />
-        <span>Dark</span>
-      </button>
-    </div>
+    <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+            role="menuitemradio" aria-checked="false" data-theme="light" tabindex="-1">
+      <Icon name="light" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+      <span>Light</span>
+    </button>
+    <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+            role="menuitemradio" aria-checked="false" data-theme="dark" tabindex="-1">
+      <Icon name="moon" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+      <span>Dark</span>
+    </button>
   </div>
+</div>
 
- <script id="theme-script" type="module">
+<script id="theme-script" type="module">
 (() => {
-  document.addEventListener('DOMContentLoaded', () => {
-    const button = document.getElementById('theme-button');
-    const menu = document.getElementById('theme-menu');
-    const options = document.querySelectorAll('.theme-option');
+  const qs  = (s, r=document) => r.querySelector(s);
+  const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-    const iconSystem = document.querySelector('svg[data-icon="bw"]');
-    const iconLight = document.querySelector('svg[data-icon="light"]');
-    const iconDark = document.querySelector('svg[data-icon="moon"]');
+  const button = qs('#theme-button');
+  const menu   = qs('#theme-menu');
+  const items  = qsa('.theme-option', menu);
 
-    const showIcon = (theme) => {
-      if (!iconSystem || !iconLight || !iconDark) return;
+  const iconSystem = qs('svg[data-icon="bw"]');
+  const iconLight  = qsa('svg[data-icon="light"]')[0];
+  const iconDark   = qsa('svg[data-icon="moon"]')[0];
 
-      iconSystem.classList.add('display-none');
-      iconLight.classList.add('display-none');
-      iconDark.classList.add('display-none');
+  const showIcon = (theme) => {
+    [iconSystem, iconLight, iconDark].forEach(el => el && el.classList.add('display-none'));
+    if (theme === 'light') iconLight?.classList.remove('display-none');
+    else if (theme === 'dark') iconDark?.classList.remove('display-none');
+    else iconSystem?.classList.remove('display-none');
+  };
 
-      if (theme === 'light') {
-        iconLight.classList.remove('display-none');
-      } else if (theme === 'dark') {
-        iconDark.classList.remove('display-none');
-      } else {
-        iconSystem.classList.remove('display-none');
-      }
-    };
+  const applyTheme = (theme) => {
+    if (theme === 'light' || theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', theme);
+      showIcon(theme);
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+      showIcon('system');
+    }
+    // update menu checked state
+    items.forEach(b => b.setAttribute('aria-checked', String(b.dataset.theme === theme)));
+  };
 
-    const applyTheme = (theme) => {
-      if (theme === 'light' || theme === 'dark') {
-        document.documentElement.setAttribute('data-theme', theme);
-        showIcon(theme);
-      } else {
-        // fallback to system preference
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const fallbackTheme = prefersDark ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', fallbackTheme);
-        showIcon('system');
-      }
-    };
+  const setTheme = (theme) => {
+    localStorage.setItem('theme', theme);
+    applyTheme(theme);
+  };
 
-    const setTheme = (theme) => {
-      localStorage.setItem('theme', theme);
-      applyTheme(theme);
-    };
+  const getStoredTheme = () => {
+    const t = localStorage.getItem('theme');
+    return (t === 'light' || t === 'dark' || t === 'system') ? t : 'light';
+  };
 
-    const getStoredTheme = () => {
-      const stored = localStorage.getItem('theme');
-      if (stored === 'light' || stored === 'dark' || stored === 'system') {
-        return stored;
-      }
-      return 'light'; // force fallback to light if invalid
-    };
+  const isOpen = () => button?.getAttribute('aria-expanded') === 'true';
 
-    const toggleMenu = () => {
-      const isExpanded = button?.getAttribute('aria-expanded') === 'true';
-      button?.setAttribute('aria-expanded', String(!isExpanded));
-      menu?.classList.toggle('display-none', isExpanded);
-    };
+  const openMenu = () => {
+    button?.setAttribute('aria-expanded', 'true');
+    menu?.classList.remove('display-none');
+    // focus first checked item, else first
+    const current = items.find(b => b.getAttribute('aria-checked') === 'true') || items[0];
+    current?.setAttribute('tabindex', '0');
+    current?.focus();
+  };
 
-    const closeMenu = () => {
-      menu?.classList.add('display-none');
-      button?.setAttribute('aria-expanded', 'false');
-    };
+  const closeMenu = () => {
+    menu?.classList.add('display-none');
+    button?.setAttribute('aria-expanded', 'false');
+    items.forEach(b => b.setAttribute('tabindex', '-1'));
+    button?.focus();
+  };
 
-    // Event: Toggle menu
-    button?.addEventListener('click', (e) => {
-      e.stopPropagation();
-      toggleMenu();
-    });
+  const toggleMenu = () => (isOpen() ? closeMenu() : openMenu());
 
-    // Event: Close menu on outside click
-    document.addEventListener('click', (e) => {
-      if (!menu?.contains(e.target) && !button?.contains(e.target)) {
-        closeMenu();
-      }
-    });
+  // Pointer interaction
+  button?.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+  document.addEventListener('click', (e) => {
+    if (!menu?.contains(e.target) && !button?.contains(e.target)) closeMenu();
+  });
 
-    // Event: Theme change
-    options.forEach((option) => {
-      option.addEventListener('click', () => {
-        const selected = option.getAttribute('data-theme');
-        if (selected) setTheme(selected);
-        closeMenu();
-      });
-    });
+  // Keyboard on trigger
+  button?.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault(); openMenu();
+    }
+  });
 
-    // Apply theme on load
-    applyTheme(getStoredTheme());
+  // Keyboard in menu (roving tabindex)
+  menu?.addEventListener('keydown', (e) => {
+    const idx = items.indexOf(document.activeElement);
+    const focusAt = (i) => { items[i]?.setAttribute('tabindex', '0'); items[i]?.focus(); items.forEach((b,j)=> j!==i && b.setAttribute('tabindex','-1')); };
 
-    // Listen for system preference changes
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-      if (getStoredTheme() === 'system') {
-        applyTheme('system');
-      }
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); focusAt((idx+1) % items.length); }
+    else if (e.key === 'ArrowUp')   { e.preventDefault(); focusAt((idx-1+items.length) % items.length); }
+    else if (e.key === 'Home')      { e.preventDefault(); focusAt(0); }
+    else if (e.key === 'End')       { e.preventDefault(); focusAt(items.length-1); }
+    else if (e.key === 'Tab')       { closeMenu(); }
+    else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      const sel = document.activeElement;
+      const theme = sel?.getAttribute('data-theme');
+      if (theme) setTheme(theme);
+      closeMenu();
+    }
+  });
+
+  // Click select
+  items.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const t = btn.getAttribute('data-theme');
+      if (t) setTheme(t);
+      closeMenu();
     });
   });
+
+  // Init on load
+  applyTheme(getStoredTheme());
+
+  // OS changes when in 'system'
+  window.matchMedia?.('(prefers-color-scheme: dark)')
+    ?.addEventListener?.('change', () => {
+      if (getStoredTheme() === 'system') applyTheme('system');
+    });
 })();
 </script>

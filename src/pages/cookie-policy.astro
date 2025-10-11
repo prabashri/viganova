@@ -1,0 +1,47 @@
+---
+// src/pages/cookie-policy.astro
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { HeadProps } from '@/types/HeadProps';
+
+import { siteDefaults } from '@/config/siteDefaults';
+import { lastModifiedRaw } from '@/utils/last-modified';
+import { machineAndHuman } from '@/utils/date-format';
+
+import CookiePolicyContent from '@/content/pages/CookiePolicy.astro';
+
+// Pull page copy/config from global defaults
+const cookieCfg = siteDefaults.pages?.cookiePolicy ?? {};
+const title = cookieCfg.title ?? `Cookie Policy — How ${siteDefaults.siteName} Uses Cookies & Similar Technologies`;
+const description = cookieCfg.description ?? `Understand how ${siteDefaults.siteName} uses essential, functional, analytics, and advertising cookies; how to manage preferences; and how to clear cookies in major browsers.`;
+
+// Last modified: try key; fall back to publishedDate
+const rawLastMod = lastModifiedRaw(['cookie-policy'], siteDefaults.publishedDate);
+const { iso: updatedAtISO, human: updatedAtHuman } = machineAndHuman(rawLastMod, 'now');
+
+// SEO
+const baseUrl = siteDefaults.siteUrl?.replace(/\/+$/,'') || '';
+const pageUrl = `${baseUrl}/cookie-policy/`;
+
+const pageSeo: HeadProps = {
+  title,
+  description,
+  image: '',
+  type: 'cookie',              // keep parallel to 'privacy'
+  url: pageUrl,
+  canonicalUrl: pageUrl,
+  siteName: siteDefaults.siteName,
+  authors: [],
+  publishedAt: siteDefaults.publishedDate,
+  updatedAt: updatedAtISO,
+  index: cookieCfg.index ?? true,
+  keywords: [...(siteDefaults.keywords || []), 'Cookie Policy', 'Cookies', 'Privacy'],
+  showBreadcrumb: false,
+};
+---
+
+<BaseLayout headProps={pageSeo}>
+  <Fragment slot="headContent-top" />
+  <Fragment slot="headContent-bottom" />
+    <CookiePolicyContent title={title} description={description} updatedAt={updatedAtHuman} />
+  <Fragment slot="extraScripts" />
+</BaseLayout>

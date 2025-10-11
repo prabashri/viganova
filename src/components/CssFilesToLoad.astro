@@ -1,63 +1,126 @@
 ---
+// src/components/CssFilesToLoad.astro
+
+/**
+ * CSS loader (per-page inline or link), manifest-aware.
+ *
+ * Item props:
+ *  - name | href  (one required)
+ *  - inline?: boolean                 // default false (true => inline <style> from generated module)
+ *  - fetchPriority?: 'high'|'auto'|'low'  // default 'high' (ignored when inline:true)
+ *  - id?: string
+ *  - media?: string                   // ONLY for <link>, not inline
+ *
+ * Inline order of preference:
+ *   1) Generated module recorded at manifest.css["pages:<name>"].inlineModule
+ *   2) Dev/source raw: /src/styles/pages/<name>.css via import.meta.glob
+ *   3) Fallback to <link>
+ */
+
 import manifest from "@/data/assets-manifest.json";
 
-type FileItem = {
-  name: string;                       // base name without .css (e.g. 'home', 'faq')
-  preload?: boolean;                  // default: false (prod only)
-  media?: string;                     // e.g. '(max-width: 768px)'
-  nonCritical?: boolean;              // if true -> use data-src (no href)
-  fetchPriority?: 'high' | 'low' | 'auto'; // default: 'high'
-};
+type FetchPriority = 'high' | 'auto' | 'low';
+type BaseItem = { id?: string; media?: string; inline?: boolean; fetchPriority?: FetchPriority; };
+type NamedItem = BaseItem & { name: string; href?: never };
+type HrefItem  = BaseItem & { href: string;  name?: never };
+interface Props { files: Array<NamedItem|HrefItem>; dedupe?: boolean; }
 
-interface Props {
-  files: FileItem[];
-}
-
-const { files } = Astro.props as Props;
+const { files, dedupe = true } = Astro.props as Props;
 
 const isDev = import.meta.env.DEV;
 const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
 
-function resolveHref(name: string) {
-  if (isDev) {
-    // DEV: load directly from /src for HMR
-    return `/src/styles/pages/${name}.css?t=${bust}`;
-  }
-  // PROD: from manifest, fallback to /styles/<name>.css
-  const entry = (manifest as any)?.css?.[`pages:${name}`];
-  const href = typeof entry === "string" ? entry : entry?.file;
-  return href || `/styles/${name}.css`;
+// Source raw (dev helper)
+const rawByPath = import.meta.glob('/src/styles/pages/*.css', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string,string>;
+
+/** Resolve manifest page entry & helpers */
+function manifestEntry(name: string) {
+  return (manifest as any)?.css?.[`pages:${name}`] ?? null;
 }
+function resolveHrefForName(name: string): string | null {
+  if (!name) return null;
+  if (isDev) return `/src/styles/pages/${name}.css?t=${bust}`;
+  return manifestEntry(name)?.file ?? null;
+}
+function resolveInlineModulePath(name: string): string | null {
+  return manifestEntry(name)?.inlineModule ?? null; // e.g. '/src/data/page-css/home.ts'
+}
+function resolveRawSource(name: string): string | null {
+  const key = `/src/styles/pages/${name}.css`;
+  return rawByPath[key] ? key : null;
+}
+
+/** Dedupe */
+type Key = string;
+const cssOnce: Set<Key> = (Astro.locals as any).__cssOnce ??= new Set<Key>();
+const keyForInline = (name?: string, id?: string) => `inline|${name ?? ''}|${id ?? ''}`;
+const keyForFile   = (href: string, media: string|undefined, mode: FetchPriority) =>
+  `file|${href}|${media ?? ''}|${mode}`;
 ---
 
-{files.map((f) => {
-  const href = resolveHref(f.name);
-  const mediaAttr = f.media ? { media: f.media } : {};
-  const fp = f.fetchPriority ?? 'high';
+{files.map((item) => {
+  const fp = (item.fetchPriority ?? 'high') as FetchPriority;
+
+  // 1) compute link href (for non-inline or fallback)
+  const linkHref = 'name' in item ? resolveHrefForName(item.name ?? '') : (item.href || null);
+
+  // 2) INLINE branch
+  if (item.inline) {
+    let cssString: string | null = null;
+
+    if ('name' in item && item.name) {
+      // a) try generated module first
+      const modPath = resolveInlineModulePath(item.name);
+      if (modPath) {
+        // import all generated modules and pick by filename
+        const mods = import.meta.glob('/src/data/page-css/*.ts', { eager: true });
+        const mod = mods[modPath] as any;
+        if (mod && typeof mod.default === 'string') {
+          cssString = mod.default;
+        }
+      }
+
+      // b) dev/source raw fallback
+      if (!cssString && isDev) {
+        const srcKey = resolveRawSource(item.name);
+        if (srcKey) cssString = rawByPath[srcKey] ?? null;
+      }
+    }
+
+    if (cssString) {
+      const k = keyForInline('name' in item ? item.name : undefined, item.id);
+      if (dedupe && cssOnce.has(k)) return null;
+      cssOnce.add(k);
+      return <style is:inline id={item.id} set:html={cssString} />;
+    }
+
+    // c) final fallback → link
+    if (!linkHref) return null;
+    const k = keyForFile(linkHref, item.media, 'auto');
+    if (dedupe && cssOnce.has(k)) return null;
+    cssOnce.add(k);
+    return <link id={item.id} rel="stylesheet" href={linkHref} {...(item.media ? { media: item.media } : {})} />;
+  }
+
+  // 3) non-inline link modes
+  if (!linkHref) return null;
+  const k = keyForFile(linkHref, item.media, fp);
+  if (dedupe && cssOnce.has(k)) return null;
+  cssOnce.add(k);
 
   return (
     <>
-      {/* Preload (prod only) — skip for nonCritical since it defers anyway */}
-      {!isDev && f.preload && !f.nonCritical && (
-        <link rel="preload" as="style" href={href} fetchpriority={fp} {...mediaAttr} />
+      {!isDev && fp === 'high' && (
+        <link rel="preload" as="style" href={linkHref} fetchpriority="high" {...(item.media ? { media: item.media } : {})} />
       )}
-
-      {/* Stylesheet link */}
-      {f.nonCritical ? (
-        // defer: your global JS will set href=data-src later
-        <link
-          rel="stylesheet"
-          data-src={href}
-          data-css-noncritical="1"
-          {...mediaAttr}
-        />
+      {fp === 'low' ? (
+        <link id={item.id} rel="stylesheet" data-href={linkHref} data-css-noncritical="1" {...(item.media ? { media: item.media } : {})} />
       ) : (
-        <link
-          rel="stylesheet"
-          href={href}
-          {...(!isDev && f.preload ? { fetchpriority: fp } : {})}
-          {...mediaAttr}
-        />
+        <link id={item.id} rel="stylesheet" href={linkHref} {...(item.media ? { media: item.media } : {})} />
       )}
     </>
   );

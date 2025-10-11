@@ -1,0 +1,13 @@
+---
+// src/components/analytics/AnalyticsBodyNoscript.astro
+import { siteFunctions } from '@/config/siteFunctions';
+const isProd = import.meta.env.PROD;
+const useGTM = isProd && !!siteFunctions.googleTag && !!siteFunctions.googleTagId;
+const gtmId = siteFunctions.googleTagId;
+---
+{useGTM && (
+  <noscript>
+    <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+      height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+)}

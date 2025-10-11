@@ -108,7 +108,8 @@ export const siteNav: NavItem[] = [
             altText: '',
             title: 'Marriage Certificate'
           },
-          { label: 'PCC / Affidavit', href: '/services/pcc-affidavit-apostille/', title: 'PCC / Affidavit' }
+          { label: 'Police Clearance Certificate', href: '/services/pcc-apostille/', title: 'PCC / Affidavit' },
+          { label: 'Other Personal Documents', href: '/services/personal-documents-apostille/', title: 'Other Personal Documents' }
         ]
       },
       {
@@ -147,7 +148,7 @@ export const siteNav: NavItem[] = [
     ]
   },
   { label: 'Reviews', href: '/reviews/', type: 'link', menuId: '', icon: '', iconName: 'star', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '', title: 'check out user experience', altText: 'star icon - user reviews', ariaLabel: 'User Reviews', variant: 'nav', description: 'List of reviews about the apostille process' },
-  { label: 'Contact', href: '/contact/', type: 'link', menuId: '', icon: '', iconName: 'email', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '', altText: 'email icon - envelope', description: 'List of resources about the apostille process', title: 'Get in touch with us', ariaLabel: 'Contact us', variant: 'nav' }
+  { label: 'Contact', href: '/contact-us/', type: 'link', menuId: '', icon: '', iconName: 'email', iconUrl: '', iconLocation: 'left', iconSize: 'large', iconClass: '', className: '', altText: 'email icon - envelope', description: 'List of resources about the apostille process', title: 'Get in touch with us', ariaLabel: 'Contact us', variant: 'nav' }
 ];
 
 /** SEARCH ICON ENABLED */

@@ -28,6 +28,12 @@ const adminEmail   = siteDefaults.admin?.email || contactEmail;
 const termsPath =
   (siteDefaults as any)?.pages?.terms?.path || '/terms/';
 
+// NEW: Cookie & Refund links if configured
+const cookiePath =
+  (siteDefaults as any)?.pages?.cookiePolicy?.path || '/cookie-policy/';
+const refundPath =
+  (siteDefaults as any)?.pages?.refund?.path || '/refund-policy/';
+
 // Choose best address: site-level, then parentOrganization
 const addr = siteDefaults.address || siteDefaults.parentOrganization?.address || null;
 
@@ -179,7 +185,12 @@ const pageDesc =
     </ul>
 
     <h2>11) Cookies &amp; analytics</h2>
-    <p>We may use cookies for functionality, performance, and analytics. Manage preferences in your browser or cookie controls.</p>
+    <p>
+      We may use cookies for functionality, performance, and analytics. Manage preferences in your browser or cookie controls.
+      For details on categories, partners, and how to clear cookies in major browsers, see our
+      {' '}<Anchor href={cookiePath}><strong>Cookie Policy</strong></Anchor>.
+    </p>
+
 
     <h2>12) Communications</h2>
     <p>
@@ -217,6 +228,10 @@ const pageDesc =
 
     <p class="text-s col-base-70">
       Looking for our service terms? Read our <Anchor href={termsPath}><strong>Terms &amp; Conditions</strong></Anchor>.
+      <br />
+      Learn more about cookies in our <Anchor href={cookiePath}><strong>Cookie Policy</strong></Anchor>.
+      <br />
+      See payment reversals and cancellations in our <Anchor href={refundPath}><strong>Refund Policy</strong></Anchor>.
     </p>
   </div>
 </article>

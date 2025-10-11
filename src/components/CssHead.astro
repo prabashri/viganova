@@ -1,7 +1,7 @@
 ---
 // src/components/CssHead.astro
-import manifest from '../data/assets-manifest.json';
-import { inlineCss } from '../data/generated-inline-css.ts';
+import manifest from '@/data/assets-manifest.json';
+import { inlineCss } from '@/data/generated-inline-css.ts';
 
 const devCssOrder = [
   '/src/styles/inline/base.css',
@@ -21,6 +21,7 @@ const devCssOrder = [
   '/src/styles/main/markdown.css',
   '/src/styles/main/table.css',
   '/src/styles/main/blockquote.css',
+  '/src/styles/main/consent-banner.css',
   // '/src/styles/main/print.css',
   '/src/styles/main/star-rating.css',
   '/src/styles/main/callout.css',

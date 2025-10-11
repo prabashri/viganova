@@ -1,88 +1,121 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { siteDefaults } from '@/config/siteDefaults';
-import { siteImages } from '@/config/siteImages'; 
+import { siteImages } from '@/config/siteImages';
 import type { HeadProps } from '@/types/HeadProps';
 import HeroCollections from '@/components/ui/HeroCollections.astro';
 import CardCollections from '@/components/ui/CardCollections.astro';
 import type { CardProps } from '@/types/CardProps';
 import { getCollection } from 'astro:content';
+import modifiedDatesJson from '@/data/modified-dates.json';
+import { toHuman } from '@/utils/date-format';
 
 // =========================
 // 🔹 Constants
 // =========================
-const entry = "resource";
-const entryConfig = siteDefaults.collections[entry];
-const basePath = entryConfig?.base ? `/${entryConfig.base}` : ``;
-const heroTitle = 'Apostille resource articles & guides';
+const entry = 'resource';
+const entryCfg = siteDefaults.collections[entry];
+const base = entryCfg?.base ?? 'resources';
+const basePath = `/${base}`;
+
+const heroTitle = `Apostille resources & guides by ${siteDefaults.siteName}`;
 const metaDescription =
-  `Browse resource articles to understand apostille processes—what to prepare, how to apply, timelines & checklists—from ${siteDefaults.siteName}.`;
+  `Understand apostille in India — what to prepare, how it works, timelines & checklists. Trusted guides from ${siteDefaults.siteName}.`;
 
 // =========================
-// 🔹 Get blog posts
+// 🔹 Last-modified helper
 // =========================
-const posts = (await getCollection(entry))
-  .filter(post =>
-    !post.id.startsWith('_') && post.data?.draft !== true
-  )
-  .sort(
-    (a, b) => new Date(b.data.publishedDate).valueOf() - new Date(a.data.publishedDate).valueOf()
+const modifiedDates = modifiedDatesJson as Record<string, string>;
+
+function getLastModified(post: any): string | undefined {
+  const slug = post.data.slug ?? post.id;
+  const key = `${base}/${slug}`;
+  return (
+    modifiedDates[key] ||
+    post.data.lastModified ||
+    post.data.updatedDate ||
+    post.data.publishedDate ||
+    undefined
   );
+}
 
 // =========================
-// 🔹 SEO
+// 🔹 Load, filter, sort
+// =========================
+const all = (await getCollection(entry)).filter(
+  (p) => !p.id.startsWith('_') && p.data?.draft !== true
+);
+
+const posts = all.sort((a, b) => {
+  const ad = new Date(getLastModified(a) ?? 0).valueOf();
+  const bd = new Date(getLastModified(b) ?? 0).valueOf();
+  return bd - ad;
+});
+
+// Split featured vs others
+const featuredPosts = posts.filter((p) => p.data?.featured === true);
+const otherPosts    = posts.filter((p) => p.data?.featured !== true);
+
 // =========================
 const headProps: HeadProps = {
-  title: `${heroTitle} | ${siteDefaults.siteName}`,
+  title: heroTitle,
   description: metaDescription,
   image: siteImages.image,
   canonicalUrl: `${siteDefaults.siteUrl}${basePath}/`,
   index: true,
-  keywords: posts.map(p => p.data.title),
+  keywords: posts.map((p) => p.data.title),
   type: 'collection',
   url: `${siteDefaults.siteUrl}${basePath}/`,
   authors: []
 };
 
 // =========================
-// 🔹 Map posts to CardProps
+// 🔹 Map to cards
 // =========================
 function mapToCardProps(post: any, index: number): CardProps {
-  const postSlug = post.data.slug ?? post.id; // Fallback to id if no slug in frontmatter
+  const postSlug = post.data.slug ?? post.id;
+  const lastMod  = getLastModified(post);
+
   return {
     link: `${basePath}/${postSlug}/`,
-    linkAriaLabel: `Read blog post: ${post.data.title}`,
+    linkAriaLabel: `Read resource: ${post.data.title}`,
     image: post.data.heroImage ?? '',
     imageAlt: post.data.heroImageAlt ?? post.data.title,
     title: post.data.title,
     description: post.data.description ?? '',
-    afterDescription: post.data.publishedDate
-      ? new Date(post.data.publishedDate).toLocaleDateString()
-      : '',
+    afterDescription: lastMod ? (toHuman(lastMod) ?? '') : '',
     orientation: 'vertical',
     imageSize: 320,
     roleType: 'list',
-    loading: index < 3 ? 'eager' : 'lazy' // First 3 eager
+    loading: index < 3 ? 'eager' : 'lazy'
   };
 }
 
-const blogCards: CardProps[] = posts.map((post, index) => mapToCardProps(post, index));
+const featuredCards: CardProps[] = featuredPosts.map((p, i) => mapToCardProps(p, i));
+const otherCards:    CardProps[] = otherPosts.map((p, i) => mapToCardProps(p, i));
 ---
 
 <BaseLayout headProps={headProps}>
   <HeroCollections
     title={heroTitle}
-    description={metaDescription}  
+    description={metaDescription}
     bgColorClass="bg-secondary-base"
     textColorClass="col-base-00"
-    image=''
-    imageAlt=''
+    image=""
+    imageAlt="Resources Hero Image"
     imageLoading="delay"
   />
 
-  {blogCards.length > 0 && (
-    <section class="mx-w-site mi-auto mb-2 pb-2">
-      <CardCollections cards={blogCards} wrapper="ul" roleType="list" entry={entry} />
-    </section>
+  { (featuredCards.length > 0 || otherCards.length > 0) && (
+    <div class="mx-w-site mi-auto mb-1 pb-1">
+      {featuredCards.length > 0 && (
+        <CardCollections cards={featuredCards} wrapper="ul" orientation="horizontal" roleType="list" entry={entry} />
+      )}
+      <hr class="b-top-0" />
+      {otherCards.length > 0 && (
+        <CardCollections cards={otherCards} wrapper="ul" roleType="list" entry={entry} />
+      )}
+    </div>
   )}
+
 </BaseLayout>

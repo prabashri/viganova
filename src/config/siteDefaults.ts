@@ -213,11 +213,14 @@ export const siteDefaults = {
       sitemap: true,
       base: "blog",
       label: "Blog",
+      title: "Blog",
+      description: "Latest articles and updates",
       rss: false,
       tags: true,
       categories: true,
       authors: true,
       search: true,
+      showInFooterNav: false,
     },
     service: {
       index: true,
@@ -229,6 +232,7 @@ export const siteDefaults = {
       categories: true,
       authors: true,
       search: true,
+      showInFooterNav: true,
     },
     resource: {
       index: true,
@@ -240,6 +244,7 @@ export const siteDefaults = {
       categories: true,
       authors: true,
       search: true,
+      showInFooterNav: true,
     },
     post: {
       index: true,
@@ -251,6 +256,7 @@ export const siteDefaults = {
       categories: true,
       authors: true,
       search: true,
+      showInFooterNav: false,
     },
     videos: {
       index: true,
@@ -262,6 +268,7 @@ export const siteDefaults = {
       categories: true,
       authors: true,
       search: true,
+      showInFooterNav: false,
     },
     audio: {
       index: true,
@@ -273,6 +280,7 @@ export const siteDefaults = {
       categories: true,
       authors: true,
       search: true,
+      showInFooterNav: false,
     },
     review:{
       index: false,
@@ -284,6 +292,7 @@ export const siteDefaults = {
       categories: false,
       authors: false,
       search: false,
+      showInFooterNav: true,
     },
     team: {
       index: true,
@@ -294,6 +303,7 @@ export const siteDefaults = {
       tags: false,
       categories: false,
       search: false,
+      showInFooterNav: true,
     },
   },
 
@@ -307,6 +317,8 @@ export const siteDefaults = {
 
   pages: {
     privacyPolicy: {
+      label: "Privacy Policy",
+      icon: "shield-check",
       title: `Privacy Policy — How ${SITE_NAME} Collects, Uses & Protects Your Data`,
       description: `Learn how ${SITE_NAME} collects, uses, and safeguards your information. We explain cookies, analytics, limited retention, and your choices in clear, human-readable language.`,
       enabled: true,
@@ -316,7 +328,21 @@ export const siteDefaults = {
       path: "/privacy-policy/",
       location: "content/pages/PrivacyPolicy.astro",
     },
+    cookiePolicy: {
+      label: "Cookie Policy",
+      icon: "cookie",
+      title: `Cookie Policy — How ${SITE_NAME} Uses Cookies & Similar Technologies`,
+      description: `Understand how ${SITE_NAME} uses essential, functional, analytics, and advertising cookies; how to manage preferences; and how to clear cookies in major browsers.`,
+      enabled: true,
+      index: true,            // indexable (ok if you’re fine with it being public)
+      sitemap: true,          // include in sitemap.xml
+      showInFooterNav: true,  // show link in footer
+      path: "/cookie-policy/",
+      location: "content/pages/CookiePolicy.astro",
+    },
     contact: {
+      label: "Contact Us",
+      icon: "phone",
       title: `Contact ${SITE_NAME} — Quotes, Support, and Fast Apostille Help`,
       description: `Reach ${SITE_NAME} for fast answers, quotes, or support. Message us for document checks, timelines, and pricing—our team replies quickly and guides you through every step of the process.`,
       enabled: true,
@@ -328,6 +354,8 @@ export const siteDefaults = {
       location: "content/pages/Contact.astro",
     },
     about: {
+      label: "About Us",
+      icon: "info-circle",
       title: `About ${SITE_NAME} — Who We Are, Our Mission, and How We Help`,
       description: `Discover ${SITE_NAME}'s story, values, team and expertise in delivering secure, reliable apostille and attestation services you can trust.`,
       enabled: true,
@@ -338,6 +366,8 @@ export const siteDefaults = {
       location: "content/pages/About.astro",
     },
     terms: {
+      label: "Terms & Conditions",
+      icon: "file-text",
       title: `Terms & Conditions — Legal Terms for Using ${SITE_NAME} Services`,
       description: `Read the terms and acceptable use for ${SITE_NAME}. This page covers service rules, limitations, disclaimers, payments, and your rights when using our website and document services.`,
       enabled: true,
@@ -348,6 +378,8 @@ export const siteDefaults = {
       location: "content/pages/Terms.astro",
     },
     refund: {
+      label: "Refund Policy",
+      icon: "arrow-uturn-left",
       title: `Refund Policy — Terms for Refunds and Cancellations at ${SITE_NAME}`,
       description: `Understand the refund and cancellation terms for services at ${SITE_NAME}. This page outlines your rights, the process for requesting refunds, and any applicable fees.`,
       enabled: true,
@@ -358,6 +390,8 @@ export const siteDefaults = {
       location: "content/pages/Refund.astro",
     },
     search: {
+      label: "Search",
+      icon: "search",
       title: `Search ${SITE_NAME} — Find Guides, Services, and Apostille Resources`,
       description: `Search ${SITE_NAME} to find articles, guides, pricing information, timelines, and help topics. Filter results to quickly discover the resources you need to complete your document tasks.`,
       enabled: true,
@@ -368,6 +402,8 @@ export const siteDefaults = {
       location: "content/pages/Search.astro",
     },
     notFound: {
+      label: "404 Not Found",
+      icon: "alert-triangle",
       title: `Page Not Found — Let ${SITE_NAME} Help You Get Back on Track`,
       description: `We couldn't find that page on ${SITE_NAME}. Try our search, browse popular guides, or return home to explore services, pricing, timelines, and support for your apostille and attestation needs.`,
       enabled: true,

@@ -1,0 +1,8 @@
+---
+/** Put this in <head> so Google can verify the account-domain binding */
+import { siteFunctions } from '@/config/siteFunctions';
+const clientId = siteFunctions.adsense?.trim();
+---
+{clientId && (
+  <meta name="google-adsense-account" content={clientId} />
+)}

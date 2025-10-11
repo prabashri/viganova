@@ -63,3 +63,12 @@
   border-color: var(--base-100);
   color: var(--base-100);
 }
+.list-separator li {
+    border-right: 1px solid;
+    padding: 0;
+    margin: 0;
+    padding-right: 1rem;
+}
+.list-separator li:nth-last-child(1) {
+    border-right: none;
+}

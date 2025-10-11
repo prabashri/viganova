@@ -1,149 +1,187 @@
 // src/config/security.mjs
-// src/config/siteFunctions.ts
-import { siteFunctions } from "../config/siteFunctions.js";
-const emailHandler = siteFunctions?.contactFormHandler ?? '';
-const cspReportHandler = siteFunctions?.cspReportHandler ?? '';
+import { siteFunctions } from "@/config/siteFunctions.js";
 
-// src/config/security.mjs
+// ===== Helpers ===============================================================
+const uniq = (arr) => Array.from(new Set((arr || []).filter(Boolean)));
+const add = (dst, key, values) => {
+  if (!values || values.length === 0) return;
+  dst[key] = uniq([...(dst[key] || []), ...values]);
+};
+const originOf = (u) => {
+  try { return new URL(u).origin; } catch { return ""; }
+};
 
-// 🛡️ Content-Security-Policy (CSP) Directives
-export const securityHeaders = {
-  // Block all by default
+// Short-hands (prefer ORIGINs in CSP)
+const emailHandler = originOf(siteFunctions?.contactFormHandler || "");
+const cspReportHandler = originOf(siteFunctions?.cspReportHandler || "");
+
+// Feature flags (derived from your existing keys + the new minimal toggles)
+const adsOn        = siteFunctions.enableAdSense ?? Boolean(siteFunctions.adsense);
+const gaOn         = !!siteFunctions.googleAnalytics;
+const gtmOn        = !!siteFunctions.googleTag;
+const cfInsightsOn = !!siteFunctions.cloudflareAnalytics;
+const turnstileOn  = !!siteFunctions.turnstileEnabled && !!siteFunctions.turnstileSitekey;
+
+const fontsOn      = !!siteFunctions.allowGoogleFonts;
+const ytOn         = !!siteFunctions.enableYouTube;
+const vimeoOn      = !!siteFunctions.enableVimeo;
+const phOn         = !!siteFunctions.enableProductHunt;
+const gravatarOn   = !!siteFunctions.allowGravatar;
+
+// ===== Base CSP (locked by default) ==========================================
+const BASE = {
   "default-src": ["'none'"],
-
-  // Only allow base URLs from this origin (protects <base>)
   "base-uri": ["'self'"],
-
-  // Disallow plugins and Flash
   "object-src": ["'none'"],
-
-  // Only allow manifest file from own origin
   "manifest-src": ["'self'"],
-
-  // Only allow workers from same origin
   "worker-src": ["'self'"],
-
-  // Restrict where forms can submit to
   "form-action": ["'self'"],
-
-  // Prevent this site from being embedded in any other frame
   "frame-ancestors": ["'none'"],
-
-  // Automatically upgrade HTTP requests to HTTPS
   "upgrade-insecure-requests": true,
 
-  // 🌐 External endpoints that JS can talk to (e.g., analytics, workers)
-  "connect-src": [
-    "'self'",
-    "https://*.google-analytics.com",
-    "https://www.googletagmanager.com",
-    // "https://tagmanager.google.com", // → Enable if Tag Manager UI used
-    "https://static.cloudflareinsights.com",
-    "https://cloudflareinsights.com",
-    // "https://*.cloudflare.com", // → Enable if other CF APIs are called
-    "https://challenges.cloudflare.com",
-    "https://nviewsweb-email-handler.nviews.workers.dev",
-    // "https://pagead2.googlesyndication.com", // → Enable if AdSense enabled
-     ...(emailHandler ? [emailHandler] : []),
-    ...(cspReportHandler ? [cspReportHandler] : []),
-  ],
-
-  // 🖼️ Trusted image sources (further lockdown possible)
-  "img-src": [
-    "'self'",
-    // "https://ssl.gstatic.com",
-    // "https://www.gstatic.com",
-    // "https://*.googleusercontent.com",
-    "https://api.producthunt.com",
-    "https://www.producthunt.com",
-    "https://www.gravatar.com/"
-    // "https://*.google-analytics.com",
-    // "https://*.googletagmanager.com",
-    // "https://*.gstatic.com"
-  ],
-
-  // 🔤 Fonts (Google Fonts OK)
-  "font-src": [
-    "'self'",
-    "https://fonts.gstatic.com"
-  ],
-
-  // 🎵 Trusted audio/video sources
-  "media-src": [
-    "'self'",
-    "https://www.youtube.com",
-    "https://player.vimeo.com",
-    "https://storage.googleapis.com",
-    "https://video-ad-stats.googlesyndication.com"
-  ],
-
-  // 📜 Allowed JS sources
-  "script-src": [
-    "'self'",
-    "https://www.googletagmanager.com/gtag/",
-    // "https://tagmanager.google.com", // → Enable if GTM UI used
-    // "https://www.google-analytics.com",
-    "https://pagead2.googlesyndication.com",
-    "https://challenges.cloudflare.com/turnstile/",
-    "https://static.cloudflareinsights.com/beacon.min.js",
-    "https://cloudflareinsights.com",
-    "https://nviewsweb-email-handler.nviews.workers.dev",
-     ...(emailHandler ? [emailHandler] : []),
-    // `'nonce-xyz'` should be dynamically added for inline scripts (SSR)
-  ],
-
-  // 🎨 Allowed CSS sources
-  "style-src": [
-    "'self'",
-    // "'unsafe-inline'", // ⚠️ Consider removing if you use CSP nonces instead
-    "https://fonts.googleapis.com",
-    ""
-    // "https://tagmanager.google.com",
-    // "https://www.googletagmanager.com"
-  ],
-
-  // 📺 Allowed frames (embedded videos, challenge pages)
-  "frame-src": [
-    "'self'",
-    // "https://www.googletagmanager.com",
-    // "https://*.googlesyndication.com",
-    // "https://*.doubleclick.net",
-    "https://challenges.cloudflare.com",
-    "https://www.youtube.com",
-    "https://player.vimeo.com",
-    "https://www.producthunt.com"
-  ],
-  ...(cspReportHandler
-    ? {
-        "report-uri": cspReportHandler ?? "", // → Deprecated in favor of Reporting-Endpoints
-        "report-to": "csp-endpoint",
-        // Deprecated but still supported in older browsers (OK to leave)
-      }
-    : {})
+  "connect-src": ["'self'"],
+  "img-src": ["'self'", "data:"],
+  "font-src": ["'self'"],
+  "media-src": ["'self'"],
+  "script-src": ["'self'"],
+  "style-src": ["'self'"],
+  "frame-src": ["'self'"]
 };
+
+// ===== Apply feature packs ====================================================
+const headers = structuredClone(BASE);
+
+// Email/contact worker
+if (emailHandler) {
+  add(headers, "connect-src", [emailHandler]);
+  add(headers, "script-src",  [emailHandler]); // if your frontend fetches it directly
+  add(headers, "form-action", ["'self'", emailHandler]); // allow form POST to worker
+}
+
+// CSP reporting
+if (cspReportHandler) {
+  headers["report-uri"] = cspReportHandler; // legacy but still useful
+  headers["report-to"]  = "csp-endpoint";
+}
+
+// Google Analytics
+if (gaOn) {
+  add(headers, "connect-src", ["https://www.google-analytics.com"]);
+  add(headers, "img-src",     ["https://www.google-analytics.com"]);
+  add(headers, "script-src",  ["https://www.google-analytics.com"]);
+}
+
+// Google Tag Manager
+if (gtmOn) {
+  add(headers, "connect-src", [
+    "https://www.googletagmanager.com",
+    "https://www.google-analytics.com"
+  ]);
+  add(headers, "img-src", [
+    "https://www.googletagmanager.com",
+    "https://*.googletagmanager.com"
+  ]);
+  add(headers, "script-src", [
+    "https://www.googletagmanager.com",
+    "https://tagmanager.google.com"
+  ]);
+  add(headers, "frame-src", ["https://www.googletagmanager.com"]);
+}
+
+// Cloudflare Web Analytics
+if (cfInsightsOn) {
+  add(headers, "connect-src", [
+    "https://static.cloudflareinsights.com",
+    "https://cloudflareinsights.com"
+  ]);
+  add(headers, "script-src", [
+    "https://static.cloudflareinsights.com/beacon.min.js",
+    "https://cloudflareinsights.com"
+  ]);
+}
+
+// Cloudflare Turnstile
+if (turnstileOn) {
+  add(headers, "connect-src", ["https://challenges.cloudflare.com"]);
+  add(headers, "script-src",  ["https://challenges.cloudflare.com/turnstile/"]);
+  add(headers, "frame-src",   ["https://challenges.cloudflare.com"]);
+}
+
+// Google AdSense / Ads
+if (adsOn) {
+  add(headers, "connect-src", [
+    "https://googleads.g.doubleclick.net",
+    "https://pagead2.googlesyndication.com",
+    "https://www.googletagmanager.com",
+    "https://www.google-analytics.com"
+  ]);
+  add(headers, "img-src", [
+    "https://pagead2.googlesyndication.com",
+    "https://googleads.g.doubleclick.net",
+    "https://tpc.googlesyndication.com"
+  ]);
+  add(headers, "media-src", [
+    "https://video-ad-stats.googlesyndication.com",
+    "https://storage.googleapis.com"
+  ]);
+  add(headers, "script-src", [
+    "https://pagead2.googlesyndication.com",
+    "https://googleads.g.doubleclick.net",
+    "https://www.googletagservices.com"
+  ]);
+  add(headers, "frame-src", [
+    "https://*.googlesyndication.com",
+    "https://*.doubleclick.net"
+  ]);
+}
+
+// Google Fonts
+if (fontsOn) {
+  add(headers, "style-src", ["https://fonts.googleapis.com"]);
+  add(headers, "font-src",  ["https://fonts.gstatic.com"]);
+}
+
+// Product Hunt
+if (phOn) {
+  add(headers, "connect-src", ["https://api.producthunt.com"]);
+  add(headers, "img-src",     ["https://www.producthunt.com"]);
+  add(headers, "frame-src",   ["https://www.producthunt.com"]);
+}
+
+// Avatars (Gravatar)
+if (gravatarOn) {
+  add(headers, "img-src", ["https://www.gravatar.com/"]);
+}
+
+// YouTube
+if (ytOn) {
+  add(headers, "media-src", ["https://www.youtube.com"]);
+  add(headers, "frame-src", ["https://www.youtube.com"]);
+}
+
+// Vimeo
+if (vimeoOn) {
+  add(headers, "media-src", ["https://player.vimeo.com"]);
+  add(headers, "frame-src", ["https://player.vimeo.com"]);
+}
+
+// Final de-duplication
+for (const k of Object.keys(headers)) {
+  if (Array.isArray(headers[k])) headers[k] = uniq(headers[k]);
+}
+
+// 🛡️ Export CSP directives
+export const securityHeaders = headers;
 
 // 🔐 Additional security & browser policy headers
 export const extraHttpHeaders = {
-  // Prevent clickjacking
   "X-Frame-Options": "DENY",
-
-  // Force consistent MIME-type interpretation
   "X-Content-Type-Options": "nosniff",
-
-  // Control referrer info
   "Referrer-Policy": "strict-origin-when-cross-origin",
-
-  // Restrict powerful features
   "Permissions-Policy": "geolocation=(), camera=(), microphone=()",
-
-  // Force long cache for static assets (adjust if needed)
   "Cache-Control": "public, max-age=31536001, immutable",
-
-  // Restrict resource sharing
   "Cross-Origin-Resource-Policy": "same-origin",
-
-  // ✅ CSP Reporting Endpoints
-   ...(cspReportHandler
+  ...(cspReportHandler
     ? {
         "Reporting-Endpoints": `csp-endpoint="${cspReportHandler}"`,
         "Report-To": JSON.stringify({
@@ -155,4 +193,3 @@ export const extraHttpHeaders = {
       }
     : {})
 };
-
