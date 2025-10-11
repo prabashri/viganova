@@ -79,7 +79,10 @@ faq:
     answer: "Follow the recipient’s written preference. If they accept e-Apostille, it’s fast and shareable. If they demand physical verification, choose Sticker on the original."
     speakable: false
 ---
-
+import Anchor from "@/components/ui/Anchor.astro";
+import FaqList from "@/components/ui/FaqList.astro";
+import { price, inr } from "@/config/pricing";
+import CalloutBox from "@/components/ui/CalloutBox.astro";
 
 
 An **apostille** from the **Ministry of External Affairs (MEA)** makes your Indian **Marriage Registration Certificate** valid in **Hague Convention** countries. You can choose:
@@ -89,6 +92,11 @@ An **apostille** from the **Ministry of External Affairs (MEA)** makes your Indi
 
 > For **non-Hague** destinations, we handle the full **attestation** chain (Notary → State/SDM → MEA → Embassy/Consulate).
 
+<CalloutBox type="cta-secondary" class="mb-1">
+  For **non-Hague destinations**, we handle the full **attestation** chain (Notary → State/SDM → MEA → Embassy/Consulate).
+
+  <Anchor href="https://easyapostille.in">EasyApostille</Anchor> is always here to support your document authentication process.
+</CalloutBox>
 ---
 
 ## Fee Structure

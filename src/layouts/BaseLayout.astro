@@ -3,23 +3,21 @@
 import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
-//import Analytics from '@/components/Analytics.astro';
-import type { HeadProps } from '@/types/HeadProps';
-import Breadcrumb from '@/components/ui/Breadcrumb.astro';
-import Analytics from '@/components/Analytics.astro';
+import AnalyticsHead from '@/components/analytics/AnalyticsHead.astro';
+import AnalyticsBodyNoscript from '@/components/analytics/AnalyticsBodyNoscript.astro';
+import AnalyticsFooter from '@/components/analytics/AnalyticsFooter.astro';
+import ConsentBanner from '@/components/consent/ConsentBanner.astro';
+import ConsentData from '@/components/consent/ConsentData.astro';
 import InlineScript from '@/components/InlineScript.astro';
 
-interface Props {
-  headProps?: HeadProps;
-  hideHeader?: boolean;
-  hideFooter?: boolean;
-}
+import AdSenseHead from '@/components/ads/AdSenseHead.astro';
+import AdSenseLoader from '@/components/ads/AdSenseLoader.astro';
 
-const {
-  headProps = { title: 'Default Title', showBreadcrumb: false },
-  hideHeader = false,
-  hideFooter = false,
-} = Astro.props;
+import type { HeadProps } from '@/types/HeadProps';
+import { siteFunctions } from '@/config/siteFunctions';
+
+
+const { headProps = { title: 'Default Title', showBreadcrumb: false }, hideHeader = false, hideFooter = false } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -28,37 +26,32 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <slot name="headContent-top" />
-    {/* -- SEO / Meta -- */}
+    <AnalyticsHead />
+    <AdSenseHead /> 
     <BaseHead {...headProps} />
-    {/* -- Optional extra tags (OG, JSON-LD, fonts, etc.) -- */}
     <slot name="headContent-bottom" />
   </head>
   <body>
-    {/* -- Accessibility -- */}
+    <AnalyticsBodyNoscript />
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
     {!hideHeader && <Header />}
 
     <main id="main-content">
-      {/*-- src/layouts/BaseLayout.astro --*/}
-      
-
-
-
       <slot />
     </main>
-      
-    {/** 🔹 Analytics */}
-    <Analytics />
-    
-    {/* -- inline scripts -- */}
-    <InlineScript />
-
-    {/* -- Optional extra content -- */}
 
     {!hideFooter && <Footer />}
+    
+    {/* ✅ Show consent UI and wire consent updates */}
+    <ConsentData />
+    <ConsentBanner />
 
-    {/* -- Page-specific scripts -- */}
+    {/* ✅ Put consent-guarded scripts BEFORE lazy loader */}
+    <AnalyticsFooter />
+    <AdSenseLoader />
+    <InlineScript />
+
     <slot name="extraScripts" />
   </body>
 </html>

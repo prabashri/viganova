@@ -74,8 +74,9 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
         sizes={imageSizeFinal}
         width={imageSizeFinal}
         height={Math.round(imageSizeFinal * 0.56)}
-        className={className}
-        imageClassName={`b-thin-primary-light br-unset ${imageClassName}`}
+        className={`${className} no-width ar-unset`}
+        objectFit='cover'
+        imageClassName={`b-thin-primary-light mx-w-320 br-unset ${imageClassName} h-full`}
         breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
         loading={loading}
       />

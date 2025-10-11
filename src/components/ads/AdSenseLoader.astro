@@ -1,0 +1,33 @@
+---
+/**
+ * Loads the AdSense library. Use data-src so your lazy loader can hydrate it.
+ * Inline script sets NPA flag based on your consent manager.
+ * Place this ONCE (head or footer is fine — head is typical).
+ */
+import { siteFunctions } from '@/config/siteFunctions';
+interface Props { clientId?: string; }
+const clientId = (Astro.props.clientId || siteFunctions.adsense || '').trim();
+---
+{clientId && (
+  <>
+    {/* External library (allowed by CSP via host allowlist) */}
+    <script
+      async
+      data-src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clientId}`}
+      crossorigin="anonymous">
+    </script>
+
+    { /* AdSenseLoader.astro */}
+    { /* Only decide NPA when ads are granted */}
+    { /* If ads are denied, do not set this — LTD will apply based on Consent Mode */ }
+    <script is:inline>
+        window.adsbygoogle = window.adsbygoogle || [];
+        try {
+            if (window.__consent?.ads === true) {            
+                window.adsbygoogle.requestNonPersonalizedAds = (window.__consent.personalized === true) ? 0 : 1;
+            }
+        } catch(e){}
+    </script>
+
+  </>
+)}

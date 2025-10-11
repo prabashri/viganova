@@ -58,15 +58,23 @@ svg use {
 	align-items: start;
 	text-align: start;
 }
-
+.b-top-dashed {
+	border-top: var(--border-width-thin, 0.5px) dashed var(--base-50);
+}
 .b-top-solid-primary {
 	border-top: var(--border-width-solid, 4px) solid var(--primary-base);
 }
 .b-top-solid-secondary {
 	border-top: var(--border-width-solid, 4px) solid var(--secondary-base);
 }
-.b-bottom-base-00 {
-	border-bottom: var(--border-width, 1px) solid var(--base-00);
+.b-top {
+	border-top: var(--border-width, 1px) solid var(--base-50);
+}
+.b-top-0 {
+	border-top: 0;
+}
+.b-bottom {
+	border-bottom: var(--border-width, 1px) solid var(--base-50);
 }
 
 .b-thin-primary-light {
@@ -276,6 +284,9 @@ hr, .hr {
 	margin-bottom: 0.5rem;
 	margin-block: 1rem;
 }
+.bottom-0 {
+	bottom: 0;
+}
 .bottom-10 {
 	bottom: 10px;
 }
@@ -386,7 +397,7 @@ hr, .hr {
 .col-base-100, .focus-col-base-100:focus, .focus-vis-col-base-100:focus-visible, .hover-col-base-100:hover {
 	color: var(--base-100);
 }
-.text-color{
+.text-color, .col-text, .focus-col-text:focus, .focus-vis-col-text:focus-visible, .hover-col-text:hover {
 	color: var(--text-color);
 }
 
@@ -424,6 +435,14 @@ hr, .hr {
 .col-success-dark {
 	color: var(--success-dark, green);
 }
+
+.pointer {
+	cursor: pointer;
+}
+.pointer-events-auto {
+	pointer-events: auto;
+}
+
 .desktop-logo-svg, .nav-text-desktop {
 	display: none;
 }
@@ -501,7 +520,10 @@ hr, .hr {
 }
 
 .full-height, .h-full {
-	height: 100%;
+	height: 100% !important;
+}
+.ar-unset{
+	aspect-ratio: unset !important;
 }
 
 
@@ -584,12 +606,14 @@ hr, .hr {
 .h-auto {
 	height: auto;
 }
-
+.h-unset {
+	height: unset !important;
+}
 .height-fit {
 	height: fit-content;
 }
 
-.hide, .display-none, .none {
+.hide, .display-none, .none, .is-hidden {
 	display: none !important;
 }
 
@@ -656,11 +680,22 @@ hr, .hr {
 .lh-0 {
 	line-height: 0;
 }
+.lh-1 {
+	line-height: 1;
+}
+.lh-1-2 {
+	line-height: 1.2;
+}
 
 .m-0 {
 	margin: 0;
 }
-
+.m-05 {
+	margin: 0.5rem;
+}
+.m-1 {
+	margin: 1rem;
+}	
 .m-bottom-0 {
 	margin-bottom: 0;
 }
@@ -825,9 +860,8 @@ hr, .hr {
 	list-style: none;
 	margin-left: 0;
 }
-
-.display-none {
-	display: none;
+.overscroll-contain {	
+	overscroll-behavior: contain;
 }
 
 .display-none.display {
@@ -1135,13 +1169,15 @@ hr, .hr {
 .w-50-1 {
 	width: calc(50% - 1rem);
 }
-
 .w-60 {
 	width: 60px;
 }
 
 .w-90-0 {
 	width: 90%;
+}
+.w-95-0 {
+	width: 95%;
 }
 .w-site {
 	width: var(--site-width);
@@ -1173,6 +1209,9 @@ hr, .hr {
 
 .ws-pre-wrap {
 	white-space: pre-wrap;
+}
+.z-0 {
+	z-index: 0;
 }
 
 .z-1 {

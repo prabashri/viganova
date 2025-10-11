@@ -70,7 +70,7 @@
    * Brand tone for promo/cta variants. Ignored for note/tip/alert/error.
    * bg-primary-{tone} is applied automatically.
    */
-  brandTone?: 'base' | 'light' | 'lighter' | 'dark' | 'darker' | 'darker-x';
+  brandTone?: 'base' | 'light' | 'lighter' | 'lighter-x' | 'dark' | 'darker' | 'darker-x';
   /**
    * Override the computed ARIA role. Defaults:
    * - "alert" for alert/error, "region" otherwise.
@@ -145,14 +145,14 @@ const typeConfig: Record<'note'|'tip'|'alert'|'error', {
 };
 
 // Brand tones for promo/cta
-const BRAND_TONES = new Set(['base','light','lighter','dark','darker','darker-x'] as const);
+const BRAND_TONES = new Set(['base','light','lighter', 'lighter-x', 'dark','darker','darker-x'] as const);
 const DARKISH = new Set(['base','dark','darker','darker-x']);
 const defaultToneFor: Record<Canonical, typeof BRAND_TONES extends Set<infer T> ? T : any> = {
   note: 'light',
   tip: 'light',
   alert: 'light',
   error: 'light',
-  promo: 'light',
+  promo: 'lighter-x',
   ctaPrimary: 'base',
   ctaSecondary: 'lighter',
 } as any;
@@ -172,7 +172,7 @@ if (canonical === 'promo' || canonical === 'ctaPrimary' || canonical === 'ctaSec
   const borderClass = 'br-left-primary';
   const textClass = DARKISH.has(tone) ? 'col-base-95' : '';
   const svg =
-    canonical === 'promo' ? '/icons/megaphone.svg'
+    canonical === 'promo' ? '/icons/speaker.svg'
     : canonical === 'ctaPrimary' ? '/icons/bolt.svg'
     : '/icons/arrow-right.svg';
   cfg = { svg, baseClass, borderClass, textClass };

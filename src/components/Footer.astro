@@ -15,6 +15,8 @@ const siteName = siteDefaults.siteName || 'EasyApostille';
 const siteTitle = siteDefaults.title || '';
 const siteUrl = (siteDefaults.siteUrl || 'https://easyapostille.in/').replace(/\/?$/, '/');
 
+const domainName = siteDefaults.domainName || 'easyapostille.in';
+
 // Build address string: prefer brand address, then parent org address
 const brandAddr = siteDefaults.address;
 const parentAddr = (siteDefaults as any)?.parentOrganization?.address;
@@ -30,17 +32,94 @@ const location = addr
   : '';
 
 // Contact (primary + optional secondary)
-const email = siteDefaults.contact?.email || `contact@${(siteDefaults.domainName || 'easyapostille.in')}`;
+const email = siteDefaults.contact?.email || `contact@${domainName}`;
 const phone = siteDefaults.contact?.phone || '';
 const waDigits = (siteDefaults.contact?.whatsapp || '').replace(/\D/g, '');
 const waHref = waDigits ? `https://wa.me/${waDigits}` : undefined;
 
-const phone2 = siteDefaults.contact?.phone2 || '';
-const waDigits2 = (siteDefaults.contact?.whatsapp2 || '').replace(/\D/g, '');
-const waHref2 = waDigits2 ? `https://wa.me/${waDigits2}` : undefined;
 
 // Logo alt
 const desktopAlt = `${siteName} Desktop Logo`;
+
+/* =========================
+   Dynamic footer navigation
+   ========================= */
+type Colls = typeof siteDefaults.collections;
+type Pages = typeof siteDefaults.pages;
+
+const collections = (siteDefaults.collections || {}) as Colls;
+const pages = (siteDefaults.pages || {}) as Pages;
+
+const clean = (s = '') => s.replace(/^\/+|\/+$/g, '');
+const withSlash = (s = '') => ('/' + clean(s) + '/').replace(/\/+/g, '/');
+const rootOr = (base: string) => base ? withSlash(base) : '/';
+
+// Build collection top links (e.g., /blog/, /services/, /resources/, etc.)
+const preferredCollectionOrder = ['post','service','resource','blog','videos','audio','team'];
+
+function buildCollectionMainLinks() {
+  const entries = Object.entries(collections)
+    .filter(([, cfg]) => Boolean(cfg?.index || cfg?.sitemap) && Boolean(cfg?.showInFooterNav));
+
+  // Order by preferred list first, then by label
+  const ordered = entries.sort((a, b) => {
+    const ai = preferredCollectionOrder.indexOf(a[0]);
+    const bi = preferredCollectionOrder.indexOf(b[0]);
+    if (ai !== -1 && bi !== -1) return ai - bi;
+    if (ai !== -1) return -1;
+    if (bi !== -1) return 1;
+    const al = a[1]?.label || a[0];
+    const bl = b[1]?.label || b[0];
+    return String(al).localeCompare(String(bl));
+  });
+
+  return ordered.map(([key, cfg]) => {
+    const base = clean(cfg?.base || '');
+    return {
+      key,
+      label: cfg?.label || key,
+      href: rootOr(base),
+    };
+  });
+}
+
+// Build static page links from pages config
+function buildPageLinks() {
+  return Object.entries(pages)
+    .filter(([, p]) => Boolean(
+      p?.enabled &&
+      (
+        ('showInFooterNav' in p ? p.showInFooterNav : false)
+      )
+    ))
+    .map(([key, p]) => ({
+      key,
+      label: p?.label,
+      title: p?.title || '',
+      href: p?.path || '/',
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+// Compose “Main Pages”:
+//  - Home (always first)
+//  - Collection roots (Services/Resources/Blog/Videos/Audio/Team/etc. when index/sitemap true)
+//  - Static pages (About/Contact/Privacy/Refund/Terms/etc. when enabled + showInFooterNav)
+const homeLink = { key: 'home', label: 'Home', href: '/' };
+
+const collectionLinks = buildCollectionMainLinks()
+  // Avoid duplicating root “/” if you use `post.base: ""`
+  .filter(c => c.href !== '/' || c.key === 'post');
+
+const pageLinks = buildPageLinks();
+
+// De-duplicate by href while preserving order
+const seen = new Set<string>();
+const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
+  if (seen.has(item.href)) return false;
+  seen.add(item.href);
+  return true;
+});
 ---
 
 <footer class="site-footer bg-primary-darker-x col-base-10 text-small pb-2 pi-1" itemscope itemtype="https://schema.org/WPFooter">
@@ -50,18 +129,22 @@ const desktopAlt = `${siteName} Desktop Logo`;
     <div class="footer-col sm-hr" itemscope itemtype="https://schema.org/WebSite" itemid={`${siteUrl}#website`}>
       {/* url + name for the WebSite node */}
       <meta itemprop="url" content={siteUrl} />
-      <a href={siteUrl} class="inline-flex ai-center gap-05 td-none br bg-primary-lighter-x">
+      <a
+        href={siteUrl}
+        aria-label={`${siteName} — Home`}
+        title={`${siteName} — Home`}
+        class="inline-flex ai-center gap-05 td-none br bg-primary-lighter-x"
+      >
         {hasDesktopSvg ? (
-          <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
+          <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} aria-hidden="true" focusable="false"/>
         ) : siteImages.desktopLogo ? (
-          <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
+          <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" aria-hidden="true"/>
         ) : (
           <span class="bold big-display-inherit col-primary hover-col-base-100" itemprop="name">{siteName}</span>
         )}
       </a>
 
       {/* If the logo image is shown, also expose the name for microdata */}
-      {!siteImages.desktopLogo && !hasDesktopSvg && null}
       { (siteImages.desktopLogo || hasDesktopSvg) && (
         <p class="bold" itemprop="name">{siteName}</p>
       )}
@@ -72,29 +155,25 @@ const desktopAlt = `${siteName} Desktop Logo`;
 
     {/* Column 2: Services (popular) */}
     <div class="footer-col sm-hr">
-      <p class="bold uppercase"><Anchor href="/services/">Apostille Services</Anchor></p>
+      <p class="bold uppercase"><Anchor href={rootOr(collections?.service?.base || 'services')}>Apostille Services</Anchor></p>
       <ul class="no-bullets">
         <li class="mb-05 pb-02"><Anchor href="/services/degree-certificate-apostille/">Degree Certificate</Anchor></li>
         <li class="mb-05 pb-02"><Anchor href="/services/marksheets-apostille/">Marksheets</Anchor></li>
         <li class="mb-05 pb-02"><Anchor href="/services/birth-certificate-apostille/">Birth Certificate</Anchor></li>
         <li class="mb-05 pb-02"><Anchor href="/services/marriage-certificate-apostille/">Marriage Certificate</Anchor></li>
         <li class="mb-05 pb-02"><Anchor href="/services/pcc-apostille/">PCC (Police Clearance)</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/services/affidavit-apostille/">Affidavit / POA</Anchor></li>
+        {/* <li class="mb-05 pb-02"><Anchor href="/services/affidavit-apostille/">Affidavit / POA</Anchor></li> */}
         <li class="mb-05 pb-02"><Anchor href="/services/business-document-apostille/">Business Documents</Anchor></li>
       </ul>
     </div>
 
-    {/* Column 3: Main pages */}
+    {/* Column 3: Main pages — now built from siteDefaults.collections + siteDefaults.pages */}
     <div class="footer-col sm-hr">
       <p class="bold uppercase">Main Pages</p>
       <ul class="no-bullets">
-        <li class="mb-05 pb-02"><Anchor href="/">Home</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/resources/">Resources</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/about/">About</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/contact/">Contact</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/privacy-policy/">Privacy Policy</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/refund-policy/">Refund Policy</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/terms/">Terms</Anchor></li>
+        {collectionLinks.map(link => (
+          <li class="mb-05 pb-02"><Anchor href={link.href}>{link.label}</Anchor></li>
+        ))}
       </ul>
     </div>
 
@@ -104,17 +183,24 @@ const desktopAlt = `${siteName} Desktop Logo`;
       <SocialLink id="footer-social-links" />
       <ul class="no-bullets">
         { email && <li class="mb-05 pb-02"><Anchor href={`mailto:${email}`}>{email}</Anchor></li> }
-        { phone && <li class="mb-05 pb-02"><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`}>{phone}</Anchor></li> }   
+        { phone && <li class="mb-05 pb-02"><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`}>{phone}</Anchor></li> }
+        { waHref && <li class="mb-05 pb-02"><Anchor href={waHref} target="_blank" rel="noopener">WhatsApp</Anchor></li> }      
         { location && <li class="mb-05 pb-02">{location}</li> }
       </ul>
     </div>
   </div>
-
+  <div class="footer-bottom pb-1">
+    <ul class="flex flex-row gap no-bullets jc-center no-bullets list-separator">
+      {pageLinks.map(link => (
+        <li class="mb-05 pb-02"><Anchor href={link.href} title={link.title}>{link.label}</Anchor></li>
+      ))}
+    </ul>
+  </div>
   {/* Bottom bar */}
   <div class="footer-bottom ta-center pb-1 hr">
     <p class="text-small">
-      Built with <Anchor href="https://astro.build" target="_blank" rel="noopener">Astro</Anchor> • Theme by
-      {' '}<Anchor href="https://nviewsweb.com" target="_blank" rel="noopener">NViewsWEB</Anchor>.
+      Built with <Anchor href="https://astro.build">Astro</Anchor> • Theme by
+      {' '}<Anchor href="https://nviewsweb.com">NViewsWEB</Anchor>.
     </p>
   </div>
 </footer>

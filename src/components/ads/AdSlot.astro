@@ -1,0 +1,37 @@
+---
+/**
+ * Reusable ad unit. Use wherever you want an ad block.
+ * Example: <AdSlot slotId="1234567890" style="display:block;min-height:250px" />
+ */
+import { siteFunctions } from '@/config/siteFunctions';
+
+interface Props {
+  slotId: string;
+  clientId?: string;      // optional override, else siteFunctions.adsense
+  format?: string;        // "auto" | "fluid" | etc.
+  responsive?: boolean;   // default true
+  style?: string;         // container size (required for layout)
+}
+const adsense = siteFunctions.adsense?.trim();
+const clientId = (Astro.props.clientId || adsense || '').trim();
+const { slotId, format = 'auto', responsive = true, style = 'display:block;min-height:120px' } = Astro.props;
+const enabled = !!clientId && !!slotId;
+---
+{enabled && (
+  <>
+    <ins class="adsbygoogle"
+      style={style}
+      data-ad-client={clientId}
+      data-ad-slot={slotId}
+      data-ad-format={format}
+      data-full-width-responsive={String(responsive)}
+    ></ins>
+
+    <script is:inline>
+      (function push(i=0){
+        if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) { window.adsbygoogle.push({}); return; }
+        if (i < 40) setTimeout(() => push(i+1), 150);
+      })();
+    </script>
+  </>
+)}

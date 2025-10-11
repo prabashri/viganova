@@ -64,33 +64,33 @@ export const siteColors = {
     // Optional dark mode colors
 
 
-  successLight:"hsla(128, 100%, 82%, 1.00)",
+  successLight:"hsla(128, 100%, 90%, 1.00)",
   success:"hsla(128, 100%, 40%, 1.00)",
-  successDark:"hsla(128, 100%, 20%, 1.00)",
+  successDark:"hsla(128, 100%, 10%, 1.00)",
 
   // darkSuccessLight:"hsla(128, 100%, 20%, 1.00)",
   // darkSuccess:"hsla(128, 100%, 70%, 1.00)",
   // darkSuccessDark:"hsla(128, 100%, 80%, 1.00)",
 
-  noteLight:"hsla(200, 100%, 70%, 1.00)",
+  noteLight:"hsla(200, 100%, 85%, 1.00)",
   note:"hsla(200, 100%, 50%, 1.00)",
-  noteDark:"hsla(220, 100%, 40%, 1.00)",
+  noteDark:"hsla(220, 100%, 20%, 1.00)",
 
   // darkNoteLight:"hsla(220, 100%, 60%, 1.00)",
   // darkNote:"hsla(220, 100%, 50%, 1.00)",
   // darkNoteDark:"hsla(220, 100%, 30%, 1.00)",
 
   errorLight:"hsla(0, 100%, 90%, 1.00)",
-  error:"hsla(0, 100%, 40%, 1.00)",
-  errorDark:"hsla(0, 100%, 30%, 1.00)",
+  error:"hsla(10, 100%, 50%, 1.00)",
+  errorDark:"hsla(0, 100%, 20%, 1.00)",
 
   // darkErrorLight:"hsla(0, 100%, 30%, 1.00)",
   // darkError:"hsla(0, 100%, 50%, 1.00)",
   // darkErrorDark:"hsla(0, 100%, 70%, 1.00)",
 
-  alertLight:"hsla(39, 100%, 85%, 1.00)",
+  alertLight:"hsla(39, 100%, 90%, 1.00)",
   alert:"hsla(39, 100%, 50%, 1.00)",
-  alertDark:"hsla(39, 100%, 30%, 1.00)",
+  alertDark:"hsla(39, 100%, 25%, 1.00)",
 
   // darkAlertLight:"hsla(39, 100%, 30%, 1.00)",
   // darkAlert:"hsla(39, 100%, 50%, 1.00)",

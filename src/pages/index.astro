@@ -49,9 +49,11 @@ const headProps: HeadProps = {
 
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top">
+ 
      <CssFilesToLoad
         files={[
-          { name: "home", preload: false, fetchPriority: "high" }
+          { name: "home", preload: true, fetchPriority: "high" },
+          { name: "home", inline: true}
         ]}
       />
   </Fragment>

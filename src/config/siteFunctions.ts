@@ -2,13 +2,60 @@
 export const siteFunctions = {
 
     contactFormHandler: "https://nviewsweb-email-handler.nviews.workers.dev/", // external worker url
-    turnstileSitekey: "", // to use Turnstile for form validation
-    analyticsId: "", // google analytics id   
+    /* CAPTCHA KEYS (for forms, comments, etc.) -------------------------- */
+    turnstileEnabled: true,
+    turnstileSitekey: "0x4AAAAAAB5d0h3hP88waWBq", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
+    /** google adsense account */
+    enableAdSense: true,
+    adsense: "ca-pub-8380181212468292",
+
+    googleAnalytics: true, // enable Google Analytics
+    analyticsId: "G-KEZGQDK3M0", // google analytics id   
+    /* by default google analytics used if id provided*/
+    googleTag: false, // enable Google Tag Manager
+    googleTagId: "GTM-PW2B4TFJ", // google tag manager id
+    
+    ahrefAnalytics: false, // enable Ahrefs Analytics
     ahrefAnalyticsId: "", 
+    
+    cloudflareAnalytics: false, // enable Cloudflare Web Analytics
     cloudflareAnalyticsId: "", 
+    
     bingAPIKey: "", // Bing API key for search
     rss: true, // enable RSS feed globally
-    index: false, // enable index page
+    index: true, // enable index page
+
+
+    // ✅ NEW: Consent settings
+    consent: {
+      enabled: true,                 // if false => NO consent mode, NO banner
+      cookieName: "consent.v1",
+      // keep both for compatibility; JS will prefer cookieDuration if present
+      cookieDuration: 180,           // days (alias)
+      ttlDays: 180,                  // days
+      autograntMs: 120000,           // auto-accept timer (ms). Ignored in EU if euOnly=true
+      preConsentPageview: true,      // allow cookieless PV, then green-flag analytics/ad storage until user chooses
+      euOnly: true,                  // if true, no autogrant in EU/UK
+      version: "1",                  // bump to force re-consent
+      position: "center",            // 'center' | 'bottomCentered' | 'bottomLeft' | 'bottomRight'
+      // Defaults applied on autogrant or first-load when preConsentPageview=true
+      defaults: {
+        analytics: true,
+        ads: true,
+        personalized: false
+      },
+
+      // Optional privacy hardening for GA/GTM
+      privacy: {
+        urlPassthrough: true,
+        adsDataRedaction: true,
+        developerId: "116822047451919185236"              // e.g. "d-XXXXXXXX"
+      },
+
+      // Optional UI copy / links (banner reads this if you show it)
+      policyUrl: "/privacy-policy/"
+    },
+
     mailHandler: "https://nviewsweb-email-handler.nviews.workers.dev/", // external worker url for email handling
     cspReportHandler: "https://csp-report-handler.nviews.workers.dev/", // external worker url for CSP reports
     features: {
@@ -18,6 +65,16 @@ export const siteFunctions = {
     },
     // siteFunctions.dateFormat (or siteDefaults.dateFormat)
     // Use this as the single source of truth for ALL date rendering.
+    robots:{
+      disallow: [
+        '/admin/', 
+        '/api/'
+      ], // paths to disallow in production
+      blockAllInNonProd: true, // block all in non-production (disallow: /)
+      sitemapUrl: 'sitemap.xml', // relative path to sitemap
+      // Optional HTTP headers (for non-Astro routes)
+      blockAICrawlers: false, // ← flip to false to allow AI bots + remove headers
+    },
     dateFormat: {
         /* Locale & Timezone ---------------------------------------------- */
         locale: 'en-US',              // e.g. 'en-GB', 'ko-KR', 'ta-IN'
@@ -64,6 +121,12 @@ export const siteFunctions = {
         'fonts',
         'static',
     ] as CdnAssetRoot[],
+
+    allowGoogleFonts: true, // set to false to block Google Fonts (in CSP and elsewhere)
+    enableYouTube: true,             // adds media-src/frame-src for YouTube
+    enableVimeo: false,              // adds media-src/frame-src for Vimeo (only if you use it)
+    enableProductHunt: false,        // adds api.producthunt.com + producthunt.com (images/embeds)
+    allowGravatar: true,             // adds www.gravatar.com to img-src
 
 } as const;
 export type CdnAssetRoot =

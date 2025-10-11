@@ -1,0 +1,53 @@
+---
+// src/components/analytics/AnalyticsHead.astro
+import { siteFunctions } from '@/config/siteFunctions';
+const isProd = import.meta.env.PROD;
+const useGTM = isProd && siteFunctions.googleTag && !!siteFunctions.googleTagId;
+const useGA  = isProd && siteFunctions.googleAnalytics && !useGTM && !!siteFunctions.analyticsId;
+const gtmId  = siteFunctions.googleTagId;
+const gaId   = siteFunctions.analyticsId;
+const consentEnabled = !!siteFunctions.consent?.enabled;
+---
+
+{useGTM && (
+  <script is:inline>
+    {`
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({'gtm.start': Date.now(), event:'gtm.js'});
+      ${consentEnabled ? `
+      // Consent Mode v2: default to denied; JS will update later
+      window.dataLayer.push({event:'default_consent',
+        analytics_storage:'denied',
+        ad_storage:'denied',
+        ad_user_data:'denied',
+        ad_personalization:'denied'
+      });` : ``}
+      window.__analyticsConfig = Object.assign(window.__analyticsConfig||{}, {useGTM:true, gtmId:'${gtmId}'});
+    `}
+  </script>
+  
+)}
+
+{useGA && (
+  <>
+    <script is:inline>
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){ dataLayer.push(arguments); }
+        window.gtag = window.gtag || gtag;
+        ${consentEnabled ? `
+        gtag('consent','default',{
+          analytics_storage:'denied',
+          ad_storage:'denied',
+          ad_user_data:'denied',
+          ad_personalization:'denied'
+        });` : ``}
+        gtag('js', new Date());
+        window.__analyticsConfig = Object.assign(window.__analyticsConfig||{}, {useGA:true, gaId:'${gaId}'});
+      `}
+    </script>
+    <script is:inline>
+      {`gtag('config','${gaId}',{ send_page_view:true, cookie_expires:31536000, allow_google_signals:false });`}
+    </script>
+  </>
+)}

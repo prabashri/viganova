@@ -1,8 +1,8 @@
 ---
 // src/components/ui/Button.astro
 interface Props {
-  id: string;           // ✅ Required for uniqueness and targeting
-  label: string;        // ✅ Required for accessibility, tracking
+  id: string;
+  label: string;
 
   type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary' | 'plain';
@@ -12,6 +12,7 @@ interface Props {
   ariaExpanded?: boolean;
   ariaControls?: string;
   ariaPressed?: boolean;
+  ariaHasPopup?: 'menu' | 'listbox' | 'dialog' | 'grid' | 'tree' | 'true' | 'false';
 
   disabled?: boolean;
   title?: string;
@@ -21,32 +22,13 @@ interface Props {
 
   dataAction?: string;
   dataLabel?: string;
-  dataTargets?: string; // Optional for tracking or targeting
+  dataTargets?: string;
 }
 
 const {
-  id,
-  label,
-
-  type = 'button',
-  variant = 'primary',
-  className = '',
-
-  ariaLabel,
-  ariaExpanded,
-  ariaControls,
-  ariaPressed,
-
-  disabled = false,
-  title,
-  name,
-  value,
-  form,
-
-  dataAction,
-  dataLabel,
-  dataTargets,
-  ...rest // forward extra attributes, including any data-* you didn’t explicitly type
+  id, label, type = 'button', variant = 'primary', className = '',
+  ariaLabel, ariaExpanded, ariaControls, ariaPressed, ariaHasPopup,
+  disabled = false, title, name, value, form, dataAction, dataLabel, dataTargets, ...rest
 } = Astro.props;
 
 const variantClassMap = {
@@ -57,16 +39,14 @@ const variantClassMap = {
 
 const variantClass = variantClassMap[variant] ?? '';
 const computedClass = `${variantClass} ${className}`.trim();
-
-// Shared fallback label for all purposes
 const resolvedLabel = label;
 
-// Filter only defined optional attributes
 const extraAttributes = {
   'aria-label': ariaLabel ?? resolvedLabel,
   'aria-expanded': ariaExpanded,
   'aria-controls': ariaControls,
   'aria-pressed': ariaPressed,
+  'aria-haspopup': ariaHasPopup,
   'title': title ?? resolvedLabel,
   'name': name,
   'value': value,
@@ -75,25 +55,13 @@ const extraAttributes = {
   'data-label': dataLabel ?? resolvedLabel,
   'data-targets': dataTargets,
 };
-/*
-<Button id="btn-submit" label="Submit">Submit</Button>
-Icon-left + text
-<Button id="btn-download" label="Download File">
-  <svg slot="icon-left" width="16" height="16"><use href="#icon-download" /></svg>
-  Download
-</Button>
-Icon-only button
-<Button id="btn-settings" label="Settings">
-  <svg slot="icon-left" width="20" height="20"><use href="#icon-settings" /></svg>
-</Button>
-*/
 ---
 <button
   id={id}
   type={type}
   class={computedClass}
   disabled={disabled}
-  {...Object.fromEntries(Object.entries(extraAttributes).filter(([_, val]) => val !== undefined))}
+  {...Object.fromEntries(Object.entries(extraAttributes).filter(([, v]) => v !== undefined))}
   {...rest}
 >
   <slot name="icon-left" />

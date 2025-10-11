@@ -1,8 +1,8 @@
 {
   "configModified": {
-    "siteDefaults": 1759314482297,
+    "siteDefaults": 1760169317724,
     "siteLogo": 1754383794286,
-    "siteColors": 1758967619583,
+    "siteColors": 1760079498262,
     "siteImages": 1757775286857
   },
   "icons": {
@@ -28,20 +28,20 @@
       "datetime": "2025-08-31T10:24:13.083Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-01T16:26:56.728Z"
+      "datetime": "2025-10-11T08:38:13.203Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-09-28T03:49:23.976Z",
+      "datetime": "2025-10-10T13:52:54.268Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-09-29T20:33:17.779Z",
+      "datetime": "2025-10-10T13:53:59.290Z",
       "names": [
         "base",
         "colors",
@@ -51,13 +51,14 @@
       ]
     },
     "main": {
-      "file": "/styles/main.ici8bs.css",
-      "datetime": "2025-10-02T01:21:34.101Z",
+      "file": "/styles/main.7e1gji.css",
+      "datetime": "2025-10-11T08:38:05.134Z",
       "names": [
         "blockquote",
         "callout",
         "colors",
         "components",
+        "consent-banner",
         "faq",
         "footer",
         "form",
@@ -72,20 +73,21 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-02T01:21:36.602Z",
+      "datetime": "2025-10-11T08:38:07.607Z",
       "names": [
         "home"
       ],
       "dir": "/styles/"
     },
     "pages:home": {
-      "file": "/styles/home.5a8276.css",
-      "datetime": "2025-09-23T13:31:29.816Z",
+      "file": "/styles/home.f4f667.css",
+      "datetime": "2025-10-10T06:04:43.556Z",
       "name": "home",
-      "hash": "5a8276",
-      "mtimeMs": 1758633705846,
-      "bytes": 6553,
-      "source": "src\\styles\\pages\\home.css"
+      "hash": "f4f667",
+      "mtimeMs": 1759944030722,
+      "bytes": 5217,
+      "source": "src\\styles\\pages\\home.css",
+      "inlineModule": "/src/data/page-css/home.ts"
     }
   },
   "logos": {
@@ -99,8 +101,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.pea3u2.json",
-      "datetime": "2025-10-02T01:21:21.127Z"
+      "file": "/search-index.kjon8j.json",
+      "datetime": "2025-10-11T08:37:51.148Z"
     }
   },
   "js": {
@@ -109,8 +111,8 @@
       "datetime": "2025-08-29T14:32:48.692Z"
     },
     "main": {
-      "file": "/scripts/main.w8m82c.min.js",
-      "datetime": "2025-08-29T14:32:49.165Z"
+      "file": "/scripts/main.fxccd0.min.js",
+      "datetime": "2025-10-11T08:38:10.221Z"
     },
     "search": {
       "file": "/scripts/search.5sjaht.min.js",

@@ -50,8 +50,13 @@ export const PRICES = {
     name: "MEA Attestation — Handling Only",
   },
 
-  pccMeaApostille: {
+  pccRpoMeaApostille: {
     amount: 1000,
+    name: "PCC RPO — MEA Apostille Handling",
+  },
+
+  pccMeaApostille: {
+    amount: 2000,
     name: "PCC — MEA Apostille Handling",
   },
 

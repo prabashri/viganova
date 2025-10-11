@@ -19,7 +19,7 @@ export type PageTypes =
   | 'website' | 'webpage' | 'article' | 'collection' | 'list'
   | 'person' | 'service' | 'product' | 'event' | 'publication'
   | 'video' | 'audio' | 'listen' | 'contact' | 'about' | '404'
-  | 'search' | 'terms' | 'privacy' | 'review' | 'faq' | 'howto'
+  | 'search' | 'terms' | 'privacy' | 'cookie' | 'review' | 'faq' | 'howto'
   | 'watch' | 'watchpage' | 'listenpage' | 'podcast' | 'medical' | 'item' | 'qa' | 'profile';
 
 export interface FaqItem {

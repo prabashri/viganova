@@ -1,0 +1,43 @@
+---
+// src/components/analytics/AnalyticsFooter.astro
+import { siteFunctions } from '@/config/siteFunctions';
+const isProd = import.meta.env.PROD;
+
+const useGTM = isProd && !!siteFunctions.googleTag && !!siteFunctions.googleTagId;
+const useGA  = isProd && siteFunctions.googleAnalytics === true && !useGTM && !!siteFunctions.analyticsId;
+
+const gtmId = siteFunctions.googleTagId;
+const gaId  = siteFunctions.analyticsId;
+
+const cfId  = siteFunctions.cloudflareAnalyticsId;
+const ahrefs = siteFunctions.ahrefAnalyticsId;
+---
+
+{/* Load the network scripts late via data-src so your lazy-loader swaps them in */}
+{useGTM && (
+  <script async data-src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}></script>
+)}
+
+{useGA && (
+  <script async data-src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+)}
+
+{/* Cloudflare Web Analytics (optional, in footer) */}
+{isProd && cfId && (
+  <script async data-src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfId })}></script>
+)}
+
+{/* Ahrefs Web Analytics (optional, in footer) */}
+{isProd && ahrefs && (
+  <script async data-src="https://analytics.ahrefs.com/analytics.js" data-key={ahrefs}></script>
+)}
+
+{/* Event delegation as external file with data-* config */}
+{(useGTM || useGA) && (
+  <script
+    type="module"
+    data-src="/scripts/analytics-events.js"
+    data-use-gtm={String(!!useGTM)}
+    data-use-ga={String(!!useGA)}
+  ></script>
+)}

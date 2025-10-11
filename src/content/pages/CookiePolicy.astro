@@ -1,0 +1,125 @@
+---
+import HeroPages from '@/components/ui/HeroPages.astro';
+import Anchor from '@/components/ui/Anchor.astro';
+import { siteDefaults } from '@/config/siteDefaults';
+import { siteFunctions } from '@/config/siteFunctions';
+import { machineAndHuman } from '@/utils/date-format';
+
+interface Props {
+  updatedAt?: string | number | Date;
+  publishedAt?: string | number | Date;
+  title?: string;
+  description?: string;
+}
+
+const props = Astro.props as Props;
+
+const eff = props.updatedAt
+  ? machineAndHuman(props.updatedAt)
+  : (props.publishedAt ? machineAndHuman(props.publishedAt) : undefined);
+
+const siteName = siteDefaults.siteName;
+const websiteUrl = siteDefaults.siteUrl || `https://${siteDefaults.domainName}`;
+const contactEmail = siteDefaults.contact?.email || siteDefaults.admin?.email || `contact@${siteDefaults.domainName}`;
+const orgDisplayName =
+  siteDefaults.parentOrganization?.legalName ||
+  siteDefaults.legalName ||
+  siteDefaults.parentOrganization?.name ||
+  siteDefaults.siteName;
+
+const pageDesc =
+  props.description ??
+  `Learn how ${siteName} uses cookies and similar technologies for essential site functionality, analytics, and advertising. Manage or clear cookies anytime through your browser settings.`;
+---
+
+<article class="prose mi-auto" itemscope itemtype="https://schema.org/WebPage">
+  <HeroPages
+    variant="post"
+    title={`Cookie Policy of ${siteName}`}
+    description={pageDesc}
+    meta={false}
+    updatedAt={props.updatedAt || props.publishedAt}
+    headingClass="mb-05 mi-auto"
+    class="mb-2 mn-h-230 jc-center"
+    descriptionClass="mx-w-featured text-xl mb-1"
+  />
+
+  <div class="mx-w-content pi-1 pb-2 mi-auto">
+    {eff?.human && (
+      <p class="mb-2">
+        <strong>Effective date:</strong>{' '}
+        <time datetime={eff.iso}>{eff.human}</time>
+      </p>
+    )}
+
+    <p>
+      This Cookie Policy explains how <strong>{orgDisplayName}</strong> (“we”, “us”, or “our”) uses cookies and similar technologies on
+      <Anchor href={websiteUrl}> {websiteUrl}</Anchor>. It also explains your choices for managing or deleting cookies.
+    </p>
+
+    <h2>1) What are cookies?</h2>
+    <p>
+      Cookies are small text files stored on your device when you visit a website. They help websites remember your preferences,
+      improve functionality, and analyze traffic. Similar technologies include local storage, pixels, and tags.
+    </p>
+
+    <h2>2) How we use cookies</h2>
+    <ul>
+      <li><strong>Essential cookies</strong> – Required for security, basic navigation, and core functions. These cannot be disabled.</li>
+      <li><strong>Functional cookies</strong> – Remember language or region preferences to improve usability.</li>
+      <li><strong>Analytics cookies</strong> – Collect anonymous usage data to help us understand performance and improve user experience.</li>
+      <li><strong>Advertising cookies</strong> – Display relevant ads and measure ad effectiveness (via partners like Google).</li>
+    </ul>
+
+    <h2>3) Third-party cookies</h2>
+    <p>
+      We may allow third-party services (e.g., Google Analytics, YouTube embeds, or ad networks) to set cookies to provide analytics
+      or advertising features. Each provider has its own privacy policy:
+    </p>
+    <ul>
+      <li><Anchor href="https://policies.google.com/privacy" rel="nofollow noopener" target="_blank">Google Privacy & Terms</Anchor></li>
+      <li><Anchor href="/privacy-policy/">Our Privacy Policy</Anchor></li>
+    </ul>
+
+    <h2>4) Managing your cookie preferences</h2>
+    <p>
+      You can control cookies via:
+    </p>
+    <ul>
+      <li><strong>Our cookie banner</strong> — Use the “Cookie preferences” or “Privacy & cookie settings” button to adjust your consent.</li>
+      <li><strong>Your browser settings</strong> — You can delete existing cookies and block new ones from being set.</li>
+    </ul>
+
+    <h3>How to clear cookies in major browsers:</h3>
+    <ul>
+      <li><strong>Google Chrome:</strong> Settings → Privacy & Security → Clear browsing data → “Cookies and other site data”.</li>
+      <li><strong>Microsoft Edge:</strong> Settings → Privacy, Search, and Services → Clear browsing data → Choose “Cookies and other site data”.</li>
+      <li><strong>Mozilla Firefox:</strong> Options → Privacy & Security → Cookies and Site Data → “Clear Data…”.</li>
+      <li><strong>Safari (macOS/iOS):</strong> Preferences → Privacy → Manage Website Data → Remove All.</li>
+      <li><strong>Opera:</strong> Settings → Privacy & Security → Clear browsing data → “Cookies and other site data”.</li>
+    </ul>
+
+    <p class="text-s col-base-70 italic">
+      Tip: You can also use private/incognito mode to automatically clear cookies when you close the browser.
+    </p>
+
+    <h2>5) Disabling cookies</h2>
+    <p>
+      Blocking some cookies may impact website performance or functionality. Essential cookies are required for security and
+      cannot be disabled through our interface.
+    </p>
+
+    <h2>6) Updates</h2>
+    <p>
+      We may update this Cookie Policy from time to time. The “Effective date” above reflects the latest version.
+      Continued use of our website means you agree to the updated policy.
+    </p>
+
+    <h2>7) Contact</h2>
+    <p>
+      For cookie or privacy concerns, contact us at:
+      <br />
+      📧 <Anchor href={`mailto:${contactEmail}`}><strong>{contactEmail}</strong></Anchor>
+    </p>
+  </div>
+</article>

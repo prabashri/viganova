@@ -1,0 +1,49 @@
+/* When locked, freeze the page at its current scrollY */
+html.consent-lock, body.consent-lock {
+  position: fixed;
+  width: 100%;
+  overflow: hidden; /* just in case */
+}
+/* show/hide */
+.consent-modal.is-open { 
+    display: flex;
+    pointer-events: auto;  }
+.consent-modal.is-hidden { 
+    display: none; 
+}
+
+/* Overlay fills the viewport behind the sheet */
+.consent-overlay{ 
+  background: rgba(0,0,0,.45);  
+  display: none;         /* not for bottom-centered if you prefer */
+}
+
+
+
+/* --- Placement presets (x = justify-content, y = align-items) --- */
+/* Center */
+#consent-modal[data-pos="center"]{
+  display: flex; justify-content: center; align-items: center;
+}
+#consent-modal[data-pos="center"] .consent-overlay{ display:block; }
+
+/* Bottom-centered */
+#consent-modal[data-pos="bottom-centered"]{
+  display: flex; justify-content: center; align-items: flex-end;
+  padding-bottom: .75rem;               /* breathing room from edge */
+}
+#consent-modal[data-pos="bottom-centered"] .consent-overlay{ display:none; }
+
+/* Bottom-right */
+#consent-modal[data-pos="bottom-right"]{
+  display: flex; justify-content: flex-end; align-items: flex-end;
+  padding: 0 .75rem .75rem 0;
+}
+#consent-modal[data-pos="bottom-right"] .consent-overlay{ display:block; }
+
+/* Bottom-left */
+#consent-modal[data-pos="bottom-left"]{
+  display: flex; justify-content: flex-start; align-items: flex-end;
+  padding: 0 0 .75rem .75rem;
+}
+#consent-modal[data-pos="bottom-left"] .consent-overlay{ display:block; }
