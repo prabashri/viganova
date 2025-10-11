@@ -177,6 +177,24 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
+  "featured/easyapostille-hague-vs-non-hague-apostille-vs-embassy-attestation.png": {
+    "lastModified": 1760194028585,
+    "path": "/2025/10/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
   "featured/easyapostille-marksheet-apostille-service-india.png": {
     "lastModified": 1759056866388,
     "path": "/2025/09/",
@@ -214,7 +232,7 @@
     "thumbnail": "120"
   },
   "featured/easyapostille-pcc-apostille-service-india.png": {
-    "lastModified": 1759915315707,
+    "lastModified": 1760194028601,
     "path": "/2025/10/",
     "variants": [
       "120",

@@ -1,25 +1,23 @@
 ---
 // src/components/navigation/ThemeLightDark.astro
-import Button from "@/components/ui/Button.astro";
 import { Icon } from "astro-icon/components";
 ---
 
 <div class="theme-toggle flex relative h-2-0 w-2-0 ai-center jc-center">
   <!-- Trigger -->
-  <Button
+  <button
     id="theme-button"
-    label="Theme"
-    variant="plain"
-    className="round box-shadow-glow transition p-02"
-    ariaHasPopup="menu"
-    ariaExpanded={false}
-    ariaControls="theme-menu"
+    class="round box-shadow-glow transition p-02"
     type="button"
+    aria-haspopup="menu"
+    aria-expanded="false"
+    aria-controls="theme-menu"
   >
     <Icon name="bw" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
     <Icon name="light" class="w-1-5 h-1-5 display-none" aria-hidden="true" focusable="false" />
     <Icon name="moon" class="w-1-5 h-1-5 display-none" aria-hidden="true" focusable="false" />
-  </Button>
+    <span class="sr-only">Theme</span>
+  </button>
 
   <!-- Popup menu -->
   <div
@@ -28,25 +26,27 @@ import { Icon } from "astro-icon/components";
     role="menu"
     aria-labelledby="theme-button"
   >
-    <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
-            role="menuitemradio" aria-checked="false" data-theme="system" tabindex="-1">
-      <Icon name="bw" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+    <!-- Use non-interactive element + ARIA role -->
+    <div class="theme-option flex ai-center gap text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+         role="menuitemradio" aria-checked="false" data-theme="system" tabindex="-1">
+      <Icon name="bw" class="w-1-5 h-1-5" aria-hidden="true" />
       <span>OS Default</span>
-    </button>
-    <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
-            role="menuitemradio" aria-checked="false" data-theme="light" tabindex="-1">
-      <Icon name="light" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+    </div>
+
+    <div class="theme-option flex ai-center gap text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+         role="menuitemradio" aria-checked="false" data-theme="light" tabindex="-1">
+      <Icon name="light" class="w-1-5 h-1-5" aria-hidden="true" />
       <span>Light</span>
-    </button>
-    <button class="theme-option flex ai-center gap full-width text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
-            role="menuitemradio" aria-checked="false" data-theme="dark" tabindex="-1">
-      <Icon name="moon" class="w-1-5 h-1-5" aria-hidden="true" focusable="false" />
+    </div>
+
+    <div class="theme-option flex ai-center gap text-left mx-w-320 mn-w-160 ac-center pi-05 mb-05 mi-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+         role="menuitemradio" aria-checked="false" data-theme="dark" tabindex="-1">
+      <Icon name="moon" class="w-1-5 h-1-5" aria-hidden="true" />
       <span>Dark</span>
-    </button>
+    </div>
   </div>
 </div>
-
-<script id="theme-script" type="module">
+<script type="module">
 (() => {
   const qs  = (s, r=document) => r.querySelector(s);
   const qsa = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -60,7 +60,7 @@ import { Icon } from "astro-icon/components";
   const iconDark   = qsa('svg[data-icon="moon"]')[0];
 
   const showIcon = (theme) => {
-    [iconSystem, iconLight, iconDark].forEach(el => el && el.classList.add('display-none'));
+    [iconSystem, iconLight, iconDark].forEach(el => el?.classList.add('display-none'));
     if (theme === 'light') iconLight?.classList.remove('display-none');
     else if (theme === 'dark') iconDark?.classList.remove('display-none');
     else iconSystem?.classList.remove('display-none');
@@ -71,11 +71,10 @@ import { Icon } from "astro-icon/components";
       document.documentElement.setAttribute('data-theme', theme);
       showIcon(theme);
     } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
       document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
       showIcon('system');
     }
-    // update menu checked state
     items.forEach(b => b.setAttribute('aria-checked', String(b.dataset.theme === theme)));
   };
 
@@ -94,25 +93,36 @@ import { Icon } from "astro-icon/components";
   const openMenu = () => {
     button?.setAttribute('aria-expanded', 'true');
     menu?.classList.remove('display-none');
-    // focus first checked item, else first
     const current = items.find(b => b.getAttribute('aria-checked') === 'true') || items[0];
     current?.setAttribute('tabindex', '0');
     current?.focus();
   };
 
-  const closeMenu = () => {
+  // ⚠️ Modified: accept an option to restore focus
+  const closeMenu = (opts = { restoreFocus: true }) => {
     menu?.classList.add('display-none');
     button?.setAttribute('aria-expanded', 'false');
     items.forEach(b => b.setAttribute('tabindex', '-1'));
-    button?.focus();
+    if (opts.restoreFocus) button?.focus();
   };
 
   const toggleMenu = () => (isOpen() ? closeMenu() : openMenu());
 
-  // Pointer interaction
+  // Helper: clicks in inputs/textareas/selects shouldn’t affect focus
+  const isEditable = (t) => {
+    if (!t) return false;
+    return t.isContentEditable ||
+      ['INPUT','TEXTAREA','SELECT'].includes((t.tagName||'').toUpperCase());
+  };
+
+  // Pointer
   button?.addEventListener('click', (e) => { e.stopPropagation(); toggleMenu(); });
+
+  // ⚠️ Modified: on outside click, close WITHOUT restoring focus
   document.addEventListener('click', (e) => {
-    if (!menu?.contains(e.target) && !button?.contains(e.target)) closeMenu();
+    if (!menu?.contains(e.target) && !button?.contains(e.target)) {
+      closeMenu({ restoreFocus: false });
+    }
   });
 
   // Keyboard on trigger
@@ -125,39 +135,41 @@ import { Icon } from "astro-icon/components";
   // Keyboard in menu (roving tabindex)
   menu?.addEventListener('keydown', (e) => {
     const idx = items.indexOf(document.activeElement);
-    const focusAt = (i) => { items[i]?.setAttribute('tabindex', '0'); items[i]?.focus(); items.forEach((b,j)=> j!==i && b.setAttribute('tabindex','-1')); };
+    const focusAt = (i) => {
+      items[i]?.setAttribute('tabindex','0'); items[i]?.focus();
+      items.forEach((b,j)=> j!==i && b.setAttribute('tabindex','-1'));
+    };
 
-    if (e.key === 'Escape') { e.preventDefault(); closeMenu(); }
+    if (e.key === 'Escape') { e.preventDefault(); closeMenu({ restoreFocus: true }); }
     else if (e.key === 'ArrowDown') { e.preventDefault(); focusAt((idx+1) % items.length); }
     else if (e.key === 'ArrowUp')   { e.preventDefault(); focusAt((idx-1+items.length) % items.length); }
     else if (e.key === 'Home')      { e.preventDefault(); focusAt(0); }
     else if (e.key === 'End')       { e.preventDefault(); focusAt(items.length-1); }
-    else if (e.key === 'Tab')       { closeMenu(); }
+    else if (e.key === 'Tab')       { closeMenu({ restoreFocus: false }); }
     else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       const sel = document.activeElement;
       const theme = sel?.getAttribute('data-theme');
       if (theme) setTheme(theme);
-      closeMenu();
+      closeMenu({ restoreFocus: true }); // selection returns focus to trigger
     }
   });
 
   // Click select
-  items.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const t = btn.getAttribute('data-theme');
+  items.forEach((el) => {
+    el.addEventListener('click', () => {
+      const t = el.getAttribute('data-theme');
       if (t) setTheme(t);
-      closeMenu();
+      closeMenu({ restoreFocus: true });
     });
   });
 
-  // Init on load
+  // Init
   applyTheme(getStoredTheme());
 
-  // OS changes when in 'system'
-  window.matchMedia?.('(prefers-color-scheme: dark)')
-    ?.addEventListener?.('change', () => {
-      if (getStoredTheme() === 'system') applyTheme('system');
-    });
+  // OS change when in 'system'
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (getStoredTheme() === 'system') applyTheme('system');
+  });
 })();
 </script>

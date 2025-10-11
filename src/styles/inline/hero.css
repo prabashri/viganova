@@ -7,3 +7,9 @@
 .ml-auto {
     margin-left: auto;
 }
+.min-h-70px{
+    min-height: 70px;
+}
+.overflow-anchor-none {
+    overflow-anchor: none;
+}

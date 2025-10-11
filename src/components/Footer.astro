@@ -123,7 +123,7 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
 ---
 
 <footer class="site-footer bg-primary-darker-x col-base-10 text-small pb-2 pi-1" itemscope itemtype="https://schema.org/WPFooter">
-  <div class="footer-columns mx-w-site w-full mi-auto pb-05 pi-1 grid gap-2 ta-start">
+  <div class="footer-columns mx-w-site w-full mi-auto pb-05 pi-1 grid gap ta-start">
 
     {/* Column 1: Site / brand (annotated as WebSite for itemprop="name") */}
     <div class="footer-col sm-hr" itemscope itemtype="https://schema.org/WebSite" itemid={`${siteUrl}#website`}>
@@ -190,7 +190,7 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
     </div>
   </div>
   <div class="footer-bottom pb-1">
-    <ul class="flex flex-row gap no-bullets jc-center no-bullets list-separator">
+    <ul class="flex flex-row wrap gap no-bullets jc-center no-bullets list-separator">
       {pageLinks.map(link => (
         <li class="mb-05 pb-02"><Anchor href={link.href} title={link.title}>{link.label}</Anchor></li>
       ))}

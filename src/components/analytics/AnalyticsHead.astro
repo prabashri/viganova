@@ -1,53 +1,69 @@
 ---
-// src/components/analytics/AnalyticsHead.astro
 import { siteFunctions } from '@/config/siteFunctions';
+
 const isProd = import.meta.env.PROD;
-const useGTM = isProd && siteFunctions.googleTag && !!siteFunctions.googleTagId;
-const useGA  = isProd && siteFunctions.googleAnalytics && !useGTM && !!siteFunctions.analyticsId;
-const gtmId  = siteFunctions.googleTagId;
-const gaId   = siteFunctions.analyticsId;
-const consentEnabled = !!siteFunctions.consent?.enabled;
+
+// Mode selection (only one path is emitted)
+const useGTM = isProd && !!siteFunctions.googleTag && !!siteFunctions.googleTagId;
+const useGA  = isProd && !!siteFunctions.googleAnalytics && !useGTM && !!siteFunctions.analyticsId;
+
+const mode  = useGTM ? 'gtm' : (useGA ? 'ga' : 'off');
+const gtmId = siteFunctions.googleTagId || '';
+const gaId  = siteFunctions.analyticsId  || '';
+const consentEnabled = !!siteFunctions?.consent?.enabled;
+
+// --- Build the exact JS payload (no runtime branching in the snippet) ----
+let payload = '';
+
+if (mode === 'gtm') {
+  payload = `
+    (function(){
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); } window.gtag = window.gtag || gtag;
+      ${consentEnabled ? `
+      gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
+      window.dataLayer.push({event:'default_consent',analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
+      ` : ``}
+      window.dataLayer.push({'gtm.start':Date.now(),event:'gtm.js'});
+      var pv={page_title:document.title,page_path:location.pathname+location.search,page_location:location.href};
+      window.dataLayer.push({event:'page_view',...pv}); window.gtag('event','page_view',pv);
+      window.__analyticsConfig=Object.assign(window.__analyticsConfig||{}, {mode:'gtm',gtmId:'${gtmId}',consentEnabled:${JSON.stringify(consentEnabled)}});
+    })();
+  `;
+} else if (mode === 'ga') {
+  payload = `
+    (function(){
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ window.dataLayer.push(arguments); } window.gtag = window.gtag || gtag;
+      ${consentEnabled ? `
+      gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
+      window.dataLayer.push({event:'default_consent',analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});
+      ` : ``}
+      var pv={page_title:document.title,page_path:location.pathname+location.search,page_location:location.href};
+      window.dataLayer.push({event:'page_view',...pv}); window.gtag('event','page_view',pv);
+      gtag('js',new Date());
+      gtag('config','${gaId}',{send_page_view:false,cookie_expires:31536000,allow_google_signals:false});
+      window.__analyticsConfig=Object.assign(window.__analyticsConfig||{}, {mode:'ga',gaId:'${gaId}',consentEnabled:${JSON.stringify(consentEnabled)}});
+    })();
+  `;
+} else {
+  // disabled in non-prod or missing IDs → emit no-op (keeps markup simple)
+  payload = `/* analytics off */`;
+}
+
+// --- Minimal, safe minifier (remove // and /* */ comments, collapse whitespace) ---
+function minifyJS(code: string) {
+  return code
+    .replace(/\/\*[^]*?\*\//g, '')        // block comments
+    .replace(/(^|[^:])\/\/.*$/gm, '$1')   // line comments
+    .replace(/\s{2,}/g, ' ')              // collapse runs
+    .replace(/\s*([{}();,:=+\-\[\]])\s*/g, '$1') // trim around punctuators
+    .trim();
+}
+
+const inlineJS = minifyJS(payload);
 ---
 
-{useGTM && (
-  <script is:inline>
-    {`
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push({'gtm.start': Date.now(), event:'gtm.js'});
-      ${consentEnabled ? `
-      // Consent Mode v2: default to denied; JS will update later
-      window.dataLayer.push({event:'default_consent',
-        analytics_storage:'denied',
-        ad_storage:'denied',
-        ad_user_data:'denied',
-        ad_personalization:'denied'
-      });` : ``}
-      window.__analyticsConfig = Object.assign(window.__analyticsConfig||{}, {useGTM:true, gtmId:'${gtmId}'});
-    `}
-  </script>
-  
-)}
-
-{useGA && (
-  <>
-    <script is:inline>
-      {`
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){ dataLayer.push(arguments); }
-        window.gtag = window.gtag || gtag;
-        ${consentEnabled ? `
-        gtag('consent','default',{
-          analytics_storage:'denied',
-          ad_storage:'denied',
-          ad_user_data:'denied',
-          ad_personalization:'denied'
-        });` : ``}
-        gtag('js', new Date());
-        window.__analyticsConfig = Object.assign(window.__analyticsConfig||{}, {useGA:true, gaId:'${gaId}'});
-      `}
-    </script>
-    <script is:inline>
-      {`gtag('config','${gaId}',{ send_page_view:true, cookie_expires:31536000, allow_google_signals:false });`}
-    </script>
-  </>
+{mode !== 'off' && (
+  <script id="analytics-head" is:inline set:html={JSON.stringify(inlineJS)} />
 )}

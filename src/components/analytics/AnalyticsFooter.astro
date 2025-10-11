@@ -4,7 +4,7 @@ import { siteFunctions } from '@/config/siteFunctions';
 const isProd = import.meta.env.PROD;
 
 const useGTM = isProd && !!siteFunctions.googleTag && !!siteFunctions.googleTagId;
-const useGA  = isProd && siteFunctions.googleAnalytics === true && !useGTM && !!siteFunctions.analyticsId;
+const useGA  = isProd && !!siteFunctions.googleAnalytics && !useGTM && !!siteFunctions.analyticsId;
 
 const gtmId = siteFunctions.googleTagId;
 const gaId  = siteFunctions.analyticsId;
@@ -30,14 +30,4 @@ const ahrefs = siteFunctions.ahrefAnalyticsId;
 {/* Ahrefs Web Analytics (optional, in footer) */}
 {isProd && ahrefs && (
   <script async data-src="https://analytics.ahrefs.com/analytics.js" data-key={ahrefs}></script>
-)}
-
-{/* Event delegation as external file with data-* config */}
-{(useGTM || useGA) && (
-  <script
-    type="module"
-    data-src="/scripts/analytics-events.js"
-    data-use-gtm={String(!!useGTM)}
-    data-use-ga={String(!!useGA)}
-  ></script>
 )}

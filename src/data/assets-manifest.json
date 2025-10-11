@@ -1,8 +1,8 @@
 {
   "configModified": {
-    "siteDefaults": 1760169317724,
+    "siteDefaults": 1760194029140,
     "siteLogo": 1754383794286,
-    "siteColors": 1760079498262,
+    "siteColors": 1760194029116,
     "siteImages": 1757775286857
   },
   "icons": {
@@ -28,20 +28,20 @@
       "datetime": "2025-08-31T10:24:13.083Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-11T08:38:13.203Z"
+      "datetime": "2025-10-11T17:23:06.696Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-10-10T13:52:54.268Z",
+      "datetime": "2025-10-11T17:22:02.035Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-10-10T13:53:59.290Z",
+      "datetime": "2025-10-11T17:22:53.919Z",
       "names": [
         "base",
         "colors",
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.7e1gji.css",
-      "datetime": "2025-10-11T08:38:05.134Z",
+      "file": "/styles/main.vo51mv.css",
+      "datetime": "2025-10-11T17:22:56.807Z",
       "names": [
         "blockquote",
         "callout",
@@ -73,7 +73,7 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-11T08:38:07.607Z",
+      "datetime": "2025-10-11T17:22:59.241Z",
       "names": [
         "home"
       ],
@@ -101,8 +101,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.kjon8j.json",
-      "datetime": "2025-10-11T08:37:51.148Z"
+      "file": "/search-index.n4apef.json",
+      "datetime": "2025-10-11T17:22:40.111Z"
     }
   },
   "js": {
@@ -111,8 +111,8 @@
       "datetime": "2025-08-29T14:32:48.692Z"
     },
     "main": {
-      "file": "/scripts/main.fxccd0.min.js",
-      "datetime": "2025-10-11T08:38:10.221Z"
+      "file": "/scripts/main.y30mxw.min.js",
+      "datetime": "2025-10-11T17:23:02.364Z"
     },
     "search": {
       "file": "/scripts/search.5sjaht.min.js",

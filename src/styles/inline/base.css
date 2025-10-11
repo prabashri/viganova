@@ -80,6 +80,7 @@ html {
   line-height: 1.5; /* Default line height */
   height: 100%;
   width: 100%;
+  font-display: swap;
 }
 html, body { 
   font-family: var(--font-family-base);  

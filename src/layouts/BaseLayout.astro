@@ -7,7 +7,6 @@ import AnalyticsHead from '@/components/analytics/AnalyticsHead.astro';
 import AnalyticsBodyNoscript from '@/components/analytics/AnalyticsBodyNoscript.astro';
 import AnalyticsFooter from '@/components/analytics/AnalyticsFooter.astro';
 import ConsentBanner from '@/components/consent/ConsentBanner.astro';
-import ConsentData from '@/components/consent/ConsentData.astro';
 import InlineScript from '@/components/InlineScript.astro';
 
 import AdSenseHead from '@/components/ads/AdSenseHead.astro';
@@ -44,7 +43,7 @@ const { headProps = { title: 'Default Title', showBreadcrumb: false }, hideHeade
     {!hideFooter && <Footer />}
     
     {/* ✅ Show consent UI and wire consent updates */}
-    <ConsentData />
+    
     <ConsentBanner />
 
     {/* ✅ Put consent-guarded scripts BEFORE lazy loader */}

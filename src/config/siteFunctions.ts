@@ -5,6 +5,8 @@ export const siteFunctions = {
     /* CAPTCHA KEYS (for forms, comments, etc.) -------------------------- */
     turnstileEnabled: true,
     turnstileSitekey: "0x4AAAAAAB5d0h3hP88waWBq", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
+    turnstileSitekeyTest: "1x00000000000000000000AA", // test key, always passes
+    turnstileSecretTest: "1x0000000000000000000000000000000AA", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
     /** google adsense account */
     enableAdSense: true,
     adsense: "ca-pub-8380181212468292",
@@ -19,7 +21,7 @@ export const siteFunctions = {
     ahrefAnalyticsId: "", 
     
     cloudflareAnalytics: false, // enable Cloudflare Web Analytics
-    cloudflareAnalyticsId: "", 
+    cloudflareAnalyticsId: "2e814bc0b10a4e08a5cf4ea751e357e7", 
     
     bingAPIKey: "", // Bing API key for search
     rss: true, // enable RSS feed globally

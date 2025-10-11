@@ -63,12 +63,14 @@ const addressLines = addr ? [
     description={description}
     publishedAt={siteDefaults.publishedDate}
     updatedAt={updatedAt}
+    meta={false}
   />
 
   {/* two-column: form | info */}
-  <section class="mx-w-content mi-auto pi-1 pb-2 grid cols-1 big-cols-2 gap-1">
+  <div class="mx-w-content mi-auto pi-1 pb-2 grid cols-1 big-cols-2 gap-1">
     {/* LEFT: contact form (or fallback) */}
     <div>
+    
       {isFormAvailable ? (
         <ContactForm
           contactEmail={contactEmail}
@@ -79,13 +81,13 @@ const addressLines = addr ? [
           defaultReviewScore={3}
         />
       ) : (
-        <section class="ta-center card br bg-base-00 border-primary-light box-shadow p-1">
+        <div class="ta-center card br bg-base-00 border-primary-light box-shadow p-1">
           <p>⚠️ The contact form is temporarily unavailable.</p>
           <p>
             Reach us at{' '}
             <Anchor href={`mailto:${contactEmail}`} className="link">{contactEmail}</Anchor>
           </p>
-        </section>
+        </div>
       )}
     </div>
 
@@ -115,7 +117,7 @@ const addressLines = addr ? [
         <p class="text-s opacity-80">Our office address will be published here.</p>
       )}
 
-      <hr class="my-1 b-thin-primary-light" />
+      <hr />
 
       <ul class="no-bullets flex flex-col gap-05 text-s">
         <li>
@@ -147,7 +149,7 @@ const addressLines = addr ? [
       {/* Primary contact person (incharge) */}
       {siteDefaults.incharge?.name && (
         <>
-          <hr class="my-1 b-thin-primary-light" />
+          <hr />
           <div class="text-s">
             <strong>Primary contact:</strong>
             <div class="mt-02">
@@ -165,5 +167,5 @@ const addressLines = addr ? [
         </>
       )}
     </aside>
-  </section>
+  </div>
 </article>
