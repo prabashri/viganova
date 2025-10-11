@@ -67,33 +67,33 @@ const addressLines = addr ? [
   />
 
   {/* two-column: form | info */}
-  <div class="mx-w-content mi-auto pi-1 pb-2 grid cols-1 big-cols-2 gap-1">
+  <div class="mx-w-site mi-auto pi-1 pb-2 flex flex-row wrap jc-center gap">
     {/* LEFT: contact form (or fallback) */}
-    <div>
     
-      {isFormAvailable ? (
-        <ContactForm
-          contactEmail={contactEmail}
-          brand={brand}
-          handler={siteFunctions.contactFormHandler ?? ''}
-          turnstileSitekey={siteFunctions.turnstileSitekey ?? ''}
-          subjectOptions={['Support','Feedback','Suggestions','Business Enquiries','Reviews','Comment','Security']}
-          defaultReviewScore={3}
-        />
-      ) : (
-        <div class="ta-center card br bg-base-00 border-primary-light box-shadow p-1">
-          <p>⚠️ The contact form is temporarily unavailable.</p>
-          <p>
-            Reach us at{' '}
-            <Anchor href={`mailto:${contactEmail}`} className="link">{contactEmail}</Anchor>
-          </p>
-        </div>
-      )}
-    </div>
+    {isFormAvailable ? (
+      <ContactForm
+        contactEmail={contactEmail}
+        brand={brand}
+        handler={siteFunctions.contactFormHandler ?? ''}
+        turnstileSitekey={siteFunctions.turnstileSitekey ?? ''}
+        subjectOptions={['Support','Feedback','Suggestions','Business Enquiries','Reviews','Comment','Security']}
+        defaultReviewScore={3}
+      />
+    ) : (
+      <div class="ta-center card br bg-base-00 border-primary-light box-shadow p-1">
+        <p>⚠️ The contact form is temporarily unavailable.</p>
+        <p>
+          Reach us at{' '}
+          <Anchor href={`mailto:${contactEmail}`} className="link">{contactEmail}</Anchor>
+        </p>
+      </div>
+    )}
+  
 
     {/* RIGHT: location & direct contacts (from siteDefaults) */}
-    <aside class="card br bg-base-00 border-primary-light box-shadow p-1">
-      <h2 class="text-base bold mb-05">Reach {brand}</h2>
+    <aside class="card p-1 w-full mx-w-420">
+      <div class="br bg-base-00 box-shadow p-1 w-full">
+        <h2 class="text-base bold mb-05">Reach {brand}</h2>
 
       {addressLines.length ? (
         <address class="not-italic text-s">
@@ -166,6 +166,8 @@ const addressLines = addr ? [
           </div>
         </>
       )}
+      </div>
+      
     </aside>
   </div>
 </article>

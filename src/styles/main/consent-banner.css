@@ -6,104 +6,87 @@ body.consent-lock {
   overflow: hidden; /* freeze background */
 }
 
-/* hidden vs open */
 .consent-modal { display: none; }
 .consent-modal.is-open { display: flex; pointer-events: auto; }
 .consent-modal.is-hidden { display: none !important; }
 
-/* ===== Positioning / overlay ===== */
+/* ===== Positioning / overlay / placement ===== */
 .consent-modal.fixed { position: fixed; inset: 0; z-index: 1000; }
+.consent-modal.is-open { align-items: center; justify-content: center; }
+.consent-modal[data-pos] { padding: .75rem; }
+
 .consent-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
 
-/* Placement presets (x = justify, y = align) */
 .consent-modal[data-pos="center"]          { justify-content: center; align-items: center; }
 .consent-modal[data-pos="bottom-centered"] { justify-content: center; align-items: flex-end; padding-bottom: .75rem; }
 .consent-modal[data-pos="bottom-right"]    { justify-content: flex-end; align-items:  flex-end; padding: 0 .75rem .75rem 0; }
 .consent-modal[data-pos="bottom-left"]     { justify-content:  flex-start; align-items:  flex-end; padding: 0 0 .75rem .75rem; }
 
-/* Show overlay everywhere except optional bottom-centered if you wish */
+/* Optional: no overlay for bottom-centered */
 .consent-modal[data-pos="bottom-centered"] .consent-overlay { display: none; }
 
-/* ===== Sheet ===== */
+/* ===== Sheet (flex column) ===== */
 .consent-sheet {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: min(640px, 95vw);
-  max-height: 80vh;
+  max-height: min(90dvh, 720px); /* use dvh for mobile chrome/safari */
   background: var(--base-00);
   color: var(--base-100);
   border: 1px solid var(--base-100);
   border-radius: .75rem;
   box-shadow: 0 10px 30px rgba(0,0,0,.25);
-  overflow: hidden; /* content scrolls inside .consent-body */
+  overflow: hidden; /* scrolling happens in .consent-body */
 }
 
-/* Header sticks; subtle divider */
+/* Header (sticky) */
 .consent-header {
   position: sticky; top: 0; z-index: 1;
   background: var(--base-00);
-  box-shadow: 0 1px 0 var(--base-100);
+  box-shadow: 0 1px 0 var(--base-20);
 }
 
-/* ===== Scrollable body with VISIBLE scrollbar ===== */
+/* ===== Scrollable body ===== */
 .consent-body {
-  max-height: calc(80vh - 48px); /* ~header height */
-  overflow-y: auto;
+  flex: 1 1 auto;                /* take remaining height */
+  overflow-y: auto;              /* the ONLY scroller */
   padding: .5rem .5rem 1rem;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch; /* iOS smooth */
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
 }
 
-/* Firefox scrollbar colors (track thumb) */
-.consent-body {
-  scrollbar-color: var(--base-60) var(--base-10);
-  scrollbar-width: thin; /* auto | thin | none */
-}
-
-/* WebKit scrollbar styling */
+/* Visible scrollbar (Firefox + WebKit) */
+.consent-body { scrollbar-color: var(--base-60) var(--base-10); scrollbar-width: thin; }
 .consent-body::-webkit-scrollbar { width: 12px; }
-.consent-body::-webkit-scrollbar-track {
-  background: var(--base-10);
-  border-left: 1px solid var(--base-20);
-}
-.consent-body::-webkit-scrollbar-thumb {
-  background: var(--base-60);
-  border-radius: 8px;
-  border: 3px solid var(--base-10); /* creates padding look */
-}
+.consent-body::-webkit-scrollbar-track { background: var(--base-10); border-left: 1px solid var(--base-20); }
+.consent-body::-webkit-scrollbar-thumb { background: var(--base-60); border-radius: 8px; border: 3px solid var(--base-10); }
 .consent-body::-webkit-scrollbar-thumb:hover { background: var(--base-70); }
 
-/* Inputs area dividers */
+/* Small utilities */
 .b-top-dashed { border-top: 1px dashed var(--base-20); }
 .b-bottom     { border-bottom: 1px solid var(--base-20); }
 
-/* ===== Sticky action bar (always visible) ===== */
+/* ===== Sticky action bar ===== */
 .consent-actions {
   position: sticky; bottom: 0; z-index: 1;
   display: flex; gap: .5rem; flex-wrap: wrap;
   background: var(--base-00);
   padding: .5rem;
-  margin: 0 -.5rem -.5rem;     /* edge-to-edge inside sheet */
   border-top: 1px dashed var(--base-20);
-}
-
-/* Buttons expand nicely on small widths */
-@media (max-width: 520px) {
-  .consent-actions > * { flex: 1 1 100%; }
+  margin: 0 -.5rem -.5rem; /* edge-to-edge inside sheet */
 }
 
 /* ===== Mobile bottom-sheet behavior ===== */
 @media (max-width: 520px) {
-  .consent-sheet {
-    width: 100vw; max-width: 100vw; max-height: 90vh;
-    border-radius: .75rem .75rem 0 0;
-    margin: 0;
-  }
-  /* force bottom-sheet alignment for all placements on phones */
-  .consent-modal[data-pos] { align-items: flex-end !important; justify-content: center !important; }
+  .consent-modal.is-open { align-items: flex-end; justify-content: center; }
+  .consent-sheet { width: 100vw; max-width: 100vw; border-radius: .75rem .75rem 0 0; }
   .consent-actions { padding-bottom: max(.5rem, env(safe-area-inset-bottom)); }
+  .consent-actions > * { flex: 1 1 100%; } /* buttons full width stack */
 }
 
-/* ===== Launcher button: keep off form submit area ===== */
+/* ===== Launcher button ===== */
 .consent-toggler {
   position: fixed; right: .75rem;
   bottom: calc(.75rem + env(safe-area-inset-bottom));

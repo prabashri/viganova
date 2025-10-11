@@ -1,33 +1,53 @@
 ---
-// src/components/analytics/AnalyticsFooter.astro
 import { siteFunctions } from '@/config/siteFunctions';
+
 const isProd = import.meta.env.PROD;
 
-const useGTM = isProd && !!siteFunctions.googleTag && !!siteFunctions.googleTagId;
-const useGA  = isProd && !!siteFunctions.googleAnalytics && !useGTM && !!siteFunctions.analyticsId;
+// ── ID validators (simple, safe) ──────────────────────────────────────────────
+const isNonEmpty = (s?: string) => !!String(s || '').trim();
+const isGTM   = (s?: string) => /^GTM-[A-Z0-9]+$/i.test(String(s || ''));
+const isGA4   = (s?: string) => /^G-[A-Z0-9]+$/i.test(String(s || ''));
+const isCFTok = (s?: string) => /^[a-f0-9]{32}$/i.test(String(s || '')); // Cloudflare beacon token is 32 hex
 
-const gtmId = siteFunctions.googleTagId;
-const gaId  = siteFunctions.analyticsId;
+// ── Read config ───────────────────────────────────────────────────────────────
+const gtmId    = siteFunctions.googleTagId;
+const gaId     = siteFunctions.analyticsId;
+const cfId     = siteFunctions.cloudflareAnalyticsId;
+const ahrefsId = siteFunctions.ahrefAnalyticsId;
 
-const cfId  = siteFunctions.cloudflareAnalyticsId;
-const ahrefs = siteFunctions.ahrefAnalyticsId;
+// ── Effective feature toggles (flag AND valid ID) ─────────────────────────────
+const wantGTM = isProd && siteFunctions.googleTag && isGTM(gtmId);
+const wantGA  = isProd && siteFunctions.googleAnalytics && isGA4(gaId);
+const wantCF  = isProd && siteFunctions.cloudflareAnalytics && isCFTok(cfId);
+const wantAh  = isProd && siteFunctions.ahrefAnalytics && isNonEmpty(ahrefsId);
+
+// ── Priority: GTM > GA (only one of these loads) ─────────────────────────────
+const loadGTM = wantGTM;
+const loadGA  = !loadGTM && wantGA;
 ---
 
-{/* Load the network scripts late via data-src so your lazy-loader swaps them in */}
-{useGTM && (
-  <script async data-src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}></script>
+{/* Load via data-src; your lazy-loader will flip to src later */}
+
+{loadGTM && (
+  <script id="google-tag-lib" async data-src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}></script>
 )}
 
-{useGA && (
-  <script async data-src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+{loadGA && (
+  <script id="google-analytics-lib" async data-src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
 )}
 
-{/* Cloudflare Web Analytics (optional, in footer) */}
-{isProd && cfId && (
-  <script async data-src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cfId })}></script>
+{wantCF && (
+  <script
+    async id="cloudflare-analytics"
+    data-src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon={JSON.stringify({ token: cfId })}
+  ></script>
 )}
 
-{/* Ahrefs Web Analytics (optional, in footer) */}
-{isProd && ahrefs && (
-  <script async data-src="https://analytics.ahrefs.com/analytics.js" data-key={ahrefs}></script>
+{wantAh && (
+  <script
+    async id="ahrefs-analytics"
+    data-src="https://analytics.ahrefs.com/analytics.js"
+    data-key={ahrefsId}
+  ></script>
 )}
