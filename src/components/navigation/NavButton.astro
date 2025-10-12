@@ -59,7 +59,7 @@ const showDescription = !!item.description;
     ) : null}
     {/** Label and Description */}
     {showDescription ? (
-        <div class="inline-flex label-block flex-1">
+        <div class="inline-flex flex-col label-block flex-1 ai-f-start">
             <div class="label text-sm">{item.label}</div>
             <div class="description text-xs sm-display-inherit">{item.description}</div>
         </div>
@@ -67,7 +67,7 @@ const showDescription = !!item.description;
         <div class="inline-flex label text-sm flex-1">{item.label}</div>
     )}
     {/* Down Arrow Icon */}
-    <div class="inline-flex down-arrow w-1-0 h-1-0" aria-hidden="true" slot="icon-right">
+    <div class="inline-flex down-arrow w-1-5 h-1-5 ai-center jc-f-end" aria-hidden="true" slot="icon-right">
         <Icon name="DownArrow-2" class="hover-down-arrow-rotate fill-primary hover-fill-base-00 w-1-0 h-1-0"/>                       
     </div>
 </Button>

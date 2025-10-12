@@ -1,66 +1,64 @@
 ---
+/**
+ * ====================  FRONTEND LOADING GUIDELINES (CSP-SAFE)  ====================
+ * 1) DO NOT use inline event handlers (eg. onload/onclick). Our CSP has: script-src-attr 'none'.
+ * 2) When you need to “preload -> stylesheet”, DO NOT use: onload="this.rel='stylesheet'".
+ *    Instead, mark the link with data-rel-after-load="stylesheet":
+ *      <link rel="preload" as="style" href="/css/app.css" data-rel-after-load="stylesheet">
+ *    The nonced boot script below flips rel to "stylesheet" on load (or immediately if cached).
+ * 3) All inline <script> / <style> blocks MUST include the request nonce:
+ *      const nonce = Astro.locals?.nonce || '';
+ *      <script nonce={nonce}>…</script>
+ * 4) Prefer external scripts with defer/type="module". For lazy activation, keep src in data-src
+ *    and the loader will move it to src on first user interaction or after a timeout.
+ * 5) In DEV we unregister any Service Workers to avoid stale caches.
+ * ===============================================================================
+ */
 import assetsManifest from '@/data/assets-manifest.json';
 const mainJsFile = assetsManifest.js?.main?.file || '';
 const isDev = import.meta.env.DEV;
 const devBust = Date.now(); // cache-buster for dev
+
 ---
 
 {isDev && (
   <>
-    <!-- Classic + defer + cache-busted; prevent Astro hoist with is:inline -->
-    <script
-      id="main-js"
-      src={`/scripts/main.js?direct&v=${devBust}`}
-      type="text/javascript"
-      defer
-      is:inline
-    ></script>
+ 
 
-    <!-- Kill any existing SW in dev; keep lazy-loader but NO SW register -->
+    <!-- Dev: unregister SW + minimal lazy loader + CSP-safe link upgrade -->
     <script is:inline type="text/javascript">
       (function () {
-        // Unregister any SW that might be serving cached JS in dev
         if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.getRegistrations().then(regs => {
-            regs.forEach(reg => reg.unregister());
-          });
-          // Also clear any runtime caches created by previous SWs
-          if (window.caches && caches.keys) {
-            caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-          }
+          navigator.serviceWorker.getRegistrations().then(function (regs){ regs.forEach(function (r){ r.unregister(); }); });
+          if (window.caches && caches.keys) { caches.keys().then(function (keys){ keys.forEach(function (k){ caches.delete(k); }); }); }
         }
-
-        // Optional: minimal lazy loader in dev (no consent/SW gating)
-        let loaded = false;
+        var loaded = false;
         function trigger() {
           if (loaded) return; loaded = true;
-          document.querySelectorAll('link[rel="stylesheet"][data-swap]').forEach(el => {
-            el.media = 'all'; el.removeAttribute('data-swap');
-          });
-          document.querySelectorAll('link[rel="stylesheet"][data-href]').forEach(el => {
-            const href = el.getAttribute('data-href'); if (href) el.href = href; el.removeAttribute('data-href');
-          });
-          document.querySelectorAll('script[data-src]').forEach(el => {
-            const src = el.getAttribute('data-src'); if (src) { el.src = src; el.removeAttribute('data-src'); }
-          });
+          document.querySelectorAll('link[rel="stylesheet"][data-swap]').forEach(function(el){ el.media='all'; el.removeAttribute('data-swap'); });
+          document.querySelectorAll('link[rel="stylesheet"][data-href]').forEach(function(el){ var href=el.getAttribute('data-href'); if(href){ el.href=href; } el.removeAttribute('data-href'); });
+          document.querySelectorAll('script[data-src]').forEach(function(el){ var src=el.getAttribute('data-src'); if(src){ el.src=src; el.removeAttribute('data-src'); } });
         }
-        const evs = ['mousemove','mousedown','keydown','touchstart','scroll'];
-        const handler = () => { evs.forEach(e => window.removeEventListener(e, handler)); trigger(); };
-        evs.forEach(e => window.addEventListener(e, handler, { once:true }));
-        window.addEventListener('load', () => setTimeout(() => { if (!loaded) trigger(); }, 1500));
+        var evs=['mousemove','mousedown','keydown','touchstart','scroll'];
+        function handler(){ evs.forEach(function(e){ window.removeEventListener(e, handler); }); trigger(); }
+        evs.forEach(function(e){ window.addEventListener(e, handler, { once:true }); });
+        window.addEventListener('load', function(){ setTimeout(function(){ if(!loaded) trigger(); }, 1500); });
+
+        // CSP-safe replacement for link onload="this.rel='stylesheet'"
+        var ls=document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"]');
+        ls.forEach(function(l){
+          function done(){ if(l.rel!=='stylesheet'){ l.rel='stylesheet'; l.removeAttribute('data-rel-after-load'); } }
+          l.addEventListener && l.addEventListener('load', done, { once:true });
+          if (l.sheet) { try{ done(); }catch(e){} } // cached case
+        });
       })();
     </script>
   </>
 )}
 
-{!isDev && mainJsFile && (
-  <!-- In prod we keep your module + lazy load path -->
-  <script id="main-js" type="module" data-src={mainJsFile} defer></script>
-)}
 
 {!isDev && (
-  <!-- Your existing minified SW + lazy loader for production -->
-  <script id="inline-script" is:inline type="module">
-    function registerSWandLazyLoader(){"serviceWorker"in navigator&&navigator.serviceWorker.register("/sw.js").catch((e=>{"localhost"===location.hostname&&console.warn("Service Worker Failed:",e)}));let e=!1;function t(){e||(e=!0,document.querySelectorAll('link[rel="stylesheet"]').forEach((e=>{if(e.hasAttribute("data-swap")&&(e.media="all",e.removeAttribute("data-swap")),e.hasAttribute("data-href")){const t=e.getAttribute("data-href");t&&(e.href=t),e.removeAttribute("data-href")}})),document.querySelectorAll("script[data-src]").forEach((e=>{const t=e.getAttribute("data-src");t&&(e.src=t,e.removeAttribute("data-src"))})))}const r=["mousemove","mousedown","keydown","touchstart","scroll"],a=()=>{r.forEach((e=>window.removeEventListener(e,a))),t()};r.forEach((e=>window.addEventListener(e,a,{once:!0}))),window.addEventListener("load",(()=>{setTimeout((()=>{e||t()}),3e3)}))}registerSWandLazyLoader();
+  <script id="worker-script-lazy-loader" is:inline type="module">
+    function registerSWandLazyLoader(){"serviceWorker"in navigator&&navigator.serviceWorker.register("/sw.js").catch(e=>{"localhost"===location.hostname&&console.warn("Service Worker Failed:",e)});let e=!1;function t(){e||(e=!0,document.querySelectorAll('link[rel="stylesheet"]').forEach(e=>{if(e.hasAttribute("data-swap")&&(e.media="all",e.removeAttribute("data-swap")),e.hasAttribute("data-href")){let t=e.getAttribute("data-href");t&&(e.href=t),e.removeAttribute("data-href")}}),document.querySelectorAll("script[data-src]").forEach(e=>{let t=e.getAttribute("data-src");t&&(e.src=t,e.removeAttribute("data-src"))})),document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"]').forEach(e=>{let t=()=>{"stylesheet"!==e.rel&&(e.rel="stylesheet",e.removeAttribute("data-rel-after-load"))};if(e.addEventListener&&e.addEventListener("load",t,{once:!0}),e.sheet)try{t()}catch(r){}})}let r=["mousemove","mousedown","keydown","touchstart","scroll"],a=()=>{r.forEach(e=>window.removeEventListener(e,a)),t()};r.forEach(e=>window.addEventListener(e,a,{once:!0})),window.addEventListener("load",()=>{setTimeout(()=>{e||t()},3e3)})}registerSWandLazyLoader();
   </script>
 )}

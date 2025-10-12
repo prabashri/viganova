@@ -161,11 +161,48 @@ function initDelayImages() {
     observer.observe(targetImg);
   });
 }
+/* ===== Bootstrap registry ===== */
+(function bootstrapFeatures(){
+  const features = [
+    { name:'menu',        selector:'#menu-toggle',          init: () => window.initMenu?.() },
+    { name:'delayImages', selector:'[delay-image]',         init: () => window.initDelayImages?.() },
+    { name:'consentUI',   selector:'#consent-modal',        init: () => window.initConsentUI?.() },
+    { name:'consentMgr',  selector:'#consent-modal',        init: () => window.initConsentManager?.() },
+  ];
+
+  const done = new Set();
+
+  function tryInit(f){
+    if (done.has(f.name)) return;
+    if (document.querySelector(f.selector)) {
+      try { f.init(); done.add(f.name); }
+      catch(e){ console.error('[init]', f.name, e); }
+    }
+  }
+  const run = () => features.forEach(tryInit);
+
+  // First pass (now or when DOM is ready)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run, { once:true });
+  } else {
+    run();
+  }
+
+  // Re-run on Astro client nav + window load
+  window.addEventListener('load', run, { once:false });
+  document.addEventListener('astro:page-load', run);
+
+  // Re-run when matching nodes appear (debounced)
+  const debounced = (() => { let t; return () => { clearTimeout(t); t = setTimeout(run, 50); }; })();
+  const mo = new MutationObserver(debounced);
+  mo.observe(document.documentElement, { childList:true, subtree:true });
+})();
+
 /* ============================================
    🔧 Feature Registry (single observer)
    ============================================ */
 (function () {
-  // --- Local implementations (always available)
+  // --- Consent UI (modal open/close + scroll lock)
   window.initConsentUI = window.initConsentUI || function initConsentUI(){
     const modal   = document.getElementById('consent-modal');
     const toggler = document.getElementById('consent-toggler');
@@ -173,10 +210,9 @@ function initDelayImages() {
     const btnX    = document.getElementById('consent-close');
     if (!modal || !toggler) return;
 
-    // --- helpers to lock/unlock background scroll
     function lockScroll() {
       const y = window.scrollY || document.documentElement.scrollTop || 0;
-      const root = document.documentElement; // <html>
+      const root = document.documentElement;
       root.dataset.scrollY = String(y);
       root.classList.add('consent-lock');
       root.style.top = `-${y}px`;
@@ -187,11 +223,9 @@ function initDelayImages() {
       root.classList.remove('consent-lock');
       root.style.top = '';
       delete root.dataset.scrollY;
-      // restore previous scroll position
       window.scrollTo(0, y);
     }
-
-    // prevent wheel/touch scrolling the page when modal open (but allow inside sheet)
+    
     let _unblock = null;
     function blockGlobalScroll() {
       const prevent = (e) => { e.preventDefault(); };
@@ -199,7 +233,6 @@ function initDelayImages() {
       window.addEventListener('wheel', prevent, opts);
       window.addEventListener('touchmove', prevent, opts);
       window.addEventListener('keydown', (e) => {
-        // Prevent page scroll keys when modal open
         const keys = ['PageUp','PageDown','Home','End','ArrowUp','ArrowDown','Space',' '];
         if (keys.includes(e.key)) e.preventDefault();
       }, { capture:true });
@@ -210,22 +243,8 @@ function initDelayImages() {
     }
     function unblockGlobalScroll() { if (_unblock) { _unblock(); _unblock = null; } }
 
-    // Enhanced open/close
-    const open  = () => {
-      const modal = document.getElementById('consent-modal');
-      modal?.removeAttribute('hidden');
-      modal?.classList.remove('is-hidden');
-      modal?.classList.add('is-open');
-      lockScroll();
-      blockGlobalScroll();
-    };
-    const close = () => {
-      const modal = document.getElementById('consent-modal');
-      modal?.classList.remove('is-open');
-      modal?.classList.add('is-hidden');
-      unblockGlobalScroll();
-      unlockScroll();
-    };
+    const open  = () => { modal.classList.remove('is-hidden'); modal.classList.add('is-open'); lockScroll(); blockGlobalScroll(); };
+    const close = () => { modal.classList.remove('is-open');  modal.classList.add('is-hidden'); unblockGlobalScroll(); unlockScroll(); };
 
     window.__consentOpen  = open;
     window.__consentClose = close;
@@ -235,19 +254,21 @@ function initDelayImages() {
     btnX?.addEventListener('click', (e) => { e.preventDefault(); document.dispatchEvent(new CustomEvent('consent:close-ui')); close(); });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && modal.classList.contains('is-open')) { document.dispatchEvent(new CustomEvent('consent:close-ui')); close(); }});
     document.addEventListener('consent:open-ui', open);
-    // ✅ ensure UI closes (and unlocks scroll) when manager dispatches the event
     document.addEventListener('consent:close-ui', close);
   };
 
+  // --- Consent Manager (reads compact data-config)
   window.initConsentManager = window.initConsentManager || function initConsentManager(){
+
     function readConfig() {
-      const el = document.getElementById('consent-data');
-      if (!el) return { enabled: false };
-      try { return JSON.parse(el.textContent || '{}') || { enabled: false }; }
-      catch { return { enabled: false }; }
+      const modal = document.getElementById('consent-modal');
+      if (!modal) return { e:false };
+      try { return JSON.parse(modal.dataset.config || '{}') || { e:false }; }
+      catch { return { e:false }; }
     }
+
     const C = readConfig();
-    if (!C.enabled) { window.__consent = { analytics:true, ads:true, personalized:true }; return; }
+    if (!C.e) { window.__consent = { analytics:true, ads:true, personalized:true }; return; }
 
     const modal        = document.getElementById('consent-modal');
     const form         = document.getElementById('consent-form');
@@ -258,8 +279,8 @@ function initDelayImages() {
     const cbAds        = document.getElementById('cb-ads');
     const cbPersonal   = document.getElementById('cb-personalized');
 
-    const cookieName = C.cookieName || "consent.v1";
-    const ttlDays    = Number(C.ttlDays || C.cookieDuration || 365);
+    const cookieName = C.cn || "consent.v1";
+    const ttlDays    = Number(C.ttl || 365);
     let delayedTimer = null;
 
     function getCookie(){
@@ -276,14 +297,14 @@ function initDelayImages() {
 
     function applyPrivacyFlags(){
       if (typeof window.gtag === 'function') {
-        if (C.privacy?.urlPassthrough)   window.gtag('set','url_passthrough', true);
-        if (C.privacy?.adsDataRedaction) window.gtag('set','ads_data_redaction', true);
-        if (C.privacy?.developerId)      window.gtag('set','developer_id', C.privacy.developerId);
+        if (C.up)  window.gtag('set','url_passthrough', true);
+        if (C.ar)  window.gtag('set','ads_data_redaction', true);
+        if (C.did) window.gtag('set','developer_id', C.did);
       } else {
         window.dataLayer = window.dataLayer || [];
-        if (C.privacy?.urlPassthrough)   window.dataLayer.push({ event:'privacy_set', url_passthrough:true });
-        if (C.privacy?.adsDataRedaction) window.dataLayer.push({ event:'privacy_set', ads_data_redaction:true });
-        if (C.privacy?.developerId)      window.dataLayer.push({ event:'privacy_set', developer_id: C.privacy.developerId });
+        if (C.up)  window.dataLayer.push({ event:'privacy_set', url_passthrough:true });
+        if (C.ar)  window.dataLayer.push({ event:'privacy_set', ads_data_redaction:true });
+        if (C.did) window.dataLayer.push({ event:'privacy_set', developer_id: C.did });
       }
     }
     function applyAdMode(flags) {
@@ -316,22 +337,24 @@ function initDelayImages() {
       applyPrivacyFlags();
     }
 
-    const readUI = () => ({ analytics: !!cbAnalytics?.checked, ads: !!cbAds?.checked, personalized: !!cbPersonal?.checked, ts: Date.now(), v: C.version || '1' });
-    const writeUI = (obj) => { if (cbAnalytics) cbAnalytics.checked = !!obj.analytics; if (cbAds) cbAds.checked = !!obj.ads; if (cbPersonal) cbPersonal.checked = !!obj.personalized; };
+    const readUI  = () => ({ analytics: !!cbAnalytics?.checked, ads: !!cbAds?.checked, personalized: !!cbPersonal?.checked, ts: Date.now(), v: C.v || '1' });
+    const writeUI = (o) => { if (cbAnalytics) cbAnalytics.checked = !!o.analytics; if (cbAds) cbAds.checked = !!o.ads; if (cbPersonal) cbPersonal.checked = !!o.personalized; };
+
     const openModalHydrated = () => {
       const saved = getCookie();
       if (saved) writeUI(saved);
-      else writeUI({ analytics: C.defaults?.analytics !== false, ads: C.defaults?.ads !== false, personalized: !!C.defaults?.personalized });
+      else writeUI({ analytics: C.an !== false, ads: C.ads !== false, personalized: !!C.per });
       document.dispatchEvent(new CustomEvent('consent:open-ui'));
     };
     const closeModal = () => { modal?.classList.remove('is-open'); modal?.classList.add('is-hidden'); };
 
     const saved = getCookie();
-    if (saved && (expired(saved, ttlDays) || saved.v !== (C.version || '1'))) delCookie();
+    if (saved && (expired(saved, ttlDays) || saved.v !== (C.v || '1'))) delCookie();
+
     const current = getCookie();
     if (current) { writeUI(current); updateConsent(current); }
     else {
-      const defaults = { analytics: C.preConsentPageview ? (C.defaults?.analytics !== false) : false, ads: C.preConsentPageview ? (C.defaults?.ads !== false) : false, personalized: false };
+      const defaults = { analytics: C.pcv ? (C.an !== false) : false, ads: C.pcv ? (C.ads !== false) : false, personalized: false };
       updateConsent(defaults);
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event:'consent_default_applied', ...defaults });
@@ -347,62 +370,28 @@ function initDelayImages() {
         setCookie(flags);
         window.dataLayer = window.dataLayer || [];
         window.dataLayer.push({ event:'consent_saved', ...flags });
-        // ✅ close through UI so scroll unlocks correctly
         document.dispatchEvent(new CustomEvent('consent:close-ui'));
         delayedTimer = null;
       }, ms);
     }
-    btnAll?.addEventListener('click', () => delayedSaveAndClose({ analytics:true, ads:true, personalized:true, ts:Date.now(), v:C.version || '1' }, 20000));
-    btnNone?.addEventListener('click', () => delayedSaveAndClose({ analytics:false, ads:false, personalized:false, ts:Date.now(), v:C.version || '1' }, 20000));
+    btnAll?.addEventListener('click', () => delayedSaveAndClose({ analytics:true, ads:true, personalized:true, ts:Date.now(), v:C.v || '1' }, 20000));
+    btnNone?.addEventListener('click', () => delayedSaveAndClose({ analytics:false, ads:false, personalized:false, ts:Date.now(), v:C.v || '1' }, 20000));
     btnSave?.addEventListener('click', () => {
       const f = readUI();
-      if (C.forceAds === true) f.ads = true;
+      if (C.forceAds === true) f.ads = true; // optional override if you ever pass it
       updateConsent(f);
       setCookie(f);
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({ event:'consent_saved', ...f });
       if (delayedTimer) { clearTimeout(delayedTimer); delayedTimer = null; }
-      // ✅ close through UI so scroll unlocks correctly
       document.dispatchEvent(new CustomEvent('consent:close-ui'));
     });
 
     document.getElementById('consent-toggler')?.addEventListener('click', openModalHydrated);
     document.addEventListener('consent:close-ui', () => updateConsent(readUI()));
   };
+})();
 
-  // -------- Features (resolve from window at call time)
-  const features = [
-    { selector: '#menu-toggle',   init: () => window.initMenu?.() },
-    { selector: '[delay-image]',  init: () => window.initDelayImages?.() },
-    { selector: 'body',           init: () => window.initConsentUI() },
-    { selector: 'body',           init: () => window.initConsentManager() },
-  ];
-
-  const mark = (el, key) => el?.setAttribute?.(`data-init-${key}`, '1');
-  const isMarked = (el, key) => el?.getAttribute?.(`data-init-${key}`) === '1';
-
-  function runInitializers(root = document) {
-    features.forEach((f, i) => {
-      const key = String(i);
-      root.querySelectorAll(f.selector).forEach(el => {
-        if (isMarked(el, key)) return;
-        try { f.init(el); mark(el, key); } catch (e) { console.warn('init failed:', f.selector, e); }
-      });
-    });
-  }
-
-  function bootstrap() {
-    runInitializers(document);
-    const mo = new MutationObserver((mutList) => {
-      for (const m of mutList) {
-        if (m.type === 'childList') m.addedNodes.forEach(node => { if (node.nodeType === 1) runInitializers(node); });
-      }
-    });
-    mo.observe(document.documentElement, { subtree: true, childList: true, attributes: false });
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootstrap, { once: true });
-  else bootstrap();
 
   /* ============================================
      📈 Analytics Events (pageview + click + submit)
@@ -499,5 +488,3 @@ function initDelayImages() {
       if (action) send(action, params);
     });
   })();
-})();
-

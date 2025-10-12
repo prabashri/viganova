@@ -660,6 +660,9 @@ hr, .hr {
 .jc-f-start {
 	justify-content: flex-start;
 }
+.jc-f-end {
+	justify-content: flex-end;
+}
 
 .jc-space-between {
 	justify-content: space-between;
@@ -1267,7 +1270,9 @@ hr, .hr {
 	.sm-full-width, .sm-w-full {
 		width: 100%;
 	}
-
+	.sm-jc-space-between {
+		justify-content: space-between;
+	}
 	.top-70 {
 		top: 70%;
 	}

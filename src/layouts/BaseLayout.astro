@@ -12,6 +12,8 @@ import InlineScript from '@/components/InlineScript.astro';
 import AdSenseHead from '@/components/ads/AdSenseHead.astro';
 import AdSenseLoader from '@/components/ads/AdSenseLoader.astro';
 
+import JsFilesToLoad from '@/components/JsFilesToLoad.astro';
+
 import type { HeadProps } from '@/types/HeadProps';
 import { siteFunctions } from '@/config/siteFunctions';
 
@@ -50,7 +52,8 @@ const { headProps = { title: 'Default Title', showBreadcrumb: false }, hideHeade
     <AnalyticsFooter />
     <AdSenseLoader />
     <InlineScript />
-
+    <JsFilesToLoad name="analytics-consent-handler" />
+    <JsFilesToLoad name="header-menu-theme" />
     <slot name="extraScripts" />
   </body>
 </html>

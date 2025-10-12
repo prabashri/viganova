@@ -92,7 +92,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     {primaryCTA.length > 0 && ( 
       <div 
         id="main-nav-cta" 
-        class="flex flex-col big-flex-row br sm-bg w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
+        class="flex flex-col big-flex-row br sm-bg sm-w-full w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
         aria-label="Primary Call to Action"
       >  
         <div class="flex flex-row gap ai-center jc-center">
@@ -104,7 +104,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
           <ThemeLightDark />
         </div>           
         
-        <div class="flex flex-row gap ai-center jc-center">
+        <div class="flex flex-row gap ai-center sm-jc-space-between jc-center">
           {/* Loop through primaryCTA items */}
           {primaryCTA.map((cta) => (
             <Anchor

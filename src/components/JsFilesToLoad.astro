@@ -1,0 +1,206 @@
+---
+/**
+ * JsFileToLoad.astro
+ * One-file JS loader (manifest-aware, dev-friendly) for Astro.
+ *
+ * ✅ What it does
+ * - In PROD: resolves {name} via "@/data/assets-manifest.json" → hashed, cache-busted file.
+ * - In DEV:   resolves {name} to "/scripts/<name>.js?t=<timestamp>" for fresh reloads.
+ * - Supports inline code, module/classic modes, async/defer, CSP nonce, SRI, and deduping.
+ * - Can be placed in <head> (footer={false}) or before </body> (default).
+ * - When in <head> and type="module", emits <link rel="modulepreload"> in PROD for faster startup.
+ *
+ * 🔧 Props (choose ONE source: name | src | inline+code)
+ *  - name?: string                 // manifest key (preferred)
+ *  - src?: string                  // explicit path/URL (bypasses manifest)
+ *  - inline?: boolean              // default false
+ *  - code?: string                 // required if inline=true
+ *
+ * ⚙️ Behavior & attributes
+ *  - module?: boolean              // default true (type="module"). Set false for classic scripts.
+ *  - async?: boolean               // default false (if true, defer is ignored)
+ *  - defer?: boolean               // default true unless async=true
+ *  - nomodule?: boolean            // default false; for legacy classic fallback
+ *  - id?: string
+ *  - nonce?: string                // CSP nonce (inline & external)
+ *  - integrity?: string            // SRI hash (external)
+ *  - crossOrigin?: 'anonymous'|'use-credentials'|''  // for SRI/CDN
+ *  - referrerPolicy?: string
+ *  - data?: Record<string,string|number|boolean>     // data-* attrs
+ *  - footer?: boolean              // default true; set false to render in <head>
+ *  - dedupe?: boolean              // default true; prevents duplicate emits
+ *
+ * 🧠 Dev vs Prod resolution
+ *  - DEV:   name="main" → /scripts/main.js?t=<timestamp>
+ *  - PROD:  name="main" → manifest.js["main"].file (e.g., /scripts/main.y30mxw.min.js)
+ *
+ * 🧩 HEAD usage (header scripts)
+ *  - Use footer={false}. Module scripts get a <link rel="modulepreload"> in PROD.
+ *  - Keep blocking classic scripts out of <head>; prefer modules (default) or async/defer.
+ *
+ * 🔒 CSP & SRI tips
+ *  - Pass page nonce to both inline and external: nonce={Astro.locals.cspNonce}
+ *  - With integrity=..., also set crossOrigin="anonymous" when served from a CDN.
+ *  - Avoid inline without a nonce when using strict CSP (script-src).
+ *
+ * 🚀 Examples
+ *
+ * 1) Head: bootstrap module + inline config (CSP-safe)
+ *    <JsFileToLoad inline code={`window.__CFG={env:"prod"};`} nonce={Astro.locals.cspNonce} footer={false} />
+ *    <JsFileToLoad name="main" nonce={Astro.locals.cspNonce} footer={false} />
+ *
+ * 2) Head: third-party analytics (classic async)
+ *    <JsFileToLoad
+ *      src="https://cdn.example.com/analytics.js"
+ *      module={false}
+ *      async
+ *      integrity="sha384-…"
+ *      crossOrigin="anonymous"
+ *      footer={false}
+ *    />
+ *
+ * 3) Footer: search module (default placement)
+ *    <JsFileToLoad name="search" />
+ *
+ * 4) Dual build (modern + legacy)
+ *    <JsFileToLoad name="main" />                               // module (modern)
+ *    <JsFileToLoad src="/scripts/main.legacy.js" module={false} nomodule />  // classic fallback
+ *
+ * 5) DEV-only debug (explicit path, classic, async)
+ *    <JsFileToLoad src="/scripts/dev-tools.js" module={false} async />
+ *
+ * 🔁 Ordering guidance (HEAD)
+ *  - Inline config → polyfills (only if needed) → main:
+ *    <JsFileToLoad inline code={`window.__CFG={...};`} nonce={nonce} footer={false} />
+ *    <JsFileToLoad name="polyfills" module={false} defer footer={false} />
+ *    <JsFileToLoad name="main" nonce={nonce} footer={false} />
+ *
+ * Performance tips
+ *  - Preconnect to your CDN if scripts load from it:
+ *      <link rel="preconnect" href="https://cdn.example.com" crossorigin>
+ *  - Keep <head> lean; shift non-critical scripts to the footer or lazy-load them.
+ */
+
+import manifest from "@/data/assets-manifest.json";
+
+type Cross = '' | 'anonymous' | 'use-credentials';
+
+interface Props {
+  // choose ONE source: name | src | (inline+code)
+  name?: string;
+  src?: string;
+  inline?: boolean;
+  code?: string;
+
+  // behavior
+  module?: boolean;   // default true
+  async?: boolean;    // default false
+  defer?: boolean;    // default true unless async=true
+  nomodule?: boolean; // default false
+
+  // attrs
+  id?: string;
+  nonce?: string;
+  integrity?: string;
+  crossOrigin?: Cross;
+  referrerPolicy?: string;
+  data?: Record<string, string | number | boolean>;
+
+  // placement & misc
+  footer?: boolean;   // default true (false = put in <head>)
+  dedupe?: boolean;   // default true
+}
+
+const {
+  name,
+  src,
+  inline = false,
+  code,
+
+  module: isModuleProp,
+  async: isAsync = false,
+  defer: deferProp,
+  nomodule = false,
+
+  id,
+  nonce,
+  integrity,
+  crossOrigin,
+  referrerPolicy,
+  data,
+
+  footer = true,      // NOTE: we no longer auto-emit <link>; add in page head if needed
+  dedupe = true,
+} = Astro.props as Props;
+
+const isDev = import.meta.env.DEV;
+const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
+
+function resolveSrcForName(n?: string): string | null {
+  if (!n) return null;
+  if (isDev) return `/scripts/${n}.js?t=${bust}`;
+  const entry = (manifest as any)?.js?.[n];
+  return entry?.file ?? null;
+}
+
+function dataAttrs(d?: Record<string, string | number | boolean>) {
+  if (!d) return {};
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(d)) out[`data-${k}`] = String(v);
+  return out;
+}
+
+/** global dedupe */
+type Key = string;
+const jsOnce: Set<Key> = (Astro.locals as any).__jsOnce ??= new Set<Key>();
+const onceKeyExt = (u: string, m: boolean, a: boolean, df: boolean) =>
+  `ext|${u}|m:${m?'1':'0'}|a:${a?'1':'0'}|d:${df?'1':'0'}`;
+const onceKeyInline = (c: string, i?: string) =>
+  `inline|${i ?? ''}|${c.length}|${c.slice(0,24)}`;
+
+const isModule = isModuleProp !== false && !nomodule;
+const useDefer = isAsync ? false : (deferProp !== false);
+
+const finalSrc = inline ? null : (src ?? resolveSrcForName(name));
+---
+
+{ /* INLINE */ }
+{inline && code?.trim() && (() => {
+  const c = code.trim();
+  const k = onceKeyInline(c, id);
+  if (dedupe && jsOnce.has(k)) return null;
+  jsOnce.add(k);
+
+  return (
+    <script
+      id={id}
+      type={isModule ? ('module' as const) : undefined}
+      nonce={nonce}
+      {...(data ? (dataAttrs(data) as any) : {})}
+      set:html={c}
+    />
+  );
+})()}
+
+{ /* EXTERNAL */ }
+{!inline && finalSrc && (() => {
+  const k = onceKeyExt(finalSrc, !!isModule, !!isAsync, !!useDefer);
+  if (dedupe && jsOnce.has(k)) return null;
+  jsOnce.add(k);
+
+  return (
+    <script
+      id={id}
+      src={finalSrc}
+      type={isModule ? ('module' as const) : undefined}
+      async={isAsync ? (true as const) : undefined}
+      defer={!isAsync && useDefer ? (true as const) : undefined}
+      nomodule={nomodule ? (true as const) : undefined}
+      nonce={nonce}
+      integrity={integrity}
+      crossorigin={crossOrigin}
+      referrerpolicy={referrerPolicy}
+      {...(data ? (dataAttrs(data) as any) : {})}
+    />
+  );
+})()}

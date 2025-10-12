@@ -53,7 +53,7 @@ const {
 };
 
 /* ---------- UI classes ---------- */
-const baseClasses = 'card mn-w-sidebar mx-w-sidebar w-full border-primary-light hover-border-primary br bg-base-00 box-shadow p-05';
+const baseClasses = 'card mx-w-sidebar w-full border-primary-light hover-border-primary br bg-base-00 box-shadow p-05';
 const orientationClass = 'flex flex-col big-flex-row big-flex-1 gap';
 const contentWrapperClass = 'flex flex-col flex-1 p-05';
 const tagClass = 'tag-link bg-primary-lighter col-base-100 br text-xs pi-05 pb-02';
@@ -219,7 +219,7 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
       const serviceHref = serviceUrl(r);
 
       // canonical fragment URL for this review (points to /reviews/#id)
-      const reviewUrl = toAbsoluteUrl(`/reviews/#${anchor}`, { cdn: 'never' });
+      const reviewUrl = `${siteDefaults.siteUrl.replace(/\/$/, '')}/reviews/#${anchor}`;
 
       // avatar / initial
       const avatarPath = relOrEmpty((r as any)?.author?.avatar);
@@ -347,7 +347,9 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
                 ...((r as any).author?.organization ? { worksFor: { '@type': 'Organization', name: (r as any).author.organization } } : {})
               } : undefined,
               itemReviewed: {
-                '@type': (r as any)?.target?.type || 'Service',
+               '@type': 'Product',
+                // stable identifier of the service page
+                ...(serviceHref ? { '@id': toAbsoluteUrl(serviceHref, { cdn: 'never' }) } : {}),
                 name: serviceLabel(r),
                 url: serviceHref ? toAbsoluteUrl(serviceHref, { cdn: 'never' }) : undefined
               },

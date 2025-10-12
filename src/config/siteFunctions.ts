@@ -11,6 +11,9 @@ export const siteFunctions = {
     enableAdSense: true,
     adsense: "ca-pub-8380181212468292",
 
+    enableOtherAds: false, // e.g., Ezoic, Media.net, etc.
+
+
     googleAnalytics: true, // enable Google Analytics
     analyticsId: "G-KEZGQDK3M0", // google analytics id   
     /* by default google analytics used if id provided*/

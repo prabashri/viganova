@@ -31,7 +31,7 @@ body.consent-lock {
   display: flex;
   flex-direction: column;
   width: min(640px, 95vw);
-  max-height: min(90dvh, 720px); /* use dvh for mobile chrome/safari */
+  max-height: min(92dvh, 92svh, 720px); /* allow a bit more room, support iOS bars */
   background: var(--base-00);
   color: var(--base-100);
   border: 1px solid var(--base-100);
@@ -39,6 +39,7 @@ body.consent-lock {
   box-shadow: 0 10px 30px rgba(0,0,0,.25);
   overflow: hidden; /* scrolling happens in .consent-body */
 }
+
 
 /* Header (sticky) */
 .consent-header {
@@ -56,6 +57,7 @@ body.consent-lock {
   -webkit-overflow-scrolling: touch;
   touch-action: pan-y;
 }
+
 
 /* Visible scrollbar (Firefox + WebKit) */
 .consent-body { scrollbar-color: var(--base-60) var(--base-10); scrollbar-width: thin; }
