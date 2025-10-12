@@ -1,87 +1,85 @@
-// src/middleware.ts
 import { defineMiddleware } from "astro:middleware";
 import { getSecurityHeaders, extraHttpHeaders } from "./config/security.mjs";
 
 declare module "astro" {
-  interface Locals { nonce: string }
+  interface Locals {
+    nonce: string;
+  }
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  // 1) Per-request nonce
+  // stable, header-safe nonce
   const nonce = crypto.randomUUID().replace(/-/g, "");
   context.locals.nonce = nonce;
 
-  const res = await next();
-  if (!res) return new Response(null, { status: 204 });
+  const response = await next();
+  if (!response) return new Response(null, { status: 204 });
 
-  const headers = new Headers(res.headers);
-  const ct = headers.get("content-type") || "";
-  const isHtml = ct.includes("text/html");
+  const headers = new Headers(response.headers);
+  const contentType = headers.get("content-type") || "";
+
+  const isHtml = contentType.includes("text/html");
   const isXml =
     context.url.pathname.toLowerCase().endsWith(".xml") ||
-    ct.includes("application/xml") ||
-    ct.includes("text/xml");
+    contentType.includes("application/xml") ||
+    contentType.includes("text/xml");
 
-  // 2) Build CSP with nonce (includes script-src-elem/script-src-attr)
-  const sec = getSecurityHeaders(nonce);
-
-  // For XML feeds/sitemaps, allow inline styles (no <script> there)
+  // Build CSP with the nonce; allow inline styles for XML feeds only
+  const security = getSecurityHeaders(nonce);
   if (isXml) {
-    sec["style-src"] = [...new Set([...(sec["style-src"] || []), "'unsafe-inline'"])];
+    const arr = Array.isArray(security["style-src"]) ? security["style-src"] : [security["style-src"]];
+    security["style-src"] = Array.from(new Set([...arr, "'unsafe-inline'"]));
   }
 
-  const csp = Object.entries(sec)
-    .map(([k, v]) => {
-      if (v === true) return k;                // e.g., upgrade-insecure-requests
-      const vals = Array.isArray(v) ? v : [v]; // normalize
-      return `${k} ${vals.join(" ")}`.trim();
+  const cspValue = Object.entries(security)
+    .map(([directive, value]) => {
+      if (value === true) return directive; // e.g., upgrade-insecure-requests
+      const values = Array.isArray(value) ? value : [value];
+      return `${directive} ${values.join(" ")}`.trim();
     })
     .join("; ");
 
-  headers.set(
-    import.meta.env.DEV ? "Content-Security-Policy-Report-Only" : "Content-Security-Policy",
-    csp
-  );
+  const cspHeaderName = import.meta.env.DEV
+    ? "Content-Security-Policy-Report-Only"
+    : "Content-Security-Policy";
+  headers.set(cspHeaderName, cspValue);
 
-  // 3) Set extra security headers
+  // Extra security headers
   for (const [k, v] of Object.entries(extraHttpHeaders)) {
     headers.set(k, typeof v === "string" ? v : JSON.stringify(v));
   }
 
-  // 4) Service worker headers (optional)
+  // Service worker extras (optional)
   if (context.url.pathname === "/sw.js") {
     headers.set("Cache-Control", "no-cache");
     headers.set("Content-Type", "application/javascript");
     headers.set("Service-Worker-Allowed", "/");
   }
 
-  // 5) Inject nonce into inline tags on HTML responses only
-  if (isHtml && res.body) {
-    const html = await res.text();
+  // Inject nonce attribute into inline <script> (no src) and <style> on HTML only
+  if (isHtml && response.body) {
+    const rawHtml = await response.text();
 
-    // a) Inline executable <script> without src and without nonce
-    //    Allow default/empty type, type="module", or type="text/javascript".
-    const withScriptNonce = html.replace(
-      /<script(?![^>]*\bsrc=)(?![^>]*\bnonce=)(?=[^>]*(?:\btype\s*=\s*"(?:module|text\/javascript)"|[^>]*\btype\b\s*=\s*'?(?:module|text\/javascript)'?)|[^>]*?\b(?!type=))([^>]*)>/gi,
+    const withScriptNonce = rawHtml.replace(
+      /<script(?![^>]*\bsrc=)(?![^>]*\bnonce=)([^>]*)>/gi,
       (_m, attrs) => `<script nonce="${nonce}"${attrs}>`
     );
 
-    // b) Inline <style> without nonce
     const withStyleNonce = withScriptNonce.replace(
       /<style(?![^>]*\bnonce=)([^>]*)>/gi,
       (_m, attrs) => `<style nonce="${nonce}"${attrs}>`
     );
 
-    // (Optional) If you do want to nonce JSON data blocks, keep as-is.
-    // We purposely did NOT add a nonce to type="application/json" to reduce noise.
-
     return new Response(withStyleNonce, {
-      status: res.status,
-      statusText: res.statusText,
+      status: response.status,
+      statusText: response.statusText,
       headers,
     });
   }
 
-  // Non-HTML (stream untouched)
-  return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
 });

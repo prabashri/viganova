@@ -22,7 +22,8 @@ export const siteFunctions = {
     
     cloudflareAnalytics: false, // enable Cloudflare Web Analytics
     cloudflareAnalyticsId: "2e814bc0b10a4e08a5cf4ea751e357e7", 
-    
+     /* Cloudflare RUM (auto /cdn-cgi/rum) */
+    enableCloudflareRUM: true,   // ← new flag
     bingAPIKey: "", // Bing API key for search
     rss: true, // enable RSS feed globally
     index: true, // enable index page
