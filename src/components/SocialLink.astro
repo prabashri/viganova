@@ -1,7 +1,7 @@
 ---
 // src/components/SocialLink.astro
 import { Icon } from 'astro-icon/components';
-import { siteDefaults } from '../config/siteDefaults';
+import { siteDefaults } from '@/config/siteDefaults';
 
 interface Props {
   id?: string;
@@ -10,38 +10,66 @@ interface Props {
   iconSize?: string;
 }
 
-const { 
-  id = 'social-links', 
-  className = '', 
-  itemClass = '', 
-  iconSize = 'w-1-5 h-1-5' 
+const {
+  id = 'social-links',
+  className = '',
+  itemClass = '',
+  iconSize = 'w-1-5 h-1-5'
 } = Astro.props;
 
-const links = siteDefaults.socialLinks;
+const links = siteDefaults.socialLinks as Record<string, string | undefined>;
 
-function getHref(key: string, value: string): string {
-  if (value.startsWith('http://') || value.startsWith('https://') || value.startsWith('mailto:')) {
-    return value;
-  }
-  if (key === 'x') {
-    return `https://x.com/${value.replace(/^@/, '')}`;
-  }
-  return `https://${value}`;
+// Simple email detector
+const isEmail = (v: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+// Normalize href based on key/value
+function getHref(key: string, raw: string): string {
+  const value = raw.trim();
+
+  // If already fully-qualified (http/https/mailto), keep as-is
+  if (/^(https?:|mailto:)/i.test(value)) return value;
+
+  // Email: either key === 'email' or it looks like an email address
+  if (key === 'email' || isEmail(value)) return `mailto:${value}`;
+
+  // X/Twitter handle (with/without leading @)
+  if (key === 'x') return `https://x.com/${value.replace(/^@/, '')}`;
+
+  // Otherwise, assume it's a hostname or path and add https
+  return `https://${value.replace(/^\/+/, '')}`;
 }
 
+// Accessible labels
+function getAriaLabel(key: string, value: string): string {
+  if (key === 'email' || isEmail(value)) return `Email us at ${value.replace(/^mailto:/, '')}`;
+  const pretty = key.charAt(0).toUpperCase() + key.slice(1);
+  return `Follow us on ${pretty}`;
+}
+
+// For mailto we usually avoid opening a new tab
+function getTarget(href: string): string | undefined {
+  return href.startsWith('mailto:') ? undefined : '_blank';
+}
+function getRel(href: string): string | undefined {
+  return href.startsWith('mailto:') ? undefined : 'noopener noreferrer';
+}
 ---
+
 <nav aria-label="Social media links" id={id} class={`social-media-links flex wrap gap-05 mx-0ai-center ${className}`}>
   {Object.entries(links).map(([key, value]) => {
     if (!value) return null;
 
     const href = getHref(key, value);
-    const label = `Follow us on ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+    const label = getAriaLabel(key, value);
+    const target = getTarget(href);
+    const rel = getRel(href);
 
     return (
       <a
         href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        {...(target ? { target } : {})}
+        {...(rel ? { rel } : {})}
         aria-label={label}
         title={label}
         class={`icon-link flex ai-center jc-center p-02 br lh-0 focus-visible bg-primary-lighter-x ${itemClass}`}
@@ -52,4 +80,3 @@ function getHref(key: string, value: string): string {
     );
   })}
 </nav>
-

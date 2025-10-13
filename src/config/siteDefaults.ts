@@ -3,6 +3,7 @@ import type { StaticPageDefaults, PageFlags, PageKey } from '../types/siteDefaul
 import { normalizePageFlags } from '../types/siteDefaults';
 
 const SITE_NAME = "EasyApostille";
+const CONTACT_EMAIL = "contact@easyapostille.in";
 
 export const siteDefaults = {
   siteName: SITE_NAME,
@@ -38,7 +39,7 @@ export const siteDefaults = {
     // youtube: "https://youtube.com/@easyapostille",
     // mastodon: "https://mastodon.social/@easyapostille",
     // bluesky: "https://bsky.app/profile/easyapostille",
-    email: "mailto:admin@easyapostille.in",
+    email: CONTACT_EMAIL,
   },
 
   // Admin contact (for technical/meta info)
@@ -48,7 +49,7 @@ export const siteDefaults = {
   },
 
   contact: {
-    email: "contact@easyapostille.in",
+    email: CONTACT_EMAIL,
     phone: "+919047433266",
     whatsapp: "919047433266",
     phone2: "+919789629727",

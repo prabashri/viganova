@@ -13,7 +13,8 @@ const cspReportOrigin = originOf(siteFunctions?.cspReportHandler || "");
 const adsOn        = siteFunctions.enableAdSense ?? !!siteFunctions.adsense;
 const gaOn         = !!siteFunctions.googleAnalytics;  // GA4 (gtag)
 const gtmOn        = !!siteFunctions.googleTag;        // GTM container
-const cfInsightsOn = !!siteFunctions.cloudflareAnalytics;
+const cfInsightsOn = !!siteFunctions.cloudflareAnalytics; 
+const cfRumOn      = !!siteFunctions.enableCloudflareRUM;
 
 const turnstileOn  = !!siteFunctions.turnstileEnabled && !!siteFunctions.turnstileSitekey;
 
@@ -74,7 +75,7 @@ function buildDirectives() {
   }
 
   // Cloudflare Web Analytics
-  if (cfInsightsOn) {
+  if (cfInsightsOn || cfRumOn) {
     add(h, "connect-src", ["https://static.cloudflareinsights.com", "https://cloudflareinsights.com"]);
     add(h, "img-src",     ["https://cloudflareinsights.com"]);
     add(h, "script-src",  ["https://static.cloudflareinsights.com"]);
