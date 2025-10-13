@@ -699,42 +699,42 @@ hr, .hr {
 .m-1 {
 	margin: 1rem;
 }	
-.m-bottom-0 {
+.mb-0{
 	margin-bottom: 0;
 }
-.m-bottom-05 {
+.mb-05 {
 	margin-bottom: 0.5rem;
 }
-.m-bottom-1 {
+.mb-1 {
 	margin-bottom: 1rem;
 }
-.m-bottom-2 {
+.mb-2 {
 	margin-bottom: 2rem;
 }
-.mb-0 {
+.my-0 {
 	margin-block: 0;
 }
-.mb-02{
+.my-02{
 	margin-block: 0.2rem;
 }
-.mb-05 {
+.my-05 {
 	margin-block: 0.5rem;
 }
-.mb-05-0 {
+.my-05-0 {
 	margin-block: 0.5rem 0;
 }
 
-.mb-1 {
+.my-1 {
 	margin-block: 1rem;
 }
 
-.mb-2 {
+.my-2 {
 	margin-block: 2rem;
 }
-.mb-3 {
+.my-3 {
 	margin-block: 3rem;
 }
-.mb-0-2{
+.my-0-2{
 	margin-block: -2rem;
 }
 .mt-1 {
@@ -743,16 +743,26 @@ hr, .hr {
 .mt-05 {
 	margin-top: 0.5rem;
 }
+.ml-1 {
+	margin-left: 1rem;
+}
 
 .big-display-block {
 	display: none;
 }
-.mi-0 {
+.mx-0{
 	margin-inline: 0;
 }
-.mi-1 {
+.mx-02{
+	margin-inline: 0.2rem;
+}
+.mx-05{
+	margin-inline: 0.5rem;
+}
+.mx-1 {
 	margin-inline: 1rem;
 }
+
 
 .mi-auto {
 	margin-inline: auto;
@@ -977,27 +987,26 @@ hr, .hr {
 	padding: 2rem;
 }
 
-.p-b-1 {
+.pb-1 {
 	padding-bottom: 1rem;
 }
-
-.pb-0-1 {
-	padding-block: 0 1rem;
+.pt-0{
+	padding-top: 0;
 }
 
-.pb-02 {
+.py-02 {
 	padding-block: 0.2rem;
 }
 
-.pb-05 {
+.py-05 {
 	padding-block: 0.5rem;
 }
 
-.pb-1 {
+.py-1 {
 	padding-block: 1rem;
 }
 
-.pb-2 {
+.py-2 {
 	padding-block: 2rem;
 }
 
@@ -1005,14 +1014,14 @@ hr, .hr {
 	place-content: center;
 }
 
-.pi-05 {
+.px-05 {
 	padding-inline: 0.5rem;
 }
 
-.pi-1 {
+.px-1 {
 	padding-inline: 1rem;
 }
-.pi-2 {
+.px-2 {
 	padding-inline: 2rem;
 }	
 

@@ -70,21 +70,21 @@ const pageDesc =
     description={pageDesc}
     meta={false}
     updatedAt={props.updatedAt || props.publishedAt}
-    headingClass="mb-05 mi-auto"
+    headingClass="my-05 mi-auto"
     class="mn-h-230 jc-center"
-    descriptionClass="mx-w-featured text-xl mb-1"
+    descriptionClass="mx-w-featured text-xl my-1"
   />
 
-  <div class="mx-w-content pi-1 pb-2 mi-auto">
+  <div class="mx-w-content px-1 py-2 mi-auto">
     {eff?.human && (
-      <p class="mb-2">
+      <p class="my-2">
         <strong>Effective date:</strong>
         {' '}
         <time datetime={eff.iso}>{eff.human}</time>
       </p>
     )}
 
-    <p class="text-l m-bottom-1">
+    <p class="text-l mb-1">
       This Privacy Policy explains how <strong>{orgDisplayName}</strong> (“we”, “us”, or “our”)
       collects, uses, shares, protects, and retains information when you use our website and services to
       facilitate certificate and document attestation and apostille in India. We are committed to protecting
@@ -215,14 +215,14 @@ const pageDesc =
 
     <h2>16) Contact &amp; grievance</h2>
     <p>For privacy questions, requests, or grievances, contact:</p>
-    <p class="mb-05">
+    <p class="my-05">
       📧 <Anchor href={`mailto:${contactEmail}`}><strong>{contactEmail}</strong></Anchor>
     </p>
     {adminEmail && adminEmail !== contactEmail && (
-      <p class="mb-05">Admin: <Anchor href={`mailto:${adminEmail}`}><strong>{adminEmail}</strong></Anchor></p>
+      <p class="my-05">Admin: <Anchor href={`mailto:${adminEmail}`}><strong>{adminEmail}</strong></Anchor></p>
     )}
-    {siteDefaults?.contact?.phone && <p class="mb-05">📞 {siteDefaults.contact.phone}</p>}
-    {location && <p class="mb-05">📍 {location}</p>}
+    {siteDefaults?.contact?.phone && <p class="my-05">📞 {siteDefaults.contact.phone}</p>}
+    {location && <p class="my-05">📍 {location}</p>}
 
     <hr class="my-2" />
 

@@ -30,10 +30,10 @@ const safeItems = Array.isArray(items) ? items.filter(i => i?.title && i?.url) :
 
 {safeItems.length > 0 ? (
   <div class={`p-1 br bg ${wrapperClass}`} aria-label={ariaLabel ?? heading}>
-    <h3 class={`mb-05 text-base uppercase ${headingClass}`}>{heading}</h3>
+    <h3 class={`my-05 text-base uppercase ${headingClass}`}>{heading}</h3>
     <ul class={`no-bullets ${listClass}`}>
       {safeItems.map((item) => (
-        <li class={`pb-05 ${itemClass}`}>
+        <li class={`py-05 ${itemClass}`}>
           <a class={`${itemClass}`} href={item.url}>{item.title}</a>
         </li>
       ))}

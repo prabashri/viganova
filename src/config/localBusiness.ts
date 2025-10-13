@@ -1,3 +1,4 @@
+// src/config/localBusiness.ts
 import type { LocalBusinessConfig } from "@/types/localBusiness";
 import { siteDefaults } from "@/config/siteDefaults";
 import { PRICES_LAST_UPDATED, PRICES } from "@/config/pricing";

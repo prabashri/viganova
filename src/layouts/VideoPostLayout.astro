@@ -427,12 +427,12 @@ const toISODuration = (secs?: number) => {
 
   <article id="video-layout" class="video-layout grid jc-center gap w-full" itemscope itemtype="https://schema.org/Article">
     {/* Header */}
-    <header class="video-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
+    <header class="video-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
       <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={d.title} breadcrumbs={headProps.breadcrumbs} />
-      <div class="mx-w-site mi-auto ta-center mb-2">
+      <div class="mx-w-site mi-auto ta-center my-2">
         <h1 class="post-title">{d.title}</h1>
         {d.description && <p class="post-desc">{d.description}</p>}
-        <div class="post-meta text-s mb-1">
+        <div class="post-meta text-s my-1">
           {(d.publishDate || lastModified) && (
             <div class="post-dates text-s">
               {d.publishDate && <time datetime={d.publishDate}>📅 on {new Date(d.publishDate).toLocaleDateString()}</time>}
@@ -445,7 +445,7 @@ const toISODuration = (secs?: number) => {
     </header>
 
     {/* Hero image + play overlay → player */}
-    <section class="video-player mx-w-content mb-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
+    <section class="video-player mx-w-content my-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
       <div
         class="player-shell bg-base-10 br overflow-hidden relative"
         id={`${uid}-shell`}
@@ -508,14 +508,14 @@ const toISODuration = (secs?: number) => {
 
       {/* Transcript link via Anchor */}
       {(d as any).transcriptUrl && (
-        <Anchor href={(d as any).transcriptUrl} variant="plain" className="text-s mb-05 w-fit">
+        <Anchor href={(d as any).transcriptUrl} variant="plain" className="text-s my-05 w-fit">
           View transcript
         </Anchor>
       )}
     </section>
 
     {/* Content */}
-    <div class="video-content mx-w-content mi-auto mb-05 p-1  bg border-primary-light br" itemprop="articleBody">
+    <div class="video-content mx-w-content mi-auto my-05 p-1  bg border-primary-light br" itemprop="articleBody">
       <slot />
     </div>
 
@@ -523,7 +523,7 @@ const toISODuration = (secs?: number) => {
     <Sidebar variant='left'>
       {downloads.length > 0 && (
         <section class="video-downloads">
-          <h3 class="text-xs uppercase mb-05">Download Links</h3>
+          <h3 class="text-xs uppercase my-05">Download Links</h3>
           <ul class="no-bullets flex flex-row full-flex-col wrap gap-05">
             {downloads.map((dwn) => (
               <li>
@@ -546,7 +546,7 @@ const toISODuration = (secs?: number) => {
     <Sidebar variant='right'>
       {Array.isArray(d.chapters) && d.chapters.length > 0 && (
         <section class="video-chapters">
-          <h3 class="text-xs uppercase mb-05">Chapters</h3>
+          <h3 class="text-xs uppercase my-05">Chapters</h3>
           <ul class="chapter-list no-bullets">
             {d.chapters.map((c, i) => (
               <li>
@@ -573,14 +573,14 @@ const toISODuration = (secs?: number) => {
     </Sidebar>
 
     {/* Footer: share, FAQ, tags, prev/next */}
-    <footer id="video-footer" class="video-footer mx-w-content w-full mi-auto mb-05 p-05">
-      <ShareLink id="video-footer-share-links" className="mb-05 p-05" title="share" />
+    <footer id="video-footer" class="video-footer mx-w-content w-full mi-auto my-05 p-05">
+      <ShareLink id="video-footer-share-links" className="my-05 p-05" title="share" />
 
       {Array.isArray(d.faq) && d.faq.length > 0 && (
          <FaqList
             items={d.faq}
             id="faq"
-            class="video-faq mb-05 p-05"
+            class="video-faq my-05 p-05"
             headingClass=''
             listClass=''
             heading="Frequently Asked Questions"

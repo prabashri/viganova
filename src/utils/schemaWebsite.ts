@@ -1,13 +1,11 @@
 // src/utils/schemaWebsite.ts
+
 import { siteDefaults } from "@/config/siteDefaults";
 import { siteImages } from "@/config/siteImages";
-
 import { getImageMeta, constructUrl } from "@/utils/getImage";
 import { parseImageDims } from "@/utils/imageHelpers";
-
 import { buildOrganizationSchema } from "@/utils/schemaOrganization";
 import { toAbsoluteUrl, idFor } from "@/utils/urls";
-
 
 /** Build an ImageObject from a public path or pipeline key. */
 function imageObjectFromPublicOrKey(src?: string) {
@@ -43,19 +41,33 @@ function imageObjectFromPublicOrKey(src?: string) {
 
 function pickWebsitePrimaryImages() {
   const candidates = [siteImages?.featuredImage, siteImages?.image].filter(Boolean) as string[];
-  const objs = candidates
-    .map(imageObjectFromPublicOrKey)
-    .filter(Boolean);
-  return objs.length > 1 ? objs : objs[0]; // array if multiple, else single
+  const objs = candidates.map(imageObjectFromPublicOrKey).filter(Boolean);
+  // OK to return a single ImageObject or an array; Google accepts either for "image".
+  return objs.length > 1 ? objs : objs[0];
 }
 
 export function buildWebsiteSchema() {
+  // Use absolute root for both url and @id base
   const siteRoot = toAbsoluteUrl("/");
-  const websiteId = idFor("website", "/");
+  const websiteId = idFor("website", siteRoot);
+
+  // We only need the org @id for publisher
   const { orgId } = buildOrganizationSchema();
 
-  const name = siteDefaults.title || siteDefaults.siteName;
+  const name =
+    siteDefaults.title ||
+    siteDefaults.siteName ||
+    siteDefaults.shortName ||
+    undefined;
+
   const imageNodeOrArray = pickWebsitePrimaryImages();
+
+  // Prefer explicit language/locale config; fall back to 'en'
+  const lang =
+    (siteDefaults as any).language ||
+    (siteDefaults as any).locale ||
+    (siteDefaults as any).htmlLang ||
+    "en";
 
   const sameAs = (() => {
     const s = siteDefaults.socialLinks || {};
@@ -63,6 +75,8 @@ export function buildWebsiteSchema() {
     if (s.x) out.push(`https://x.com/${String(s.x).replace(/^@/, "")}`);
     if (s.facebook) out.push(s.facebook);
     if (s.instagram) out.push(s.instagram);
+    if ((s as any).youtube) out.push((s as any).youtube as string);
+    if ((s as any).linkedin) out.push((s as any).linkedin as string);
     return out.length ? out : undefined;
   })();
 
@@ -70,13 +84,13 @@ export function buildWebsiteSchema() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "@id": websiteId,
-    url: siteRoot,
-    name,
+    url: siteRoot,                     // absolute root with trailing slash
+    ...(name ? { name } : {}),
     ...(siteDefaults.shortName ? { alternateName: siteDefaults.shortName } : {}),
     ...(imageNodeOrArray ? { image: imageNodeOrArray } : {}),
     ...(sameAs ? { sameAs } : {}),
-    ...(siteDefaults?.jurisdictionCountry ? { inLanguage: "en-IN" } : {}), // adjust to your locale
-    publisher: { "@id": orgId },
+    inLanguage: lang,                  // language tag like 'en', 'en-IN', 'ko', etc.
+    publisher: { "@id": orgId },       // ✅ reference Organization by @id
     potentialAction: {
       "@type": "SearchAction",
       target: `${siteRoot}search?q={search_term_string}`,

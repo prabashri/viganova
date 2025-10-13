@@ -10,12 +10,12 @@ const { title = 'Search', description = '', query = '', indexPath = '/search-ind
 ---
 
 <article class="mx-w-content mi-auto">
-  <header class="mb-1 ta-center">
+  <header class="my-1 ta-center">
     <h1 class="cc-h3">{query ? `Search Results for: "${query}"` : title}</h1>
     {description && <p class="text-xl">{description}</p>}
   </header>
 
-  <section class="m-bottom-1 pi-1 pb-2">
+  <section class="mb-1 px-1 py-2">
     <div id="search" class="search-box" data-index={indexPath}>
       <input
         type="search"

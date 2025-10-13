@@ -31,7 +31,7 @@ const dataId = index ? `nav-link-item-${index}` : undefined;
 
 <Anchor
   href={item.href}
-  className={`nav-link-item flex ai-center gap-05 pi-05 pb-02 ${isCard ? 'card-style' : ''} ${item.className || ''}`}
+  className={`nav-link-item flex ai-center gap-05 px-05 py-02 ${isCard ? 'card-style' : ''} ${item.className || ''}`}
   rel={item.external ? 'noopener noreferrer' : undefined}
   ariaLabel={item.ariaLabel || item.label}
   title={item.title || item.label}

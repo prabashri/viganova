@@ -47,7 +47,7 @@ const separatorMap = {
   none: 'box-shadow-bottom'
 }
 
-const commonHeaderClasses = 'flex flex-col ai-center jc-center gap-05 mi-auto pi-1 pb-05 min-h-70px overflow-anchor-none';
+const commonHeaderClasses = 'flex flex-col ai-center jc-center gap-05 mi-auto px-1 py-05 min-h-70px overflow-anchor-none';
 const headerClasses = [
   commonHeaderClasses,
   modeMap[headerStyle.mode],
@@ -68,13 +68,13 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
 <header class={`site-header ${headerClasses}`} role="banner" itemscope itemtype="https://schema.org/WPHeader">
   <div class="flex flex-col big-flex-row mx-w-site w-full relative gap-05 mi-auto ai-f-start big-ai-center jc-space-between lg-wrap md-wrap">
     {/* LOGO */}
-    <div class="flex flex-row wrap gap-05 mx-w-site w-auto sm-w-full mb-0 ai-center jc-space-between">
+    <div class="flex flex-row wrap gap-05 mx-w-site w-auto sm-w-full my-0 ai-center jc-space-between">
       <Logo />
       {/* Mobile Menu Toggle */}
       <Button
         id="menu-toggle"
         label="Toggle Menu"
-        className="menu-toggle sm-display-inherit h-40 w-40 mb-05 order-2"
+        className="menu-toggle sm-display-inherit h-40 w-40 my-05 order-2"
         aria-label="Toggle Menu"
         type="button"
         variant="plain"
@@ -167,7 +167,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                 id={`dropdown-menu-${navIndex}`}
                 role="menu"
                 aria-hidden="true"
-                class="dropdown-menu pb-1 bg-transparent static big-absolute top-70 z-1000"
+                class="dropdown-menu py-1 bg-transparent static big-absolute top-70 z-1000"
               >
                 <div class="bg-base-00 p-1 flex flex-col wrap gap br big-b-thin-primary-lighter">
                   {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
@@ -191,15 +191,15 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                 id={`dropdown-menu-${navIndex}`}
                 role="menu"
                 aria-hidden="true" 
-                class="dropdown-menu mega-menu-panel pb-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
+                class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
               >
                 <div class="bg-base-00 sm-bg p-05 br flex flex-row wrap w-full gap big-b-thin-primary-lighter">
                   {item.columns.map((col, colIndex) => (
                     <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
-                      <h4 class="bold capitalize text-s mb-2">{col.title}</h4>
+                      <h4 class="bold capitalize text-s my-2">{col.title}</h4>
                       <ul>
                         {Array.isArray(col.items) && col.items.map((subItem, subItemIndex) => (
-                          <li data-id={`mega-item-${navIndex}-${colIndex}-${subItemIndex}`} class="mb-1">
+                          <li data-id={`mega-item-${navIndex}-${colIndex}-${subItemIndex}`} class="my-1">
                             <NavLinkItem
                               item={subItem}
                             />
@@ -244,7 +244,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                   id={`dropdown-menu-${navIndex}`}
                   role="menu"
                   aria-hidden="true"
-                  class="dropdown-menu pb-1 bg-transparent static big-absolute top-70 z-1000"
+                  class="dropdown-menu py-1 bg-transparent static big-absolute top-70 z-1000"
                 >
                   <div class="bg-base-90 col-base-00 p-1 flex flex-col wrap gap br">
                     {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
@@ -268,15 +268,15 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                   id={`dropdown-menu-${navIndex}`}
                   role="menu"
                   aria-hidden="true"
-                  class="dropdown-menu mega-menu-panel pb-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
+                  class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
                 >
                   <div class="bg-base-00 sm-bg p-1 br flex flex-row wrap w-full gap big-b-thin-primary-lighter">
                     {item.columns.map((col, colIndex) => (
                       <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
-                        <h4 class="bold capitalize text-s mb-2">{col.title}</h4>
+                        <h4 class="bold capitalize text-s my-2">{col.title}</h4>
                         <ul>
                           {Array.isArray(col.items) && col.items.map((subItem, subItemIndex) => (
-                            <li data-id={`mega-item-${navIndex}-${colIndex}-${subItemIndex}`} class="mb-1">
+                            <li data-id={`mega-item-${navIndex}-${colIndex}-${subItemIndex}`} class="my-1">
                               <NavLinkItem
                                 item={subItem}
                               />

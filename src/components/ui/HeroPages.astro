@@ -46,16 +46,16 @@ interface Props {
 const DEFAULT_CLS = {
   // roots
   rootError: 'flex flex-col jc-center ai-center mi-auto mn-h-230',
-  rootBand:  'flex flex-col jc-center ai-center mx-w-full w-full mi-auto pb-2 mn-h-230',
+  rootBand:  'flex flex-col jc-center ai-center mx-w-full w-full mi-auto py-2 mn-h-230',
   rootSimple:'flex flex-col mi-auto',
 
   // common
   container: 'mx-w-content w-full mi-auto',
-  title:     'mx-w-content mi-auto mb-05',
+  title:     'mx-w-content mi-auto my-05',
   desc:      'text-xl',
-  metaWrap:  'post-meta text-s mb-1',
-  authors:   'post-authors mb-1',
-  dates:     'post-dates text-s mb-1',
+  metaWrap:  'post-meta text-s my-1',
+  authors:   'post-authors my-1',
+  dates:     'post-dates text-s my-1',
   dateText:  'text-s',
 
   // helpers
@@ -122,8 +122,8 @@ const isBandLike = variant === 'band' || variant === 'post';
 {variant === 'error' ? (
   /* ========================= ERROR ========================= */
   <header class={cx(CLS.rootError, className, textClass)}>
-    <h1 class={cx('mx-w-site mi-auto pb-05 mb-05', headingClass)}>{errorCode}</h1>
-    {description && <p class={cx('mx-w-featured mi-auto text-xl mb-1', descriptionClass)}>{description}</p>}
+    <h1 class={cx('mx-w-site mi-auto py-05 my-05', headingClass)}>{errorCode}</h1>
+    {description && <p class={cx('mx-w-featured mi-auto text-xl my-1', descriptionClass)}>{description}</p>}
     <slot name="actions" />
   </header>
 ) : isBandLike ? (

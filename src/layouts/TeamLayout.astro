@@ -190,7 +190,7 @@ if (useImage && photo) {
   </script>
 
   <article class="team-profile" id={id}>
-    <header class="team-header pb-1 mi-auto bg-primary-dark col-base-00">
+    <header class="team-header py-1 mi-auto bg-primary-dark col-base-00">
       <div class="mx-w-content mi-auto ta-center">
 
         {avatarSrc.type === 'img' && <img src={avatarSrc.src} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />}
@@ -206,12 +206,12 @@ if (useImage && photo) {
 
         <h1>{headProps.title}</h1>
         {highestDegree && <p class="team-degree">{highestDegree}</p>}
-        {role && <p class="team-role bold text-xs pb-05 mb-05">{role}</p>}      
+        {role && <p class="team-role bold text-xs py-05 my-05">{role}</p>}      
         {shortBio && <p class="team-short-bio">{shortBio}</p>}
       </div>
     </header>
 
-    <section class="team-details mx-w-content mi-auto mb-1 pb-1">
+    <section class="team-details mx-w-content mi-auto my-1 py-1">
       {affiliation && <p><strong>Affiliation:</strong> {affiliation}</p>}
       {experience && <p><strong>Experience:</strong> {experience} years</p>}
       {joined && <p><strong>Joined:</strong> {new Date(joined).toLocaleDateString()}</p>}
@@ -252,9 +252,9 @@ if (useImage && photo) {
         </>
       )}
     </section>
-    <ShareLink url={fullCanonical} title={`Share ${name}'s profile`} className="mx-w-content mi-auto mb-1" />
+    <ShareLink url={fullCanonical} title={`Share ${name}'s profile`} className="mx-w-content mi-auto my-1" />
 
-    <section class="team-slot-content mx-w-content mi-auto mb-1 pb-1">      
+    <section class="team-slot-content mx-w-content mi-auto my-1 py-1">      
       <slot />
     </section>
     {/*!-- Posts Section Hook */}

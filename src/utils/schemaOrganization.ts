@@ -210,12 +210,13 @@ function contactPoints() {
   return cps.length ? cps : undefined;
 }
 
-/** Build a Brand node for the site (brand name/logo) */
+/** Build a Brand node */
 function buildBrandNode() {
   const brandName = siteDefaults.shortName || siteDefaults.siteName || siteDefaults.title;
   if (!brandName) return undefined;
+
   const brandUrl = toAbsoluteUrl(siteDefaults.siteUrl || "/");
-  const brandId = idFor("brand", brandUrl);
+  const brandId = idFor("brand", brandUrl); // keep consistent base
 
   const logo = orgLogoImageObject();
   const sameAs = sameAsFromSite();
@@ -231,18 +232,19 @@ function buildBrandNode() {
   return { brandNode: node, brandId };
 }
 
-/** Build a minimal Parent Organization node (optional) */
+/** Build Parent Organization node */
 function buildParentOrganizationNode() {
   const cfg = getParentOrgConfig();
   if (!cfg?.url || !cfg?.name) return undefined;
 
-  const parentOrgId = idFor("organization", cfg.url);
+  const parentOrgUrl = toAbsoluteUrl(cfg.url);
+  const parentOrgId = idFor("organization", parentOrgUrl);
 
   const node: Record<string, any> = {
     "@type": "Organization",
     "@id": parentOrgId,
     name: cfg.name,
-    url: cfg.url,
+    url: parentOrgUrl,
     ...(cfg.legalName ? { legalName: cfg.legalName } : {}),
     ...(cfg.jurisdictionCountry ? { areaServed: cfg.jurisdictionCountry } : {}),
     ...(cfg.foundingDate ? { foundingDate: cfg.foundingDate } : {}),
@@ -250,13 +252,11 @@ function buildParentOrganizationNode() {
     ...(Array.isArray(cfg.sameAs) && cfg.sameAs.length ? { sameAs: cfg.sameAs } : {}),
   };
 
-  // NEW: resolve parent org logo via manifest (PNG >= 112px)
   const parentLogo = resolveLogoFromManifest({
     manifest,
     kind: "parentOrganization",
     mode: "schema",
     toAbsoluteUrl,
-    // fallback: cfg.logo, // uncomment if you want to allow a last-resort string path
   }) as { url?: string; width?: number };
 
   if (parentLogo?.url) {
@@ -269,9 +269,8 @@ function buildParentOrganizationNode() {
   return { parentNode: node, parentOrgId };
 }
 
-
-/** Build a single, canonical Organization node with a stable @id
- *  Returns extras brandNode/parentNode for optional inclusion in your graph.
+/** Build a single, canonical Organization node with proper @id references.
+ *  Ensures brand and parentOrganization use @id links only (no inline types).
  */
 export function buildOrganizationSchema() {
   const orgCfg = getPrimaryOrgConfig();
@@ -284,12 +283,13 @@ export function buildOrganizationSchema() {
   const { brandNode, brandId } = buildBrandNode() || ({} as any);
   const parent = buildParentOrganizationNode();
 
+  /** Main Organization node */
   const node: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": type,
     "@id": orgId,
-    name, // public-facing brand name
-    url,  // trailing slash ensured
+    name,
+    url,
     ...(email ? { email } : {}),
     ...(sameAs ? { sameAs } : {}),
     ...(orgLogoImageObject() ? { logo: orgLogoImageObject() } : {}),
@@ -298,8 +298,11 @@ export function buildOrganizationSchema() {
     ...(orgCfg.foundingDate ? { foundingDate: orgCfg.foundingDate } : {}),
     ...(orgCfg.registrationId ? { identifier: orgCfg.registrationId } : {}),
     ...(contactPoints() ? { contactPoint: contactPoints() } : {}),
+
+    // ✅ Correct reference-only linking (Google prefers @id)
     ...(brandId ? { brand: { "@id": brandId } } : {}),
     ...(parent?.parentOrgId ? { parentOrganization: { "@id": parent.parentOrgId } } : {}),
+    
   };
 
   // Leadership
@@ -307,12 +310,13 @@ export function buildOrganizationSchema() {
   if (founder) node.founder = founder;
 
   const incharge = maybePerson(orgCfg.incharge);
-  if (incharge) node.employee = incharge; // or "employee"/"director" per your preference
+  if (incharge) node.employee = incharge; // or "director" per preference
 
-  // Return extras for optional inclusion in @graph
+  // ✅ Final export structure
   return {
     node,
     orgId,
+    // include these in your @graph if needed:
     ...(brandNode ? { brandNode } : {}),
     ...(parent?.parentNode ? { parentNode: parent.parentNode, parentOrgId: parent.parentOrgId } : {}),
   };

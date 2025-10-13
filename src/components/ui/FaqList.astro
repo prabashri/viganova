@@ -68,8 +68,8 @@ const speakableSchema = hasSpeakable ? {
 ---
 
 {items.length > 0 && (
-  <section id={id} class={`faq w-full bg br mb-1 pb-1 ${sectionClass}`} aria-labelledby={`${id}-heading`}>
-    {heading && <Heading id={`${id}-heading`} class={`text-xl mb-0 ${headingClass}`}>{heading}</Heading>}
+  <section id={id} class={`faq w-full bg br my-1 py-1 ${sectionClass}`} aria-labelledby={`${id}-heading`}>
+    {heading && <Heading id={`${id}-heading`} class={`text-xl my-0 ${headingClass}`}>{heading}</Heading>}
     <div class={`faq-list mx-w-content mt-1 ${listClass}`}>
       {items.map((item, index) => (
         <details data-key={index} class="faq-item" open={openAll}>

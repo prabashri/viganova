@@ -29,7 +29,7 @@ const allowedLevels = depth === 'h2' ? [2] : [2, 3];
 
 {toc.length > 0 && (    
     <details id="toc-details" class={`toc-details ${props.className} block lg:[open]`} open>
-      <summary class="toc-header pointer mb-05 flex jc-space-between ai-center bold no-bullets pb-05">
+      <summary class="toc-header pointer my-05 flex jc-space-between ai-center bold no-bullets py-05">
         <h2 class="text-base bold no-margin">{heading}</h2>      
         <Icon name="down-arrow-2" width="20" height="20" class="arrow-icon" />      
       </summary>
@@ -39,7 +39,7 @@ const allowedLevels = depth === 'h2' ? [2] : [2, 3];
                   .filter(item => item.level !== undefined && allowedLevels.includes(item.level))
                   .map(item => (
                   <li class={item.level === 3 ? 'ml-4' : 'ml-0'}>
-                      <a class="block no-bb pi-05 pb-02" href={`#${item.id}`}>{item.text}</a>
+                      <a class="block no-bb px-05 py-02" href={`#${item.id}`}>{item.text}</a>
                   </li>
               ))}
           </ul>

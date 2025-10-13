@@ -122,8 +122,8 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
 });
 ---
 
-<footer class="site-footer bg-primary-darker-x col-base-10 text-small pb-2 pi-1" itemscope itemtype="https://schema.org/WPFooter">
-  <div class="footer-columns mx-w-site w-full mi-auto pb-05 pi-1 grid gap ta-start">
+<footer class="site-footer bg-primary-darker-x col-base-10 text-small py-2 px-1" itemscope itemtype="https://schema.org/WPFooter">
+  <div class="footer-columns mx-w-site w-full mi-auto py-05 px-1 grid gap ta-start">
 
     {/* Column 1: Site / brand (annotated as WebSite for itemprop="name") */}
     <div class="footer-col sm-hr" itemscope itemtype="https://schema.org/WebSite" itemid={`${siteUrl}#website`}>
@@ -150,20 +150,20 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
       )}
 
       <p class="text-base">{siteTitle}</p>
-      <p class="pb-05">&copy; {today.getFullYear()} {siteName}. All rights reserved.</p>
+      <p class="py-05">&copy; {today.getFullYear()} {siteName}. All rights reserved.</p>
     </div>
 
     {/* Column 2: Services (popular) */}
     <div class="footer-col sm-hr">
       <p class="bold uppercase"><Anchor href={rootOr(collections?.service?.base || 'services')}>Apostille Services</Anchor></p>
       <ul class="no-bullets">
-        <li class="mb-05 pb-02"><Anchor href="/services/degree-certificate-apostille/">Degree Certificate</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/services/marksheets-apostille/">Marksheets</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/services/birth-certificate-apostille/">Birth Certificate</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/services/marriage-certificate-apostille/">Marriage Certificate</Anchor></li>
-        <li class="mb-05 pb-02"><Anchor href="/services/pcc-apostille/">PCC (Police Clearance)</Anchor></li>
-        {/* <li class="mb-05 pb-02"><Anchor href="/services/affidavit-apostille/">Affidavit / POA</Anchor></li> */}
-        <li class="mb-05 pb-02"><Anchor href="/services/business-document-apostille/">Business Documents</Anchor></li>
+        <li class="my-05 py-02"><Anchor href="/services/degree-certificate-apostille/">Degree Certificate</Anchor></li>
+        <li class="my-05 py-02"><Anchor href="/services/marksheets-apostille/">Marksheets</Anchor></li>
+        <li class="my-05 py-02"><Anchor href="/services/birth-certificate-apostille/">Birth Certificate</Anchor></li>
+        <li class="my-05 py-02"><Anchor href="/services/marriage-certificate-apostille/">Marriage Certificate</Anchor></li>
+        <li class="my-05 py-02"><Anchor href="/services/pcc-apostille/">PCC (Police Clearance)</Anchor></li>
+        {/* <li class="my-05 py-02"><Anchor href="/services/affidavit-apostille/">Affidavit / POA</Anchor></li> */}
+        <li class="my-05 py-02"><Anchor href="/services/business-document-apostille/">Business Documents</Anchor></li>
       </ul>
     </div>
 
@@ -172,7 +172,7 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
       <p class="bold uppercase">Main Pages</p>
       <ul class="no-bullets">
         {collectionLinks.map(link => (
-          <li class="mb-05 pb-02"><Anchor href={link.href}>{link.label}</Anchor></li>
+          <li class="my-05 py-02"><Anchor href={link.href}>{link.label}</Anchor></li>
         ))}
       </ul>
     </div>
@@ -182,22 +182,22 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
       <p class="bold uppercase">Connect with us</p>
       <SocialLink id="footer-social-links" />
       <ul class="no-bullets">
-        { email && <li class="mb-05 pb-02"><Anchor href={`mailto:${email}`}>{email}</Anchor></li> }
-        { phone && <li class="mb-05 pb-02"><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`}>{phone}</Anchor></li> }
-        { waHref && <li class="mb-05 pb-02"><Anchor href={waHref} target="_blank" rel="noopener">WhatsApp</Anchor></li> }      
-        { location && <li class="mb-05 pb-02">{location}</li> }
+        { email && <li class="my-05 py-02"><Anchor href={`mailto:${email}`}>{email}</Anchor></li> }
+        { phone && <li class="my-05 py-02"><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`}>{phone}</Anchor></li> }
+        { waHref && <li class="my-05 py-02"><Anchor href={waHref} target="_blank" rel="noopener">WhatsApp</Anchor></li> }      
+        { location && <li class="my-05 py-02">{location}</li> }
       </ul>
     </div>
   </div>
-  <div class="footer-bottom pb-1">
+  <div class="footer-bottom py-1">
     <ul class="flex flex-row wrap gap no-bullets jc-center no-bullets list-separator">
       {pageLinks.map(link => (
-        <li class="mb-05 pb-02"><Anchor href={link.href} title={link.title}>{link.label}</Anchor></li>
+        <li class="my-05 py-02"><Anchor href={link.href} title={link.title}>{link.label}</Anchor></li>
       ))}
     </ul>
   </div>
   {/* Bottom bar */}
-  <div class="footer-bottom ta-center pb-1 hr">
+  <div class="footer-bottom ta-center py-1 hr">
     <p class="text-small">
       Built with <Anchor href="https://astro.build">Astro</Anchor> • Theme by
       {' '}<Anchor href="https://nviewsweb.com">NViewsWEB</Anchor>.

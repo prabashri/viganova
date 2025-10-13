@@ -20,10 +20,8 @@ import type { PageTypes } from "@/types/HeadProps";
 import { toAbsoluteUrl, idFor } from "@/utils/urls";
 
 /* ===== Props ===== */
-/* ===== Internal page types SchemaLocalBusiness cares about ===== */
 type InternalPageType = "home" | "contact" | "location" | "service" | "other";
 type PageTypeProp = PageTypes | InternalPageType;
-
 type OfferProp = { priceKey: string; name?: string; buyNowLink?: string };
 
 interface Props {
@@ -48,14 +46,11 @@ function normalizePageType(
 ): InternalPageType {
   const p = (input || "other").toLowerCase();
 
-  // Home detection
   if (p === "home") return "home";
   if ((p === "website" || p === "webpage") && (pathname === "/" || pathname === "")) return "home";
 
   if (p === "contact") return "contact";
   if (p === "service" || p === "product") return "service";
-
-  // ✅ If a page is marked as "article" but has offers, treat it like a service page for business schema
   if (p === "article" && hasOffers) return "service";
 
   if (p === "about") return "location";
@@ -101,6 +96,7 @@ const shouldEmitService =
 /* ===== IDs ===== */
 const firstSuffix = hasLocations ? (localBusiness.locations[0]["@idSuffix"] || "main") : "main";
 const LB_ID = localBusinessId ?? idFor(`localbusiness-${firstSuffix}`, "/");
+
 /* ===== Site/Org fallbacks ===== */
 function collectSameAsFromSiteDefaults(): string[] {
   const s = siteDefaults.socialLinks || {};
@@ -112,6 +108,7 @@ function collectSameAsFromSiteDefaults(): string[] {
   }
   return Array.from(new Set(out));
 }
+
 const PARENT = siteDefaults.parentOrganization || {};
 const ORG_ID =
   orgIdFromCaller ?? idFor("organization", siteDefaults.parentOrganization?.url || "/");
@@ -149,7 +146,7 @@ function mapOpeningHours(hours?: OpeningHour[] | null) {
   if (!hours || !Array.isArray(hours)) return undefined;
   return hours.map((h) =>
     h.closed
-      ? { "@type": "OpeningHoursSpecification", dayOfWeek: h.dayOfWeek }
+      ? { "@type": "OpeningHoursSpecification", dayOfWeek: h.dayOfWeek, closed: true }
       : { "@type": "OpeningHoursSpecification", dayOfWeek: h.dayOfWeek, opens: h.opens, closes: h.closes }
   );
 }
@@ -252,6 +249,82 @@ function pageLevelOffers() {
   return items.length ? items : undefined;
 }
 
+/* ===== Fallback resolvers (phone, image, address, email) ===== */
+function resolvePhone(loc: LocationEntry): string | undefined {
+  return (
+    loc.telephone ||
+    localBusiness.online?.servicePhone ||
+    siteDefaults.contact?.phone ||
+    undefined
+  );
+}
+
+function resolveEmail(loc: LocationEntry): string | undefined {
+  return (
+    loc.email ||
+    localBusiness.online?.serviceEmail ||
+    siteDefaults.contact?.email ||
+    siteDefaults.admin?.email ||
+    undefined
+  );
+}
+
+function resolveImage(loc: LocationEntry): string | undefined {
+  const buLogo = localBusiness.businessUnit?.logo;
+  const buLogoAbs = buLogo
+    ? (buLogo.startsWith('/') || /^https?:\/\//i.test(buLogo) ? toAbsoluteUrl(buLogo) : undefined)
+    : undefined;
+
+  return (
+    (loc.image ? toAbsoluteUrl(loc.image) : undefined) ||
+    buLogoAbs ||
+    ORG_LOGO_RESOLVED?.url ||
+    (ORG_LOGO_FALLBACK ? toAbsoluteUrl(ORG_LOGO_FALLBACK) : undefined) ||
+    undefined
+  );
+}
+
+/** Prefer location address; else siteDefaults.address; else first physical location address */
+function resolveAddress(loc: LocationEntry): any | undefined {
+  if (effectiveMode(loc) === 'physical' && loc.address) {
+    const a = loc.address;
+    return {
+      "@type": "PostalAddress",
+      streetAddress: a.streetAddress,
+      addressLocality: a.addressLocality,
+      addressRegion: a.addressRegion,
+      postalCode: a.postalCode,
+      addressCountry: a.addressCountry
+    };
+  }
+
+  const sa = siteDefaults.address;
+  if (sa) {
+    return {
+      "@type": "PostalAddress",
+      streetAddress: sa.streetAddress,
+      addressLocality: sa.addressLocality,
+      addressRegion: sa.addressRegion,
+      postalCode: sa.postalCode,
+      addressCountry: sa.addressCountryCode || sa.addressCountry
+    };
+  }
+
+  const firstPhysical = (localBusiness.locations || []).find(l => (l.mode || localBusiness.businessMode) === 'physical' && l.address);
+  if (firstPhysical?.address) {
+    const a = firstPhysical.address;
+    return {
+      "@type": "PostalAddress",
+      streetAddress: a.streetAddress,
+      addressLocality: a.addressLocality,
+      addressRegion: a.addressRegion,
+      postalCode: a.postalCode,
+      addressCountry: a.addressCountry
+    };
+  }
+  return undefined;
+}
+
 /* ===== LocalBusiness node builder ===== */
 function locationToSchema(loc: LocationEntry, index: number) {
   const idSuffix = loc["@idSuffix"] || `loc-${index + 1}`;
@@ -261,15 +334,11 @@ function locationToSchema(loc: LocationEntry, index: number) {
   const mode = effectiveMode(loc);
 
   const attachOfferCatalog =
-  offerCatalog && (mode === "online" || mode === "serviceArea") ? offerCatalog : undefined;
-  
+    offerCatalog && (mode === "online" || mode === "serviceArea") ? offerCatalog : undefined;
+
   const opening = mapOpeningHours(
-  (loc.openingHours === null ? undefined : loc.openingHours) || localBusiness.openingHours
-)?.map((o: any) => (o.dayOfWeek === "Sunday" && !o.opens && !o.closes
-  ? { "@type": "OpeningHoursSpecification", dayOfWeek: "Sunday", closed: true }
-  : o
-));
-  // const opening = mapOpeningHours((loc.openingHours === null ? undefined : loc.openingHours) || localBusiness.openingHours);
+    (loc.openingHours === null ? undefined : loc.openingHours) || localBusiness.openingHours
+  );
 
   const areaServed =
     (loc.serviceArea && loc.serviceArea.length ? loc.serviceArea : localBusiness.areaServed) || undefined;
@@ -299,7 +368,11 @@ function locationToSchema(loc: LocationEntry, index: number) {
     "@id": localId,
     name: loc.name || localBusiness.businessUnit.name || siteDefaults.siteName,
     url: toAbsoluteUrl(localBusiness.businessUnit.url || "/"),
-    image: loc.image ? toAbsoluteUrl(loc.image) : undefined,
+
+    // ✅ Always provide image/telephone/email/address via fallbacks
+    image: resolveImage(loc),
+    telephone: resolvePhone(loc),
+    email: resolveEmail(loc),
 
     brand: {
       "@type": "Brand",
@@ -313,8 +386,6 @@ function locationToSchema(loc: LocationEntry, index: number) {
       })()
     },
 
-    telephone: loc.telephone || undefined,
-    email: loc.email || undefined,
     sameAs: sameAsBase.length ? Array.from(new Set(sameAsBase)) : undefined,
 
     priceRange: localBusiness.priceRange || undefined,
@@ -324,18 +395,12 @@ function locationToSchema(loc: LocationEntry, index: number) {
       : localBusiness.paymentAccepted || undefined,
     availableLanguage: localBusiness.availableLanguage || undefined,
 
-    address:
-      mode === "physical" && loc.address
-        ? {
-            "@type": "PostalAddress",
-            streetAddress: loc.address.streetAddress,
-            addressLocality: loc.address.addressLocality,
-            addressRegion: loc.address.addressRegion,
-            postalCode: loc.address.postalCode,
-            addressCountry: loc.address.addressCountry
-          }
-        : undefined,
-    geo: mode === "physical" && loc.geo ? { "@type": "GeoCoordinates", latitude: loc.geo.latitude, longitude: loc.geo.longitude } : undefined,
+    // ✅ Address even for non-physical modes (HQ/registered as fallback)
+    address: resolveAddress(loc),
+
+    geo: mode === "physical" && loc.geo
+      ? { "@type": "GeoCoordinates", latitude: loc.geo.latitude, longitude: loc.geo.longitude }
+      : undefined,
     hasMap: mode === "physical" && loc.hasMap ? toAbsoluteUrl(loc.hasMap) : undefined,
 
     openingHoursSpecification: opening,
@@ -363,7 +428,7 @@ function locationToSchema(loc: LocationEntry, index: number) {
       { "@type": "PropertyValue", name: "BusinessMode", value: effectiveMode(loc) }
     ].filter(Boolean),
 
-    hasOfferCatalog: attachOfferCatalog, 
+    hasOfferCatalog: attachOfferCatalog,
     availableChannel: (effectiveMode(loc) !== "physical") && onlineChannel ? onlineChannel : undefined,
     identifier: identifiers.length ? identifiers : undefined,
 
@@ -371,15 +436,13 @@ function locationToSchema(loc: LocationEntry, index: number) {
     ...(PRICES_LAST_UPDATED ? { dateModified: PRICES_LAST_UPDATED } : {})
   };
 
-  // ✅ On homepage, mark the online/service-area LB as the main entity
+  // ✅ On homepage, mark online/service-area LB as the main entity
   if (Astro.url?.pathname === "/" && (mode === "online" || mode === "serviceArea")) {
     node.mainEntityOfPage = toAbsoluteUrl("/");
   }
 
   return node;
 }
-
-
 
 /* ===== Build LocalBusiness nodes when needed ===== */
 const localSchemas = shouldEmitLB ? localBusiness.locations.map(locationToSchema) : [];
@@ -403,7 +466,6 @@ const localSchemas = shouldEmitLB ? localBusiness.locations.map(locationToSchema
       "name": pageTitleProp || localBusiness.businessUnit.name,
       "url": toAbsoluteUrl(offerUrl || Astro.url?.pathname || "/"),
       "provider": { "@id": LB_ID },
-      // "offers": pageLevelOffers()
       ...(pageLevelOffers() ? { offers: pageLevelOffers() } : {})
     })}
   />

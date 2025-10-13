@@ -90,7 +90,7 @@ const breadcrumbSchema = {
 ---
 
 {shouldShow && (
-  <nav class="breadcrumb mx-w-site flex wrap ai-center mi-auto text-xs pi-05 pb-02 mb-05" aria-label="Breadcrumb navigation">
+  <nav class="breadcrumb mx-w-site flex wrap ai-center mi-auto text-xs px-05 py-02 my-05" aria-label="Breadcrumb navigation">
     <ul class="flex wrap ai-center no-bullets no-margin no-padding">
       {crumbs.map((item, idx) => {
         // Site-relative link for UI (external stays absolute)
@@ -98,11 +98,11 @@ const breadcrumbSchema = {
         const isLast = idx === crumbs.length - 1;
         return (
           <li class="flex ai-center">
-            {idx > 0 && <span class="mi-05 pi-05" aria-hidden="true">›</span>}
+            {idx > 0 && <span class="mx-05 px-05" aria-hidden="true">›</span>}
             {isLast ? (
               <strong aria-current="page">{item.label ?? item.name}</strong>
             ) : (
-              <a href={href} class="td-none pi-05 pb-02">{item.label ?? item.name}</a>
+              <a href={href} class="td-none px-05 py-02">{item.label ?? item.name}</a>
             )}
           </li>
         );

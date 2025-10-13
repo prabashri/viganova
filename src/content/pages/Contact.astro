@@ -67,7 +67,7 @@ const addressLines = addr ? [
   />
 
   {/* two-column: form | info */}
-  <div class="mx-w-site mi-auto pi-1 pb-2 flex flex-row wrap jc-center gap">
+  <div class="mx-w-site mi-auto px-1 py-2 flex flex-row wrap jc-center gap">
     {/* LEFT: contact form (or fallback) */}
     
     {isFormAvailable ? (
@@ -93,12 +93,12 @@ const addressLines = addr ? [
     {/* RIGHT: location & direct contacts (from siteDefaults) */}
     <aside class="card p-1 w-full mx-w-420">
       <div class="br bg-base-00 box-shadow p-1 w-full">
-        <h2 class="text-base bold mb-05">Reach {brand}</h2>
+        <h2 class="text-base bold my-05">Reach {brand}</h2>
 
       {addressLines.length ? (
         <address class="not-italic text-s">
           {addressLines.map((line) => (
-            <div class="mb-02">{line}</div>
+            <div class="my-02">{line}</div>
           ))}
           {googleMapUrl && (
             <div class="mt-03">

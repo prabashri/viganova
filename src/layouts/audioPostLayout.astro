@@ -449,11 +449,11 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
 
   <article id="audio-layout" class="audio-layout grid w-full jc-center">
     {/* Header */}
-    <header class="audio-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit pb-2">
-      <div class="mx-w-site mi-auto ta-center mb-2">
+    <header class="audio-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
+      <div class="mx-w-site mi-auto ta-center my-2">
         <h1 class="post-title">{d.title}</h1>
         {d.description && <p class="post-desc">{d.description}</p>}
-        <div class="post-meta text-s mb-1">
+        <div class="post-meta text-s my-1">
           {(d.publishDate || lastModified) && (
             <div class="post-dates text-s">
               {d.publishDate && <time datetime={d.publishDate}>📅 on {new Date(d.publishDate).toLocaleDateString()}</time>}
@@ -466,7 +466,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     </header>
 
     {/* Hero cover + play overlay → audio/iframe */}
-    <section class="audio-player mx-w-content mb-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
+    <section class="audio-player mx-w-content my-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
       <div
         class="player-shell overflow-hidden relative bg-base-10 br w-full h-full"
         id={`${uid}-shell`}
@@ -519,14 +519,14 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
 
       {/* Transcript link via Anchor (if any) */}
       {(d as any).transcriptUrl && (
-        <Anchor href={(d as any).transcriptUrl} variant="plain" className="text-s mb-05 w-fit">
+        <Anchor href={(d as any).transcriptUrl} variant="plain" className="text-s my-05 w-fit">
           View transcript
         </Anchor>
       )}
     </section>
 
     {/* Content */}
-    <div class="audio-content mx-w-content mi-auto mb-05 p-1">
+    <div class="audio-content mx-w-content mi-auto my-05 p-1">
       <slot />
     </div>
 
@@ -534,7 +534,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     <Sidebar variant="left">
       {links.length > 0 && (
         <section class="audio-links">
-          <h3 class="text-xs uppercase mb-05">Listen / Download</h3>
+          <h3 class="text-xs uppercase my-05">Listen / Download</h3>
           <ul class="no-bullets flex flex-row full-flex-col wrap gap-05">
             {links.map((lnk) => (
               <li>
@@ -557,7 +557,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     <Sidebar variant="right">
       {Array.isArray(d.chapters) && d.chapters.length > 0 && (
         <section class="audio-chapters">
-          <h3 class="text-xs uppercase mb-05">Chapters</h3>
+          <h3 class="text-xs uppercase my-05">Chapters</h3>
           <ul class="chapter-list no-bullets">
             {d.chapters.map((c: any, i: number) => (
               <li>
@@ -584,14 +584,14 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     </Sidebar>
 
     {/* Footer: share, FAQ, tags, prev/next */}
-    <footer id="audio-footer" class="audio-footer mx-w-content w-full mi-auto mb-05 p-05">
-      <ShareLink id="audio-footer-share-links" className="mb-05 p-05" title="share" />
+    <footer id="audio-footer" class="audio-footer mx-w-content w-full mi-auto my-05 p-05">
+      <ShareLink id="audio-footer-share-links" className="my-05 p-05" title="share" />
 
       {Array.isArray(d.faq) && d.faq.length > 0 && (
         <FaqList
           items={d.faq}
           id="faq"
-          class="mb-05 p-05"
+          class="my-05 p-05"
           heading="Frequently Asked Questions"
           headingTag="h2"
           openAll={true}

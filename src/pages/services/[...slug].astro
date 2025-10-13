@@ -1,27 +1,23 @@
 ---
 // src/pages/service/[...slug].astro
 import { getEntry, getCollection, render, type CollectionEntry } from 'astro:content';
-import PostLayout from '@/layouts/PostLayout.astro';
+import ServiceLayout from '@/layouts/ServiceLayout.astro'; // ⬅️ changed
 import { siteDefaults } from '@/config/siteDefaults';
 import modifiedDatesJson from '@/data/modified-dates.json';
 
 const { slug } = Astro.params;
-const base = siteDefaults.collections['service']?.base ?? 'services'; // e.g. "services"
+const base = siteDefaults.collections['service']?.base ?? 'services';
 const collectionBase = base ? `${base}/` : '';
 const modifiedDates = modifiedDatesJson as Record<string, string>;
 
-// ---------- guards ----------
 if (!slug || typeof slug !== 'string' || slug.startsWith('0-example-')) {
   throw Astro.redirect('/404/');
 }
 
-// ---------- helpers ----------
-function getSlugFromEntry(p: any) {
-  return p?.data?.slug ?? p?.id ?? '';
-}
+function getSlugFromEntry(p: any) { return p?.data?.slug ?? p?.id ?? ''; }
 function getLastModifiedForEntry(p: any): string | undefined {
   const s = getSlugFromEntry(p);
-  const key = `${base}/${s}`; // matches keys in modified-dates.json
+  const key = `${base}/${s}`;
   return (
     modifiedDates[key] ||
     p?.data?.lastModified ||
@@ -31,7 +27,6 @@ function getLastModifiedForEntry(p: any): string | undefined {
   );
 }
 
-// ---------- entry ----------
 let post: CollectionEntry<'service'>;
 try {
   const entry = await getEntry('service', slug);
@@ -40,49 +35,39 @@ try {
 } catch {
   throw Astro.redirect('/404/');
 }
-if (post.data?.draft === true) {
-  throw Astro.redirect('/404/');
-}
+if (post.data?.draft === true) throw Astro.redirect('/404/');
 
-// ---------- render & toc ----------
 const { Content, headings } = await render(post);
-const toc = headings
-  .filter((h) => h.depth === 2)
-  .map((h) => ({ id: h.slug, text: h.text, level: h.depth }));
+const toc = headings.filter(h => h.depth === 2).map(h => ({ id: h.slug, text: h.text, level: h.depth }));
 
-// ---------- modified date for this page ----------
 const lastModifiedRaw = getLastModifiedForEntry(post);
 
-// ---------- authors ----------
+// authors
 const authorsRaw = post.data.authors ?? [];
 const authors = await Promise.all(
   authorsRaw.map(async ({ id }: { id: string }) => {
     try {
       const entry = await getEntry('team', id);
-      return entry
-        ? {
-            id,
-            slug: entry.data.slug,
-            url: `/team/${entry.data.slug}/`,
-            name: entry.data.name ?? id,
-            data: entry.data
-          }
-        : null;
-    } catch {
-      return null;
-    }
+      return entry ? {
+        id,
+        slug: entry.data.slug,
+        url: `/team/${entry.data.slug}/`,
+        name: entry.data.name ?? id,
+        data: entry.data
+      } : null;
+    } catch { return null; }
   })
-).then((list) => list.filter(Boolean));
+).then(list => list.filter(Boolean));
 
-// ---------- canonical ----------
+// canonical
 const canonicalUrl = post.data?.canonicalUrl?.startsWith('http')
   ? post.data.canonicalUrl!
   : `${siteDefaults.siteUrl}${post.data?.canonicalUrl || `/${collectionBase}${slug}/`}`;
 
-// ---------- all posts (for prev/next/related), sorted by last-modified desc ----------
+// list for prev/next
 const allPosts = await getCollection('service');
 const sortedPosts = allPosts
-  .filter((p) => !p.data.draft)
+  .filter(p => !p.data.draft)
   .sort((a, b) => {
     const ad = new Date(getLastModifiedForEntry(a) ?? 0).valueOf();
     const bd = new Date(getLastModifiedForEntry(b) ?? 0).valueOf();
@@ -91,22 +76,29 @@ const sortedPosts = allPosts
 
 ---
 
-<PostLayout  
+<ServiceLayout
   title={post.data.title}
   description={post.data.description}
   slug={slug}
-  type={post.data.type ?? 'service'}
+  type="service"
   canonicalUrl={canonicalUrl}
   index={post.data.index ?? true}
   publishedDate={post.data.publishedDate}
   lastModified={lastModifiedRaw}
   authors={authors.filter(Boolean).map(a => ({ id: a!.id }))}
+
   tags={post.data.tags}
   categories={post.data.categories}
   keywords={post.data.keywords}
+
   featured={post.data.featured ?? false}
   draft={post.data.draft ?? false}
+
   heroImage={post.data.heroImage}
+  heroImageAlt={post.data.heroImageAlt}
+  heroImageTitle={post.data.heroImageTitle}
+  heroImageCaption={post.data.heroImageCaption}
+
   toc={toc}
   collection="service"
   collectionBase={collectionBase}
@@ -116,11 +108,8 @@ const sortedPosts = allPosts
     answer: f.answer,
     speakable: typeof f.speakable === 'boolean' ? f.speakable : false
   })) ?? []}
-  heroImageAlt={post.data.heroImageAlt}
-  heroImageTitle={post.data.heroImageTitle}
-  heroImageCaption={post.data.heroImageCaption}
 
   serviceOffers={post.data.offers ?? []}
 >
   <Content />
-</PostLayout>
+</ServiceLayout>

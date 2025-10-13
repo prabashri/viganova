@@ -16,7 +16,7 @@ const {
 } = Astro.props;
 ---
 
-<div class="flex jc-center mb-2">
+<div class="flex jc-center my-2">
   <button
     id="loadMoreBtn"
     class="btn border-secondary br ta-center hover-bg-primary-light"
@@ -66,10 +66,10 @@ const {
         const anchor = document.createElement('a');
         const base = p.collectionBase ? p.collectionBase : '';
         anchor.href = `/${base}${p.slug}/`;
-        anchor.className = 'block td-none border-primary br bg-base-00 hover-box-shadow transition p-05 mb-1 mx-w-320 w-full';
+        anchor.className = 'block td-none border-primary br bg-base-00 hover-box-shadow transition p-05 my-1 mx-w-320 w-full';
 
         const titleDiv = document.createElement('div');
-        titleDiv.className = 'font-bold text-lg mb-1';
+        titleDiv.className = 'font-bold text-lg my-1';
         titleDiv.textContent = p.title;
 
         const descDiv = document.createElement('div');

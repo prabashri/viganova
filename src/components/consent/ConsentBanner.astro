@@ -89,8 +89,8 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
           <button id="consent-close" class="consent-close bg-transparent border w-2-0 h-2-0 br pointer" aria-label="Close dialog" title="Close">x</button>
         </div>
 
-        <div class="consent-body overflow-auto pi-05 pb-1 overscroll-contain">
-          <p class="consent-intro m-0 mb-05 text-sm">
+        <div class="consent-body overflow-auto px-05 py-1 overscroll-contain">
+          <p class="consent-intro m-0 my-05 text-sm">
             We use cookies to keep the site secure and functional, improve services, and—if you allow—measure usage and show relevant ads.
             See our <Anchor href="/privacy-policy/">Privacy Policy</Anchor>, <Anchor href="/cookie-policy/">Cookie Policy</Anchor>,
             and Google's <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="nofollow noopener">Privacy &amp; Terms</a>.
@@ -100,7 +100,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
             <fieldset class="consent-group m-0 p-0 border-0">
               <legend class="consent-group-title">Your choices</legend>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 pi-05 pb-0">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0">
                 <label for="cb-essential-ui" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Essential</span>
                   <span class="consent-row-note text-sm col-base-80">Security, network, and core features.</span>
@@ -108,7 +108,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
                 <input id="cb-essential-ui" type="checkbox" class="w-1-5 h-1-5 m-05" checked disabled />
               </div>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 pi-05 pb-0 b-top-dashed">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 b-top-dashed">
                 <label for="cb-ads-ui" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Advertising (basic)</span>
                   <span class="consent-row-note text-sm col-base-80">Shows ads to keep access free.</span>
@@ -117,7 +117,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
                 <input id="cb-ads" type="checkbox" class="display-none none is-hidden hide" checked />
               </div>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 pi-05 pb-0 b-top-dashed">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 b-top-dashed">
                 <label for="cb-personalized" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Advertising (personalized)</span>
                   <span class="consent-row-note text-sm col-base-80">Use activity to tailor ads.</span>
@@ -125,7 +125,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
                 <input id="cb-personalized" type="checkbox" class="w-1-5 h-1-5 m-05" />
               </div>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 pi-05 pb-0 b-top-dashed">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 b-top-dashed">
                 <label for="cb-analytics" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Analytics</span>
                   <span class="consent-row-note text-sm col-base-80">Anonymous stats to improve quality.</span>
@@ -135,7 +135,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
             </fieldset>
 
             {cfg.eu && (
-              <p class="consent-footnote mi-05 col-base-80 text-sm italic">
+              <p class="consent-footnote mx-05 col-base-80 text-sm italic">
                 You can change your choices any time. After <span id="consent-timer-seconds">{timer}</span> seconds, default settings may apply.
               </p>
             )}

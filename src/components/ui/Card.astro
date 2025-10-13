@@ -41,7 +41,7 @@ const imageSizeFinal = imageSize || (orientation === 'horizontal' ? 160 : 320); 
 const contentWrapperClass =
   orientation === 'horizontal'
     ? 'flex flex-col flex-1 p-05'
-    : 'flex flex-col pi-05 pb-0-1';
+    : 'flex flex-col px-05 pt-0 pb-1';
 
 // Wrapper element
 const WrapperTag = link ? 'a' : 'div';
@@ -87,16 +87,16 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
     {afterImage && <div class="after-image mt-05">{afterImage}</div>}
 
     {otherEntries.length > 0 && (
-      <ul class="tag-list flex wrap gap-05 mb-05 no-bullets">
+      <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
         {otherEntries.map((entry: { url: string; label: string }) => (
-          <li class="tag-link bg-primary-lighter col-base-100 br text-xs pi-05 pb-02" aria-label={`View tag: ${entry.label}`}>
+          <li class="tag-link bg-primary-lighter col-base-100 br text-xs px-05 py-02" aria-label={`View tag: ${entry.label}`}>
             <span class="tag">{entry.label}</span>
           </li>
         ))}
       </ul>
     )}
 
-    <h3 id={labelledById} class="text-base bold mb-02">{title}</h3>
+    <h3 id={labelledById} class="text-base bold my-02">{title}</h3>
     {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
 
     {date && (
@@ -116,7 +116,7 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
 
     {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
 
-    {description && <p class="text-s mb-05-0 clamp-3">{description}</p>}
+    {description && <p class="text-s my-05-0 clamp-3">{description}</p>}
     {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
 
     {author && <span class="inline-block mt-05 text-xs">By {author}</span>}

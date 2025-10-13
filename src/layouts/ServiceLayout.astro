@@ -1,8 +1,8 @@
 ---
-// src/layouts/PostLayout.astro
+// src/layouts/ServiceLayout.astro
 /**
- * Layout for blog posts and other "article" content types
- * css: src/styles/pages/post-layout.css
+ * Layout for "Service" pages (schema: Service)
+ * css: src/styles/pages/post-layout.css (re-use for now)
  */
 
 import BaseLayout from './BaseLayout.astro';
@@ -16,25 +16,28 @@ import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import RelatedPostsList from '@/components/ui/RelatedPostsList.astro';
 
 import ShareLink from '@/components/ShareLink.astro';
-import Anchor from '@/components/ui/Anchor.astro';
-import Button from '@/components/ui/Button.astro';
 import FaqList from '@/components/ui/FaqList.astro';
 import TagList from '@/components/ui/TagList.astro';
 import PrevNextNav from '@/components/ui/PrevNextNav.astro';
 import Sidebar from '@/components/ui/Sidebar.astro';
+import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
 
 import { getImage, constructUrl, getImageMeta } from '@/utils/getImage';
 import { parseImageDims } from '@/utils/imageHelpers';
 import { machineAndHuman } from '@/utils/date-format';
-import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
 
+interface Offer {
+  name?: string;
+  priceKey: string;
+  buyNowLink?: string;
+}
 interface Props {
   title?: string;
   description?: string;
   slug?: string;
   canonicalUrl?: string;
   index?: boolean;
-  type?: string; // e.g. "blog" or "service"
+  type?: string; // kept for compatibility but forced to 'service' below
   publishedDate?: string;
   lastModified?: string | null;
   authors?: { id: string }[];
@@ -45,19 +48,15 @@ interface Props {
   draft?: boolean;
   faq?: { question: string; answer: string; speakable: boolean }[];
   collection?: string;
-  collectionBase?: string; // e.g. "services/"
+  collectionBase?: string;
   heroImage?: string;
   heroImageAlt?: string;
   heroImageTitle?: string;
   heroImageCaption?: string;
   toc?: { id: string; text: string; level: number }[];
-  allPosts?: any[]; // entries from getCollection()
+  allPosts?: any[];
   relatedPosts?: { title: string; url: string }[];
-  serviceOffers?: Array<{
-    name?: string;    
-    priceKey: string; // pricing key from src/config/pricing.ts
-    buyNowLink?: string; // optional buy now / CTA link
-  }>;
+  serviceOffers?: Offer[];                    // ⬅️ important
 }
 
 const {
@@ -67,7 +66,7 @@ const {
   canonicalUrl,
   index = true,
   featured = false,
-  type = 'article',
+  type = 'service',                           // ⬅️ force service
   publishedDate,
   lastModified,
   authors = [],
@@ -84,89 +83,63 @@ const {
   toc = [],
   allPosts = [],
   relatedPosts = [],
-  serviceOffers
-
+  serviceOffers = [],                         // ⬅️ default []
 } = Astro.props as Props;
 
-// Canonical: falls back to siteUrl + collectionBase + slug
+// Canonical
 const fullCanonical =
-  canonicalUrl ||
-  `${siteDefaults.siteUrl}${collectionBase ?? ''}${slug ?? ''}/`;
+  canonicalUrl || `${siteDefaults.siteUrl}${collectionBase ?? ''}${slug ?? ''}/`;
 
-// ---- prev/next resolution (use data.slug OR entry id) ----
-const currentIndex = allPosts.findIndex(
-  (p) => (p.data?.slug || p.id) === slug
-);
+// Prev/next
+const currentIndex = allPosts.findIndex((p) => (p.data?.slug || p.id) === slug);
 const prevItem = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
 const nextItem =
   currentIndex >= 0 && currentIndex < allPosts.length - 1
     ? allPosts[currentIndex + 1]
     : null;
 
-// ---- authors resolved from team collection ----
+// Authors (resolve)
 const resolvedAuthors = await Promise.all(
   authors.map(async ({ id }) => {
     try {
       const entry = await getEntry('team', id);
-      return entry
-        ? {
-            id,
-            slug: entry.data.slug,
-            url: `/team/${entry.data.slug}/`,
-            name: entry.data.name ?? id,
-            data: entry.data
-          }
-        : null;
-    } catch {
-      return null;
-    }
+      return entry ? {
+        id,
+        slug: entry.data.slug,
+        url: `/team/${entry.data.slug}/`,
+        name: entry.data.name ?? id,
+        data: entry.data
+      } : null;
+    } catch { return null; }
   })
-).then((xs) => xs.filter(Boolean));
+).then(xs => xs.filter(Boolean));
 
-// ---- hero image info ----
+// Hero image
 const imageSrc = heroImage ?? siteImages.image;
 const heroImageMeta = getImageMeta(imageSrc);
 const heroImageUrlRaw =
   heroImageMeta && typeof heroImageMeta === 'object'
     ? constructUrl(heroImageMeta, 'full')
     : '';
-const heroImageUrl = Array.isArray(heroImageUrlRaw)
-  ? heroImageUrlRaw[0]
-  : heroImageUrlRaw;
-const imageInfo =
-  typeof heroImageUrl === 'string' ? parseImageDims(heroImageUrl) : undefined;
+const heroImageUrl = Array.isArray(heroImageUrlRaw) ? heroImageUrlRaw[0] : heroImageUrlRaw;
+const imageInfo = typeof heroImageUrl === 'string' ? parseImageDims(heroImageUrl) : undefined;
 
-// ---- dates for head ----
-const { iso: publishedAtISO, human: publishedAtHuman } = machineAndHuman(
-  publishedDate,
-  'now'
-);
-const { iso: lastModifiedISO, human: lastModifiedHuman } = machineAndHuman(
-  lastModified ?? publishedDate,
-  'now'
-);
+// Dates for head
+const { iso: publishedAtISO, human: publishedAtHuman } = machineAndHuman(publishedDate, 'now');
+const { iso: lastModifiedISO, human: lastModifiedHuman } = machineAndHuman(lastModified ?? publishedDate, 'now');
 
-const sameDay =
-  publishedAtISO && lastModifiedISO
-    ? publishedAtISO.slice(0, 10) === lastModifiedISO.slice(0, 10)
-    : false;
-
-
-/** optional bits for publisher/logo */
-
-  
+// Head props — NOTE: we include serviceOffers here
 const headProps: HeadProps = {
   title: `${title}`,
   description,
   image: heroImageUrl,
   imageWidth: imageInfo?.width,
   imageHeight: imageInfo?.height,
-  imageAlt:
-    heroImageAlt || (title ? `hero image of ${title}` : '') || siteImages.imageAlt || 'Site featured image',
-  type: type === 'service' ? 'service' : 'article',
+  imageAlt: heroImageAlt || (title ? `hero image of ${title}` : '') || siteImages.imageAlt || 'Site featured image',
+  type: 'service',                             // ⬅️ force service
   canonicalUrl: fullCanonical,
   index,
-  keywords: tags?.length ? tags : keywords, // prefer tags if present
+  keywords: tags?.length ? tags : keywords,
   publishedAt: publishedAtHuman,
   publishedAtISO,
   updatedAt: lastModifiedHuman,
@@ -174,80 +147,37 @@ const headProps: HeadProps = {
   authors: resolvedAuthors as any,
   showBreadcrumb: true,
   breadcrumbs: [],
+  serviceOffers,                               // ⬅️ PASSED TO HEAD
 };
 ---
 
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top">
-    <CssFilesToLoad
-        files={[
-          { name: "post-layout", inline: true}
-        ]}
-      /> 
+    <CssFilesToLoad files={[{ name: "post-layout", inline: true }]} />
   </Fragment>
+
   <Fragment slot="headContent-bottom">
-    {/* rel=prev/next help crawlers understand pagination/series */}
-   <meta name="heroimage" content={heroImageUrl || ''} />
+    <meta name="heroimage" content={heroImageUrl || ''} />
     {prevItem && (
-      <link
-        rel="prev"
-        href={`/${collectionBase}${prevItem.data?.slug || prevItem.id}/`}
-      />
+      <link rel="prev" href={`/${collectionBase}${prevItem.data?.slug || prevItem.id}/`} />
     )}
     {nextItem && (
-      <link
-        rel="next"
-        href={`/${collectionBase}${nextItem.data?.slug || nextItem.id}/`}
-      />
+      <link rel="next" href={`/${collectionBase}${nextItem.data?.slug || nextItem.id}/`} />
     )}
   </Fragment>
 
-  <article id="post-layout" class="post-layout w-full gap jc-center" itemscope
-  itemtype="https://schema.org/Article">
+  <article id="post-layout" class="post-layout w-full gap jc-center"
+    itemscope itemtype="https://schema.org/Service">   {/* ⬅️ Service schema */}
     {/* Header */}
     <header class="post-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
-      { /* Breadcrumb */ }
       <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={title} breadcrumbs={headProps.breadcrumbs} />
       <div id="post-header-content" class="mx-w-featured mi-auto ta-center my-2 p-1">
         <h1 class="post-title">{title}</h1>
         {description && <p class="post-desc">{description}</p>}
-
-        <div class="post-meta text-s my-1">
-          {resolvedAuthors.length > 0 && (
-            <div class="post-authors">
-              ✍️ By{' '}
-              {resolvedAuthors.map((a, i) => {
-                const isLast = i === resolvedAuthors.length - 1;
-                const isSecondLast = i === resolvedAuthors.length - 2;
-                return (
-                  <>
-                    <a href={a!.url} class="author-link td-underline">{a!.name}</a>
-                    {!isLast &&
-                      (resolvedAuthors.length === 2
-                        ? ' and '
-                        : isSecondLast
-                        ? ', and '
-                        : ', ')}
-                  </>
-                );
-              })}
-            </div>
-          )}
-
-          {(publishedDate || lastModified) && (
-            <div class="post-dates text-s">
-              {publishedDate && (
-                <time datetime={publishedAtISO}>📅 on {publishedAtHuman}</time>
-              )}
-              {lastModified && (
-                <span class="last-updated-on"> • Updated: {lastModifiedHuman}</span>
-              )}
-            </div>
-          )}
-        </div>
       </div>
     </header>
-    {/* Hero Image */}
+
+    {/* Optional hero */}
     {heroImage && heroImageMeta && typeof heroImageMeta === 'object' ? (
       <ResponsiveImage
         src={heroImage}
@@ -277,25 +207,41 @@ const headProps: HeadProps = {
       />
     ) : null}
 
-    {/* Left Sidebar with ToC */}
+    {/* Left Sidebar (ToC) */}
     <Sidebar variant="left">
-      <TableOfContents
-        toc={toc}
-        heading="On This Page"
-        depth="h2,h3"
-        className="toc bg br"
-      />
+      <TableOfContents toc={toc} heading="On This Page" depth="h2,h3" className="toc bg br" />
     </Sidebar>
 
-    {/* Content */}
-    <div class="post-content mx-w-content mi-auto my-05 p-1 bg border-primary-light br" itemprop="articleBody">
+    {/* Main content */}
+    <div class="post-content mx-w-content mi-auto my-05 p-1 bg border-primary-light br" itemprop="description">
       <slot />
     </div>
 
-    {/* Right Sidebar (currently empty, but keep the region) */}
+    {/* Simple Offers block (optional visual) */}
+    {Array.isArray(serviceOffers) && serviceOffers.length > 0 && (
+      <section class="service-offers mx-w-content mi-auto my-1 p-1 br border-primary-light">
+        <h2 class="mb-05">Service Packages</h2>
+        <ul>
+          {serviceOffers.map((o) => (
+            <li class="my-03">
+              <strong>{o.name ?? o.priceKey}</strong>
+              {o.buyNowLink && (
+                <>
+                  {' '}— <a class="td-underline" href={o.buyNowLink}>Buy Now</a>
+                </>
+              )}
+              <div class="text-s col-base-70">pricing key: {o.priceKey}</div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    {/* Right Sidebar */}
     <Sidebar variant="right">
       <RelatedPostsList items={relatedPosts} />
     </Sidebar>
+
     <footer id="post-footer" class="post-footer mx-w-content w-full mi-auto my-05 p-05">
       <ShareLink id="blog-footer-share-links" className="" title="share" />
 
@@ -314,25 +260,20 @@ const headProps: HeadProps = {
       )}
 
       {Array.isArray(tags) && tags.length > 0 && (
-        <TagList
-          items={tags}
-          heading="Keywords"
-          baseHref="/tags/"
-          dedupe={true}
-          sort="asc"
-        />
+        <TagList items={tags} heading="Keywords" baseHref="/tags/" dedupe={true} sort="asc" />
       )}
-    </footer>    
+    </footer>
   </article>
+
   {(prevItem || nextItem) && (
-      <PrevNextNav
-        prevItem={prevItem}
-        nextItem={nextItem}
-        collectionBase={collectionBase}
-        prevVariant="secondary"
-        nextVariant="secondary"      
-      />
-    )}
+    <PrevNextNav
+      prevItem={prevItem}
+      nextItem={nextItem}
+      collectionBase={collectionBase}
+      prevVariant="secondary"
+      nextVariant="secondary"
+    />
+  )}
 
   <Fragment slot="extraScripts" />
 </BaseLayout>
