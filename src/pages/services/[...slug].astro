@@ -4,6 +4,8 @@ import { getEntry, getCollection, render, type CollectionEntry } from 'astro:con
 import ServiceLayout from '@/layouts/ServiceLayout.astro'; // ⬅️ changed
 import { siteDefaults } from '@/config/siteDefaults';
 import modifiedDatesJson from '@/data/modified-dates.json';
+import { PRICES_LAST_UPDATED, PRICES } from "@/config/pricing";
+import type { PriceKey } from "@/config/pricing";
 
 const { slug } = Astro.params;
 const base = siteDefaults.collections['service']?.base ?? 'services';
@@ -74,6 +76,15 @@ const sortedPosts = allPosts
     return bd - ad;
   });
 
+function svc(key: PriceKey, name?: string) {
+  const p = PRICES[key];
+  return {
+    name: name ?? p.name,
+    amount: p.amount,
+    ...( 'currency' in p ? { currency: p.currency } : {} )
+  };
+}
+
 ---
 
 <ServiceLayout
@@ -109,7 +120,12 @@ const sortedPosts = allPosts
     speakable: typeof f.speakable === 'boolean' ? f.speakable : false
   })) ?? []}
 
-  serviceOffers={post.data.offers ?? []}
+  serviceOffers={
+    (post.data.offers ?? []).map((o: any) => ({
+      priceKey: o.priceKey as PriceKey,
+      name: o.name,
+    }))
+  }
 >
   <Content />
 </ServiceLayout>

@@ -2,7 +2,6 @@
 // src/layouts/ServiceLayout.astro
 /**
  * Layout for "Service" pages (schema: Service)
- * css: src/styles/pages/post-layout.css (re-use for now)
  */
 
 import BaseLayout from './BaseLayout.astro';
@@ -14,7 +13,6 @@ import TableOfContents from '@/components/TableOfContents.astro';
 import ResponsiveImage from '@/components/ResponsiveImage.astro';
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import RelatedPostsList from '@/components/ui/RelatedPostsList.astro';
-
 import ShareLink from '@/components/ShareLink.astro';
 import FaqList from '@/components/ui/FaqList.astro';
 import TagList from '@/components/ui/TagList.astro';
@@ -22,14 +20,21 @@ import PrevNextNav from '@/components/ui/PrevNextNav.astro';
 import Sidebar from '@/components/ui/Sidebar.astro';
 import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
 
-import { getImage, constructUrl, getImageMeta } from '@/utils/getImage';
+import { getImageMeta, constructUrl } from '@/utils/getImage';
 import { parseImageDims } from '@/utils/imageHelpers';
 import { machineAndHuman } from '@/utils/date-format';
 
-interface Offer {
-  name?: string;
-  priceKey: string;
-  buyNowLink?: string;
+/* ⬇️ pricing utilities */
+import {
+  PRICES_LAST_UPDATED,
+  priceInfo,
+  inr,
+  type PriceKey,
+} from '@/config/pricing';
+
+interface OfferInput {
+  name?: string;        // optional frontmatter display override
+  priceKey: PriceKey;   // resolve everything by this key
 }
 interface Props {
   title?: string;
@@ -37,7 +42,7 @@ interface Props {
   slug?: string;
   canonicalUrl?: string;
   index?: boolean;
-  type?: string; // kept for compatibility but forced to 'service' below
+  type?: string;
   publishedDate?: string;
   lastModified?: string | null;
   authors?: { id: string }[];
@@ -56,8 +61,10 @@ interface Props {
   toc?: { id: string; text: string; level: number }[];
   allPosts?: any[];
   relatedPosts?: { title: string; url: string }[];
-  serviceOffers?: Offer[];                    // ⬅️ important
+  serviceOffers?: OfferInput[];   // ⬅️ only priceKey + (optional) name come in
 }
+
+const props = Astro.props as Props;
 
 const {
   title,
@@ -66,7 +73,7 @@ const {
   canonicalUrl,
   index = true,
   featured = false,
-  type = 'service',                           // ⬅️ force service
+  type = 'service',
   publishedDate,
   lastModified,
   authors = [],
@@ -83,8 +90,8 @@ const {
   toc = [],
   allPosts = [],
   relatedPosts = [],
-  serviceOffers = [],                         // ⬅️ default []
-} = Astro.props as Props;
+  serviceOffers = [],
+} = props;
 
 // Canonical
 const fullCanonical =
@@ -115,8 +122,7 @@ const resolvedAuthors = await Promise.all(
 ).then(xs => xs.filter(Boolean));
 
 // Hero image
-const imageSrc = heroImage ?? siteImages.image;
-const heroImageMeta = getImageMeta(imageSrc);
+const heroImageMeta = heroImage ? getImageMeta(heroImage) : undefined;
 const heroImageUrlRaw =
   heroImageMeta && typeof heroImageMeta === 'object'
     ? constructUrl(heroImageMeta, 'full')
@@ -128,7 +134,34 @@ const imageInfo = typeof heroImageUrl === 'string' ? parseImageDims(heroImageUrl
 const { iso: publishedAtISO, human: publishedAtHuman } = machineAndHuman(publishedDate, 'now');
 const { iso: lastModifiedISO, human: lastModifiedHuman } = machineAndHuman(lastModified ?? publishedDate, 'now');
 
-// Head props — NOTE: we include serviceOffers here
+/* ⬇️ Resolve frontmatter offers → display-ready offers */
+type ResolvedOffer = {
+  key: PriceKey;
+  name: string;
+  amount: number;
+  currency: 'INR';
+  buyNowLink?: string;
+};
+const resolvedOffers: ResolvedOffer[] = Array.isArray(serviceOffers)
+  ? serviceOffers.flatMap((o) => {
+      try {
+        const p = priceInfo(o.priceKey);
+        return [{
+          key: o.priceKey,
+          name: o.name ?? p.name,
+          amount: p.amount,
+          currency: p.currency,
+          buyNowLink: p.buyNowLink,
+        }];
+      } catch (e) {
+        // Unknown priceKey—skip silently in prod, warn in dev
+        if (import.meta.env.DEV) console.warn(`[ServiceLayout] Unknown priceKey: ${o?.priceKey}`);
+        return [];
+      }
+    })
+  : [];
+
+// Head props (pass through the raw frontmatter offers for head/schema if you like)
 const headProps: HeadProps = {
   title: `${title}`,
   description,
@@ -136,7 +169,7 @@ const headProps: HeadProps = {
   imageWidth: imageInfo?.width,
   imageHeight: imageInfo?.height,
   imageAlt: heroImageAlt || (title ? `hero image of ${title}` : '') || siteImages.imageAlt || 'Site featured image',
-  type: 'service',                             // ⬅️ force service
+  type: 'service',
   canonicalUrl: fullCanonical,
   index,
   keywords: tags?.length ? tags : keywords,
@@ -147,7 +180,8 @@ const headProps: HeadProps = {
   authors: resolvedAuthors as any,
   showBreadcrumb: true,
   breadcrumbs: [],
-  serviceOffers,                               // ⬅️ PASSED TO HEAD
+  // Optional: if your BaseLayout/Schema consumes offers, you can pass resolvedOffers too.
+  serviceOffers: serviceOffers,
 };
 ---
 
@@ -167,13 +201,13 @@ const headProps: HeadProps = {
   </Fragment>
 
   <article id="post-layout" class="post-layout w-full gap jc-center"
-    itemscope itemtype="https://schema.org/Service">   {/* ⬅️ Service schema */}
+    itemscope itemtype="https://schema.org/Service">
     {/* Header */}
     <header class="post-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
       <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={title} breadcrumbs={headProps.breadcrumbs} />
       <div id="post-header-content" class="mx-w-featured mi-auto ta-center my-2 p-1">
-        <h1 class="post-title">{title}</h1>
-        {description && <p class="post-desc">{description}</p>}
+        <h1 class="post-title" itemprop="name">{title}</h1>
+        {description && <p class="post-desc" itemprop="description">{description}</p>}
       </div>
     </header>
 
@@ -213,27 +247,39 @@ const headProps: HeadProps = {
     </Sidebar>
 
     {/* Main content */}
-    <div class="post-content mx-w-content mi-auto my-05 p-1 bg border-primary-light br" itemprop="description">
+    <div class="post-content mx-w-content mx-auto my-05 p-1 bg border-primary-light br" itemprop="description">
       <slot />
     </div>
 
-    {/* Simple Offers block (optional visual) */}
-    {Array.isArray(serviceOffers) && serviceOffers.length > 0 && (
-      <section class="service-offers mx-w-content mi-auto my-1 p-1 br border-primary-light">
-        <h2 class="mb-05">Service Packages</h2>
-        <ul>
-          {serviceOffers.map((o) => (
-            <li class="my-03">
-              <strong>{o.name ?? o.priceKey}</strong>
-              {o.buyNowLink && (
-                <>
-                  {' '}— <a class="td-underline" href={o.buyNowLink}>Buy Now</a>
-                </>
-              )}
-              <div class="text-s col-base-70">pricing key: {o.priceKey}</div>
+    {/* Offers (resolved from priceKey) */}
+    {resolvedOffers.length > 0 && (
+      <section class="service-offers mx-w-content mx-auto my-05 p-1 br border-primary-light"
+               itemprop="hasOfferCatalog"
+               itemscope
+               itemtype="https://schema.org/OfferCatalog">
+        <meta itemprop="name" content="Service Packages" />
+        
+        <h2 class="text-xl m-0">Service Packages</h2>        
+
+        <ul class="my-05">
+          {resolvedOffers.map((o) => (
+            <li class="my-03"
+                itemprop="itemListElement"
+                itemscope
+                itemtype="https://schema.org/Offer">
+              <meta itemprop="priceCurrency" content={o.currency} />
+              <span class="block">
+                <strong itemprop="name">{o.name}</strong>
+              </span>
+              <span class="block text-s">
+                <meta itemprop="price" content={String(o.amount)} />
+                <span itemprop="price">{inr(o.amount)}</span>
+                <span class="col-base-60"> · key: {o.key}</span>
+              </span>
             </li>
           ))}
         </ul>
+        <small class="col-base-70">Prices updated: {PRICES_LAST_UPDATED}</small>
       </section>
     )}
 

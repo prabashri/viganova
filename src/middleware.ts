@@ -10,7 +10,7 @@ declare module "astro" {
 export const onRequest = defineMiddleware(async (context, next) => {
   // stable, header-safe nonce
   const nonce = crypto.randomUUID().replace(/-/g, "");
-  context.locals.nonce = nonce;
+  (context.locals as any).nonce = nonce;
 
   const response = await next();
   if (!response) return new Response(null, { status: 204 });

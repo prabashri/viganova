@@ -39,6 +39,11 @@ export const PRICES = {
     name: "Marksheet — SDM–MEA Apostille",
   },
 
+  transferCertificateSdmBundle: {
+    amount: 2000,
+    name: "Transfer Certificate — SDM–MEA Apostille",
+  },
+
   /* MEA-only handling */
   meaApostille: {
     amount: 450,
@@ -67,7 +72,7 @@ export const PRICES = {
   },
 
   notary: {
-    amount: 160,
+    amount: 450,
     name: "Notary",
   },
 

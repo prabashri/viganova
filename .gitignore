@@ -26,3 +26,19 @@ pnpm-debug.log*
 # wrangler files
 .wrangler
 .dev.vars
+
+
+# generated images & metadata
+/public/images/**
+/src/data/image-format-details.json
+# Generated assets (your list)
+public/sw.js
+public/scripts/*.min.js
+public/styles/*.css
+public/search-index*.json
+src/data/generated-*.json
+src/data/*-details.json
+src/data/*-dates.json
+src/styles/*-generated.css
+src/components/*Inline*.css
+assets-manifest.json

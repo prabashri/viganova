@@ -1,5 +1,5 @@
 {
-  "name": "astroweb-template-ssr",
+  "name": "easyapostille",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -15,7 +15,7 @@
     "@astrojs/cloudflare": "^12.6.9",
     "@astrojs/mdx": "^4.3.6",
     "@astrojs/rss": "^4.0.12",
-    "astro": "^5.13.10",
+    "astro": "^5.14.4",
     "fuse.js": "^7.1.0",
     "typescript": "^5.9.2"
   },

@@ -18,9 +18,6 @@ const offerItemSchema = z.object({
   priceKey: z.string(),
   /** optional display name override; else pricing.ts name is used */
   name: z.string().optional(),
-  /** optional buy-now or CTA URL for *this* offer (overrides pricing.ts buyNowLink) */
-  buyNowLink: z.string().url().optional(),
-
 });
 
 

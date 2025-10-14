@@ -1,19 +1,4 @@
 ---
-/**
- * ====================  FRONTEND LOADING GUIDELINES (CSP-SAFE)  ====================
- * 1) DO NOT use inline event handlers (eg. onload/onclick). Our CSP has: script-src-attr 'none'.
- * 2) When you need to “preload -> stylesheet”, DO NOT use: onload="this.rel='stylesheet'".
- *    Instead, mark the link with data-rel-after-load="stylesheet":
- *      <link rel="preload" as="style" href="/css/app.css" data-rel-after-load="stylesheet">
- *    The nonced boot script below flips rel to "stylesheet" on load (or immediately if cached).
- * 3) All inline <script> / <style> blocks MUST include the request nonce:
- *      const nonce = Astro.locals?.nonce || '';
- *      <script nonce={nonce}>…</script>
- * 4) Prefer external scripts with defer/type="module". For lazy activation, keep src in data-src
- *    and the loader will move it to src on first user interaction or after a timeout.
- * 5) In DEV we unregister any Service Workers to avoid stale caches.
- * ===============================================================================
- */
 import assetsManifest from '@/data/assets-manifest.json';
 const mainJsFile = assetsManifest.js?.main?.file || '';
 const isDev = import.meta.env.DEV;
