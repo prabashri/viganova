@@ -11,6 +11,7 @@ const devCssOrder = [
   '/src/styles/inline/hero.css',
   '/src/styles/main/components.css',
   '/src/styles/main/colors.css',
+  '/src/styles/main/toc.css',
   '/src/styles/main/form.css',
   '/src/styles/main/utilities.css',
   '/src/styles/main/non-critical.css',
@@ -27,7 +28,7 @@ const devCssOrder = [
   '/src/styles/main/callout.css',
 ];
 
-
+const nonce = (Astro.locals as any).nonce;
 
 const isDev = import.meta.env.DEV;
 let cssFiles: string[] = [];
@@ -48,7 +49,7 @@ preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc1
 )}
 
 {/* -- ✅ PROD: Inline critical CSS -- */}
-{ !isDev && inlineCss && <style id="inline-css" set:html={inlineCss} />}
+{ !isDev && inlineCss && <style nonce={nonce} id="inline-css" set:html={inlineCss} />}
 
 {/* -- ✅ PROD: Preload + load main CSS -- */}
 { !isDev && preloadCssFiles[0] && (

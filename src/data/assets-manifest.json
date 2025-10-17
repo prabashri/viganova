@@ -1,9 +1,9 @@
 {
   "configModified": {
-    "siteDefaults": 1760332526847,
+    "siteDefaults": 1760570329903,
     "siteLogo": 1754383794286,
     "siteColors": 1760194029116,
-    "siteImages": 1757775286857
+    "siteImages": 1760570329917
   },
   "icons": {
     "android-chrome-192x192.png": {
@@ -28,7 +28,7 @@
       "datetime": "2025-08-31T10:24:13.083Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-14T06:02:24.749Z"
+      "datetime": "2025-10-15T23:24:13.405Z"
     }
   },
   "css": {
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.akwkot.css",
-      "datetime": "2025-10-14T06:02:11.303Z",
+      "file": "/styles/main.v8mkqx.css",
+      "datetime": "2025-10-15T23:24:06.334Z",
       "names": [
         "blockquote",
         "callout",
@@ -73,7 +73,7 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-14T06:02:13.953Z",
+      "datetime": "2025-10-15T23:24:08.689Z",
       "names": [
         "contact-form",
         "home",
@@ -123,8 +123,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.yhsh4h.json",
-      "datetime": "2025-10-14T06:01:58.486Z"
+      "file": "/search-index.01tto8.json",
+      "datetime": "2025-10-15T23:23:55.188Z"
     }
   },
   "js": {

@@ -7,10 +7,13 @@ import { Icon } from 'astro-icon/components';
 import emailHashes from '../data/email-hash.json';
 import ShareLink from '../components/ShareLink.astro';
 import type { imageConfig } from 'astro:assets';
+import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
 
 const emailHashesMap: Record<string, string> = Object.fromEntries(
   Object.entries(emailHashes).map(([slug, obj]) => [slug, obj.sha256])
 );
+
+const nonce = (Astro.locals as any).nonce;
 
 interface Props {
   name: string;
@@ -155,32 +158,10 @@ if (useImage && photo) {
 ---
 
 <BaseLayout headProps={headProps}>
-  <style is:inline>
-    .team-photo {
-      border-radius: 50%;
-      margin-bottom: 1rem;
-    }
-    .avatar-initial {
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 1rem;
-      font-size: 3rem;
-      font-weight: bold;
-      color: white;
-    }
-    .team-details h3 {
-      margin-top: 1.5rem;
-    }
-    .team-details ul {
-      padding-left: 1.25rem;
-    }
-  </style>
+ <CssFilesToLoad files={[{ name: 'team-layout', inline: true }]} />
+  {/*!-- Fix avatar colors --*/}
 
-  <script is:inline>
+  <script is:inline nonce={nonce}>
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.avatar-initial[data-color], .icon-avatar[data-color]').forEach(el => {
         const clr = el.getAttribute('data-color');
@@ -188,15 +169,14 @@ if (useImage && photo) {
       });
     });
   </script>
-
   <article class="team-profile" id={id}>
     <header class="team-header py-1 mi-auto bg-primary-dark col-base-00">
-      <div class="mx-w-content mi-auto ta-center">
+      <div class="max-w-content mi-auto ta-center">
 
         {avatarSrc.type === 'img' && <img src={avatarSrc.src} alt={`Photo of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />}
         {avatarSrc.type === 'gravatar' && <img src={avatarSrc.src} alt={`Gravatar of ${name}`} width="160" height="160" loading="lazy" class="team-photo" />}
         {avatarSrc.type === 'initial' && (
-          <div class="avatar-initial" data-color={avatarSrc.color || null}>
+          <div class="avatar-initial round ai-center jc-center mt-0 mx-auto mb-1 fs-3xl bold col-base-00" data-color={avatarSrc.color || null}>
             {avatarSrc.text}
           </div>
         )}
@@ -211,7 +191,7 @@ if (useImage && photo) {
       </div>
     </header>
 
-    <section class="team-details mx-w-content mi-auto my-1 py-1">
+    <section class="team-details max-w-content mi-auto my-1 py-1">
       {affiliation && <p><strong>Affiliation:</strong> {affiliation}</p>}
       {experience && <p><strong>Experience:</strong> {experience} years</p>}
       {joined && <p><strong>Joined:</strong> {new Date(joined).toLocaleDateString()}</p>}
@@ -252,9 +232,9 @@ if (useImage && photo) {
         </>
       )}
     </section>
-    <ShareLink url={fullCanonical} title={`Share ${name}'s profile`} className="mx-w-content mi-auto my-1" />
+    <ShareLink url={fullCanonical} title={`Share ${name}'s profile`} className="max-w-content mi-auto my-1" />
 
-    <section class="team-slot-content mx-w-content mi-auto my-1 py-1">      
+    <section class="team-slot-content max-w-content mi-auto my-1 py-1">      
       <slot />
     </section>
     {/*!-- Posts Section Hook */}

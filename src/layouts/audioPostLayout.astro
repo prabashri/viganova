@@ -24,6 +24,7 @@ import { getImageMeta, constructUrl } from '@/utils/getImage';
 import { parseImageDims } from '@/utils/imageHelpers';
 
 import type { AudioMeta } from '@/types/HeadProps';
+import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
 // Optional local AudioMeta if not in your shared types
 
 interface Props {
@@ -246,6 +247,7 @@ const audioSchema = {
   ...(hasPart.length ? { hasPart } : {})
 };
 
+const nonce = (Astro.locals as any).nonce;
 /* ── HeadProps for BaseLayout (SEO) ────────────────────── */
 const headProps: HeadProps = {
   title: d.title,
@@ -389,68 +391,13 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
       <link rel="alternate" type="application/rss+xml" title={`${d.title} – RSS`} href={toAbs(d.platform.rss)} />
     )}
   </Fragment>
+  
+  <CssFilesToLoad files={[{ name: 'audio-layout', inline: true }]} />
 
-  <style id="audio-layout-styles" is:inline>
-.audio-layout {{
-  grid-template-columns: minmax(0,1fr);
-  grid-template-areas:
-    "header"
-    "player"
-    "sidebar-left"
-    "content"
-    "sidebar-right"
-    "footer"
-    "footerNav";
-}}
-.audio-header   {{ grid-area: header; }}
-.audio-player   {{ grid-area: player; }}
-.audio-content  {{ grid-area: content; }}
-.sidebar-left   {{ grid-area: sidebar-left; }}
-.sidebar-right  {{ grid-area: sidebar-right; }}
-.audio-footer   {{ grid-area: footer; }}
-.footer-nav     {{ grid-area: footerNav; }}
-
-/* Media */
-.player-shell iframe, .player-shell audio {{
-  width: 100%;
-  height: 100%;
-  display: block;
-  border: 0;
-}}
-
-@media (min-width: 1024px) and (max-width: 1279px) {{
-  .audio-layout {{
-    grid-template-columns: 2fr 1fr;
-    grid-template-areas:
-      "header header"
-      "player player"
-      "content sidebar-left"
-      "content sidebar-right"
-      "footer sidebar-right"
-      "footerNav footerNav";
-  }}
-}}
-@media (min-width: 1280px) {{
-  .audio-layout {{
-    grid-template-columns: 1fr minmax(auto, var(--content-width)) 1fr;
-    grid-template-areas:
-      "header header header"
-      "player player player"
-      "sidebar-left content sidebar-right"
-      "sidebar-left footer sidebar-right"
-      "footerNav footerNav footerNav";
-  }}
-  .sidebar-left, .sidebar-right {{
-    max-height: calc(100vh - 5rem);
-  }}
-}}
-.sidebar-left:empty, .sidebar-right:empty {{ display: none; }}
-  </style>
-
-  <article id="audio-layout" class="audio-layout grid w-full jc-center">
+  <article id="audio-layout" class="audio-layout grid w-100p jc-center">
     {/* Header */}
     <header class="audio-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
-      <div class="mx-w-site mi-auto ta-center my-2">
+      <div class="max-w-site mi-auto ta-center my-2">
         <h1 class="post-title">{d.title}</h1>
         {d.description && <p class="post-desc">{d.description}</p>}
         <div class="post-meta text-s my-1">
@@ -466,9 +413,9 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     </header>
 
     {/* Hero cover + play overlay → audio/iframe */}
-    <section class="audio-player mx-w-content my-05 hero-image mx-w-95-0 w-90-0 lg-mx-w-featured lg-w-full full-mx-w-featured full-w-full mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
+    <section class="audio-player max-w-content my-05 hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
       <div
-        class="player-shell overflow-hidden relative bg-base-10 br w-full h-full"
+        class="player-shell overflow-hidden relative bg-base-10 br w-100p h-full"
         id={`${uid}-shell`}
         data-ap-root
         data-uid={uid}
@@ -477,7 +424,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
         data-embed-src={embedSrc || ''}
       >
         {heroImage && heroImageMeta && (
-          <div class="poster-wrap w-full h-full" id={`${uid}-poster-wrap`}>
+          <div class="poster-wrap w-100p h-full" id={`${uid}-poster-wrap`}>
             <ResponsiveImage
               src={heroImageKey}
               imageMeta={heroImageMeta}
@@ -488,7 +435,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
               height={heroImageHeight}
               id={`${uid}-poster-img`}
               loading="eager"
-              className="w-full h-full object-cover block"
+              className="w-100p h-full object-cover block"
               variant="desktop"
               addSchema={false}
             />
@@ -526,7 +473,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     </section>
 
     {/* Content */}
-    <div class="audio-content mx-w-content mi-auto my-05 p-1">
+    <div class="audio-content max-w-content mi-auto my-05 p-1">
       <slot />
     </div>
 
@@ -584,7 +531,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     </Sidebar>
 
     {/* Footer: share, FAQ, tags, prev/next */}
-    <footer id="audio-footer" class="audio-footer mx-w-content w-full mi-auto my-05 p-05">
+    <footer id="audio-footer" class="audio-footer max-w-content w-100p mi-auto my-05 p-05">
       <ShareLink id="audio-footer-share-links" className="my-05 p-05" title="share" />
 
       {Array.isArray(d.faq) && d.faq.length > 0 && (
@@ -624,7 +571,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
   </article>
 
   <Fragment slot="extraScripts">
-    <script id="audio-schema" type="application/ld+json" set:html={JSON.stringify(audioSchema)}></script>
+    <script id="audio-schema" nonce={nonce} type="application/ld+json" set:html={JSON.stringify(audioSchema)}></script>
     <script type="module" data-src="/scripts/audio-listen.js" async></script>
   </Fragment>
 

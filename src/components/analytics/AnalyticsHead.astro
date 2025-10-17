@@ -1,5 +1,7 @@
 ---
+// src/components/analytics/AnalyticsHead.astro
 import { siteFunctions } from '@/config/siteFunctions';
+import { minifyJS } from '@/utils/minify';
 
 const isProd = import.meta.env.PROD;
 
@@ -51,19 +53,12 @@ if (mode === 'gtm') {
   payload = `/* analytics off */`;
 }
 
-// --- Minimal, safe minifier (remove // and /* */ comments, collapse whitespace) ---
-function minifyJS(code: string) {
-  return code
-    .replace(/\/\*[^]*?\*\//g, '')        // block comments
-    .replace(/(^|[^:])\/\/.*$/gm, '$1')   // line comments
-    .replace(/\s{2,}/g, ' ')              // collapse runs
-    .replace(/\s*([{}();,:=+\-\[\]])\s*/g, '$1') // trim around punctuators
-    .trim();
-}
+// --- Minimal, safe minifier is provided by '@/utils/minify' ---
 
 const inlineJS = minifyJS(payload);
+const nonce = (Astro.locals as any).nonce;
 ---
 
 {mode !== 'off' && (
-  <script id="analytics-head" is:inline set:html={JSON.stringify(inlineJS)} />
+  <script id="analytics-head" is:inline set:html={inlineJS} nonce={nonce} />
 )}

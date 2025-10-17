@@ -5,8 +5,20 @@
  * Place this ONCE (head or footer is fine — head is typical).
  */
 import { siteFunctions } from '@/config/siteFunctions';
+import { minifyJS } from '@/utils/minify';
 interface Props { clientId?: string; }
 const clientId = (Astro.props.clientId || siteFunctions.adsense || '').trim();
+
+const payload = `
+  window.adsbygoogle = window.adsbygoogle || [];
+  try {
+      if (window.__consent?.ads === true) {            
+          window.adsbygoogle.requestNonPersonalizedAds = (window.__consent.personalized === true) ? 0 : 1;
+      }
+  } catch(e){}
+`;
+const inlineJS = minifyJS(payload);
+const nonce = (Astro.locals as any).nonce;
 ---
 {clientId && (
   <>
@@ -20,14 +32,6 @@ const clientId = (Astro.props.clientId || siteFunctions.adsense || '').trim();
     { /* AdSenseLoader.astro */}
     { /* Only decide NPA when ads are granted */}
     { /* If ads are denied, do not set this — LTD will apply based on Consent Mode */ }
-    <script is:inline>
-        window.adsbygoogle = window.adsbygoogle || [];
-        try {
-            if (window.__consent?.ads === true) {            
-                window.adsbygoogle.requestNonPersonalizedAds = (window.__consent.personalized === true) ? 0 : 1;
-            }
-        } catch(e){}
-    </script>
-
+    <script id="adsense-inline-init" is:inline nonce={nonce} set:html={inlineJS}></script>
   </>
 )}

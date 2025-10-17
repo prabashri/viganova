@@ -108,10 +108,10 @@ const faq = [
 ---
 
 <article id="post-layout">
-  <header id="post-header" class="post-header mx-w-full w-full mi-auto ta-center bg-primary-darker relative overflow-hidden">
-        <div id="hero-section" class="flex flex-col md-flex-row lg-flex-row mx-w-site mi-auto w-full py-2 px-1 ai-start gap-2 hero-wrap relative">
+  <header id="post-header" class="post-header mx-w-100p w-100p mi-auto ta-center bg-primary-darker relative overflow-hidden">
+        <div id="hero-section" class="flex flex-col md-flex-row lg-flex-row max-w-site mi-auto w-100p py-2 px-1 ai-start gap-2 hero-wrap relative">
             {/** Left: Text */}
-            <div class="hero-text mx-w-content flex-1 relative col-base-00 ta-start">
+            <div class="hero-text max-w-content flex-1 relative col-base-00 ta-start">
                 <h1 class="post-title regular text-xs">
                     EasyApostille - Fast & Secure Certificate, Document Attestation in India
                 </h1>
@@ -183,7 +183,7 @@ const faq = [
                 title="Easy Apostille - MEA-Approved Certificate Attestation in India"
                 width="380" breakpoints={{ mobile: 380, desktop: 640 }}
                 addSchema={true}
-                className="hero-image mx-w-content big-absolute right-0-100 top-0 bottom-0 opacity-90 md-opacity-50 mi-auto flex-1"
+                className="hero-image max-w-content big-absolute right-0-100 top-0 bottom-0 opacity-90 md-opacity-50 mi-auto flex-1"
                 loading="eager"
                 variant="desktop" 
                 id="hero-image"
@@ -191,7 +191,7 @@ const faq = [
         </div>
     </header>
 
-    <section class="mx-w-site w-full mi-auto my-2 p-2">
+    <section class="max-w-site w-100p mi-auto my-2 p-2">
         <h2 class="mi-auto py-1 ta-center">Read our customers' words</h2>
         <p class="bold ta-center">Don't just take our word for it—hear what our customers have to say!</p>
         <div class="flex flex-row text-xl bold ta-center border-secondary bg-base-00 col-base-100 br my-1 p-1 w-fit mi-auto">
@@ -258,7 +258,7 @@ const faq = [
         </Anchor>
     </section>
     {/* link added */}
-    <section id="how-it-works" class="mx-w-full w-full mi-auto my-2 p-2 howitworks bg-base-00" aria-labelledby="howitworks-h2">
+    <section id="how-it-works" class="mx-w-100p w-100p mi-auto my-2 p-2 howitworks bg-base-00" aria-labelledby="howitworks-h2">
         <h2 id="howitworks-h2" class="mi-auto ta-center py-1">
             How Your Apostille Gets Done — Sticker or e-Apostille (QR)
         </h2>
@@ -273,7 +273,7 @@ const faq = [
         </p>
 
         <!-- Timeline steps as semantic list -->
-        <ol class="mx-w-site w-full mi-auto my-1 how-timeline" aria-label="Apostille process timeline">
+        <ol class="max-w-site w-100p mi-auto my-1 how-timeline" aria-label="Apostille process timeline">
             <li class="how-item right">
                 <div class="how-node" aria-hidden="true"><span>1</span></div>
                 <div class="how-content">
@@ -364,7 +364,7 @@ const faq = [
         </ol>
 
         <!-- Minimal contextual internal links -->
-        <div class="mx-w-featured w-full mi-auto ta-center mt-1" role="navigation" aria-label="Explore related services and resources">
+        <div class="max-w-featured w-100p mi-auto ta-center mt-1" role="navigation" aria-label="Explore related services and resources">
             <p class="text-s opacity-80">
             Explore related:
             <Anchor href="/services/education-documents-apostille/" className="td-none underline focus-vis-outline" title="Education document apostille services">Education</Anchor>,
@@ -377,7 +377,7 @@ const faq = [
     </section>
 
 
-    <section id="what-to-apostille" class="mx-w-site w-full mi-auto my-2 p-2">
+    <section id="what-to-apostille" class="max-w-site w-100p mi-auto my-2 p-2">
         <h2 class="ta-center my-05">What to Apostille?</h2>
 
         <div class="flex flex-row wrap gap-2 jc-center my-2">
@@ -473,7 +473,7 @@ const faq = [
         </p>
     </section>
 
-    <section id="what-you-need" class="w-full bg-base-00 mi-auto my-2 p-2" aria-labelledby="what-you-need-h2">
+    <section id="what-you-need" class="w-100p bg-base-00 mi-auto my-2 p-2" aria-labelledby="what-you-need-h2">
         <h2 id="what-you-need-h2" class="ta-center my-05">
             What you'll need to get an Apostille in India
         </h2>
@@ -483,7 +483,7 @@ const faq = [
         </p>
 
         {/* Use semantic UL/LI instead of div[role=list] */}
-        <ul class="req-list flex flex-col gap-2 my-2 mx-w-featured mi-auto">
+        <ul class="req-list flex flex-col gap-2 my-2 max-w-featured mi-auto">
             {/* Clear scans */}
             <li class="req-item col-base-90">
             <div class="req-icon" aria-hidden="true">✓</div>
@@ -554,18 +554,18 @@ const faq = [
         </p>
     </section>
     { /*-- Link added --*/ }
-    <section id="why-easyapostille" class="mx-w-site w-full mi-auto my-2 p-2" aria-labelledby="why-easyapostille-h2">
+    <section id="why-easyapostille" class="max-w-site w-100p mi-auto my-2 p-2" aria-labelledby="why-easyapostille-h2">
         <h2 id="why-easyapostille-h2" class="ta-center my-05">
             Why everyone chooses <span class="nowrap">EasyApostille</span>
         </h2>
 
-        <p class="mx-w-featured w-full mi-auto ta-center opacity-90 my-1">
+        <p class="max-w-featured w-100p mi-auto ta-center opacity-90 my-1">
             Fast, <strong>MEA-compliant apostille &amp; attestation</strong> across India — choose
             <strong>e-Apostille (QR)</strong> or <strong>sticker apostille</strong> with tracked delivery.
         </p>
 
         <!-- Feature cards -->
-        <ul class="req-list flex flex-row wrap gap-2 my-2 mx-w-featured mi-auto jc-center">
+        <ul class="req-list flex flex-row wrap gap-2 my-2 max-w-featured mi-auto jc-center">
             <li class="req-item w-sidebar info bg-color-warn">
                 <div class="req-icon" aria-hidden="true">✅</div>
                 <div class="req-body">
@@ -628,7 +628,7 @@ const faq = [
         </ul>
 
         <!-- Compact, curated internal links to keep link density low -->
-        <div class="mx-w-featured w-full mi-auto grid gap-1 my-2" role="navigation" aria-label="Popular services and guides">
+        <div class="max-w-featured w-100p mi-auto grid gap-1 my-2" role="navigation" aria-label="Popular services and guides">
             <!-- Popular services (4 max) -->
             <div class="ta-center">
                 <p class="bold uppercase my-02">Popular services</p>
@@ -691,7 +691,7 @@ const faq = [
         </div>
 
         <!-- CTAs -->
-        <div class="mx-w-featured w-full mi-auto flex wrap jc-center gap-05 my-2 ta-center">
+        <div class="max-w-featured w-100p mi-auto flex wrap jc-center gap-05 my-2 ta-center">
             <Anchor
                 href={buildWhatsAppLink({
                     phone: '',
@@ -723,7 +723,7 @@ const faq = [
             </Anchor>
         </div>
 
-        <p class="mx-w-featured w-full mi-auto opacity-80 mt-05 ta-center">
+        <p class="max-w-featured w-100p mi-auto opacity-80 mt-05 ta-center">
             Free document pre-check • MEA-approved flow • e-Apostille (QR) &amp; sticker options
         </p>
     </section>
@@ -736,9 +736,9 @@ const faq = [
         <FaqList
           items={faq}
           id="faq"
-          class="post-faq bg-base-00 w-full mi-auto my-2 p-2"
-          headingClass="mx-w-featured mi-auto ta-center"   
-          listClass='mx-w-featured mi-auto'
+          class="post-faq bg-base-00 w-100p mi-auto my-2 p-2"
+          headingClass="max-w-featured mi-auto ta-center"   
+          listClass='max-w-featured mi-auto'
           questionClass='text-base bold'
           answerClass='bg-primary-lighter-x'
           heading="Frequently Asked Questions"
@@ -751,7 +751,7 @@ const faq = [
     )}
 
 
-    <section id="home-contact" class="w-full mi-auto my-2 p-2 ta-center">
+    <section id="home-contact" class="w-100p mi-auto my-2 p-2 ta-center">
         <h2 class="my-05">Still have questions?</h2>
         <p class="opacity-80 my-1">Prefer WhatsApp or a quick call? We're happy to help.</p>
 
@@ -772,10 +772,10 @@ const faq = [
            <Anchor href={`mailto:${email}`} className="td-none">{email}</Anchor>
         </p>
     </section>
-    <section id="home-compliance" class="w-full bg-base-00 mi-auto p-2">
+    <section id="home-compliance" class="w-100p bg-base-00 mi-auto p-2">
         <h2 class="my-05 ta-center">Compliance &amp; Assurance</h2>
 
-        <div class="flex flex-row wrap gap-2 my-2 mx-w-featured mi-auto jc-center req-list">
+        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mi-auto jc-center req-list">
             <div class="box block w-sidebar">✅ <strong>MEA-compliant apostille</strong> via authorized channels — <em>sticker</em> &amp; <em>e-Apostille (QR verification)</em>.</div>
             <div class="box block w-sidebar">✅ Correct chain handled end-to-end: <strong>Notary → SDM/State → MEA</strong> (as applicable).</div>
             <div class="box block w-sidebar">✅ <strong>Acceptance guidance</strong> for university admissions, immigration, visa &amp; HR.</div>
@@ -783,14 +783,14 @@ const faq = [
             <div class="box block w-sidebar">✅ <strong>Secure pickup &amp; tracked delivery</strong> across India; privacy-first document handling.</div>
         </div>
 
-        <div class="flex flex-row wrap gap-2 my-2 mx-w-featured mi-auto jc-center">
+        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mi-auto jc-center">
             <Anchor
                 href={buildWhatsAppLink({
                     phone: '',
                         text: 'Hi EasyApostille! I need MEA apostille help. Please share eligibility, ETA & all-inclusive quote.',
                         source: 'Home-Compliance-CTA',
                         })}
-                    className="mt-1 inline-flex ai-center gap-05 w-full"
+                    className="mt-1 inline-flex ai-center gap-05 w-100p"
                     ariaLabel="Start your apostille on WhatsApp"
                     variant="primary" dataId='home-compliance-whatsapp' dataAction='link_click' dataLabel='Start Apostille in whatsapp chat'
                 >

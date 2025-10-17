@@ -1,4 +1,5 @@
 ---
+// src/pages/team/index.astro
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { siteDefaults } from '../../config/siteDefaults';
@@ -7,10 +8,13 @@ import gravatarHashesJson from '../../data/email-hash.json';
 import type { HeadProps } from '../../types/HeadProps';
 import HeroCollections from '../../components/ui/HeroCollections.astro';
 import { siteImages } from '@/config/siteImages';
+import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
 
 const gravatarHashes: Record<string, string> = Object.fromEntries(
   Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
 );
+
+const nonce = (Astro.locals as any).nonce;
 
 const allMembers = await getCollection('team');
 
@@ -92,109 +96,15 @@ const headProps: HeadProps = {
 ---
 
 <BaseLayout headProps={headProps}>
-  <style id="team-styles" is:inline>
-   .team-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* keeps them centered */
-  gap: 1rem; /* adjust to control space between cards */
-  padding: 0.5rem 0;
-}
-
-    .team-card {
-      flex: 1 1 260px;  /* flexible width but minimum 260px */
-      background: var(--base-00);
-      border: 1px solid var(--base-20);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      text-align: center;
-      max-width: 320px;
-      width: 100%;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      position: relative;
-      list-style: none;
-    }
-    /* Balance last odd card */
-
-    .team-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-    }
-    .team-card.featured {
-      border: 2px solid var(--primary-base);
-      box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.2);
-    }
-    .featured-badge {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      background: var(--primary-base);
-      color: var(--base-00);
-      font-size: 0.7rem;
-      padding: 0.3rem 0.5rem;
-      border-radius: 0.5rem;
-      font-weight: 600;
-    }
-    .avatar-img, .avatar-initial {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 1rem;
-      border-radius: 50%;
-      object-fit: cover;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: #fff;
-      font-size: 1.5rem;
-    }
-    /* Theme avatar colors */
-    .avatar-color-green   { background: hsl(145, 70%, 50%); }
-    .avatar-color-pink    { background: hsl(320, 70%, 55%); }
-    .avatar-color-blue    { background: hsl(210, 70%, 55%); }
-    .avatar-color-purple  { background: hsl(270, 70%, 55%); }
-    .avatar-color-teal    { background: hsl(180, 70%, 45%); }
-    .avatar-color-default { background: var(--primary-lighter); }
-    /* Placeholder for custom */
-    .avatar-color-custom { background: var(--primary-lighter); }
-    
-    .team-card h2 {
-      margin: 0.5rem 0 0.25rem;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--base-100);
-    }
-    .role {
-      font-size: 0.9rem;
-      font-style: italic;
-      color: var(--base-60);
-      margin-bottom: 0.5rem;
-    }
-    .expertise {
-      font-size: 0.85rem;
-      color: var(--base-70);
-      border-top: 1px solid var(--base-20);
-      margin-top: 0.75rem;
-      padding-top: 0.5rem;
-    }
-
-    @media (max-width: 480px) {
-      .team-card {
-        flex: 1 1 100%;
-        max-width: 100%; /* take full width */
-      }
-    }
-  </style>
-
-<script id="avatar-color-script" is:inline>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.avatar-color-custom[data-color]').forEach(el => {
-      const clr = el.getAttribute('data-color');
-      if (clr) el.style.backgroundColor = clr;
+ <CssFilesToLoad files={[{name:'team-index', inline:true}]} />
+  <script id="avatar-color-script" nonce={nonce} is:inline>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.avatar-color-custom[data-color]').forEach(el => {
+        const clr = el.getAttribute('data-color');
+        if (clr) el.style.backgroundColor = clr;
+      });
     });
-  });
-</script>
+  </script>
 
    <HeroCollections
     title={headProps.title}
@@ -203,15 +113,15 @@ const headProps: HeadProps = {
     textColorClass="col-base-00"
   />
 
-  <section class="mx-w-site mi-auto my-2 py-2">
-    <ul class="team-grid no-bullets">
+  <section class="max-w-site mi-auto my-2 py-2">
+    <ul class="team-grid no-bullets flex wrap jc-center gap py-05 px-0">
       {[...featured, ...others].map(member => {
         const { slug, name, role, expertise, color, image, useImage, useInitial, initialText, useGravatar } = member.data;
         const avatar = getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color });
 
         return (
-          <li class={`team-card ${member.data.featured ? 'featured' : ''}`}>
-            {member.data.featured && <span class="featured-badge">Featured</span>}
+          <li class={`team-card bg-base-00 border br p-1-5 ta-center max-w-sidebar w-100p box-shadow relative ${member.data.featured ? 'featured' : ''}`}>
+            {member.data.featured && <span class="featured-badge absolute bg-primary-base col-base-00 fs-xs py-02 px-05 bold">Featured</span>}
             <a class="team-link td-none p-0" href={`/team/${slug}/`}>
               {avatar.type === 'img' && <img class="avatar-img" src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
               {avatar.type === 'gravatar' && <img class="avatar-img" src={avatar.src} alt={`Gravatar of ${name}`} loading="lazy" />}
@@ -223,9 +133,9 @@ const headProps: HeadProps = {
               {avatar.type === 'icon' && (
                 <Icon name="avatar" width="120" height="120" class={avatar.colorClass} data-color={avatar.dataColor || null} />
               )}
-              <h2>{name}</h2>
-              <p class="role">{role}</p>
-              <p class="expertise">{expertise?.join(', ')}</p>
+              <h2 class="fs-2xl mt-05 mx-0 mb-02 col-base-100">{name}</h2>
+              <p class="role fs-s italic col-base-70 mb-05">{role}</p>
+              <p class="expertise fs-xs col-base-70 mt-05 pt-05">{expertise?.join(', ')}</p>
             </a>
           </li>
         );

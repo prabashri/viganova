@@ -24,8 +24,8 @@ const {
   variant = 'right',
   sticky = true,
   stickyTopClass = 'top-20',
-  stickyTopLeftClass = 'top-0 full-mx-h-95vh',
-  stickyTopRightClass = 'lg-top-42vh full-mx-h-95vh full-sticky full-top-0',
+  stickyTopLeftClass = 'top-0 full-max-h-95vh',
+  stickyTopRightClass = 'lg-top-42vh full-max-h-95vh full-sticky full-top-0',
   class: className = '',
   id,
   ariaLabel,
@@ -35,11 +35,11 @@ const {
 /** Base class maps (exact strings from your spec) */
 const baseMap = {
   left:
-    'sidebar-left bg b-top-solid-primary mx-w-content lg-mx-w-sidebar full-mx-w-sidebar lg-mx-h-40vh sm-w-90-0 w-full br ml-auto mr-auto full-mr-unset as-f-start my-05 p-05 overflow-auto',
+    'sidebar-left bg b-top-solid-primary max-w-content lg-max-w-sidebar full-max-w-sidebar lg-mx-h-40vh sm-w-90p w-100p br ml-auto mr-auto full-mr-unset as-f-start my-05 p-05 overflow-auto',
   right:
-    'sidebar-right bg b-top-solid-primary mx-w-content lg-mx-w-sidebar full-mx-w-sidebar lg-mx-h-60vh sm-w-90-0 w-full br mi-auto mr-auto full-ml-unset as-f-start my-05 p-05 overflow-auto',
+    'sidebar-right bg b-top-solid-primary max-w-content lg-max-w-sidebar full-max-w-sidebar lg-mx-h-60vh sm-w-90p w-100p br mi-auto mr-auto full-ml-unset as-f-start my-05 p-05 overflow-auto',
   generic:
-    'sidebar bg b-top-solid-primary mx-w-content lg-mx-w-sidebar full-mx-w-sidebar sm-w-90-0 w-full mi-auto as-f-start my-05 p-05 overflow-auto',
+    'sidebar bg b-top-solid-primary max-w-content lg-max-w-sidebar full-max-w-sidebar sm-w-90p w-100p mi-auto as-f-start my-05 p-05 overflow-auto',
 } as const;
 
 /** Sticky class maps (variant-specific) */

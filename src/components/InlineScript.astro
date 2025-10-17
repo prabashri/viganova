@@ -1,49 +1,154 @@
 ---
 import assetsManifest from '@/data/assets-manifest.json';
+import { minifyJS } from '@/utils/minify';
+
+/**
+ * <!-- Preloaded critical: swapped to stylesheet immediately -->
+<link rel="preload" as="style" href="/assets/pages/home.abc123.css"
+      data-rel-after-load="stylesheet" data-css-critical>
+
+<!-- Or: stylesheet with delayed href population → href set immediately -->
+<link rel="stylesheet" data-href="/assets/pages/home.abc123.css" data-css-critical>
+
+<!-- Or: swap pattern → media becomes 'all' immediately -->
+<link rel="stylesheet" media="print" data-swap href="/assets/pages/print.css" data-css-critical>
+
+<!-- Your existing patterns keep working (no data-css-critical) -->
+<link rel="stylesheet" data-href="/assets/pages/gallery.abc123.css" data-css-noncritical="1">
+<link rel="stylesheet" media="print" data-swap href="/assets/pages/print.css">
+<link rel="preload" as="style" href="/assets/pages/faq.abc123.css" data-rel-after-load="stylesheet">
+
+ */
+
 const mainJsFile = assetsManifest.js?.main?.file || '';
 const isDev = import.meta.env.DEV;
 const devBust = Date.now(); // cache-buster for dev
+const nonce = (Astro.locals as any).nonce;
+const payload = `function registerSWandLazyLoader(){
+  "serviceWorker"in navigator&&navigator.serviceWorker.register("/sw.js").catch(e=>{"localhost"===location.hostname&&console.warn("Service Worker Failed:",e)});
+  const p=()=>{
+    document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"][data-css-critical]').forEach(e=>{e.rel="stylesheet",e.removeAttribute("data-rel-after-load")});
+    document.querySelectorAll('link[rel="stylesheet"][data-href][data-css-critical]').forEach(e=>{const t=e.getAttribute("data-href");t&&!e.href&&(e.href=t),e.setAttribute("fetchpriority","high"),e.removeAttribute("data-href")});
+    document.querySelectorAll('link[rel="stylesheet"][data-swap][data-css-critical]').forEach(e=>{e.media="all",e.removeAttribute("data-swap"),e.setAttribute("fetchpriority","high")});
+  };
+  const u=()=>{ 
+    document.querySelectorAll('link[rel="stylesheet"][data-swap]:not([data-css-critical])').forEach(e=>{e.media="all",e.removeAttribute("data-swap")});
+    document.querySelectorAll('link[rel="stylesheet"][data-href]:not([data-css-critical])').forEach(e=>{const t=e.getAttribute("data-href");t&&!e.href&&(e.href=t),e.removeAttribute("data-href")});
+    document.querySelectorAll("script[data-src]").forEach(e=>{const t=e.getAttribute("data-src");t&&(e.src=t,e.removeAttribute("data-src"))});
+  };
+  const h=()=>{ // preload hooks (CSP-safe)
+    document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"]:not([data-css-critical])').forEach(e=>{
+      const t=()=>{"stylesheet"!==e.rel&&(e.rel="stylesheet",e.removeAttribute("data-rel-after-load"))};
+      e.addEventListener&&e.addEventListener("load",t,{once:!0}),e.sheet&&(()=>{try{t()}catch(r){}})();
+    });
+  };
+  // run order: critical ASAP
+  "requestAnimationFrame"in window?requestAnimationFrame(p):p();
+  // non-critical on first interaction, else onload+3s
+  let l=!1;const d=()=>{l||(l=!0,u(),h())}, ev=["mousemove","mousedown","keydown","touchstart","scroll"], once=()=>{ev.forEach(e=>window.removeEventListener(e,once)),d()}; ev.forEach(e=>window.addEventListener(e,once,{once:!0}));
+  window.addEventListener("load",()=>{setTimeout(()=>{l||d()},3e3)});
+}
+registerSWandLazyLoader();
+`;
+
+const inlineJS = minifyJS(payload);
 
 ---
 
 {isDev && (
   <>
- 
 
     <!-- Dev: unregister SW + minimal lazy loader + CSP-safe link upgrade -->
-    <script is:inline type="text/javascript">
+    <script nonce={nonce} is:inline id="dev-inline-service-worker-lazy-loader" type="text/javascript">
       (function () {
+        // 0) Dev SW unregister + cache clear
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.getRegistrations().then(function (regs){ regs.forEach(function (r){ r.unregister(); }); });
           if (window.caches && caches.keys) { caches.keys().then(function (keys){ keys.forEach(function (k){ caches.delete(k); }); }); }
         }
+
+        // ---- helpers --------------------------------------------------------------
+        function promotePreloadToStylesheet(el) {
+          // CSP-safe replacement for: onload="this.rel='stylesheet'"
+          function done(){ if(el.rel!=='stylesheet'){ el.rel='stylesheet'; el.removeAttribute('data-rel-after-load'); } }
+          el.addEventListener && el.addEventListener('load', done, { once:true });
+          // cached/fast-path
+          if (el.sheet) { try { done(); } catch(e){} }
+        }
+
+        function promoteCriticalNow() {
+          // A) Critical preload → stylesheet NOW (no waiting)
+          document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"][data-css-critical]').forEach(function(l){
+            // swap immediately; browser will still reuse the fetched preload
+            l.rel = 'stylesheet';
+            l.removeAttribute('data-rel-after-load');
+            // keep for safety in case it was already loaded
+            if (l.sheet) { /* no-op */ }
+          });
+
+          // B) Critical stylesheet with data-href → set href NOW
+          document.querySelectorAll('link[rel="stylesheet"][data-href][data-css-critical]').forEach(function(el){
+            var href = el.getAttribute('data-href');
+            if (href && !el.href) { el.href = href; }
+            el.setAttribute('fetchpriority', 'high');
+            el.removeAttribute('data-href');
+          });
+
+          // C) Critical swap → set media='all' NOW
+          document.querySelectorAll('link[rel="stylesheet"][data-swap][data-css-critical]').forEach(function(el){
+            el.media = 'all';
+            el.removeAttribute('data-swap');
+            el.setAttribute('fetchpriority', 'high');
+          });
+        }
+
+        function upgradeNonCriticalDeferred() {
+          // non-critical swap → after interaction/idle
+          document.querySelectorAll('link[rel="stylesheet"][data-swap]:not([data-css-critical])').forEach(function(el){
+            el.media = 'all';
+            el.removeAttribute('data-swap');
+          });
+          // non-critical data-href → set href late
+          document.querySelectorAll('link[rel="stylesheet"][data-href]:not([data-css-critical])').forEach(function(el){
+            var href = el.getAttribute('data-href');
+            if (href && !el.href) { el.href = href; }
+            el.removeAttribute('data-href');
+          });
+        }
+
+        function upgradePreloadHooks() {
+          // generic CSP-safe preload→stylesheet hook
+          var ls = document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"]:not([data-css-critical])');
+          ls.forEach(promotePreloadToStylesheet);
+        }
+
+        // ---- run order ------------------------------------------------------------
+        // 1) Promote critical immediately (rAF to avoid layout thrash)
+        if (window.requestAnimationFrame) requestAnimationFrame(promoteCriticalNow); else promoteCriticalNow();
+
+        // 2) Lazy-load non-critical upon first interaction, else after onload+1.5s
         var loaded = false;
         function trigger() {
           if (loaded) return; loaded = true;
-          document.querySelectorAll('link[rel="stylesheet"][data-swap]').forEach(function(el){ el.media='all'; el.removeAttribute('data-swap'); });
-          document.querySelectorAll('link[rel="stylesheet"][data-href]').forEach(function(el){ var href=el.getAttribute('data-href'); if(href){ el.href=href; } el.removeAttribute('data-href'); });
-          document.querySelectorAll('script[data-src]').forEach(function(el){ var src=el.getAttribute('data-src'); if(src){ el.src=src; el.removeAttribute('data-src'); } });
+          upgradeNonCriticalDeferred();
+          // also upgrade any <script data-src> you have
+          document.querySelectorAll('script[data-src]').forEach(function(el){
+            var src = el.getAttribute('data-src'); if (src){ el.src = src; el.removeAttribute('data-src'); }
+          });
         }
-        var evs=['mousemove','mousedown','keydown','touchstart','scroll'];
+        var evs = ['mousemove','mousedown','keydown','touchstart','scroll'];
         function handler(){ evs.forEach(function(e){ window.removeEventListener(e, handler); }); trigger(); }
         evs.forEach(function(e){ window.addEventListener(e, handler, { once:true }); });
         window.addEventListener('load', function(){ setTimeout(function(){ if(!loaded) trigger(); }, 1500); });
 
-        // CSP-safe replacement for link onload="this.rel='stylesheet'"
-        var ls=document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"]');
-        ls.forEach(function(l){
-          function done(){ if(l.rel!=='stylesheet'){ l.rel='stylesheet'; l.removeAttribute('data-rel-after-load'); } }
-          l.addEventListener && l.addEventListener('load', done, { once:true });
-          if (l.sheet) { try{ done(); }catch(e){} } // cached case
-        });
+        // 3) Always keep the preload hook (covers both critical/non-critical that remained)
+        upgradePreloadHooks();
       })();
-    </script>
+      </script>
+
   </>
 )}
 
-
 {!isDev && (
-  <script id="worker-script-lazy-loader" is:inline type="module">
-    function registerSWandLazyLoader(){"serviceWorker"in navigator&&navigator.serviceWorker.register("/sw.js").catch(e=>{"localhost"===location.hostname&&console.warn("Service Worker Failed:",e)});let e=!1;function t(){e||(e=!0,document.querySelectorAll('link[rel="stylesheet"]').forEach(e=>{if(e.hasAttribute("data-swap")&&(e.media="all",e.removeAttribute("data-swap")),e.hasAttribute("data-href")){let t=e.getAttribute("data-href");t&&(e.href=t),e.removeAttribute("data-href")}}),document.querySelectorAll("script[data-src]").forEach(e=>{let t=e.getAttribute("data-src");t&&(e.src=t,e.removeAttribute("data-src"))})),document.querySelectorAll('link[rel="preload"][as="style"][data-rel-after-load="stylesheet"]').forEach(e=>{let t=()=>{"stylesheet"!==e.rel&&(e.rel="stylesheet",e.removeAttribute("data-rel-after-load"))};if(e.addEventListener&&e.addEventListener("load",t,{once:!0}),e.sheet)try{t()}catch(r){}})}let r=["mousemove","mousedown","keydown","touchstart","scroll"],a=()=>{r.forEach(e=>window.removeEventListener(e,a)),t()};r.forEach(e=>window.addEventListener(e,a,{once:!0})),window.addEventListener("load",()=>{setTimeout(()=>{e||t()},3e3)})}registerSWandLazyLoader();
-  </script>
+  <script nonce={nonce} id="worker-script-lazy-loader" is:inline set:html={inlineJS}></script>
 )}

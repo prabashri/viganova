@@ -15,6 +15,19 @@
  *   1) Generated module recorded at manifest.css["pages:<name>"].inlineModule
  *   2) Dev/source raw: /src/styles/pages/<name>.css via import.meta.glob
  *   3) Fallback to <link>
+ * 
+ * usage examples:
+ * <CssFilesToLoad
+  files={[
+    { name: 'home', inline: true, id: 'critical-home' }, // inlines the string from inlineModule if present
+    { name: 'home' }, 
+      { href: 'https://cdn.example.com/ui/tooltip.css' },
+    { href: '/assets/vendor/photoswipe.css', id: 'photoswipe' },
+     { name: 'checkout' },                    // will emit <link rel="preload" as="style" ...> in prod
+      { name: 'gallery', fetchPriority: 'low' },     // outputs <link data-href="..." data-css-noncritical="1">
+  ]}
+/>
+
  */
 
 import manifest from "@/data/assets-manifest.json";
@@ -29,6 +42,8 @@ const { files, dedupe = true } = Astro.props as Props;
 
 const isDev = import.meta.env.DEV;
 const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
+
+const nonce = (Astro.locals as any).nonce;
 
 // Source raw (dev helper)
 const rawByPath = import.meta.glob('/src/styles/pages/*.css', {
@@ -95,7 +110,7 @@ const keyForFile   = (href: string, media: string|undefined, mode: FetchPriority
       const k = keyForInline('name' in item ? item.name : undefined, item.id);
       if (dedupe && cssOnce.has(k)) return null;
       cssOnce.add(k);
-      return <style is:inline id={item.id} set:html={cssString} />;
+      return <style is:inline nonce={nonce} id={item.id} set:html={cssString} />;
     }
 
     // c) final fallback → link

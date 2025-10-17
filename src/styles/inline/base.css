@@ -97,42 +97,40 @@ html, body {
 :root{
   /* Headings / display scale */
 
-  --font-size-5xl: clamp(1.6rem, 1.455rem + 0.727vw, 2rem);   /* h1 */
-  --font-size-4xl: clamp(1.5rem, 1.364rem + 0.682vw, 1.88rem); /* h2 */
-  --font-size-3xl: clamp(1.4rem, 1.273rem + 0.636vw, 1.75rem); /* h3 */
-  --font-size-2xl: clamp(1.3rem, 1.182rem + 0.591vw, 1.63rem); /* h4 */
-  --font-size-xl:  clamp(1.2rem, 1.091rem + 0.545vw, 1.5rem);  /* h5 */
-  --font-size-lg:  clamp(1.1rem, 1.000rem + 0.500vw, 1.38rem); /* h6 */
+  --font-size-5xl: clamp(2.25rem, calc(2.148rem + 0.511vw), 2.53rem);   /* h1 */
+  --font-size-4xl: clamp(2.00rem, calc(1.909rem + 0.455vw), 2.25rem); /* h2 */
+  --font-size-3xl: clamp(1.75rem, calc(1.670rem + 0.398vw), 1.97rem);/* h3 */
+  --font-size-2xl: clamp(1.50rem, calc(1.432rem + 0.341vw), 1.69rem); /* h4 */
+  --font-size-xl:  clamp(1.35rem, calc(1.289rem + 0.307vw), 1.52rem);  /* h5 */
+  --font-size-lg:  clamp(1.20rem, calc(1.145rem + 0.273vw), 1.35rem); /* h6 */
 
   /* Body/base */
-  --font-size-base: clamp(1rem, 0.909rem + 0.455vw, 1.25rem);
+  --font-size-base: clamp(1.00rem, calc(0.955rem + 0.227vw), 1.13rem);
 
   /* Small text scale */
-  --font-size-sm:   clamp(0.88rem, 0.795rem + 0.398vw, 1.09rem);
-  --font-size-xs:   clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
-  --font-size-2xs:  clamp(0.625rem, 0.591rem + 0.295vw, 0.78rem);
-  --font-size-smaller: clamp(0.75rem, 0.682rem + 0.341vw, 0.94rem);
-
+  --font-size-sm: clamp(0.90rem, calc(0.859rem + 0.205vw), 1.01rem);
+  --font-size-xs:   clamp(0.80rem, calc(0.764rem + 0.182vw), 0.90rem);
+  --font-size-2xs:  clamp(0.75rem, calc(0.736rem + 0.068vw), 0.79rem);
 }
 .text-5rem {
   font-size: clamp(2.50rem, calc(1.591rem + 4.545vw), 5.00rem);
 }
-h1, .text-5xl {
+h1, .text-5xl, .fs-5xl {
   font-size: var(--font-size-5xl);
 }
-h2, .text-4xl {
+h2, .text-4xl, .fs-4xl {
   font-size: var(--font-size-4xl);
 }
-h3, .text-3xl {
+h3, .text-3xl, .fs-3xl {
   font-size: var(--font-size-3xl);
 }
-h4, .text-2xl {
+h4, .text-2xl, .fs-2xl {
   font-size: var(--font-size-2xl);
 }
-h5, .text-xl {
+h5, .text-xl, .fs-xl {
   font-size: var(--font-size-xl);
 }
-h6, .text-l, .text-lg {
+h6, .text-l, .text-lg, .fs-l {
   font-size: var(--font-size-lg);
 }
 h1, h2, h3, h4, h5, h6 {
@@ -146,14 +144,14 @@ body, p, .text-base {
   font-size: var(--font-size-base);
 }
 
-small, .text-small, .text-s {
+small, .text-small, .text-s, .fs-s {
   font-size: var(--font-size-sm);
 }
-.text-xs, .text-smaller {
+.text-xs, .text-smaller, .fs-xs {
   font-size: var(--font-size-xs);
   line-height: 1.2;
 }
-.text-2xs {
+.text-2xs, .fs-2xs {
   font-size: var(--font-size-2xs);
 }
 

@@ -61,6 +61,7 @@ function normalizePageType(
   if (p === "location") return "location";
   return "other";
 }
+const nonce = (Astro.locals as any).nonce;
 
 const {
   pageType: pageTypeProp,
@@ -451,7 +452,8 @@ const localSchemas = shouldEmitLB ? localBusiness.locations.map(locationToSchema
 {shouldEmitLB && localSchemas.map((node, i) => (
   <script
     type="application/ld+json"
-    id={`localbusiness-${i}`}
+    id={`localbusiness-${i}`} 
+    nonce={nonce}
     set:html={JSON.stringify(node)}
   />
 ))}
@@ -460,6 +462,7 @@ const localSchemas = shouldEmitLB ? localBusiness.locations.map(locationToSchema
   <script
     type="application/ld+json"
     id="service-schema"
+    nonce={nonce}
     set:html={JSON.stringify({
       "@context": "https://schema.org",
       "@type": "Service",

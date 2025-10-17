@@ -9,7 +9,7 @@ interface Props {
 const { title = 'Search', description = '', query = '', indexPath = '/search-index.json' } = Astro.props as Props;
 ---
 
-<article class="mx-w-content mi-auto">
+<article class="max-w-content mi-auto">
   <header class="my-1 ta-center">
     <h1 class="cc-h3">{query ? `Search Results for: "${query}"` : title}</h1>
     {description && <p class="text-xl">{description}</p>}
@@ -20,7 +20,7 @@ const { title = 'Search', description = '', query = '', indexPath = '/search-ind
       <input
         type="search"
         id="search-input"
-        class="search-input w-full p-05 text-base"
+        class="search-input w-100p p-05 text-base"
         placeholder="Search articles, pages…"
         value={query}
         autocomplete="off"

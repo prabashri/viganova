@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+/** public/scripts/analytics-consent-handler.js */
 'use strict';
 
 (function () {

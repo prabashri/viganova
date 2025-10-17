@@ -1,0 +1,43 @@
+    details.toc {
+      border: none;
+      background: none;
+    }
+
+
+details.toc summary::-webkit-details-marker {
+  display: none; /* hide default arrow */
+}
+
+/* Custom arrow */
+.arrow-icon {
+  transition: transform 0.3s ease;
+  transform: rotate(0deg);
+}
+
+/* Rotate when parent <details> is open */
+details[open] .arrow-icon {
+  transform: rotate(180deg);
+}
+
+#toc li.active-heading > a {
+  font-weight: bold;
+  color: #1d4ed8;
+  border-left: 2px solid #1d4ed8;
+  background-color: #f0f4ff;
+  padding-left: 0.5rem;
+}
+
+
+    /* Highlight active TOC link */
+.toc-list a {
+  
+  border-left: 2px solid transparent;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.toc-list li.active-heading a {
+  color: var(--text-active, #111);
+  font-weight: 600;
+  border-left-color: var(--accent, #4f46e5); /* Indigo or your brand color */
+  background-color: var(--highlight-bg, #f0f4ff);
+}

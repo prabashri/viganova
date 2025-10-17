@@ -12,6 +12,7 @@ import { buildWebsiteSchema } from "@/utils/schemaWebsite";
 import { toAbsoluteUrl, idFor } from '@/utils/urls';
 import SchemaLocalBusiness from './SchemaLocalBusiness.astro';
 
+const nonce = (Astro.locals as any).nonce;
 /** 1) Organization / Website */
 const { node: organizationNode, orgId, brandNode, parentNode } = buildOrganizationSchema();
 const { node: websiteNode, websiteId } = buildWebsiteSchema();
@@ -378,24 +379,24 @@ if (type === 'faq' && Array.isArray(faq) && faq.length) {
 ---
 
 {/* Organization / Brand / Parent */}
-<script id="organization-schema" type="application/ld+json" set:html={JSON.stringify(organizationNode)}></script>
-{brandNode && <script id="brand-schema" type="application/ld+json" set:html={JSON.stringify(brandNode)}></script>}
-{parentNode && <script id="parent-org-schema" type="application/ld+json" set:html={JSON.stringify(parentNode)}></script>}
+<script id="organization-schema" type="application/ld+json" nonce={nonce} set:html={JSON.stringify(organizationNode)}></script>
+{brandNode && <script id="brand-schema" type="application/ld+json" nonce={nonce} set:html={JSON.stringify(brandNode)}></script>}
+{parentNode && <script id="parent-org-schema" type="application/ld+json" nonce={nonce} set:html={JSON.stringify(parentNode)}></script>}
 
 {/* WebSite */}
-<script id="website-schema" type="application/ld+json" set:html={JSON.stringify(websiteNode)}></script>
+<script id="website-schema" type="application/ld+json" nonce={nonce} set:html={JSON.stringify(websiteNode)}></script>
 
 {/* WebPage */}
-<script id="webpage-schema" type="application/ld+json" set:html={JSON.stringify(webpageSchema)}></script>
+<script id="webpage-schema" type="application/ld+json" nonce={nonce} set:html={JSON.stringify(webpageSchema)}></script>
 
 {/* Page entities (Article/FAQ/Media attachments) */}
 {extraNodes.map((n, i) => (
-  <script type="application/ld+json" id={`entity-${i}`} set:html={JSON.stringify(n)}></script>
+  <script type="application/ld+json" id={`entity-${i}`} nonce={nonce} set:html={JSON.stringify(n)}></script>
 ))}
 
 {/* Authors (emit full Person nodes once, built inline) */}
 { (personNodes || []).map((p: any, i: number) => (
-  <script id={`person-schema-${i}`} type="application/ld+json" set:html={JSON.stringify(p)}></script>
+  <script id={`person-schema-${i}`} type="application/ld+json" nonce={nonce} set:html={JSON.stringify(p)}></script>
 ))}
 
 {/* LocalBusiness (if service/product page) */}

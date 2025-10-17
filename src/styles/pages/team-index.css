@@ -1,0 +1,52 @@
+.team-card {
+      flex: 1 1 260px;  /* flexible width but minimum 260px */
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    /* Balance last odd card */
+
+    .team-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    }
+    .team-card.featured {
+      border: 2px solid var(--primary-base);
+      box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.2);
+    }
+    .featured-badge{
+      top: -10px;
+      right: -10px;
+    }
+    .avatar-img, .avatar-initial {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: #fff;
+      font-size: 1.5rem;
+    }
+    /* Theme avatar colors */
+    .avatar-color-green   { background: hsl(145, 70%, 50%); }
+    .avatar-color-pink    { background: hsl(320, 70%, 55%); }
+    .avatar-color-blue    { background: hsl(210, 70%, 55%); }
+    .avatar-color-purple  { background: hsl(270, 70%, 55%); }
+    .avatar-color-teal    { background: hsl(180, 70%, 45%); }
+    .avatar-color-default { background: var(--primary-lighter); }
+    /* Placeholder for custom */
+    .avatar-color-custom { background: var(--primary-lighter); }
+    
+
+    .expertise {
+      border-top: 1px solid var(--base-20);   
+    }
+
+    @media (max-width: 480px) {
+      .team-card {
+        flex: 1 1 100%;
+        max-width: 100%; /* take full width */
+      }
+    }

@@ -38,7 +38,7 @@ const modeMap = {
 const positionMap = {
   static: '',
   sticky: 'sticky top-0 z-100',
-  fixed: 'fixed top-0 left-0 w-full z-100'
+  fixed: 'fixed top-0 left-0 w-100p z-100'
 }
 
 const separatorMap = {
@@ -53,7 +53,7 @@ const headerClasses = [
   modeMap[headerStyle.mode],
   positionMap[headerStyle.position],
   separatorMap[headerStyle.separator ?? 'none'],
-  headerStyle.width === 'sitewidth' ? 'w-site' : 'w-full',
+  headerStyle.width === 'sitewidth' ? 'w-site' : 'w-100p',
 ]
 .filter(Boolean)
 .join(' ')
@@ -62,13 +62,13 @@ const navClasses = [
   modeMapNav[headerStyle.mode],
 ].filter(Boolean).join(' ');
 
-const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.length > 0 ) ? "md-w-full lg-w-full order-2 md-order-3 lg-order-3" : "order-2 lg-order-2"; 
+const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.length > 0 ) ? "md-w-100p lg-w-100p order-2 md-order-3 lg-order-3" : "order-2 lg-order-2"; 
 
 ---
 <header class={`site-header ${headerClasses}`} role="banner" itemscope itemtype="https://schema.org/WPHeader">
-  <div class="flex flex-col big-flex-row mx-w-site w-full relative gap-05 mi-auto ai-f-start big-ai-center jc-space-between lg-wrap md-wrap">
+  <div class="flex flex-col big-flex-row max-w-site w-100p relative gap-05 mi-auto ai-f-start big-ai-center jc-space-between lg-wrap md-wrap">
     {/* LOGO */}
-    <div class="flex flex-row wrap gap-05 mx-w-site w-auto sm-w-full my-0 ai-center jc-space-between">
+    <div class="flex flex-row wrap gap-05 max-w-site w-auto sm-w-100p my-0 ai-center jc-space-between">
       <Logo />
       {/* Mobile Menu Toggle */}
       <Button
@@ -92,7 +92,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     {primaryCTA.length > 0 && ( 
       <div 
         id="main-nav-cta" 
-        class="flex flex-col big-flex-row br sm-bg sm-w-full w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
+        class="flex flex-col big-flex-row br sm-bg sm-w-100p w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
         aria-label="Primary Call to Action"
       >  
         <div class="flex flex-row gap ai-center jc-center">
@@ -138,11 +138,11 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     {siteNav.length > 0 && (
     <nav 
       id="main-nav" 
-      class={`main-nav relative mx-w-site w-full sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 gap br full-br-1 col-base-100 z-100 big-display-inherit ${navOrder}`} 
+      class={`main-nav relative max-w-site w-100p sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 gap br full-br-1 col-base-100 z-100 big-display-inherit ${navOrder}`} 
       aria-label="Primary site navigation"
       >
       {/* Logo for Desktop */}
-      <ul class="nav-list flex ai-center lg-w-full jc-center no-bullets gap sm-flex-col sm-ai-start">
+      <ul class="nav-list flex ai-center lg-w-100p jc-center no-bullets gap sm-flex-col sm-ai-start">
       {/* Loop through siteNav items */}
       {Array.isArray(siteNav) && siteNav.map((item, navIndex) => (           
           <li
@@ -167,7 +167,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                 id={`dropdown-menu-${navIndex}`}
                 role="menu"
                 aria-hidden="true"
-                class="dropdown-menu py-1 bg-transparent static big-absolute top-70 z-1000"
+                class="dropdown-menu py-1 bg-transparent static big-absolute top-70p z-1000"
               >
                 <div class="bg-base-00 p-1 flex flex-col wrap gap br big-b-thin-primary-lighter">
                   {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
@@ -191,9 +191,9 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                 id={`dropdown-menu-${navIndex}`}
                 role="menu"
                 aria-hidden="true" 
-                class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
+                class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70p left-0 z-1000 w-100p"
               >
-                <div class="bg-base-00 sm-bg p-05 br flex flex-row wrap w-full gap big-b-thin-primary-lighter">
+                <div class="bg-base-00 sm-bg p-05 br flex flex-row wrap w-100p gap big-b-thin-primary-lighter">
                   {item.columns.map((col, colIndex) => (
                     <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
                       <h4 class="bold capitalize text-s my-2">{col.title}</h4>
@@ -218,7 +218,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     )}
   {/* SECONDARY NAVIGATION (Optional) */}
   {secondaryNavigation.length > 0 && (
-    <nav id="secondary-nav" class="secondary-nav sm-bg flex flex-row text-xs p-05 br gap z-10 mx-w-site w-full desktop-box-shadow-bottom big-display-inherit" aria-label="Secondary site navigation">
+    <nav id="secondary-nav" class="secondary-nav sm-bg flex flex-row text-xs p-05 br gap z-10 max-w-site w-100p desktop-box-shadow-bottom big-display-inherit" aria-label="Secondary site navigation">
       {/* Loop through secondaryNavigation items */}
       <ul class="nav-list flex ai-center no-bullets gap sm-flex-col sm-ai-start">
         {Array.isArray(secondaryNavigation) && secondaryNavigation.map((item, navIndex) => (
@@ -244,7 +244,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                   id={`dropdown-menu-${navIndex}`}
                   role="menu"
                   aria-hidden="true"
-                  class="dropdown-menu py-1 bg-transparent static big-absolute top-70 z-1000"
+                  class="dropdown-menu py-1 bg-transparent static big-absolute top-70p z-1000"
                 >
                   <div class="bg-base-90 col-base-00 p-1 flex flex-col wrap gap br">
                     {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
@@ -268,9 +268,9 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                   id={`dropdown-menu-${navIndex}`}
                   role="menu"
                   aria-hidden="true"
-                  class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70 left-0 z-1000 w-full"
+                  class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70p left-0 z-1000 w-100p"
                 >
-                  <div class="bg-base-00 sm-bg p-1 br flex flex-row wrap w-full gap big-b-thin-primary-lighter">
+                  <div class="bg-base-00 sm-bg p-1 br flex flex-row wrap w-100p gap big-b-thin-primary-lighter">
                     {item.columns.map((col, colIndex) => (
                       <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
                         <h4 class="bold capitalize text-s my-2">{col.title}</h4>

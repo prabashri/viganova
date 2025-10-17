@@ -3,6 +3,7 @@ import ResponsiveImage from '@/components/ResponsiveImage.astro';
 import { siteDefaults } from '@/config/siteDefaults';
 import { getEntry } from 'astro:content';
 import type { VideoMeta } from '@/types/HeadProps';
+import CssFilesToLoad from  '@/components/CssFilesToLoad.astro';
 
 type Aspect = `${number}:${number}`;
 
@@ -212,20 +213,10 @@ const captions = (video?.captions ?? doc?.captions ?? []) as any[];
 /* unique ids per instance */
 const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
 ---
-
-<style is:inline>
-/* Component-local shell; aspect is set via inline style attr for accuracy */
-.player-shell iframe, .player-shell video { width: 100%; height: 100%; display: block; border: 0; }
-
-.video-poster-wrap { width: 100%; height: 100%; }
-.video-play-btn { background: linear-gradient(0deg, rgba(0,0,0,.35), rgba(0,0,0,.35));  }
-.video-play-btn:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
-.hide { display: none !important; }
-</style>
-
+<CssFilesToLoad files={[{name:'video-player', inline:true}]}  />
 <div class={`video-player ${className}`}>
   <div
-    class="player-shell w-full bg-base-10 br overflow-hidden relative"
+    class="player-shell w-100p bg-base-10 br overflow-hidden relative"
     id={`${uid}-shell`}    
     data-vp-root
     data-uid={uid}
@@ -237,7 +228,7 @@ const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
   >
     {/* Poster (ResponsiveImage) + Play overlay */}
     {poster && (
-      <div id={`${uid}-poster-wrap`} class="video-poster-wrap">
+      <div id={`${uid}-poster-wrap`} class="video-poster-wrap w-100p h-full ">
         <ResponsiveImage
           src={poster}
           alt={posterAlt}
@@ -247,7 +238,7 @@ const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
           height={posterH}
           id={`${uid}-poster-img`}
           loading="eager"
-          className="w-full h-full object-cover block"
+          className="w-100p h-full object-cover block"
           variant="desktop"
           addSchema={false}
         />

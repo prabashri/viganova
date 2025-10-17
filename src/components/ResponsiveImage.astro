@@ -57,6 +57,8 @@ const {
 const variants: ImageVariants = siteImages.variants;
 const breakpoints: ImageBreakpoints = siteImages.breakpoints;
 
+const nonce = (Astro.locals as any).nonce;
+
 // meta (either from props or util)
 const meta = imageMeta ?? getImageMeta(src);
 const hasData = !!meta;
@@ -194,14 +196,14 @@ if (hasData && meta) {
 ---
 {!hasData ? (
   <div class={`flex ai-center jc-center bg-primary-lighter br ${aspectClass} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit ${className}`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-full h-auto ${imageClassName} ${objectFitClass}`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-100p h-auto ${imageClassName} ${objectFitClass}`}>
       <rect width="400" height="225" fill="#00000000"></rect>
     </svg>
     <span class="absolute bold text-base">{siteDefaults.siteName}</span>
   </div>
 ) : (
   caption ? (
-    <figure id={id} class={`block image-wrapper w-full ${aspectClass} h-fit ${className}`}>
+    <figure id={id} class={`block image-wrapper w-100p ${aspectClass} h-fit ${className}`}>
       <picture>
         {formats.map(fmt => (
           <source
@@ -224,13 +226,13 @@ if (hasData && meta) {
           loading={loading === 'delay' ? 'lazy' : loading}
           decoding="async"
           fetchpriority={loading === 'eager' ? 'high' : loading === 'delay' ? 'low' : undefined}
-          class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
+          class={`block w-100p h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
         />
       </picture>
       <figcaption class="text-s">{caption}</figcaption>
     </figure>
   ) : (
-    <figure id={id} class={`block image-wrapper w-full ${aspectClass} h-fit ${className}`}>
+    <figure id={id} class={`block image-wrapper w-100p ${aspectClass} h-fit ${className}`}>
       <picture>
         {formats.map(fmt => (
           <source
@@ -253,7 +255,7 @@ if (hasData && meta) {
           loading={loading === 'delay' ? 'lazy' : loading}
           decoding="async"
           fetchpriority={loading === 'eager' ? 'high' : loading === 'delay' ? 'low' : undefined}
-          class={`block w-full h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
+          class={`block w-100p h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
         />
       </picture>
     </figure>
@@ -262,7 +264,9 @@ if (hasData && meta) {
 {addSchema && hasData && (
   <script
     is:inline
-    type="application/ld+json"
+    data-id="image-schema"
+    type="application/ld+json" 
+    nonce={nonce}
     set:html={JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'ImageObject',

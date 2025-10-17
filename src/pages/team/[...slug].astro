@@ -195,7 +195,7 @@ const authorCards: CardProps[] = initialPosts.map((p) => ({
   roleType: 'article',
   loading: 'lazy',
 
-  className: 'w-full mn-w-320',
+  className: 'w-100p mn-w-320',
   imageClassName: '',
 
   otherEntries: [],
@@ -206,10 +206,10 @@ const authorCards: CardProps[] = initialPosts.map((p) => ({
   <Content />
   <Fragment slot="posts">
     {authorCards.length > 0 && (
-      <section id="author-posts-section" class="mx-w-site w-full mi-auto my-1 py-1">
+      <section id="author-posts-section" class="max-w-site w-100p mi-auto my-1 py-1">
         <h2 class="text-xl bold">Posts by {name}</h2>
 
-        <div id="author-posts" class="flex mx-w-site w-full wrap gap my-1 ai-center jc-center">
+        <div id="author-posts" class="flex max-w-site w-100p wrap gap my-1 ai-center jc-center">
           {authorCards.map((card) => (
             <Card {...card} />
           ))}

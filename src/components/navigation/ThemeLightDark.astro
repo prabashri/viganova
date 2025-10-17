@@ -27,24 +27,24 @@ import { Icon } from "astro-icon/components";
   <!-- Popup menu -->
   <div
     id="theme-menu"
-    class="relative big-absolute br border-primary bg-base-00 col-base-100 my-05 box-shadow display-none right-0 top-100 p-05 z-1000"
+    class="relative big-absolute br border-primary bg-base-00 col-base-100 my-05 box-shadow display-none right-0 top-100p p-05 z-1000"
     role="menu"
     aria-labelledby="theme-button"
   >
     <!-- Use non-interactive element + ARIA role -->
-    <div class="theme-option flex ai-center gap text-left mx-w-320 mn-w-160 ac-center px-05 my-05 mx-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+    <div class="theme-option flex ai-center gap text-left max-w-sidebar mn-w-160 ac-center px-05 my-05 mx-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 w-100p jc-start"
          role="menuitemradio" aria-checked="false" data-theme="system" tabindex="-1">
       <Icon name="bw" class="w-1-5 h-1-5" aria-hidden="true" />
       <span>OS Default</span>
     </div>
 
-    <div class="theme-option flex ai-center gap text-left mx-w-320 mn-w-160 ac-center px-05 my-05 mx-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+    <div class="theme-option flex ai-center gap text-left max-w-sidebar mn-w-160 ac-center px-05 my-05 mx-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 w-100p jc-start"
          role="menuitemradio" aria-checked="false" data-theme="light" tabindex="-1">
       <Icon name="light" class="w-1-5 h-1-5" aria-hidden="true" />
       <span>Light</span>
     </div>
 
-    <div class="theme-option flex ai-center gap text-left mx-w-320 mn-w-160 ac-center px-05 my-05 mx-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 full-width jc-start"
+    <div class="theme-option flex ai-center gap text-left max-w-sidebar mn-w-160 ac-center px-05 my-05 mx-02 bg-transparent hover-bg-primary-light col-inherit hover-col-base-00 w-100p jc-start"
          role="menuitemradio" aria-checked="false" data-theme="dark" tabindex="-1">
       <Icon name="moon" class="w-1-5 h-1-5" aria-hidden="true" />
       <span>Dark</span>

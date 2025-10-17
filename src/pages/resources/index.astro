@@ -107,7 +107,7 @@ const otherCards:    CardProps[] = otherPosts.map((p, i) => mapToCardProps(p, i)
   />
 
   { (featuredCards.length > 0 || otherCards.length > 0) && (
-    <div class="mx-w-site mi-auto my-1 py-1">
+    <div class="max-w-site mi-auto my-1 py-1">
       {featuredCards.length > 0 && (
         <CardCollections cards={featuredCards} wrapper="ul" orientation="horizontal" roleType="list" entry={entry} />
       )}

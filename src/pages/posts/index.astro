@@ -80,7 +80,7 @@ const blogCards: CardProps[] = posts.map((post, index) => mapToCardProps(post, i
   />
 
   {blogCards.length > 0 && (
-    <section class="mx-w-site mi-auto my-2 py-2">
+    <section class="max-w-site mi-auto my-2 py-2">
       <CardCollections cards={blogCards} wrapper="ul" roleType="list" entry={entry} />
     </section>
   )}

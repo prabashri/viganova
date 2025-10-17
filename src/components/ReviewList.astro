@@ -17,6 +17,8 @@ import { getAllReviews, getGlobalAggregate } from "@/utils/reviews";
 
 const { orgId } = buildOrganizationSchema();
 
+const nonce = (Astro.locals as any).nonce;
+
 /* ---------- Props ---------- */
 const {
   reviews = [],
@@ -49,7 +51,7 @@ const allReviews = (reviews && reviews.length > 0) ? reviews : await getAllRevie
 await getGlobalAggregate();
 
 /* ---------- UI Classes ---------- */
-const baseClasses = 'card mx-w-sidebar w-full border-primary-light hover-border-primary br bg-base-00 box-shadow p-05';
+const baseClasses = 'card max-w-sidebar w-100p border-primary-light hover-border-primary br bg-base-00 box-shadow p-05';
 const orientationClass = 'flex flex-col big-flex-row big-flex-1 gap';
 const contentWrapperClass = 'flex flex-col flex-1 p-05';
 const tagClass = 'tag-link bg-primary-lighter col-base-100 br text-xs px-05 py-02';
@@ -297,6 +299,8 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
           {reviewSchema && (
             <script
               is:inline
+              data-id="review-schema"
+              nonce={nonce}
               type="application/ld+json"
               set:html={JSON.stringify({
                 '@context': 'https://schema.org',
@@ -343,5 +347,5 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
 )}
 
 {aggregateJsonLd && (
-  <script id="review-aggregate" type="application/ld+json" set:html={JSON.stringify(aggregateJsonLd)} />
+  <script nonce={nonce} id="review-aggregate" type="application/ld+json" set:html={JSON.stringify(aggregateJsonLd)} />
 )}

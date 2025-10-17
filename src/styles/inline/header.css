@@ -66,7 +66,7 @@ svg use {
 .big-display-block {
   display: none
 }
-.mx-w-width, .mx-w-site{
+.max-w-site, .max-w-site{
   max-width: var(--site-width)
 }
 .main-nav.mobile-active {
@@ -121,7 +121,7 @@ svg use {
     display: none !important;
     overflow-y:scroll;
   }
-  .sm-w-full {
+  .sm-w-100p {
     width: 100%;
   }
   .main-nav.is-open {

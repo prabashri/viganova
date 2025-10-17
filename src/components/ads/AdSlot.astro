@@ -16,6 +16,7 @@ const adsense = siteFunctions.adsense?.trim();
 const clientId = (Astro.props.clientId || adsense || '').trim();
 const { slotId, format = 'auto', responsive = true, style = 'display:block;min-height:120px' } = Astro.props;
 const enabled = !!clientId && !!slotId;
+const nonce = (Astro.locals as any).nonce;
 ---
 {enabled && (
   <>
@@ -27,7 +28,7 @@ const enabled = !!clientId && !!slotId;
       data-full-width-responsive={String(responsive)}
     ></ins>
 
-    <script is:inline>
+    <script nonce={nonce} id="adslot-inline-init" is:inline>
       (function push(i=0){
         if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) { window.adsbygoogle.push({}); return; }
         if (i < 40) setTimeout(() => push(i+1), 150);

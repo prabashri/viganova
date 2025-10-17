@@ -7,17 +7,17 @@ interface Props {
 
 const props = Astro.props as Props;
 ---
-<section class="page-content w-full flex flex-col jc-center ai-center mi-auto ta-center mn-h-70vh px-1 py-2">
+<section class="page-content w-100p flex flex-col jc-center ai-center mi-auto ta-center mn-h-70vh px-1 py-2">
      <HeroPages
         variant="simple"
         title="404"
         description={props.description}
         headingClass="text-5rem my-05"
-        descriptionClass="mx-w-featured text-xl my-1"
-        containerClass='mx-w-featured'
+        descriptionClass="max-w-featured text-xl my-1"
+        containerClass='max-w-featured'
     />
     {/*-- Simple client-side search hook */}
-    <div id="search" class="search-box mt-1 mn-w-320 w-full mx-w-content my-3" role="search">
+    <div id="search" class="search-box mt-1 mn-w-320 w-100p max-w-content my-3" role="search">
       <input
         type="search"
         id="search-input"
@@ -28,7 +28,7 @@ const props = Astro.props as Props;
       <ul id="search-results" class="no-bullets ta-left"></ul>
     </div>
 
-    <div class="mi-auto ta-center my-2 mx-w-content">
+    <div class="mi-auto ta-center my-2 max-w-content">
         <a href="/" class="col-base-00 p-1 td-none bg-primary-lighter col-base-100 br">
         ← Go back to homepage
         </a>

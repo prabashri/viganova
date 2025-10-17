@@ -30,7 +30,7 @@ const {
   prevItem = null,
   nextItem = null,
   collectionBase,
-  class: wrapperClass = 'footerNav flex footer-nav post-navigation my-05 p-05 w-full mi-auto jc-center bg',
+  class: wrapperClass = 'footerNav flex footer-nav post-navigation my-05 p-05 w-100p mi-auto jc-center bg',
   prevVariant = 'secondary',
   nextVariant = 'secondary',
 } = Astro.props as Props;
@@ -53,14 +53,14 @@ const nextHref = nextSlug ? `/${safeBase}${nextSlug}/` : '';
 
 {(prevSlug || nextSlug) && (
   <nav class={wrapperClass} aria-label="Post navigation">
-    <ul class="flex flex-row mx-w-featured w-full wrap gap-2 jc-space-between no-list-style-type no-margin">
+    <ul class="flex flex-row max-w-featured w-100p wrap gap-2 jc-space-between no-list-style-type no-margin">
       <li class="w-50-1 ta-start bg-primary-lighter br">
         {prevSlug && (
           <Anchor
             href={prevHref}
             type="button"
             variant={prevVariant}
-            className="prev-post flex flex-col bg-primary-light p-05 gap-05 br ai-f-start"
+            className="prev-post flex flex-col bg-primary-light p-05 gap-05 br ai-f-start h-webkit jc-f-start"
             ariaLabel={`Go to previous: ${titleOf(prevItem)}`}
             rel="prev"
             data-action="prev_click"

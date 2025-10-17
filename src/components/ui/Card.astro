@@ -33,7 +33,7 @@ const {
 
 // Orientation classes
 const baseClasses = `card border-primary-light hover-border-primary br bg-base-00 box-shadow p-0 ${className}`;
-const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap mx-w-content w-320 big-w-full';
+const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap max-w-content w-320 big-w-100p';
 const verticalClass = 'flex flex-col w-320';
 const orientationClass = orientation === 'horizontal' ? horizontalClass : verticalClass;
 const imageSizeFinal = imageSize || (orientation === 'horizontal' ? 160 : 320); // default sizes  
@@ -74,9 +74,9 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
         sizes={imageSizeFinal}
         width={imageSizeFinal}
         height={Math.round(imageSizeFinal * 0.56)}
-        className={`${className} no-width ar-unset`}
+        className={`${className} w-unset ar-unset`}
         objectFit='cover'
-        imageClassName={`b-thin-primary-light mx-w-320 br-unset ${imageClassName} h-full`}
+        imageClassName={`b-thin-primary-light max-w-sidebar br-unset ${imageClassName} h-full`}
         breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
         loading={loading}
       />

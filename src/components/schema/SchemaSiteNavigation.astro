@@ -121,6 +121,7 @@ const siteNavigationSchema: any = {
     }] : [])
   ]
 };
+const nonce = (Astro.locals as any).nonce;
 ---
 
-<script id="sitenav-schema" type="application/ld+json" set:html={JSON.stringify(siteNavigationSchema)}></script>
+<script id="sitenav-schema" nonce={nonce} type="application/ld+json" set:html={JSON.stringify(siteNavigationSchema)}></script>
