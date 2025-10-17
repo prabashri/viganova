@@ -47,7 +47,7 @@ const BASE: Directives = {
   "media-src": ["'self'"],
 
   // Modern + safe script policy. Hosts are Safari fallback.
-  "script-src": ["'self'", "'strict-dynamic'", "'report-sample'"],
+  "script-src": ["'self'", "'report-sample'"],
   "script-src-elem": ["'self'"],           // will be mirrored from script-src
   "script-src-attr": ["'none'"],
 
@@ -174,12 +174,11 @@ function buildDirectives(): Directives {
 function orderScriptSrc(list: string[], nonceToken?: string): string[] {
   const set = new Set(list);
   const hosts = Array.from(set).filter(v =>
-    v !== "'self'" && v !== "'strict-dynamic'" && v !== "'report-sample'" && v !== nonceToken
+    v !== "'self'" && v !== "'report-sample'" && v !== nonceToken
   );
   return [
     "'self'",
     ...(nonceToken ? [nonceToken] : []),
-    "'strict-dynamic'",
     "'report-sample'",
     ...hosts,
   ];
