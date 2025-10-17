@@ -1,5 +1,5 @@
 import { defineMiddleware } from "astro:middleware";
-import { getSecurityHeaders, extraHttpHeaders } from "./config/security.mjs";
+import { getSecurityHeaders, extraHttpHeaders } from "./config/security.js";
 
 declare module "astro" {
   interface Locals {
@@ -29,7 +29,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
   const security = getSecurityHeaders(nonce);
   if (isXml) {
     const arr = Array.isArray(security["style-src"]) ? security["style-src"] : [security["style-src"]];
-    security["style-src"] = Array.from(new Set([...arr, "'unsafe-inline'"]));
+    const strArr = arr.filter((v): v is string => typeof v === "string");
+    security["style-src"] = Array.from(new Set([...strArr, "'unsafe-inline'"]));
   }
 
   const cspValue = Object.entries(security)
