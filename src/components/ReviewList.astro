@@ -51,10 +51,10 @@ const allReviews = (reviews && reviews.length > 0) ? reviews : await getAllRevie
 await getGlobalAggregate();
 
 /* ---------- UI Classes ---------- */
-const baseClasses = 'card max-w-sidebar w-100p border-primary-light hover-border-primary br bg-base-00 box-shadow p-05';
+const baseClasses = 'card max-w-sidebar w-100p br-primary-light hover-br-primary br-r bg-base-00 box-shadow p-05';
 const orientationClass = 'flex flex-col big-flex-row big-flex-1 gap';
 const contentWrapperClass = 'flex flex-col flex-1 p-05';
-const tagClass = 'tag-link bg-primary-lighter col-base-100 br text-xs px-05 py-02';
+const tagClass = 'tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02';
 
 /* ---------- Helpers ---------- */
 function serviceLabel(r: Review) {
@@ -192,7 +192,7 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
 ---
 
 {showRating && uiValue != null && uiCount > 0 && (
-  <div class="flex flex-row text-xl bold ta-center border-secondary bg-base-00 col-base-100 br my-2 p-1 w-fit mi-auto">
+  <div class="flex flex-row text-xl bold ta-center br-secondary bg-base-00 col-base-100 br-r my-2 p-1 w-fit mi-auto">
     <StarRating rating={uiValue} showNumber />
     <span class="opacity-75">/ 5 from {uiCount} reviews</span>
   </div>
@@ -236,7 +236,7 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
                 <span class="text-s block bold my-02">Customers loved</span>
                 <ul class="no-bullets flex wrap gap-05">
                   {(r as any).pros.map((p: string) => (
-                    <li class="tag-link bold bg-success-light col-base-100 br text-xs px-05 py-02">{p}</li>
+                    <li class="tag-link bold bg-success-light col-base-100 br-r text-xs px-05 py-02">{p}</li>
                   ))}
                 </ul>
               </div>
@@ -251,13 +251,13 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
                   width={24}
                   height={24}
                   breakpoints={{ mobile: 24, desktop: 24 }}
-                  imageClassName="round b-thin-primary-light br-unset"
+                  imageClassName="round br-thin-primary-light br-r-unset"
                   className="w-1-5 h-1-5"
                   loading="lazy"
                 />
               ) : (
                 <div
-                  class="w-1-5 h-1-5 round bg-primary-lighter b-thin-primary-light flex ai-center jc-center text-xs bold col-base-900"
+                  class="w-1-5 h-1-5 round bg-primary-lighter br-thin-primary-light flex ai-center jc-center text-xs bold col-base-900"
                   aria-label={`Reviewer initial ${firstInitial(nameText)}`}
                 >
                   {firstInitial(nameText)}

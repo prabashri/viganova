@@ -1,5 +1,5 @@
 {
-  "name": "easyapostille",
+  "name": "verifiedapostille",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "@astrojs/check": "^0.9.4",
-    "@astrojs/cloudflare": "^12.6.9",
-    "@astrojs/mdx": "^4.3.6",
+    "@astrojs/cloudflare": "^12.6.10",
+    "@astrojs/mdx": "^4.3.7",
     "@astrojs/rss": "^4.0.12",
-    "astro": "^5.14.4",
+    "astro": "^5.14.5",
     "fuse.js": "^7.1.0",
     "typescript": "^5.9.2"
   },

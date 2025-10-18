@@ -1,47 +1,47 @@
 {
   "configModified": {
-    "siteDefaults": 1760570329903,
+    "siteDefaults": 1760781661321,
     "siteLogo": 1754383794286,
-    "siteColors": 1760194029116,
-    "siteImages": 1760570329917
+    "siteColors": 1760716640779,
+    "siteImages": 1760803010198
   },
   "icons": {
     "android-chrome-192x192.png": {
-      "datetime": "2025-08-31T11:05:14.168Z"
+      "datetime": "2025-10-18T16:01:02.551Z"
     },
     "android-chrome-512x512.png": {
-      "datetime": "2025-08-31T11:05:14.168Z"
+      "datetime": "2025-10-18T16:01:02.551Z"
     },
     "apple-touch-icon.png": {
-      "datetime": "2025-08-31T11:05:14.168Z"
+      "datetime": "2025-10-18T16:01:02.551Z"
     },
     "favicon-16x16.png": {
       "datetime": "2025-06-27T05:12:16.114Z"
     },
     "favicon-32x32.png": {
-      "datetime": "2025-08-31T11:05:14.168Z"
+      "datetime": "2025-10-18T16:01:02.551Z"
     },
     "favicon.ico": {
-      "datetime": "2025-08-31T11:05:14.168Z"
+      "datetime": "2025-10-18T16:01:02.551Z"
     },
     "favicon.svg": {
-      "datetime": "2025-08-31T10:24:13.083Z"
+      "datetime": "2025-10-18T15:46:23.708Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-15T23:24:13.405Z"
+      "datetime": "2025-10-18T10:01:43.532Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-10-11T17:22:02.035Z",
+      "datetime": "2025-10-18T03:11:06.994Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-10-14T06:02:08.126Z",
+      "datetime": "2025-10-18T16:17:58.744Z",
       "names": [
         "base",
         "colors",
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.v8mkqx.css",
-      "datetime": "2025-10-15T23:24:06.334Z",
+      "file": "/styles/main.1wevf8.css",
+      "datetime": "2025-10-18T10:01:34.639Z",
       "names": [
         "blockquote",
         "callout",
@@ -68,16 +68,22 @@
         "search",
         "star-rating",
         "table",
+        "toc",
         "utilities"
       ]
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-15T23:24:08.689Z",
+      "datetime": "2025-10-18T16:18:03.721Z",
       "names": [
+        "audio-layout",
         "contact-form",
         "home",
-        "post-layout"
+        "post-layout",
+        "team-index",
+        "team-layout",
+        "video-layout",
+        "video-player"
       ],
       "dir": "/styles/"
     },
@@ -123,34 +129,34 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.01tto8.json",
-      "datetime": "2025-10-15T23:23:55.188Z"
+      "file": "/search-index.dmvayd.json",
+      "datetime": "2025-10-18T16:17:50.624Z"
     }
   },
   "js": {
     "contact-form": {
-      "file": "/scripts/contact-form.ka44bd.min.js",
-      "datetime": "2025-08-29T14:32:48.692Z"
+      "file": "/scripts/contact-form.ukucmg.min.js",
+      "datetime": "2025-10-18T03:14:23.005Z"
     },
     "main": {
-      "file": "/scripts/main.947vgx.min.js",
-      "datetime": "2025-10-14T06:02:17.774Z"
+      "file": "/scripts/main.skr9dp.min.js",
+      "datetime": "2025-10-18T03:14:23.473Z"
     },
     "search": {
-      "file": "/scripts/search.5sjaht.min.js",
-      "datetime": "2025-08-29T14:32:49.358Z"
+      "file": "/scripts/search.6fzd2l.min.js",
+      "datetime": "2025-10-18T03:14:23.893Z"
     },
     "video-watch": {
-      "file": "/scripts/video-watch.5oxhga.min.js",
-      "datetime": "2025-09-08T14:08:37.542Z"
+      "file": "/scripts/video-watch.0wzilc.min.js",
+      "datetime": "2025-10-18T03:14:23.931Z"
     },
     "analytics-consent-handler": {
-      "file": "/scripts/analytics-consent-handler.gv9v2l.min.js",
-      "datetime": "2025-10-14T06:02:17.629Z"
+      "file": "/scripts/analytics-consent-handler.b7i5je.min.js",
+      "datetime": "2025-10-18T03:14:22.798Z"
     },
     "header-menu-theme": {
-      "file": "/scripts/header-menu-theme.pb8k85.min.js",
-      "datetime": "2025-10-14T06:02:17.679Z"
+      "file": "/scripts/header-menu-theme.0ma8vz.min.js",
+      "datetime": "2025-10-18T03:14:23.382Z"
     }
   },
   "logosPublic": {
@@ -227,8 +233,8 @@
   },
   "sources": {
     "parentOrganizationLogo": {
-      "path": "D:\\Onedrive\\websites\\easyapostille\\src\\assets\\logos\\nviews-logo.png",
-      "fingerprint": "D:\\Onedrive\\websites\\easyapostille\\src\\assets\\logos\\nviews-logo.png:14467:1650088292000:552f40ee00c3275430409766eb634f0b8ce70936"
+      "path": "D:\\Onedrive\\websites\\verifiedapostille\\src\\assets\\logos\\nviews-logo.png",
+      "fingerprint": "D:\\Onedrive\\websites\\verifiedapostille\\src\\assets\\logos\\nviews-logo.png:14467:1760708775251.3499:552f40ee00c3275430409766eb634f0b8ce70936"
     }
   }
 }

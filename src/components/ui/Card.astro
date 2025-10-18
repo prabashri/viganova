@@ -32,7 +32,7 @@ const {
 } = Astro.props as CardProps;
 
 // Orientation classes
-const baseClasses = `card border-primary-light hover-border-primary br bg-base-00 box-shadow p-0 ${className}`;
+const baseClasses = `card br-primary-light hover-br-primary br-r bg-base-00 box-shadow p-0 ${className}`;
 const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap max-w-content w-320 big-w-100p';
 const verticalClass = 'flex flex-col w-320';
 const orientationClass = orientation === 'horizontal' ? horizontalClass : verticalClass;
@@ -76,7 +76,7 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
         height={Math.round(imageSizeFinal * 0.56)}
         className={`${className} w-unset ar-unset`}
         objectFit='cover'
-        imageClassName={`b-thin-primary-light max-w-sidebar br-unset ${imageClassName} h-full`}
+        imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset ${imageClassName} h-full`}
         breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
         loading={loading}
       />
@@ -89,7 +89,7 @@ const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
     {otherEntries.length > 0 && (
       <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
         {otherEntries.map((entry: { url: string; label: string }) => (
-          <li class="tag-link bg-primary-lighter col-base-100 br text-xs px-05 py-02" aria-label={`View tag: ${entry.label}`}>
+          <li class="tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02" aria-label={`View tag: ${entry.label}`}>
             <span class="tag">{entry.label}</span>
           </li>
         ))}

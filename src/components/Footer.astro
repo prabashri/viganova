@@ -13,9 +13,9 @@ const hasDesktopSvg = Boolean(manifestLogos.desktopLogoSvg);
 
 const siteName = siteDefaults.siteName || 'EasyApostille';
 const siteTitle = siteDefaults.title || '';
-const siteUrl = (siteDefaults.siteUrl || 'https://easyapostille.in/').replace(/\/?$/, '/');
+const siteUrl = (siteDefaults.siteUrl || 'https://VerifiedApostille.in/').replace(/\/?$/, '/');
 
-const domainName = siteDefaults.domainName || 'easyapostille.in';
+const domainName = siteDefaults.domainName || 'VerifiedApostille.in';
 
 // Build address string: prefer brand address, then parent org address
 const brandAddr = siteDefaults.address;
@@ -133,7 +133,7 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
         href={siteUrl}
         aria-label={`${siteName} — Home`}
         title={`${siteName} — Home`}
-        class="inline-flex ai-center gap-05 td-none br bg-primary-lighter-x"
+        class="inline-flex ai-center gap-05 td-none br-r bg-primary-lighter-x"
       >
         {hasDesktopSvg ? (
           <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} aria-hidden="true" focusable="false"/>

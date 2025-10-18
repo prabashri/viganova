@@ -48,15 +48,15 @@ const headProps: HeadProps = {
 ---
 
 <BaseLayout headProps={headProps}>
-  <Fragment slot="headContent-top">
- 
-     <CssFilesToLoad
+  <Fragment slot="headContent-top">      
+  </Fragment>
+  <Fragment slot="headContent-bottom">
+    <CssFilesToLoad
         files={[
-          { name: "home", inline: true}
+          { name: "home-page", inline: true, id: "home-page-inline"}
         ]}
       />
   </Fragment>
-  <Fragment slot="headContent-bottom" />
   <Home />
   <Fragment slot="extraScripts" />
 </BaseLayout>

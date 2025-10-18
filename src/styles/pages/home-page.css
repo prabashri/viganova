@@ -1,7 +1,7 @@
  /* colors respect light/dark; tweak if needed */
  .post-header{
-	background-color: var(--primary-darker);
-    background-image: url('/icons/dots-background.svg');
+	/* background-color: var(--primary-darker);*/
+   background-image: url('/icons/dots-background.svg');
 	background-repeat: repeat;
     background-attachment: fixed;
     background-size: 60%;
@@ -19,7 +19,7 @@
     position: relative;
     display: grid;
     grid-template-columns: 1fr 56px 1fr; /* left | center | right */
-    row-gap: 3rem;
+    row-gap: 0rem;
     column-gap: 2.5rem;
     padding-block: .5rem;
   }
@@ -144,7 +144,7 @@
   color: #0a0a0a;
   justify-content: space-between;
 
-  /* ring via background, not a real border (prevents hairline) */
+  /* ring via background, not a real br (prevents hairline) */
   border: 5px solid transparent;
   background-origin: border-box;
   background-clip: padding-box, border-box;

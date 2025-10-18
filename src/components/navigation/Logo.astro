@@ -21,16 +21,16 @@ const mobileAlt = `${siteDefaults.siteName} Mobile Logo`;
   className="inline-flex order-1 h-60 w-auto no-bb hover-bg-transparent hover-box-shadow-glow p-0"
 >
   {hasDesktopSvg ? (
-    <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} />
+    <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br-r" aria-label={desktopAlt} title={desktopAlt} />
   ) : siteImages.desktopLogo ? (
-    <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" />
+    <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br-r" />
   ) : (
     <span class="bold text-base big-display-inherit col-primary hover-col-base-100">{siteDefaults.siteName}</span>
   )}
 
   {hasMobileSvg ? (
-    <Icon name="MobileLogo" class="h-60 w-auto sm-display-inherit br" aria-label={mobileAlt} title={mobileAlt} />
+    <Icon name="MobileLogo" class="h-60 w-auto sm-display-inherit br-r" aria-label={mobileAlt} title={mobileAlt} />
   ) : siteImages.mobileLogo ? (
-    <img src={siteImages.mobileLogo} alt={mobileAlt} title={mobileAlt} class="h-60 w-auto sm-display-inherit br" />
+    <img src={siteImages.mobileLogo} alt={mobileAlt} title={mobileAlt} class="h-60 w-auto sm-display-inherit br-r" />
   ) : null}
 </Anchor>

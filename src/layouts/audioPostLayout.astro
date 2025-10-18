@@ -415,7 +415,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
     {/* Hero cover + play overlay → audio/iframe */}
     <section class="audio-player max-w-content my-05 hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
       <div
-        class="player-shell overflow-hidden relative bg-base-10 br w-100p h-full"
+        class="player-shell overflow-hidden relative bg-base-10 br-r w-100p h-full"
         id={`${uid}-shell`}
         data-ap-root
         data-uid={uid}
@@ -513,7 +513,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
                   label={`Seek to ${ts(c.start)} — ${c.name}`}
                   type="button"
                   variant="plain"
-                  className="chapter-link inline-flex gap-05 td-none p-05 br bg-transparent pointer hover-bg-primary-lighter-x"
+                  className="chapter-link inline-flex gap-05 td-none p-05 br-r bg-transparent pointer hover-bg-primary-lighter-x"
                   data-seek={c.start}
                   data-href={chapterHref(c.start, c.url)}
                   ariaLabel={`Seek to ${ts(c.start)} — ${c.name}`}

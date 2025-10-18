@@ -4,7 +4,7 @@ import type { ImageSizeLabel } from '@/types/images';
 export const siteImages = {  
     /** General lightweight image used as background*/
     image: "featured/easy-apostille-service.png",
-    imageAlt: "Image with easyapostille logo, notary, verified and trusted stamp, with some documents graphics",
+    imageAlt: "Image with VerifiedApostille logo, notary, verified and trusted stamp, with some documents graphics",
     imageTitle: "Easy Apostille - Best Apostille Services in India",
 
     /** featured image for the website */
@@ -66,16 +66,16 @@ export const siteImages = {
     thumbnail: true,
     /* thumbnailSize: 120,*/
 
-    desktopLogo: "src/assets/logos/easy-apostille-logo-w700.png",
+    desktopLogo: "src/assets/logos/verifiedapostille-logo-w700.png",
     desktopLogoSvg: "src/assets/logos/DesktopLogo.svg",
 
-    mobileLogo: "src/assets/logos/easy-apostille-icon-w1024.png",
+    mobileLogo: "src/assets/logos/verifiedapostille-mobile-logo-w1024.png",
     mobileLogoSvg: "src/assets/logos/MobileLogo.svg",
 
-    siteIcon: "src/assets/logos/easy-apostille-favicon-w1024.png",
+    siteIcon: "src/assets/logos/verifiedapostille-favicon-w1024.png",
     siteIconSvg: "src/assets/logos/Icon.svg",
 
-    favIcon: "src/assets/logos/easy-apostille-favicon-w1024.png",
+    favIcon: "src/assets/logos/verifiedapostille-favicon-w1024.png",
     favIconSvg: "src/assets/logos/Icon.svg",
 
 }

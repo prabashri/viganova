@@ -18,11 +18,11 @@ function svc(key: PriceKey, url: string) {
 }
 
 /* Brand / contacts */
-const BRAND_NAME = siteDefaults.siteName || "EasyApostille";
-const BRAND_URL  = siteDefaults.siteUrl || "https://easyapostille.in/";
+const BRAND_NAME = siteDefaults.siteName || "VerifiedApostille";
+const BRAND_URL  = siteDefaults.siteUrl || "https://verifiedapostille.com/";
 const BRAND_SAME_AS = collectSameAs();
 
-const CONTACT_EMAIL    = siteDefaults.contact?.email    || "contact@easyapostille.in";
+const CONTACT_EMAIL    = siteDefaults.contact?.email    || "contact@verifiedapostille.com";
 const CONTACT_PHONE    = siteDefaults.contact?.phone    || "+919047433266";
 const CONTACT_WHATSAPP = siteDefaults.contact?.whatsapp || "919047433266";
 
@@ -107,7 +107,7 @@ export const localBusiness: LocalBusinessConfig = {
     // ✅ ONLINE/SERVICE-AREA NODE: just channel info (no address)
     {
       "@idSuffix": "india",
-      name: "EasyApostille (Online Service — India)",
+      name: "VerifiedApostille (Online Service — India)",
       mode: "serviceArea",
       serviceArea: ["India"],
       openingHours: null,
@@ -126,7 +126,7 @@ export const localBusiness: LocalBusinessConfig = {
     // ✅ PHYSICAL NODE: just give address (channels optional)
     ...(BRAND_ADDR ? [{
       "@idSuffix": "hq",
-      name: "EasyApostille — Headquarters",
+      name: "VerifiedApostille — Headquarters",
       mode: "physical" as const,
       address: {
         streetAddress: BRAND_ADDR.streetAddress,

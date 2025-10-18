@@ -1,11 +1,11 @@
 {
-  "name": "EasyApostille",
-  "short_name": "EasyApostille",
+  "name": "VerifiedApostille",
+  "short_name": "VerifiedApostil",
   "start_url": "/",
   "display": "standalone",
   "background_color": "hsla(0, 0%, 100%, 1.00)",
-  "theme_color": "hsla(210, 100%, 35%, 1.00)",
-  "description": "Get your MEA apostille certificates, documents attestation at EasyApostille with fast, secure, discounts & free premium delivery services across India",
+  "theme_color": "hsla(232, 96%, 33%, 1.00)",
+  "description": "MEA apostille, attestation services with fast, secure, discounts & free premium worldwide delivery options. Trusted by NRIs & residents across India.",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",

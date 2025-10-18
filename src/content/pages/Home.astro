@@ -20,13 +20,13 @@ const agg = await getGlobalAggregate();
 
 const waStartHref = buildWhatsAppLink({
   phone: '',
-  text: 'Hi EasyApostille! I want to start the apostille process by sharing my certificates/documents.',
+  text: 'Hi VerifiedApostille! I want to start the apostille process by sharing my certificates/documents.',
   source: 'Hero • Start Apostille',
 });
 
 const waQuoteHref = buildWhatsAppLink({
   phone: '',
-  text: 'Hi EasyApostille! I need a consultation and price/timeline quote for apostille services.',
+  text: 'Hi VerifiedApostille! I need a consultation and price/timeline quote for apostille services.',
   source: 'Hero • Free Quote',
 });
 
@@ -41,97 +41,78 @@ const telHref1 = tel1 ? `tel:${tel1.replace(/[^\d+]/g, '')}` : '';
 
 const waHref1  = wa1 ? buildWhatsAppLink({
   phone: '',
-  text: 'Hi EasyApostille! I need a consultation and price/timeline quote for apostille services.',
+  text: 'Hi VerifiedApostille! I need a consultation and price/timeline quote for apostille services.',
   source: 'home-contact',
 }) : '';
 
-
 const faq = [
-  {
-    question: "Is a scan enough?",
-    answer: "Yes—for many personal documents we can start with scans. We'll confirm if originals are required."
-  },
-  {
-    question: "What is the EasyApostille cost of MEA apostille in India?",
-    answer: `EasyApostille offers a transparent SDM bundle for many personal/education cases: ${inr(price('sdmBundle'))} per document (Notary + SDM (Delhi) + MEA + premium return). Multi-document discounts apply; HRD/CoC, if required, are quoted after route confirmation.`,
-    speakable: true
-  },
-  {
-    question: "How long does it take?",
-    answer: "Typically 2-3 working days for most personal documents; commercial docs may vary."
-  },
-  {
-    question: "Do you cover all Indian states?",
-    answer: "Yes, we provide nationwide service across all states and union territories in India."
-  },
-  {
-    question: "Where are you based?",
-    answer: "Johnson Complex, Rajaji Nagar, Thanjavur, Tamil Nadu 613004 — India. Open in Maps"
-  },
-  {
-    question: "Is my data safe?",
-    answer: "Absolutely. We follow strict privacy controls and secure disposal policies."
-  },
-  {
-    question: "Can you arrange pickup/delivery?",
-    answer: "Yes, we can arrange secure pickup and delivery anywhere in India."
-  },
-  {
-    question: "Is the apostille valid abroad?",
-    answer: "Yes, apostilles issued by the MEA are recognized in all Hague Convention member countries."
-  },
-  {
-    question: "Which documents can be apostilled?",
-    answer: "Common documents for apostille include educational certificates (degrees, diplomas), birth and marriage certificates, power of attorney, affidavits, and commercial documents like invoices and agreements."
-  },
-  {
-    question: "How long does the apostille process take?",
-    answer: "The apostille process typically takes 2-3 working days for most personal documents. However, timelines may vary based on document type and issuing state."
-  },
-  {
-    question: "What are the costs involved in getting a document apostilled?",
-    answer: "Costs vary depending on the type of document and the number of documents. We offer transparent pricing with no hidden charges and discounts for multiple documents."
-  },
-  {
-    question: "Can I send scanned copies of my documents for apostille?",
-    answer: "Yes, we accept both physical and scanned copies of documents. We will guide you through the process based on your preference."
-  },
-  {
-    question: "Is there a way to track the status of my apostille request?",
-    answer: "Yes, we provide real-time tracking and proactive updates at each step of the apostille process."
-  },
-  {
-    question: "What if I need an urgent apostille service?",
-    answer: "We understand that some situations require urgency. Please contact us directly to discuss expedited options based on your specific needs."
-  }
+    {
+        question: "What is the cost of MEA apostille through VerifiedApostille?",
+        answer: `Our standard SDM bundle covers Notary + SDM (Delhi) + MEA + premium return for just ₹${inr(price('sdmBundle'))} per document. Multi-document discounts are available; HRD/CoC routes are quoted after verification.`,
+        speakable: true
+    },
+    {
+        question: "Can I courier or email my documents from abroad?",
+        answer: "Yes. Overseas Indian clients can send scanned copies by email or courier the originals to our Delhi service center. We guide you through every step securely."
+    },
+    {
+        question: "Can you send the apostilled documents to my country?",
+        answer: "Yes, we're happy to take full responsibility for safely delivering your completed apostille documents to your address anywhere in the world via Blue Dart, DHL, or other standard international courier services."
+    },
+    {
+        question: "Is the apostille valid abroad?",
+        answer: "Yes. Apostilles issued by the Ministry of External Affairs (MEA), India, are legally valid in all Hague Convention member countries."
+    },
+    {
+        question: "Which documents can I apostille?",
+        answer: "You can apostille personal (birth, marriage, PCC), educational (degree, diploma), and commercial documents (invoices, agreements, power of attorney)."
+    },
+    {
+        question: "How long does the process take?",
+        answer: "Typically 2-3 working days for most personal and educational documents. Processing time may vary slightly depending on document type or issuing state."
+    },
+
+    {
+        question: "How can I track my apostille request?",
+        answer: "You'll receive live status updates and tracking links at each step — from receipt to completion and dispatch."
+    },
+    {
+        question: "What payment methods do you accept?",
+        answer: "We accept secure payments via UPI and bank transfer. A GST invoice is provided for all transactions."
+    },
+    {
+        question: "Is my data safe with VerifiedApostille?",
+        answer: "Absolutely. We follow strict data-handling, encryption, and disposal policies to keep all client information secure and confidential."
+    }
 ];
+
 ---
 
 <article id="post-layout">
-  <header id="post-header" class="post-header mx-w-100p w-100p mi-auto ta-center bg-primary-darker relative overflow-hidden">
-        <div id="hero-section" class="flex flex-col md-flex-row lg-flex-row max-w-site mi-auto w-100p py-2 px-1 ai-start gap-2 hero-wrap relative">
+  <header id="post-header" class="post-header mx-w-100p w-100p mi-auto ta-center relative overflow-hidden">
+        <div id="hero-section" class="flex flex-col big-flex-row max-w-site mi-auto w-100p py-2 px-1 ai-center jc-center gap relative">
             {/** Left: Text */}
-            <div class="hero-text max-w-content flex-1 relative col-base-00 ta-start">
+            <div class="hero-text flex-1 relative col-primary ta-start">
                 <h1 class="post-title regular text-xs">
-                    EasyApostille - Fast & Secure Certificate, Document Attestation in India
+                    VerifiedApostille - Fast & Secure Apostille Services in India for NRI & Residents
                 </h1>
 
                 <h2 class="text-5xl">
-                👉 Get your documents apostilled end-to-end — from Notary → SDM → MEA — with proactive updates and safe return delivery.
+                Apostille your Indian documents from anywhere — just share scans.  
+    We'll handle the rest and deliver to your doorstep in India or abroad.
                 </h2>
 
-                <ul class="feature-list no-bullets ml-1" aria-label="Easy Apostille key features">
-                    <li class="tick"><Anchor href="/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc" className='highlight'><mark>SDM bundle {inr(price('sdmBundle'))}</mark></Anchor></li>
-                    <li class="tick">5 - 10% Discount for 1+ Certificates/Documents</li>
+                <ul class="feature-list no-bullets ml-1 flex flex-row gap-col-2 wrap" aria-label="Why people choose VerifiedApostille">
+                    { /*<li class="tick"><Anchor href="/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc" className='highlight'><mark>SDM bundle {inr(price('sdmBundle'))}</mark></Anchor></li>*/}
                     <li class="tick">Physical &amp; Scanned Copies Accepted</li>
-                    <li class="tick">Quick Service (2-3 working days)*</li>
-                    <li class="tick">Nationwide free delivery</li>                  
-                    <li class="tick">100% Genuine</li>	
-                    <li class="tick">100% Satisfaction &amp; Privacy Guarantee</li>
+                    <li class="tick">Premium International delivery with discounts</li>
+                    <li class="tick">Nationwide free delivery</li>
+                    <li class="tick">Upfront pricing, multi-document discounts (5-10%)</li>                 
+                    <li class="tick">Strict privacy & data protection — 100% genuine processing</li>
                 </ul>
                 <small class="">*Timelines vary by document type and issuing state.</small>
 
-                <div class="cta-container flex flex-col gap ai-f-start">
+                <div class="cta-container my-1 flex flex-row wrap gap ai-f-start">
                     <Anchor
                         href={waStartHref}
                         type="button"
@@ -151,7 +132,7 @@ const faq = [
                             aria-hidden="true"
                             focusable="false"
                         />
-                        Share Certificates or Documents (Start Apostille)
+                        Start Now - Get It Done Fast 
                     </Anchor>
 
 
@@ -172,29 +153,34 @@ const faq = [
                             aria-hidden="true"
                             focusable="false"
                         />
-                        Get a Free Consultation & Quote
+                        Free Consultation & Quote
                     </Anchor>
                 </div>				
             </div>
             {/** Right: Image */}
             <ResponsiveImage
-                src="document-with-notary-sdm-attestation-mea-ministry-external-affairs-apostille-stamp-open-from-cover.png"
-                alt="MEA-approved apostille sticker on an Indian document—secure, verified example used by Easy Apostille across India"
-                title="Easy Apostille - MEA-Approved Certificate Attestation in India"
+                src="photocopy-of-marriage-certificate-apostille-stamp-india-with-notary-sdm-sign.jpg"
+                alt="photo of MEA apostille sticker on an Indian marriage certificate with notary and SDM stamps"
+                title="Verified Apostille - MEA-Approved Certificate Attestation in India"
                 width="380" breakpoints={{ mobile: 380, desktop: 640 }}
                 addSchema={true}
-                className="hero-image max-w-content big-absolute right-0-100 top-0 bottom-0 opacity-90 md-opacity-50 mi-auto flex-1"
+                className="hero-image max-w-featured-half flex-1"
+                imageClassName='br-thicker-primary-lighter'
                 loading="eager"
                 variant="desktop" 
                 id="hero-image"
             />
         </div>
+        <p class="text-xs mt-1" aria-label="Service scope">
+            MEA Apostille • State HRD/SDM/CoC routing when required • Birth/Marriage/Edu/Commercial documents • Delivery to 200+ countries
+        </p>
+        <hr />        
     </header>
 
     <section class="max-w-site w-100p mi-auto my-2 p-2">
-        <h2 class="mi-auto py-1 ta-center">Read our customers' words</h2>
+        <h2 class="mi-auto py-1 my-0 ta-center">Read our customers' words</h2>
         <p class="bold ta-center">Don't just take our word for it—hear what our customers have to say!</p>
-        <div class="flex flex-row text-xl bold ta-center border-secondary bg-base-00 col-base-100 br my-1 p-1 w-fit mi-auto">
+        <div class="flex flex-row text-xl bold ta-center br-secondary bg-base-00 col-base-100 br-r my-1 p-1 w-fit mi-auto">
             <StarRating rating={agg.ratingValue} showNumber />
             <span class="opacity-75">/ 5 from {agg.reviewCount} reviews</span>
         </div>
@@ -277,7 +263,7 @@ const faq = [
             <li class="how-item right">
                 <div class="how-node" aria-hidden="true"><span>1</span></div>
                 <div class="how-content">
-                    <h3 class="text-l bold mb-0">Contact &amp; Plan Finalization</h3>
+                    <h3 class="text-l bold my-0">Contact &amp; Plan Finalization</h3>
                     <p class="text-s opacity-90">
                     Chat with us on WhatsApp, phone, or through our contact form. We confirm and finalize
                     the <strong>handover type</strong> (<em>scan</em> or <em>originals</em>) and the
@@ -289,7 +275,7 @@ const faq = [
 
             <li class="how-item left">
                 <div class="how-content ta-right">
-                    <h3 class="text-l bold mb-0">Payment &amp; Document Handover</h3>
+                    <h3 class="text-l bold my-0">Payment &amp; Document Handover</h3>
                     <p class="text-s opacity-90">
                     Pay securely via <strong>UPI</strong> or <strong>bank transfer</strong>
                     (GST invoice available). Then, upload scans or schedule courier pickup.
@@ -302,7 +288,7 @@ const faq = [
             <li class="how-item right">
                 <div class="how-node" aria-hidden="true"><span>3</span></div>
                 <div class="how-content">
-                    <h3 class="text-l bold mb-0">Notary Attestation</h3>
+                    <h3 class="text-l bold my-0">Notary Attestation</h3>
                     <p class="text-s opacity-90">
                     Your document is authenticated by a government-approved notary when required.
                     <Anchor href="/services/personal-documents-apostille/"
@@ -316,7 +302,7 @@ const faq = [
 
             <li class="how-item left">
                 <div class="how-content ta-right">
-                    <h3 class="text-l bold mb-0">SDM / State Attestation</h3>
+                    <h3 class="text-l bold my-0">SDM / State Attestation</h3>
                     <p class="text-s opacity-90">
                     Attested by Sub-Divisional Magistrate (SDM) or State Home/HRD department, depending on your document category and destination country.
                     </p>
@@ -327,7 +313,7 @@ const faq = [
             <li class="how-item right">
                 <div class="how-node" aria-hidden="true"><span>5</span></div>
                 <div class="how-content">
-                    <h3 class="text-l bold mb-0">MEA Apostille</h3>
+                    <h3 class="text-l bold my-0">MEA Apostille</h3>
                     <p class="text-s opacity-90">
                     Submitted to the Ministry of External Affairs (MEA) for final
                     <strong>authentication and apostille issuance</strong>.
@@ -342,7 +328,7 @@ const faq = [
 
             <li class="how-item left">
                 <div class="how-content ta-right">
-                    <h3 class="text-l bold mb-0">Digital Copy &amp; Verification</h3>
+                    <h3 class="text-l bold my-0">Digital Copy &amp; Verification</h3>
                     <p class="text-s opacity-90">
                     Once completed, a scanned apostille page or e-Apostille PDF (with official verification link)
                     is shared instantly via WhatsApp/email for immediate use.
@@ -354,7 +340,7 @@ const faq = [
             <li class="how-item right">
                 <div class="how-node" aria-hidden="true"><span>7</span></div>
                 <div class="how-content">
-                    <h3 class="text-l bold mb-0">Secure Home Delivery</h3>
+                    <h3 class="text-l bold my-0">Secure Home Delivery</h3>
                     <p class="text-s opacity-90">
                     Originals are couriered safely across India with <strong>tracking</strong> and
                     <strong>insurance coverage</strong> in tamper-evident packaging.
@@ -446,7 +432,7 @@ const faq = [
             
         </div>
         { /*-- Ask --*/ }
-        <div class="flex flex-col bg-base-00 my-2 py-2 px-1 br ta-center" role="group" aria-label="Don't see your document? Ask us">
+        <div class="flex flex-col bg-base-00 my-2 py-2 px-1 br-r ta-center" role="group" aria-label="Don't see your document? Ask us">
             <div class="ap-head ta-center mi-auto">
                 <span class="text-3xl" aria-hidden="true">💬</span>
                 <h3 class="m-0">Don't see your document? No worries!</h3>
@@ -455,7 +441,7 @@ const faq = [
             <div class="flex flex-row gap ai-center jc-center flex-wrap">
                 <Anchor href={buildWhatsAppLink({
                     phone: '',
-                    text: 'Hi EasyApostille! check my documents.',
+                    text: 'Hi VerifiedApostille! check my documents.',
                     source: 'Home-What-to-Apostille',
                     })} className="ap-ask td-none my-1 ta-center" ariaLabel="Don't see your document? Ask us" variant='primary'>
                 Share a Scan on WhatsApp → 
@@ -526,7 +512,7 @@ const faq = [
             <Anchor
             href={buildWhatsAppLink({
                 phone: '',
-                text: 'Hi EasyApostille! check my documents.',
+                text: 'Hi VerifiedApostille! check my documents.',
                 source: 'Home-What-you-need',
             })}
             ariaLabel="Share documents on WhatsApp to get ETA"
@@ -554,9 +540,9 @@ const faq = [
         </p>
     </section>
     { /*-- Link added --*/ }
-    <section id="why-easyapostille" class="max-w-site w-100p mi-auto my-2 p-2" aria-labelledby="why-easyapostille-h2">
-        <h2 id="why-easyapostille-h2" class="ta-center my-05">
-            Why everyone chooses <span class="nowrap">EasyApostille</span>
+    <section id="why-VerifiedApostille" class="max-w-site w-100p mi-auto my-2 p-2" aria-labelledby="why-VerifiedApostille-h2">
+        <h2 id="why-VerifiedApostille-h2" class="ta-center my-05">
+            Why everyone chooses <span class="nowrap">VerifiedApostille</span>
         </h2>
 
         <p class="max-w-featured w-100p mi-auto ta-center opacity-90 my-1">
@@ -695,7 +681,7 @@ const faq = [
             <Anchor
                 href={buildWhatsAppLink({
                     phone: '',
-                    text: 'Hi EasyApostille!',
+                    text: 'Hi VerifiedApostille!',
                     source: 'Home-Why',
                 })}
                 ariaLabel="Chat on WhatsApp"
@@ -711,7 +697,7 @@ const faq = [
                 Chat on WhatsApp →
             </Anchor>
 
-            <Anchor href="/contact/" ariaLabel="Email the EasyApostille team" variant="secondary">
+            <Anchor href="/contact/" ariaLabel="Email the VerifiedApostille team" variant="secondary">
                 <Icon
                     slot="icon-left"
                     name="email"
@@ -743,7 +729,7 @@ const faq = [
           answerClass='bg-primary-lighter-x'
           heading="Frequently Asked Questions"
           headingTag="h2"
-          openAll={true}
+          openAll={false}
           addSchema={true}
           addSpeakableSchema={true}
           htmlAnswers={false}
@@ -787,7 +773,7 @@ const faq = [
             <Anchor
                 href={buildWhatsAppLink({
                     phone: '',
-                        text: 'Hi EasyApostille! I need MEA apostille help. Please share eligibility, ETA & all-inclusive quote.',
+                        text: 'Hi VerifiedApostille! I need MEA apostille help. Please share eligibility, ETA & all-inclusive quote.',
                         source: 'Home-Compliance-CTA',
                         })}
                     className="mt-1 inline-flex ai-center gap-05 w-100p"

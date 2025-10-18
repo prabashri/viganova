@@ -1,0 +1,12 @@
+:root{
+  --border-width-thin: .5px;
+  --border-width: 1px;
+  --border-width-thick: 2px;
+  --border-width-thicker: 4px; 
+  --border-width-thickest: 8px;
+
+  --border-style: solid;
+  --border-style-dashed: dashed;
+  --border-style-dotted: dotted;
+  --border-style-solid: solid;
+}

@@ -2,22 +2,22 @@
 import type { StaticPageDefaults, PageFlags, PageKey } from '../types/siteDefaults';
 import { normalizePageFlags } from '../types/siteDefaults';
 
-const SITE_NAME = "EasyApostille";
-const CONTACT_EMAIL = "contact@easyapostille.in";
+const SITE_NAME = "VerifiedApostille";
+const CONTACT_EMAIL = "contact@verifiedapostille.com";
 
 export const siteDefaults = {
   siteName: SITE_NAME,
-  shortName: "EasyApostille",
+  shortName: "VerifiedApostille",
   publishedDate: "September 12 2025",
 
-  cloudflareUrl: "https://easyapostille.pages.dev",
+  cloudflareUrl: "https://verifiedapostille.pages.dev",
 
-  domainName: "easyapostille.in",
-  siteUrl: "https://easyapostille.in/", // ensure trailing slash
+  domainName: "verifiedapostille.com",
+  siteUrl: "https://verifiedapostille.com/", // ensure trailing slash
 
-  title: `EasyApostille - Fast & Secure Certificate, Document Attestation in India`,
+  title: `VerifiedApostille - Fast & Secure Apostille Services in India for NRI & Residents`,
   description:
-    "Get your MEA apostille certificates, documents attestation at EasyApostille with fast, secure, discounts & free premium delivery services across India",
+    "MEA apostille, attestation services with fast, secure, discounts & free premium worldwide delivery options. Trusted by NRIs & residents across India.",
   keywords: [
     "Apostille Services India",
     "MEA Approved Apostille",
@@ -31,14 +31,14 @@ export const siteDefaults = {
   ],
 
   socialLinks: {
-    x: "easyapostille", // handle WITHOUT @
-    // github: "https://github.com/easyapostille",
-    // linkedin: "https://linkedin.com/company/easyapostille",
-    facebook: "https://facebook.com/easyapostille",
-    instagram: "https://instagram.com/easyapostille",
-    // youtube: "https://youtube.com/@easyapostille",
-    // mastodon: "https://mastodon.social/@easyapostille",
-    // bluesky: "https://bsky.app/profile/easyapostille",
+    x: "verifiedapostille", // handle WITHOUT @
+    // github: "https://github.com/VerifiedApostille",
+    // linkedin: "https://linkedin.com/company/VerifiedApostille",
+    facebook: "https://facebook.com/verifiedapostille",
+    instagram: "https://instagram.com/verifiedapostille",
+    // youtube: "https://youtube.com/@VerifiedApostille",
+    // mastodon: "https://mastodon.social/@VerifiedApostille",
+    // bluesky: "https://bsky.app/profile/VerifiedApostille",
     email: CONTACT_EMAIL,
   },
 

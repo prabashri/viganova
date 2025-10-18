@@ -120,7 +120,7 @@ const headProps: HeadProps = {
         const avatar = getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color });
 
         return (
-          <li class={`team-card bg-base-00 border br p-1-5 ta-center max-w-sidebar w-100p box-shadow relative ${member.data.featured ? 'featured' : ''}`}>
+          <li class={`team-card bg-base-00 br br-r p-1-5 ta-center max-w-sidebar w-100p box-shadow relative ${member.data.featured ? 'featured' : ''}`}>
             {member.data.featured && <span class="featured-badge absolute bg-primary-base col-base-00 fs-xs py-02 px-05 bold">Featured</span>}
             <a class="team-link td-none p-0" href={`/team/${slug}/`}>
               {avatar.type === 'img' && <img class="avatar-img" src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}

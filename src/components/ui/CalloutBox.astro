@@ -138,10 +138,10 @@ const aliasMap: Record<string, { canonical: Canonical; defaultHeading: string }>
 const typeConfig: Record<'note'|'tip'|'alert'|'error', {
   svg: string; baseClass: string; borderClass: string; textClass: string;
 }> = {
-  note:  { svg: '/icons/note.svg',   baseClass: 'bg-note-light',    borderClass: 'br-left-note',    textClass: '' },
-  tip:   { svg: '/icons/idea-2.svg', baseClass: 'bg-success-light',  borderClass: 'br-left-success', textClass: '' },
-  alert: { svg: '/icons/alert.svg',  baseClass: 'bg-alert-light',    borderClass: 'br-left-alert',   textClass: '' },
-  error: { svg: '/icons/error.svg',  baseClass: 'bg-error-light',    borderClass: 'br-left-error',   textClass: '' },
+  note:  { svg: '/icons/note.svg',   baseClass: 'bg-note-light',    borderClass: 'br-left-thicker-note',    textClass: '' },
+  tip:   { svg: '/icons/idea-2.svg', baseClass: 'bg-success-light',  borderClass: 'br-left-thicker-success', textClass: '' },
+  alert: { svg: '/icons/alert.svg',  baseClass: 'bg-alert-light',    borderClass: 'br-left-thicker-alert',   textClass: '' },
+  error: { svg: '/icons/error.svg',  baseClass: 'bg-error-light',    borderClass: 'br-left-thicker-error',   textClass: '' },
 };
 
 // Brand tones for promo/cta
@@ -169,7 +169,7 @@ if (canonical === 'promo' || canonical === 'ctaPrimary' || canonical === 'ctaSec
     ? (brandToneProp as any)
     : defaultToneFor[canonical];
   const baseClass = `bg-primary-${tone}`;
-  const borderClass = 'br-left-primary';
+  const borderClass = 'br-left-thicker-primary';
   const textClass = DARKISH.has(tone) ? 'col-base-95' : '';
   const svg =
     canonical === 'promo' ? '/icons/speaker.svg'
@@ -194,7 +194,7 @@ const roleAttr = roleOverride ?? computedRole;
 
  <div
    {...(id ? { id } : {})}
-  class={`callout br ${padding} my-1 ${cfg.baseClass} ${cfg.borderClass} ${wrapperClass}`}
+  class={`callout br-r ${padding} my-1 ${cfg.baseClass} ${cfg.borderClass} ${wrapperClass}`}
   role={roleAttr}
    aria-label={ariaLabel}
    data-type={requested}

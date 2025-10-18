@@ -195,7 +195,7 @@ if (hasData && meta) {
 }
 ---
 {!hasData ? (
-  <div class={`flex ai-center jc-center bg-primary-lighter br ${aspectClass} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit ${className}`}>
+  <div class={`flex ai-center jc-center bg-primary-lighter br-r ${aspectClass} ${loading === 'delay' ? 'opacity-02 transition-opacity duration-300' : ''} h-fit ${className}`}>
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-100p h-auto ${imageClassName} ${objectFitClass}`}>
       <rect width="400" height="225" fill="#00000000"></rect>
     </svg>
@@ -226,7 +226,7 @@ if (hasData && meta) {
           loading={loading === 'delay' ? 'lazy' : loading}
           decoding="async"
           fetchpriority={loading === 'eager' ? 'high' : loading === 'delay' ? 'low' : undefined}
-          class={`block w-100p h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
+          class={`block w-100p h-auto br-r ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
         />
       </picture>
       <figcaption class="text-s">{caption}</figcaption>
@@ -255,7 +255,7 @@ if (hasData && meta) {
           loading={loading === 'delay' ? 'lazy' : loading}
           decoding="async"
           fetchpriority={loading === 'eager' ? 'high' : loading === 'delay' ? 'low' : undefined}
-          class={`block w-100p h-auto br ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
+          class={`block w-100p h-auto br-r ${imageClassName} ${objectFitClass} ${loading === 'delay' ? 'opacity-0 transition-opacity duration-300' : ''}`}
         />
       </picture>
     </figure>

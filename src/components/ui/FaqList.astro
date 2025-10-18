@@ -70,7 +70,7 @@ const nonce = (Astro.locals as any).nonce;
 ---
 
 {items.length > 0 && (
-  <section id={id} class={`faq w-100p bg br my-1 py-1 ${sectionClass}`} aria-labelledby={`${id}-heading`}>
+  <section id={id} class={`faq w-100p bg br-r my-1 py-1 ${sectionClass}`} aria-labelledby={`${id}-heading`}>
     {heading && <Heading id={`${id}-heading`} class={`text-xl my-0 ${headingClass}`}>{heading}</Heading>}
     <div class={`faq-list max-w-content mt-1 ${listClass}`}>
       {items.map((item, index) => (

@@ -216,7 +216,7 @@ const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
 <CssFilesToLoad files={[{name:'video-player', inline:true}]}  />
 <div class={`video-player ${className}`}>
   <div
-    class="player-shell w-100p bg-base-10 br overflow-hidden relative"
+    class="player-shell w-100p bg-base-10 br-r overflow-hidden relative"
     id={`${uid}-shell`}    
     data-vp-root
     data-uid={uid}
@@ -245,7 +245,7 @@ const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
       </div>
     )}
 
-    <button id={`${uid}-play`} class="video-play-btn absolute inset-0 grid place-items-center pointer col-base-00 text-xl border-0" aria-label="Play video">▶</button>
+    <button id={`${uid}-play`} class="video-play-btn absolute inset-0 grid place-items-center pointer col-base-00 text-xl br-0" aria-label="Play video">▶</button>
 
     {/* Self-hosted */}
     {provider === 'self' && (

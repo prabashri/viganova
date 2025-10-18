@@ -1,14 +1,20 @@
 ---
-// src/components/CssHead.astro
+/* src/components/CssHead.astro */
 import manifest from '@/data/assets-manifest.json';
 import { inlineCss } from '@/data/generated-inline-css.ts';
 
-const devCssOrder = [
+const nonce = (Astro.locals as any).nonce;
+const isDev = import.meta.env.DEV;
+
+/** Dev order – your existing list */
+const devCssOrder: string[] = [
   '/src/styles/inline/base.css',
   '/src/styles/inline/colors.css',
   '/src/styles/inline/header.css',
   '/src/styles/inline/size.css',
   '/src/styles/inline/hero.css',
+  // main css
+  '/src/styles/main/base.css',
   '/src/styles/main/components.css',
   '/src/styles/main/colors.css',
   '/src/styles/main/toc.css',
@@ -28,36 +34,71 @@ const devCssOrder = [
   '/src/styles/main/callout.css',
 ];
 
-const nonce = (Astro.locals as any).nonce;
+/** Helpers to safely read the manifest (shape-agnostic) */
+function flattenValues(obj: any): string[] {
+  const out: string[] = [];
+  const visit = (v: any) => {
+    if (!v) return;
+    if (typeof v === 'string') {
+      out.push(v);
+    } else if (Array.isArray(v)) {
+      v.forEach(visit);
+    } else if (typeof v === 'object') {
+      // prefer .file if present
+      if (typeof v.file === 'string') out.push(v.file);
+      // but also scan all props
+      Object.values(v).forEach(visit);
+    }
+  };
+  visit(obj);
+  return out;
+}
 
-const isDev = import.meta.env.DEV;
+/** Try to find a “main” css first, then others */
+let mainCss: string | undefined =
+  (manifest as any)?.css?.main?.file ??
+  (manifest as any)?.main?.css?.file ??
+  (manifest as any)?.css?.main ??
+  undefined;
+
+// collect all css-like paths (endsWith .css)
+const allCssCandidates = flattenValues((manifest as any)?.css ?? manifest)
+  .filter((p) => typeof p === 'string' && p.endsWith('.css'));
+
+// de-dupe while preserving order
+const seen = new Set<string>();
+const dedupe = (arr: string[]) => arr.filter((p) => !seen.has(p) && (seen.add(p), true));
+
 let cssFiles: string[] = [];
+if (!isDev) {
+  const rest = allCssCandidates.filter((p) => p !== mainCss);
+  cssFiles = dedupe([mainCss, ...rest].filter(Boolean) as string[]);
+}
 
-let preloadCssFiles: string[] = [];
-// let nonCriticalCssFiles: string[] = [];
-
-preloadCssFiles = [manifest.css.main.file];            // e.g. /styles/main.abc123.min.css
-  // nonCriticalCssFiles = [manifest.css.nonCritical.file]; // e.g. /styles/non-critical.xyz456.min.css
+/** Choose a preload target (the first = main) */
+const preloadCss = !isDev ? cssFiles[0] : undefined;
 ---
-{/* -- ✅ Preload fonts --*/}
+
+<!-- ✅ Preload fonts early -->
 <link rel="preload" href="/fonts/Inter-Regular-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/Inter-Bold-Subset.woff2" as="font" fetchpriority="high" type="font/woff2" crossorigin>
-{ !isDev && preloadCssFiles[0] && (
-  <>
-    <link rel="preload" as="style" href={preloadCssFiles[0]} />
-  </>
+
+<!-- ✅ PROD: Preload main CSS (if found) -->
+{!isDev && preloadCss && (
+  <link rel="preload" as="style" href={preloadCss} fetchpriority="high" />
 )}
 
-{/* -- ✅ PROD: Inline critical CSS -- */}
-{ !isDev && inlineCss && <style nonce={nonce} id="inline-css" set:html={inlineCss} />}
-
-{/* -- ✅ PROD: Preload + load main CSS -- */}
-{ !isDev && preloadCssFiles[0] && (
-  <>
-    <link rel="stylesheet" href={preloadCssFiles[0]} fetchpriority="high" />
-  </>
+<!-- ✅ PROD: Inline critical CSS (CSP nonce) -->
+{!isDev && inlineCss && (
+  <style nonce={nonce} id="inline-css" set:html={inlineCss} />
 )}
 
-{isDev && devCssOrder.map(href => (
+<!-- ✅ PROD: Load all discovered CSS files (main first) -->
+{!isDev && cssFiles.map((href) => (
+  <link rel="stylesheet" href={href} fetchpriority={href === preloadCss ? 'high' : undefined} />
+))}
+
+<!-- ✅ DEV: Load your authored list (cache-bust via timestamp) -->
+{isDev && devCssOrder.map((href) => (
   <link rel="stylesheet" href={`${href}?t=${import.meta.hot?.data?.timestamp ?? Date.now()}`} />
 ))}

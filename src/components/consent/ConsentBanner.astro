@@ -68,7 +68,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
   <>
     <button
       id="consent-toggler"
-      class="consent-toggler fixed left-0 bottom-0 z-1000 inline-flex ai-center jc-center w-2-5 h-2-5 br bg border box-shadow pointer"
+      class="consent-toggler fixed left-0 bottom-0 z-1000 inline-flex ai-center jc-center w-2-5 h-2-5 br-r bg br box-shadow pointer"
       aria-label="Privacy & cookie settings"
       title="Privacy & cookie settings"
     >
@@ -86,13 +86,13 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
     >
       <div id="consent-overlay" class="consent-overlay pointer-events-auto absolute inset-0 z-0" aria-hidden="true"></div>
 
-      <div class="consent-sheet bg col-text border br box-shadow max-w-featured w-95p mn-h-230 max-h-80vh overflow-hidden pointer-events-auto z-1" role="document">
-        <div class="consent-header flex ai-center jc-space-between p-1 b-bottom">
+      <div class="consent-sheet bg col-text br br-r box-shadow max-w-featured w-95p mn-h-230 max-h-80vh overflow-hidden pointer-events-auto z-1" role="document">
+        <div class="consent-header flex ai-center jc-space-between p-1 br-bottom">
           <div class="consent-title-wrap flex ai-center gap-05">
             <img class="consent-title-icon opacity-90 w-2-0 h-2-0" src="/icons/privacy-shield.svg" width="20" height="20" alt="" aria-hidden="true" />
             <h3 id="consent-title" class="consent-title m-0 text-base lh-1-2">Cookie preferences</h3>
           </div>
-          <button id="consent-close" class="consent-close bg-transparent border w-2-0 h-2-0 br pointer" aria-label="Close dialog" title="Close">x</button>
+          <button id="consent-close" class="consent-close bg-transparent br w-2-0 h-2-0 br-r pointer" aria-label="Close dialog" title="Close">x</button>
         </div>
 
         <div class="consent-body overflow-auto px-05 py-1 overscroll-contain">
@@ -103,7 +103,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
           </p>
 
           <form id="consent-form" class="consent-form flex flex-col gap-05" action="#" method="post" novalidate>
-            <fieldset class="consent-group m-0 p-0 border-0">
+            <fieldset class="consent-group m-0 p-0 br-0">
               <legend class="consent-group-title">Your choices</legend>
 
               <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0">
@@ -114,7 +114,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
                 <input id="cb-essential-ui" type="checkbox" class="w-1-5 h-1-5 m-05" checked disabled />
               </div>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 b-top-dashed">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 br-top-thin-dashed">
                 <label for="cb-ads-ui" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Advertising (basic)</span>
                   <span class="consent-row-note text-sm col-base-80">Shows ads to keep access free.</span>
@@ -123,7 +123,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
                 <input id="cb-ads" type="checkbox" class="display-none none is-hidden hide" checked />
               </div>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 b-top-dashed">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 br-top-thin-dashed">
                 <label for="cb-personalized" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Advertising (personalized)</span>
                   <span class="consent-row-note text-sm col-base-80">Use activity to tailor ads.</span>
@@ -131,7 +131,7 @@ const timer = Math.round((cfg.ag || 120000) / 1000);
                 <input id="cb-personalized" type="checkbox" class="w-1-5 h-1-5 m-05" />
               </div>
 
-              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 b-top-dashed">
+              <div class="consent-row flex ai-f-start jc-space-between gap-05 px-05 pb-0 br-top-thin-dashed">
                 <label for="cb-analytics" class="consent-row-main flex flex-col gap-02">
                   <span class="consent-row-label bold">Analytics</span>
                   <span class="consent-row-note text-sm col-base-80">Anonymous stats to improve quality.</span>

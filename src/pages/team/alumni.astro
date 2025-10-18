@@ -88,7 +88,7 @@ const headProps: HeadProps = {
         const avatar = getAvatar({ slug, image, useImage, useInitial, initialText, useGravatar, color });
 
         return (
-          <li class="team-card bg-base-00 border br p-1-5 ta-center max-w-sidebar w-100p box-shadow relative">
+          <li class="team-card bg-base-00 br br-r p-1-5 ta-center max-w-sidebar w-100p box-shadow relative">
             <a class="team-link td-none p-0" href={`/team/${slug}/`}>
               {avatar.type === 'img' && <img class="avatar-img" src={avatar.src} alt={`Photo of ${name}`} loading="lazy" />}
               {avatar.type === 'gravatar' && <img class="avatar-img" src={avatar.src} alt={`Gravatar of ${name}`} loading="lazy" />}

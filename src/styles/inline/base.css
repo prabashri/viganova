@@ -86,7 +86,7 @@ html, body {
   font-family: var(--font-family-base);  
   line-height: 1.6;
   color: var(--text-color);
-  background-color: var(--primary-lighter-x, hsla(230, 100%, 99%, 1.00));
+  background-color: var(--background-color, hsla(230, 100%, 99%, 1.00));
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
@@ -207,7 +207,7 @@ a:focus-visible {
   color: var(--base-100);
 }
 
-/* Optional: Remove inner border on Firefox */
+/* Optional: Remove inner br on Firefox */
 a::-moz-focus-inner {
   border: 0;
 }

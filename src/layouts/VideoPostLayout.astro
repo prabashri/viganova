@@ -424,7 +424,7 @@ const toISODuration = (secs?: number) => {
     {/* Hero image + play overlay → player */}
     <section class="video-player max-w-content my-05 hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5" style={{ aspectRatio: cssAspect }}>
       <div
-        class="player-shell bg-base-10 br overflow-hidden relative"
+        class="player-shell bg-base-10 br-r overflow-hidden relative"
         id={`${uid}-shell`}
         data-vp-root
         data-uid={uid}
@@ -492,7 +492,7 @@ const toISODuration = (secs?: number) => {
     </section>
 
     {/* Content */}
-    <div class="video-content max-w-content mi-auto my-05 p-1  bg border-primary-light br" itemprop="articleBody">
+    <div class="video-content max-w-content mi-auto my-05 p-1  bg br-primary-light br" itemprop="articleBody">
       <slot />
     </div>
 
@@ -532,7 +532,7 @@ const toISODuration = (secs?: number) => {
                   label={`Seek to ${ts(c.start)} — ${c.name}`}
                   type="button"
                   variant="plain"
-                  className="chapter-link inline-flex gap-05 p-05 br bg-transparent pointer hover-bg-primary-lighter-x"
+                  className="chapter-link inline-flex gap-05 p-05 br-r bg-transparent pointer hover-bg-primary-lighter-x"
                   data-seek={c.start}
                   data-href={chapterHref(c.start)}
                   ariaLabel={`Seek to ${ts(c.start)} — ${c.name}`}

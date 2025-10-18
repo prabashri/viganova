@@ -67,8 +67,8 @@ body.consent-lock {
 .consent-body::-webkit-scrollbar-thumb:hover { background: var(--base-70); }
 
 /* Small utilities */
-.b-top-dashed { border-top: 1px dashed var(--base-20); }
-.b-bottom     { border-bottom: 1px solid var(--base-20); }
+.br-top-thin-dashed { border-top: 1px dashed var(--base-20); }
+.br-bottom     { border-bottom: 1px solid var(--base-20); }
 
 /* ===== Sticky action bar ===== */
 .consent-actions {

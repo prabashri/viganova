@@ -92,7 +92,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     {primaryCTA.length > 0 && ( 
       <div 
         id="main-nav-cta" 
-        class="flex flex-col big-flex-row br sm-bg sm-w-100p w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
+        class="flex flex-col big-flex-row br-r sm-bg sm-w-100p w-auto p-05 ai-f-start big-ai-center gap order-3 md-order-2 lg-order-2" 
         aria-label="Primary Call to Action"
       >  
         <div class="flex flex-row gap ai-center jc-center">
@@ -138,7 +138,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     {siteNav.length > 0 && (
     <nav 
       id="main-nav" 
-      class={`main-nav relative max-w-site w-100p sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 gap br full-br-1 col-base-100 z-100 big-display-inherit ${navOrder}`} 
+      class={`main-nav relative max-w-site w-100p sm-bg scroll-container flex flex-row text-small ${navClasses} p-02 gap br-r full-br-r-1 col-base-100 z-100 big-display-inherit ${navOrder}`} 
       aria-label="Primary site navigation"
       >
       {/* Logo for Desktop */}
@@ -169,7 +169,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                 aria-hidden="true"
                 class="dropdown-menu py-1 bg-transparent static big-absolute top-70p z-1000"
               >
-                <div class="bg-base-00 p-1 flex flex-col wrap gap br big-b-thin-primary-lighter">
+                <div class="bg-base-00 p-1 flex flex-col wrap gap br-r big-br-thin-primary-lighter">
                   {Array.isArray(item.content) && item.content.map((subItem, subItemIndex) => (
                     <NavLinkItem
                       item={subItem} index={subItemIndex}
@@ -193,7 +193,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                 aria-hidden="true" 
                 class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70p left-0 z-1000 w-100p"
               >
-                <div class="bg-base-00 sm-bg p-05 br flex flex-row wrap w-100p gap big-b-thin-primary-lighter">
+                <div class="bg-base-00 sm-bg p-05 br-r flex flex-row wrap w-100p gap big-br-thin-primary-lighter">
                   {item.columns.map((col, colIndex) => (
                     <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
                       <h4 class="bold capitalize text-s my-2">{col.title}</h4>
@@ -218,7 +218,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
     )}
   {/* SECONDARY NAVIGATION (Optional) */}
   {secondaryNavigation.length > 0 && (
-    <nav id="secondary-nav" class="secondary-nav sm-bg flex flex-row text-xs p-05 br gap z-10 max-w-site w-100p desktop-box-shadow-bottom big-display-inherit" aria-label="Secondary site navigation">
+    <nav id="secondary-nav" class="secondary-nav sm-bg flex flex-row text-xs p-05 br-r gap z-10 max-w-site w-100p desktop-box-shadow-bottom big-display-inherit" aria-label="Secondary site navigation">
       {/* Loop through secondaryNavigation items */}
       <ul class="nav-list flex ai-center no-bullets gap sm-flex-col sm-ai-start">
         {Array.isArray(secondaryNavigation) && secondaryNavigation.map((item, navIndex) => (
@@ -270,7 +270,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
                   aria-hidden="true"
                   class="dropdown-menu mega-menu-panel py-1 bg-col-ff static big-absolute top-70p left-0 z-1000 w-100p"
                 >
-                  <div class="bg-base-00 sm-bg p-1 br flex flex-row wrap w-100p gap big-b-thin-primary-lighter">
+                  <div class="bg-base-00 sm-bg p-1 br-r flex flex-row wrap w-100p gap big-br-thin-primary-lighter">
                     {item.columns.map((col, colIndex) => (
                       <div data-id={`mega-col-${navIndex}-${colIndex}`} class="mega-column mn-w-250 flex flex-col flex-1 gap-05">
                         <h4 class="bold capitalize text-s my-2">{col.title}</h4>

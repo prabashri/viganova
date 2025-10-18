@@ -21,7 +21,7 @@ const nonce = (Astro.locals as any).nonce;
 <div class="flex jc-center my-2">
   <button
     id="loadMoreBtn"
-    class="btn border-secondary br ta-center hover-bg-primary-light"
+    class="btn br-secondary br-r ta-center hover-bg-primary-light"
     data-slug={slug}
     data-loaded={loaded}
     data-total={total}
@@ -68,7 +68,7 @@ const nonce = (Astro.locals as any).nonce;
         const anchor = document.createElement('a');
         const base = p.collectionBase ? p.collectionBase : '';
         anchor.href = `/${base}${p.slug}/`;
-        anchor.className = 'block td-none border-primary br bg-base-00 hover-box-shadow transition p-05 my-1 max-w-sidebar w-100p';
+        anchor.className = 'block td-none br-primary br-r bg-base-00 hover-box-shadow transition p-05 my-1 max-w-sidebar w-100p';
 
         const titleDiv = document.createElement('div');
         titleDiv.className = 'font-bold text-lg my-1';

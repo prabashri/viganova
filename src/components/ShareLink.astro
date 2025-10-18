@@ -57,7 +57,7 @@ function toIconName(name: string) {
 <nav
   id={id}
   aria-label="Share this page"
-  class={`share-toolbar py-1 px-05 my-1 bg br ${className}`}
+  class={`share-toolbar py-1 px-05 my-1 bg br-r ${className}`}
   data-title={pageTitle}
   data-url={resolvedUrl}
 >
@@ -94,7 +94,7 @@ function toIconName(name: string) {
                 data-action="share"
                 role="button"
                 tabindex={isFirst ? '0' : '-1'}
-                class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent hover-border hover-box-shadow p-02"
+                class="icon-link inline-flex ai-center jc-center br-r lh-0 focus-visible br-transparent hover-br hover-box-shadow p-02"
               >
                 <Icon name={icon} class={iconSize} />
               </a>
@@ -106,7 +106,7 @@ function toIconName(name: string) {
                 aria-label="Copy Link"
                 role="button"
                 tabindex={isFirst ? '0' : '-1'}
-                class="icon-link inline-flex ai-center jc-center br lh-0 focus-visible border-transparent bg-transparent hover-border hover-box-shadow p-02"
+                class="icon-link inline-flex ai-center jc-center br-r lh-0 focus-visible br-transparent bg-transparent hover-br hover-box-shadow p-02"
               >
                 <Icon name="clipboard" class={iconSize} />
               </button>

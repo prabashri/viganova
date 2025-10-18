@@ -64,13 +64,13 @@ const finalRel = rel ?? (isExternal && finalTarget === '_blank' ? 'noopener nore
 // Variant class logic (apply button variants only when type="button")
 const variantClassMap: Record<string, string> = {
   plain: '',
-  nav: 'no-bb br',
+  nav: 'no-bb br-r',
   ghost:
     'button bg-transparent col-inherit hover-bg-base-10 transition focus-vis-bg-base-200 focus-vis-col-base-900',
   primary:
-    'button col-base-00 hover-col-base-100 border-2 bg-primary hover-bg-primary-lighter transition focus-vis-bg-primary-lighter focus-vis-col-base-100 p-05',
+    'button col-base-00 hover-col-base-100 br-thick bg-primary hover-bg-primary-lighter transition focus-vis-bg-primary-lighter focus-vis-col-base-100 p-05',
   secondary:
-    'button bg-primary-lighter-x col-primary-darker hover-col-base-00 border-2 hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
+    'button bg-primary-lighter-x col-primary-darker hover-col-base-00 br-thick hover-bg-primary transition focus-vis-bg-primary focus-vis-col-base-00 p-05',
 };
 
 // If not a "button" type, ignore button-specific classes except 'nav'/'plain'

@@ -22,7 +22,7 @@ import type {
 const waStartHref = buildWhatsAppLink({
   phone: '',
   text:
-    "Hi EasyApostille! I want to start the apostille process by sharing my certificates/documents.",
+    "Hi VerifiedApostille! I want to start the apostille process by sharing my certificates/documents.",
   source: "Hero • Start Apostille",
 });
 
@@ -30,7 +30,7 @@ const waStartHref = buildWhatsAppLink({
 const waQuoteHref = buildWhatsAppLink({
   phone: '',
   text:
-    "Hi EasyApostille! I need a consultation and price/timeline quote for apostille services.",
+    "Hi VerifiedApostille! I need a consultation and price/timeline quote for apostille services.",
   source: "Hero • Free Quote",
 });
 /** LOGO CONFIGURATION */
@@ -89,7 +89,7 @@ export const siteNav: NavItem[] = [
     menuId: 'mega-resources', iconName: 'stamp',
     iconUrl: '',
     iconLocation: 'left', iconSize: 'large', iconClass: '', className: '',
-    title: 'Go to services available in easyapostille', altText: 'icon of stamp with right sign', ariaLabel: 'stamp', variant: 'plain', description: 'Navigate to the list of services we offer',
+    title: 'Go to services available in VerifiedApostille', altText: 'icon of stamp with right sign', ariaLabel: 'stamp', variant: 'plain', description: 'Navigate to the list of services we offer',
     columns: [
       {
         title: 'Personal Documents',
@@ -195,5 +195,5 @@ export const headerStyle: NavStyleConfig = {
   width: 'fullwidth',          // fullwidth | sitewidth
   position: 'static',          // static | sticky | fixed
   scrollBehavior: 'none',      // none | hide-on-scroll | show-on-scroll-up
-  separator: 'none'          // none | border | shadow (adds bottom split)
+  separator: 'none'          // none | br | shadow (adds bottom split)
 };
