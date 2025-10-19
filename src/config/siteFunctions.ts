@@ -24,7 +24,7 @@ export const siteFunctions = {
     ahrefAnalyticsId: "", 
     
     cloudflareAnalytics: false, // enable Cloudflare Web Analytics
-    cloudflareAnalyticsId: "2e814bc0b10a4e08a5cf4ea751e357e7", 
+    cloudflareAnalyticsId: "4be9b10a675a4f35bf2dcf007478da91", 
      /* Cloudflare RUM (auto /cdn-cgi/rum) */
     enableCloudflareRUM: true,   // ← new flag
     

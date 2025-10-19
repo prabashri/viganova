@@ -2,7 +2,7 @@
   "configModified": {
     "siteDefaults": 1760781661321,
     "siteLogo": 1754383794286,
-    "siteColors": 1760716640779,
+    "siteColors": 1760806264203,
     "siteImages": 1760803010198
   },
   "icons": {
@@ -28,20 +28,20 @@
       "datetime": "2025-10-18T15:46:23.708Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-18T10:01:43.532Z"
+      "datetime": "2025-10-19T03:30:45.884Z"
     }
   },
   "css": {
     "colors": {
       "file": "/src/styles/inline/colors.css",
-      "datetime": "2025-10-18T03:11:06.994Z",
+      "datetime": "2025-10-19T03:29:48.334Z",
       "names": [
         "colors"
       ]
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-10-18T16:17:58.744Z",
+      "datetime": "2025-10-19T03:30:31.332Z",
       "names": [
         "base",
         "colors",
@@ -74,11 +74,11 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-18T16:18:03.721Z",
+      "datetime": "2025-10-19T03:30:38.002Z",
       "names": [
         "audio-layout",
         "contact-form",
-        "home",
+        "home-page",
         "post-layout",
         "team-index",
         "team-layout",
@@ -88,14 +88,10 @@
       "dir": "/styles/"
     },
     "pages:home": {
-      "file": "/styles/home.f4f667.css",
-      "datetime": "2025-10-10T06:04:43.556Z",
+      "file": "",
+      "datetime": "2025-10-19T03:30:38.097Z",
       "name": "home",
-      "hash": "f4f667",
-      "mtimeMs": 1759944030722,
-      "bytes": 5217,
-      "source": "src\\styles\\pages\\home.css",
-      "inlineModule": "/src/data/page-css/home.ts"
+      "removed": true
     },
     "pages:contact-form": {
       "file": "/styles/contact-form.f08719.css",
@@ -129,8 +125,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.dmvayd.json",
-      "datetime": "2025-10-18T16:17:50.624Z"
+      "file": "/search-index.oowusn.json",
+      "datetime": "2025-10-19T03:30:20.931Z"
     }
   },
   "js": {
