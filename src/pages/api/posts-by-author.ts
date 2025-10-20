@@ -1,20 +1,4 @@
 // src/pages/api/posts-by-author.ts
-/**
- * API Endpoint to fetch posts by author
- * Supports filtering by multiple collections
- * Returns posts with pagination and sorting options
- * @route /api/posts-by-author
- * @method GET
- * @queryParam slug - Author slug to filter posts
- * @queryParam offset - Number of posts to skip (default: 6)
- * @queryParam loaded - Number of posts already loaded (default: 0)
- * @queryParam sort - Sorting criteria (default: lastmodified)
- *  @queryParam total - Total expected posts (for pagination)
- * @queryParam collections - Comma-separated list of collections to search (default: blog,post)
- * @returns JSON with posts and pagination info
- * @response 200 - List of posts by the author
- * @response 400 - Bad request if slug is missing or invalid
- */
 import { getCollection } from 'astro:content';
 import type { DataEntryMap } from 'astro:content';
 
@@ -23,7 +7,7 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
   const host = request.headers.get('host') || '';
 
   try {
-    // ✅ Restrict to same-origin requests
+    // same-origin guard
     if (origin && new URL(origin).hostname !== host) {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403,
@@ -31,23 +15,58 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
       });
     }
 
-    const slug = url.searchParams.get('slug');
+    const slug = url.searchParams.get('slug') || '';
     const offset = Number(url.searchParams.get('offset') || '6');
     const loaded = Number(url.searchParams.get('loaded') || '0');
     const sort = url.searchParams.get('sort') || 'lastmodified';
-    const totalExpected = Number(url.searchParams.get('total') || '0');
-    const limit = offset;
+    const totalExpected = Number(url.searchParams.get('total') || '0'); // not required here, but kept
 
-    if (!slug || typeof slug !== 'string') {
+    if (!slug) {
       return new Response(JSON.stringify({ posts: [], hasMore: false }), { status: 400 });
     }
 
-    // ✅ Allow multiple collection filters via ?collections=blog&collections=post
-    const collectionsParam = url.searchParams.getAll('collections');
-    
-    const collectionsToSearch = collectionsParam.length > 0 ? collectionsParam : ['blog', 'post'];
+    // collections: support repeated & comma-separated
+    const collectionsMulti = url.searchParams.getAll('collections');
+    const collectionsToSearch =
+      collectionsMulti.length > 0
+        ? collectionsMulti.flatMap((c) => c.split(',').map((s) => s.trim()).filter(Boolean))
+        : ['blog', 'post'];
 
-    const allPosts: {
+    // ---------- helpers ----------
+    const segHasUnderscore = (v: string) => v.split('/').some((seg) => seg.startsWith('_'));
+
+    const getRuntimeSlug = (entry: any): string =>
+      // Astro injects `entry.slug` at runtime for content collections
+      (entry?.slug as string) ?? (entry?.data?.slug as string) ?? '';
+
+    const isHiddenEntry = (entry: any): boolean => {
+      if (entry?.data?.draft === true) return true;
+      if (segHasUnderscore(entry.id)) return true;
+      if (segHasUnderscore(getRuntimeSlug(entry))) return true;
+      return false;
+    };
+
+    const authorMatches = (authors: unknown, wanted: string): boolean => {
+      const arr = Array.isArray(authors) ? authors : [];
+      const wantedVariants = new Set([
+        wanted,
+        `team/${wanted}`,
+        // if your team collection base differs, add it here, e.g. `members/${wanted}`
+      ]);
+      return arr.some((a: any) => {
+        if (typeof a === 'string') return wantedVariants.has(a) || a.endsWith(`/${wanted}`);
+        const id = a?.id ?? a; // some schemas store string in `id`, some as plain string
+        return typeof id === 'string' && (wantedVariants.has(id) || id.endsWith(`/${wanted}`));
+      });
+    };
+
+    const getLastModified = (entry: any): string => {
+      const lm = entry?.data?.lastModified || entry?.data?.updatedDate || entry?.data?.publishedDate;
+      return lm ? new Date(lm).toISOString() : new Date(0).toISOString();
+    };
+    // -----------------------------
+
+    const allPosts: Array<{
       title: string;
       description: string;
       slug: string;
@@ -55,47 +74,34 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
       heroImage: string | null;
       heroImageAlt: string;
       lastModified: string;
-    }[] = [];
+    }> = [];
 
     for (const collection of collectionsToSearch) {
       const entries = await getCollection(collection as keyof DataEntryMap);
 
       for (const entry of entries) {
-        const isDraft = 'draft' in entry.data && entry.data.draft === true;
-        const isHidden = entry.id.startsWith('_') || (('slug' in entry.data) && (entry.data as any).slug?.startsWith('_'));
+        if (isHiddenEntry(entry)) continue;
 
-        if (isDraft || isHidden) continue;
+        const authors = (entry.data as any)?.authors;
+        if (!authorMatches(authors, slug)) continue;
 
-        let matchesAuthor = false;
-        if ('authors' in entry.data && Array.isArray(entry.data.authors)) {
-          const authors = entry.data.authors;
-          matchesAuthor =
-            authors.some((a) => typeof a === 'object' && a?.id === slug);
-        }
+        const title = (entry.data as any)?.title ?? 'Untitled';
+        const description = (entry.data as any)?.description ?? '';
+        const runtimeSlug = getRuntimeSlug(entry);
 
-        if (matchesAuthor) {
-          if ('title' in entry.data && typeof entry.data.title === 'string') {
-            allPosts.push({
-              title: entry.data.title ?? 'Untitled',
-              description: entry.data.description ?? '',
-              slug: entry.data.slug ?? '',
-              collection: entry.collection,
-              heroImage: (entry.data as any)?.heroImage ?? null,
-              heroImageAlt: (entry.data as any)?.heroImageAlt ?? '',
-              lastModified:
-                ('lastModified' in entry.data && entry.data.lastModified
-                  ? new Date(entry.data.lastModified).toISOString()
-                  : 'publishedDate' in entry.data && entry.data.publishedDate
-                  ? new Date(entry.data.publishedDate).toISOString()
-                  : new Date().toISOString()
-                ),
-            });
-          }
-        }
+        allPosts.push({
+          title,
+          description,
+          slug: runtimeSlug,
+          collection: entry.collection,
+          heroImage: (entry.data as any)?.heroImage ?? null,
+          heroImageAlt: (entry.data as any)?.heroImageAlt ?? title,
+          lastModified: getLastModified(entry),
+        });
       }
     }
 
-    // Sort by last modified
+    // sort
     const sortedPosts = allPosts.sort((a, b) => {
       if (sort === 'lastmodified') {
         return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
@@ -103,7 +109,8 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
       return 0;
     });
 
-    // Pagination
+    // paginate
+    const limit = offset;
     const sliced = sortedPosts.slice(loaded, loaded + limit);
     const hasMore = loaded + sliced.length < sortedPosts.length;
 
@@ -117,9 +124,9 @@ export async function GET({ url, request }: { url: URL; request: Request }) {
     });
   } catch (err) {
     console.error('[posts-by-author] Internal error:', err);
-    return new Response(
-      JSON.stringify({ error: 'Internal Server Error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

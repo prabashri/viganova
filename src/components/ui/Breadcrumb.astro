@@ -92,7 +92,7 @@ const nonce = (Astro.locals as any).nonce;
 ---
 
 {shouldShow && (
-  <nav class="breadcrumb max-w-site flex wrap ai-center mi-auto text-xs px-05 py-02 my-05" aria-label="Breadcrumb navigation">
+  <nav class="breadcrumb max-w-site flex wrap ai-center mx-auto text-xs px-05 py-02 my-05" aria-label="Breadcrumb navigation">
     <ul class="flex wrap ai-center no-bullets no-margin p-unset">
       {crumbs.map((item, idx) => {
         // Site-relative link for UI (external stays absolute)

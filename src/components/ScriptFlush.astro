@@ -1,0 +1,51 @@
+---
+import {
+  getRegisteredScripts,
+  registerScript,
+  clearScriptRegistry,
+} from "@/utils/scriptRegistry";
+import { getGlobalScripts } from "@/config/globalScripts";
+
+interface Props {
+  position: 'head' | 'footer';
+  nonce?: string;
+  includeGlobals?: boolean;
+  clearAfterPrint?: boolean;
+}
+
+const {
+  position,
+  nonce,
+  includeGlobals = true,
+  clearAfterPrint = (position === 'footer'),
+} = Astro.props as Props;
+
+if (includeGlobals) {
+  const globals = getGlobalScripts(position);
+  for (const g of globals) registerScript({ ...g, position });
+}
+
+const list = getRegisteredScripts(position);
+
+function dataSpread(d?: Record<string, string | number | boolean>) {
+  if (!d) return {};
+  return Object.fromEntries(Object.entries(d).map(([k,v]) => [`data-${k}`, String(v)]));
+}
+---
+{list.map((s) => (
+  <script
+    id={s.id}
+    src={s.src}
+    type={s.module === false ? undefined : 'module'}
+    async={s.async ? true : undefined}
+    defer={s.async ? undefined : (s.defer === false ? undefined : true)}
+    nomodule={s.nomodule ? true : undefined}
+    nonce={nonce}
+    integrity={s.integrity}
+    crossorigin={s.crossOrigin}
+    referrerpolicy={s.referrerPolicy}
+    {...dataSpread(s.data)}
+  />
+))}
+
+{clearAfterPrint && clearScriptRegistry()}

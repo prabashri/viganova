@@ -3,7 +3,7 @@ import ResponsiveImage from '@/components/ResponsiveImage.astro';
 import { siteDefaults } from '@/config/siteDefaults';
 import { getEntry } from 'astro:content';
 import type { VideoMeta } from '@/types/HeadProps';
-import CssFilesToLoad from  '@/components/CssFilesToLoad.astro';
+import FilesToLoadCSS from  '@/components/FilesToLoadCSS.astro';
 
 type Aspect = `${number}:${number}`;
 
@@ -213,7 +213,7 @@ const captions = (video?.captions ?? doc?.captions ?? []) as any[];
 /* unique ids per instance */
 const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
 ---
-<CssFilesToLoad files={[{name:'video-player', inline:true}]}  />
+<FilesToLoadCSS files={[{name:'video-player', inline:true}]}  />
 <div class={`video-player ${className}`}>
   <div
     class="player-shell w-100p bg-base-10 br-r overflow-hidden relative"

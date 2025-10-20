@@ -15,10 +15,10 @@ export const siteFunctions = {
 
 
     googleAnalytics: true, // enable Google Analytics
-    analyticsId: "G-KEZGQDK3M0", // google analytics id   
+    analyticsId: "G-6KCKPN2GF6", // google analytics id   
     /* by default google analytics used if id provided*/
     googleTag: false, // enable Google Tag Manager
-    googleTagId: "GTM-PW2B4TFJ", // google tag manager id
+    googleTagId: "GTM-K9NQ9CBL", // google tag manager id
     
     ahrefAnalytics: false, // enable Ahrefs Analytics
     ahrefAnalyticsId: "", 

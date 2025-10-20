@@ -1,11 +1,11 @@
  /* colors respect light/dark; tweak if needed */
- .post-header{
-	/* background-color: var(--primary-darker);*/
-   background-image: url('/icons/dots-background.svg');
-	background-repeat: repeat;
-    background-attachment: fixed;
-    background-size: 60%;
-} 
+
+.dots-background {
+    background-attachment: local;
+    background-image: radial-gradient(hsl(232deg 96% 33% / 8%) 1px, transparent 2px);
+    background-size: 12px 12px;
+}
+
  :root {
     --hw-col: 44px;          /* step column width on mobile */
     --hw-gap: 12px;          /* gap between node and content (.75rem ≈ 12px) */
@@ -75,6 +75,7 @@
 /* Mobile: two-column item grid — col1 = step node, col2 = content  */
 /* MOBILE */
 @media (max-width: 768px) {
+  .dots-background { background-size: 10px 10px; }
   /* parent becomes block; spine aligned to center of the step column */
   .how-timeline{
     display:block;
@@ -171,29 +172,6 @@
   background:rgba(255,255,255,.65); border:1px solid rgba(0,0,0,.08);
   backdrop-filter:saturate(140%) blur(3px);
 }
-
-/* Gradients per classification */
-.ap-card.ap-edu{
-  --accent: #5faaff;
-  background-image:
-    linear-gradient(180deg, color-mix(in oklab, var(--accent) 35%, #fff) 0%, #fff 100%),
-    linear-gradient(var(--accent), var(--accent));
-}
-
-.ap-card.ap-personal{
-  --accent: #ffb8b8;
-  background-image:
-    linear-gradient(180deg, color-mix(in oklab, var(--accent) 35%, #fff) 0%, #fff 100%),
-    linear-gradient(var(--accent), var(--accent));
-}
-
-.ap-card.ap-commercial{
-  --accent: #7cf886;
-  background-image:
-    linear-gradient(180deg, color-mix(in oklab, var(--accent) 35%, #fff) 0%, #fff 100%),
-    linear-gradient(var(--accent), var(--accent));
-}
-
 
 
 /* === Requirement card === */

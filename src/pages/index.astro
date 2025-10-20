@@ -10,7 +10,7 @@ import { siteImages } from '@/config/siteImages';
 import { lastModifiedRaw } from '@/utils/last-modified';
 import { toMachineDate, toHumanDate, machineAndHuman } from '@/utils/date-format';
 
-import CssFilesToLoad from "@/components/CssFilesToLoad.astro";
+import FilesToLoadCSS from "@/components/FilesToLoadCSS.astro";
 
 import Home from '@/content/pages/Home.astro';
 
@@ -51,9 +51,9 @@ const headProps: HeadProps = {
   <Fragment slot="headContent-top">      
   </Fragment>
   <Fragment slot="headContent-bottom">
-    <CssFilesToLoad
+    <FilesToLoadCSS
         files={[
-          { name: "home-page", inline: true, id: "home-page-inline"}
+          { name: "home-page", inline: false, id: "home-page-external-css", fetchPriority: "high" },
         ]}
       />
   </Fragment>

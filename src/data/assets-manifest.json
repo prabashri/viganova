@@ -25,7 +25,7 @@
       "datetime": "2025-10-18T16:01:02.551Z"
     },
     "favicon.svg": {
-      "datetime": "2025-10-18T15:46:23.708Z"
+      "datetime": "2025-10-19T09:11:45.626Z"
     },
     "manifest.webmanifest": {
       "datetime": "2025-10-19T03:30:45.884Z"
@@ -74,7 +74,7 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-19T03:30:38.002Z",
+      "datetime": "2025-10-20T00:48:00.457Z",
       "names": [
         "audio-layout",
         "contact-form",
@@ -89,29 +89,89 @@
     },
     "pages:home": {
       "file": "",
-      "datetime": "2025-10-19T03:30:38.097Z",
+      "datetime": "2025-10-20T00:48:00.221Z",
       "name": "home",
       "removed": true
     },
     "pages:contact-form": {
       "file": "/styles/contact-form.f08719.css",
-      "datetime": "2025-10-14T06:02:13.914Z",
+      "datetime": "2025-10-19T07:58:51.881Z",
       "name": "contact-form",
       "hash": "f08719",
-      "mtimeMs": 1760214268522,
+      "mtimeMs": 1760708775685,
       "bytes": 410,
       "source": "src\\styles\\pages\\contact-form.css",
       "inlineModule": "/src/data/page-css/contact-form.ts"
     },
     "pages:post-layout": {
       "file": "/styles/post-layout.049035.css",
-      "datetime": "2025-10-14T06:02:14.006Z",
+      "datetime": "2025-10-19T07:58:51.978Z",
       "name": "post-layout",
       "hash": "049035",
-      "mtimeMs": 1760316650130,
+      "mtimeMs": 1760708775688,
       "bytes": 932,
       "source": "src\\styles\\pages\\post-layout.css",
       "inlineModule": "/src/data/page-css/post-layout.ts"
+    },
+    "pages:audio-layout": {
+      "file": "/styles/audio-layout.65e7e2.css",
+      "datetime": "2025-10-19T07:58:51.845Z",
+      "name": "audio-layout",
+      "hash": "65e7e2",
+      "mtimeMs": 1760851785214,
+      "bytes": 1073,
+      "source": "src\\styles\\pages\\audio-layout.css",
+      "inlineModule": "/src/data/page-css/audio-layout.ts"
+    },
+    "pages:home-page": {
+      "file": "/styles/home-page.e9e777.css",
+      "datetime": "2025-10-19T07:58:51.901Z",
+      "name": "home-page",
+      "hash": "e9e777",
+      "mtimeMs": 1760806301559,
+      "bytes": 5175,
+      "source": "src\\styles\\pages\\home-page.css",
+      "inlineModule": "/src/data/page-css/home-page.ts"
+    },
+    "pages:team-index": {
+      "file": "/styles/team-index.238b24.css",
+      "datetime": "2025-10-19T07:58:52.001Z",
+      "name": "team-index",
+      "hash": "238b24",
+      "mtimeMs": 1760708775690,
+      "bytes": 865,
+      "source": "src\\styles\\pages\\team-index.css",
+      "inlineModule": "/src/data/page-css/team-index.ts"
+    },
+    "pages:team-layout": {
+      "file": "/styles/team-layout.2580fe.css",
+      "datetime": "2025-10-19T07:58:52.014Z",
+      "name": "team-layout",
+      "hash": "2580fe",
+      "mtimeMs": 1760708775690,
+      "bytes": 297,
+      "source": "src\\styles\\pages\\team-layout.css",
+      "inlineModule": "/src/data/page-css/team-layout.ts"
+    },
+    "pages:video-layout": {
+      "file": "/styles/video-layout.f88031.css",
+      "datetime": "2025-10-19T07:58:52.027Z",
+      "name": "video-layout",
+      "hash": "f88031",
+      "mtimeMs": 1760708775691,
+      "bytes": 1111,
+      "source": "src\\styles\\pages\\video-layout.css",
+      "inlineModule": "/src/data/page-css/video-layout.ts"
+    },
+    "pages:video-player": {
+      "file": "/styles/video-player.5a661c.css",
+      "datetime": "2025-10-19T07:58:52.036Z",
+      "name": "video-player",
+      "hash": "5a661c",
+      "mtimeMs": 1760708775692,
+      "bytes": 225,
+      "source": "src\\styles\\pages\\video-player.css",
+      "inlineModule": "/src/data/page-css/video-player.ts"
     }
   },
   "logos": {
@@ -125,8 +185,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.oowusn.json",
-      "datetime": "2025-10-19T03:30:20.931Z"
+      "file": "/search-index.x7e2m9.json",
+      "datetime": "2025-10-20T00:47:46.309Z"
     }
   },
   "js": {
@@ -153,6 +213,10 @@
     "header-menu-theme": {
       "file": "/scripts/header-menu-theme.0ma8vz.min.js",
       "datetime": "2025-10-18T03:14:23.382Z"
+    },
+    "icon-mask": {
+      "file": "/scripts/icon-mask.gux1yn.min.js",
+      "datetime": "2025-10-20T00:48:02.940Z"
     }
   },
   "logosPublic": {

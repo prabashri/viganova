@@ -1,5 +1,4 @@
 ---
-// src/components/ui/Card.astro
 import ResponsiveImage from '@/components/ResponsiveImage.astro';
 import { Icon } from 'astro-icon/components';
 import type { CardProps } from '@/types/CardProps';
@@ -25,103 +24,277 @@ const {
   orientation = 'horizontal',
   imageSize,
   roleType = 'none',
-  loading = 'lazy', // default lazy
-  className = '', // ✅ new prop
-  imageClassName = '', // ✅ new prop
-  otherEntries = [] // ✅ fixed destructuring
+  loading = 'lazy',
+  className = '',
+  imageClassName = '',
+  otherEntries = [],
 } = Astro.props as CardProps;
 
-// Orientation classes
 const baseClasses = `card br-primary-light hover-br-primary br-r bg-base-00 box-shadow p-0 ${className}`;
-const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap max-w-content w-320 big-w-100p';
-const verticalClass = 'flex flex-col w-320';
+const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap max-w-content w-sidebar big-w-100p';
+const verticalClass = 'flex flex-col ai-center max-w-sidebar w-100p ';
 const orientationClass = orientation === 'horizontal' ? horizontalClass : verticalClass;
-const imageSizeFinal = imageSize || (orientation === 'horizontal' ? 160 : 320); // default sizes  
-// Content wrapper classes
+const imageSizeFinal = imageSize || (orientation === 'horizontal' ? 160 : 320);
 const contentWrapperClass =
-  orientation === 'horizontal'
-    ? 'flex flex-col flex-1 p-05'
-    : 'flex flex-col px-05 pt-0 pb-1';
+  orientation === 'horizontal' ? 'flex flex-col flex-1 p-05' : 'flex flex-col px-05 pt-0 pb-1';
 
-// Wrapper element
-const WrapperTag = link ? 'a' : 'div';
-
-// ARIA role
-const roleAttr = roleType === 'article' ? 'article' : undefined;
-const labelledById = `${title.replace(/\s+/g, '-').toLowerCase()}-title`;
+const labelledById = `${(title || 'card').replace(/[^\w-]+/g, '-').toLowerCase()}-title`;
+const isArticle = roleType === 'article';
+const hasLink = typeof link === 'string' && link.length > 0;
 ---
 
-<WrapperTag
-  href={link}
-  aria-label={linkAriaLabel ?? title}
-  role={roleAttr}
-  aria-labelledby={roleAttr === 'article' ? labelledById : undefined}
-  class={`${baseClasses} ${orientationClass} td-none`}
->
-  {icon
-    ? (
-      <Icon
-        name={icon}
-        title={iconTitle ?? title}
-        aria-label={iconAriaLabel ?? title}
-        class="block w-1-5 h-1-5"
-      />
-    )
-    : image && (
-      <ResponsiveImage
-        src={image}
-        alt={imageAlt ?? title}
-        sizes={imageSizeFinal}
-        width={imageSizeFinal}
-        height={Math.round(imageSizeFinal * 0.56)}
-        className={`${className} w-unset ar-unset`}
-        objectFit='cover'
-        imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset ${imageClassName} h-full`}
-        breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
-        loading={loading}
-      />
-    )
-  }
-
-  <div class={`${contentWrapperClass}`}>
-    {afterImage && <div class="after-image mt-05">{afterImage}</div>}
-
-    {otherEntries.length > 0 && (
-      <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
-        {otherEntries.map((entry: { url: string; label: string }) => (
-          <li class="tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02" aria-label={`View tag: ${entry.label}`}>
-            <span class="tag">{entry.label}</span>
-          </li>
-        ))}
-      </ul>
-    )}
-
-    <h3 id={labelledById} class="text-base bold my-02">{title}</h3>
-    {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
-
-    {date && (
-        <time 
-            datetime={new Date(date).toISOString()} 
-            class="inline-flex flex-row gap-05 mt-05 text-xs"
-        >
-            <Icon
-                name="calendar"
-                title={iconTitle ?? title}
-                aria-label={iconAriaLabel ?? title}
-                class="block w-1-0 h-1-0"
+{isArticle ? (
+  <article aria-labelledby={labelledById} class={`${baseClasses} ${orientationClass} td-none`}>
+    {hasLink ? (
+      <a href={link!} aria-label={linkAriaLabel ?? title} class="block td-none">
+        {icon ? (
+          <Icon
+            name={icon}
+            title={iconTitle ?? title}
+            aria-label={iconAriaLabel ?? title}
+            class="block w-1-5 h-1-5"
+          />
+        ) : (
+          image && (
+            <ResponsiveImage
+              src={image}
+              alt={imageAlt ?? title}
+              sizes={imageSizeFinal}
+              width={imageSizeFinal}
+              height={Math.round(imageSizeFinal * 0.56)}
+              className={`${className}`}
+              objectFit="cover"
+              imageClassName={`w-100p br-r-unset ${imageClassName} h-full`}
+              breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
+              loading={loading}
             />
-            {date}
-        </time>
+          )
+        )}
+
+        <div class={contentWrapperClass}>
+          {afterImage && (
+            <div class="after-image mt-05 bg-primary col-base-00 w-fit br-r py-02 px-05">{afterImage}</div>
+          )}
+
+          {otherEntries.length > 0 && (
+            <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
+              {otherEntries.map((entry: { url?: string; label: string }) => (
+                <li class="tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02">
+                  {entry.url ? <a href={entry.url} class="td-none">{entry.label}</a> : <span class="tag">{entry.label}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <h3 id={labelledById} class="text-base bold my-02">{title}</h3>
+          {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
+
+          {date && (
+            <time datetime={new Date(date).toISOString()} class="inline-flex flex-row gap-05 mt-05 text-xs">
+              <Icon name="calendar" title={iconTitle ?? title} aria-label={iconAriaLabel ?? title} class="block w-1-0 h-1-0" />
+              {date}
+            </time>
+          )}
+
+          {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
+
+          {description && <p class="text-s my-05-0 clamp-3">{description}</p>}
+          {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
+
+          {author && <span class="inline-block mt-05 text-xs">By {author}</span>}
+          {afterAuthor && <span class="inline-block mt-05 text-xs">By {afterAuthor}</span>}
+
+          {lastRow && <span class="inline-block mt-05 text-xs">{lastRow}</span>}
+        </div>
+      </a>
+    ) : (
+      <Fragment>
+        {icon ? (
+          <Icon
+            name={icon}
+            title={iconTitle ?? title}
+            aria-label={iconAriaLabel ?? title}
+            class="block w-1-5 h-1-5"
+          />
+        ) : (
+          image && (
+            <ResponsiveImage
+              src={image}
+              alt={imageAlt ?? title}
+              sizes={imageSizeFinal}
+              width={imageSizeFinal}
+              height={Math.round(imageSizeFinal * 0.56)}
+              className={`${className}`}
+              objectFit="cover"
+              imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset w-100p ${imageClassName} h-full`}
+              breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
+              loading={loading}
+            />
+          )
+        )}
+
+        <div class={contentWrapperClass}>
+          {afterImage && (
+            <div class="after-image mt-05 bg-primary col-base-00 w-fit br-r py-02 px-05">{afterImage}</div>
+          )}
+
+          {otherEntries.length > 0 && (
+            <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
+              {otherEntries.map((entry: { url?: string; label: string }) => (
+                <li class="tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02">
+                  {entry.url ? <a href={entry.url} class="td-none">{entry.label}</a> : <span class="tag">{entry.label}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <h3 id={labelledById} class="text-base bold my-02">{title}</h3>
+          {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
+
+          {date && (
+            <time datetime={new Date(date).toISOString()} class="inline-flex flex-row gap-05 mt-05 text-xs">
+              <Icon name="calendar" title={iconTitle ?? title} aria-label={iconAriaLabel ?? title} class="block w-1-0 h-1-0" />
+              {date}
+            </time>
+          )}
+
+          {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
+
+          {description && <p class="text-s my-05-0 clamp-3">{description}</p>}
+          {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
+
+          {author && <span class="inline-block mt-05 text-xs">By {author}</span>}
+          {afterAuthor && <span class="inline-block mt-05 text-xs">By {afterAuthor}</span>}
+
+          {lastRow && <span class="inline-block mt-05 text-xs">{lastRow}</span>}
+        </div>
+      </Fragment>
     )}
+  </article>
+) : (
+  (hasLink ? (
+    <a href={link!} aria-label={linkAriaLabel ?? title} class={`${baseClasses} ${orientationClass} td-none`}>
+      {icon ? (
+        <Icon
+          name={icon}
+          title={iconTitle ?? title}
+          aria-label={iconAriaLabel ?? title}
+          class="block w-1-5 h-1-5"
+        />
+      ) : (
+        image && (
+          <ResponsiveImage
+            src={image}
+            alt={imageAlt ?? title}
+            sizes={imageSizeFinal}
+            width={imageSizeFinal}
+            height={Math.round(imageSizeFinal * 0.56)}
+            className={`${className}`}
+            objectFit="cover"
+            imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset w-100p ${imageClassName} h-full`}
+            breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
+            loading={loading}
+          />
+        )
+      )}
 
-    {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
+      <div class={contentWrapperClass}>
+        {afterImage && (
+          <div class="after-image mt-05 bg-primary col-base-00 w-fit br-r py-02 px-05">{afterImage}</div>
+        )}
 
-    {description && <p class="text-s my-05-0 clamp-3">{description}</p>}
-    {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
+        {otherEntries.length > 0 && (
+          <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
+            {otherEntries.map((entry: { url?: string; label: string }) => (
+              <li class="tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02">
+                {entry.url ? <a href={entry.url} class="td-none">{entry.label}</a> : <span class="tag">{entry.label}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
 
-    {author && <span class="inline-block mt-05 text-xs">By {author}</span>}
-    {afterAuthor && <span class="inline-block mt-05 text-xs">By {afterAuthor}</span>}
+        <h3 id={labelledById} class="text-base bold my-02">{title}</h3>
+        {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
 
-    {lastRow && <span class="inline-block mt-05 text-xs">{lastRow}</span>}
-  </div>
-</WrapperTag>
+        {date && (
+          <time datetime={new Date(date).toISOString()} class="inline-flex flex-row gap-05 mt-05 text-xs">
+            <Icon name="calendar" title={iconTitle ?? title} aria-label={iconAriaLabel ?? title} class="block w-1-0 h-1-0" />
+            {date}
+          </time>
+        )}
+
+        {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
+
+        {description && <p class="text-s my-05-0 clamp-3">{description}</p>}
+        {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
+
+        {author && <span class="inline-block mt-05 text-xs">By {author}</span>}
+        {afterAuthor && <span class="inline-block mt-05 text-xs">By {afterAuthor}</span>}
+
+        {lastRow && <span class="inline-block mt-05 text-xs">{lastRow}</span>}
+      </div>
+    </a>
+  ) : (
+    <div class={`${baseClasses} ${orientationClass} td-none`}>
+      {icon ? (
+        <Icon
+          name={icon}
+          title={iconTitle ?? title}
+          aria-label={iconAriaLabel ?? title}
+          class="block w-1-5 h-1-5"
+        />
+      ) : (
+        image && (
+          <ResponsiveImage
+            src={image}
+            alt={imageAlt ?? title}
+            sizes={imageSizeFinal}
+            width={imageSizeFinal}
+            height={Math.round(imageSizeFinal * 0.56)}
+            className={`${className}`}
+            objectFit="cover"
+            imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset w-100p ${imageClassName} h-full`}
+            breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
+            loading={loading}
+          />
+        )
+      )}
+
+      <div class={contentWrapperClass}>
+        {afterImage && (
+          <div class="after-image mt-05 bg-primary col-base-00 w-fit br-r py-02 px-05">{afterImage}</div>
+        )}
+
+        {otherEntries.length > 0 && (
+          <ul class="tag-list flex wrap gap-05 my-05 no-bullets">
+            {otherEntries.map((entry: { url?: string; label: string }) => (
+              <li class="tag-link bg-primary-lighter col-base-100 br-r text-xs px-05 py-02">
+                {entry.url ? <a href={entry.url} class="td-none">{entry.label}</a> : <span class="tag">{entry.label}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <h3 id={labelledById} class="text-base bold my-02">{title}</h3>
+        {afterTitle && <h4 class="text-sm mt-05">{afterTitle}</h4>}
+
+        {date && (
+          <time datetime={new Date(date).toISOString()} class="inline-flex flex-row gap-05 mt-05 text-xs">
+            <Icon name="calendar" title={iconTitle ?? title} aria-label={iconAriaLabel ?? title} class="block w-1-0 h-1-0" />
+            {date}
+          </time>
+        )}
+
+        {afterDate && <span class="inline-block mt-05 text-xs">{afterDate}</span>}
+
+        {description && <p class="text-s my-05-0 clamp-3">{description}</p>}
+        {afterDescription && <p class="text-s mt-05 clamp-3">{afterDescription}</p>}
+
+        {author && <span class="inline-block mt-05 text-xs">By {author}</span>}
+        {afterAuthor && <span class="inline-block mt-05 text-xs">By {afterAuthor}</span>}
+
+        {lastRow && <span class="inline-block mt-05 text-xs">{lastRow}</span>}
+      </div>
+    </div>
+  ))
+)}

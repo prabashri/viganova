@@ -89,8 +89,8 @@ const faq = [
 ---
 
 <article id="post-layout">
-  <header id="post-header" class="post-header mx-w-100p w-100p mi-auto ta-center relative overflow-hidden">
-        <div id="hero-section" class="flex flex-col big-flex-row max-w-site mi-auto w-100p py-2 px-1 ai-center jc-center gap relative">
+  <header id="post-header" class="post-header dots-background mx-w-100p w-100p mx-auto ta-center relative overflow-hidden pb-2">
+        <div id="hero-section" class="flex flex-col big-flex-row max-w-site mx-auto w-100p py-2 px-1 ai-center jc-center gap relative">
             {/** Left: Text */}
             <div class="hero-text flex-1 relative col-primary ta-start">
                 <h1 class="post-title regular text-xs">
@@ -103,7 +103,7 @@ const faq = [
                 </h2>
 
                 <ul class="feature-list no-bullets ml-1 flex flex-row gap-col-2 wrap" aria-label="Why people choose VerifiedApostille">
-                    { /*<li class="tick"><Anchor href="/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc" className='highlight'><mark>SDM bundle {inr(price('sdmBundle'))}</mark></Anchor></li>*/}
+                    { /*<li class="tick"><Anchor href="https://easyapostille.in/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc" className='highlight'><mark>SDM bundle {inr(price('sdmBundle'))}</mark></Anchor></li>*/}
                     <li class="tick">Physical &amp; Scanned Copies Accepted</li>
                     <li class="tick">Premium International delivery with discounts</li>
                     <li class="tick">Nationwide free delivery</li>
@@ -173,14 +173,13 @@ const faq = [
         </div>
         <p class="text-xs mt-1" aria-label="Service scope">
             MEA Apostille • State HRD/SDM/CoC routing when required • Birth/Marriage/Edu/Commercial documents • Delivery to 200+ countries
-        </p>
-        <hr />        
+        </p>       
     </header>
 
-    <section class="max-w-site w-100p mi-auto my-2 p-2">
-        <h2 class="mi-auto py-1 my-0 ta-center">Read our customers' words</h2>
+    <section class="max-w-site w-100p mx-auto my-1 p-2" aria-labelledby="customer-reviews-h2">
+        <h2 class="mx-auto py-1 my-0 ta-center">Read our customers' words</h2>
         <p class="bold ta-center">Don't just take our word for it—hear what our customers have to say!</p>
-        <div class="flex flex-row text-xl bold ta-center br-secondary bg-base-00 col-base-100 br-r my-1 p-1 w-fit mi-auto">
+        <div class="flex flex-row text-xl bold ta-center br-secondary bg-base-00 col-base-100 br-r my-1 p-1 w-fit mx-auto">
             <StarRating rating={agg.ratingValue} showNumber />
             <span class="opacity-75">/ 5 from {agg.reviewCount} reviews</span>
         </div>
@@ -191,7 +190,7 @@ const faq = [
             ariaLabel="Start Apostille Process on WhatsApp"
             title="Share certificates or documents securely on WhatsApp to begin"
             dataId="cta-wa-start"
-            className="cta-button my-2 w-fit mi-auto ta-center"
+            className="cta-button my-2 w-fit mx-auto ta-center"
             dataAction="link_click"
             dataLabel="WhatsApp • Start Apostille"
         >
@@ -214,7 +213,7 @@ const faq = [
             ariaLabel="Read all reviews"
             title="Read all reviews"
             dataId="cta-read-all-reviews"
-            className="cta-button secondary my-2 w-fit mi-auto ta-center"
+            className="cta-button secondary my-2 w-fit mx-auto ta-center"
             dataAction="link_click"
             dataLabel="Read All Reviews"
         >
@@ -228,7 +227,7 @@ const faq = [
             ariaLabel="Start Apostille Process on WhatsApp"
             title="Share certificates or documents securely on WhatsApp to begin"
             dataId="cta-wa-start"
-            className="cta-button my-2 w-fit mi-auto ta-center"
+            className="cta-button my-2 w-fit mx-auto ta-center"
             dataAction="link_click"
             dataLabel="WhatsApp • Start Apostille"
         >
@@ -244,14 +243,14 @@ const faq = [
         </Anchor>
     </section>
     {/* link added */}
-    <section id="how-it-works" class="mx-w-100p w-100p mi-auto my-2 p-2 howitworks bg-base-00" aria-labelledby="howitworks-h2">
-        <h2 id="howitworks-h2" class="mi-auto ta-center py-1">
+    <section id="how-it-works" class="dots-background mx-w-100p w-100p mx-auto my-2 p-2 howitworks bg-base-00" aria-labelledby="howitworks-h2">
+        <h2 id="howitworks-h2" class="mx-auto ta-center py-1">
             How Your Apostille Gets Done — Sticker or e-Apostille (QR)
         </h2>
 
-        <p class="mi-auto ta-center opacity-90 my-1">
+        <p class="mx-auto ta-center opacity-90 my-1">
             Learn the full process from document submission to verified apostille.
-            <Anchor href="/resources/how-to-get-apostille-in-india-step-by-step/"
+            <Anchor href="https://easyapostille.in/resources/how-to-get-apostille-in-india-step-by-step/"
             className="td-none underline focus-vis-outline"
             title="Step-by-step apostille process in India">
             Read the complete step-by-step guide
@@ -259,7 +258,7 @@ const faq = [
         </p>
 
         <!-- Timeline steps as semantic list -->
-        <ol class="max-w-site w-100p mi-auto my-1 how-timeline" aria-label="Apostille process timeline">
+        <ol class="max-w-site w-100p mx-auto my-1 how-timeline" aria-label="Apostille process timeline">
             <li class="how-item right">
                 <div class="how-node" aria-hidden="true"><span>1</span></div>
                 <div class="how-content">
@@ -317,7 +316,7 @@ const faq = [
                     <p class="text-s opacity-90">
                     Submitted to the Ministry of External Affairs (MEA) for final
                     <strong>authentication and apostille issuance</strong>.
-                    <Anchor href="/resources/what-is-apostille-meaning-process-certificate/"
+                    <Anchor href="/resources/apostille-process-in-india/"
                         className="td-none underline focus-vis-outline"
                         title="What is an apostille certificate and why it matters">
                         Learn what an apostille means
@@ -350,25 +349,25 @@ const faq = [
         </ol>
 
         <!-- Minimal contextual internal links -->
-        <div class="max-w-featured w-100p mi-auto ta-center mt-1" role="navigation" aria-label="Explore related services and resources">
+        <div class="max-w-featured w-100p mx-auto ta-center mt-1" role="navigation" aria-label="Explore related services and resources">
             <p class="text-s opacity-80">
             Explore related:
             <Anchor href="/services/education-documents-apostille/" className="td-none underline focus-vis-outline" title="Education document apostille services">Education</Anchor>,
             <Anchor href="/services/business-documents-apostille/" className="td-none underline focus-vis-outline" title="Business document apostille services">Business</Anchor>,
-            <Anchor href="/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc/" className="td-none underline focus-vis-outline" title="Apostille price guide India">Price Guide</Anchor>,
+            <Anchor href="https://easyapostille.in/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc/" className="td-none underline focus-vis-outline" title="Apostille price guide India">Price Guide</Anchor>,
             and
-            <Anchor href="/resources/apostille-on-original-vs-copy-certificate-india/" className="td-none underline focus-vis-outline" title="Apostille on original vs copy">Original vs Copy</Anchor>.
+            <Anchor href="https://easyapostille.in/resources/apostille-on-original-vs-copy-certificate-india/" className="td-none underline focus-vis-outline" title="Apostille on original vs copy">Original vs Copy</Anchor>.
             </p>
         </div>
     </section>
 
 
-    <section id="what-to-apostille" class="max-w-site w-100p mi-auto my-2 p-2">
+    <section id="what-to-apostille" class="max-w-site w-100p mx-auto my-1 p-2">
         <h2 class="ta-center my-05">What to Apostille?</h2>
 
         <div class="flex flex-row wrap gap-2 jc-center my-2">
             { /*-- Educational -- */}
-            <div class="ap-card ap-edu" role="group" aria-label="Educational documents">
+            <div class="ap-card" role="group" aria-label="Educational documents">
                 <div class="ap-head">
                     <span class="text-3xl" aria-hidden="true">🎓</span>
                     <h3 class="m-0">Educational Documents</h3>
@@ -389,7 +388,7 @@ const faq = [
             </div>
 
             { /*-- Personal --*/ }
-            <div class="ap-card ap-personal" role="group" aria-label="Personal/civil documents">
+            <div class="ap-card" role="group" aria-label="Personal/civil documents">
                 <div class="ap-head">
                     <span class="text-3xl" aria-hidden="true">🧾</span>
                     <h3 class="m-0">Personal (Civil) Documents</h3>
@@ -409,7 +408,7 @@ const faq = [
             </div>
 
             { /*-- Commercial --*/ }
-            <div class="ap-card ap-commercial" role="group" aria-label="Commercial/business documents">
+            <div class="ap-card" role="group" aria-label="Commercial/business documents">
                 <div class="ap-head">
                     <span class="text-3xl" aria-hidden="true">🏢</span>
                     <h3 class="m-0">Commercial / Business</h3>
@@ -433,7 +432,7 @@ const faq = [
         </div>
         { /*-- Ask --*/ }
         <div class="flex flex-col bg-base-00 my-2 py-2 px-1 br-r ta-center" role="group" aria-label="Don't see your document? Ask us">
-            <div class="ap-head ta-center mi-auto">
+            <div class="ap-head ta-center mx-auto">
                 <span class="text-3xl" aria-hidden="true">💬</span>
                 <h3 class="m-0">Don't see your document? No worries!</h3>
             </div>
@@ -459,7 +458,7 @@ const faq = [
         </p>
     </section>
 
-    <section id="what-you-need" class="w-100p bg-base-00 mi-auto my-2 p-2" aria-labelledby="what-you-need-h2">
+    <section id="what-you-need" class="dots-background w-100p bg-base-00 mx-auto my-1 p-2" aria-labelledby="what-you-need-h2">
         <h2 id="what-you-need-h2" class="ta-center my-05">
             What you'll need to get an Apostille in India
         </h2>
@@ -469,7 +468,7 @@ const faq = [
         </p>
 
         {/* Use semantic UL/LI instead of div[role=list] */}
-        <ul class="req-list flex flex-col gap-2 my-2 max-w-featured mi-auto">
+        <ul class="req-list flex flex-col gap-2 my-2 max-w-featured mx-auto">
             {/* Clear scans */}
             <li class="req-item col-base-90">
             <div class="req-icon" aria-hidden="true">✓</div>
@@ -540,179 +539,183 @@ const faq = [
         </p>
     </section>
     { /*-- Link added --*/ }
-    <section id="why-VerifiedApostille" class="max-w-site w-100p mi-auto my-2 p-2" aria-labelledby="why-VerifiedApostille-h2">
-        <h2 id="why-VerifiedApostille-h2" class="ta-center my-05">
-            Why everyone chooses <span class="nowrap">VerifiedApostille</span>
-        </h2>
+<section id="why-VerifiedApostille" class="max-w-site w-100p mx-auto my-1 p-2" aria-labelledby="why-VerifiedApostille-h2">
+  <h2 id="why-VerifiedApostille-h2" class="ta-center my-05">
+    Why everyone chooses <span class="nowrap">VerifiedApostille</span>
+  </h2>
 
-        <p class="max-w-featured w-100p mi-auto ta-center opacity-90 my-1">
-            Fast, <strong>MEA-compliant apostille &amp; attestation</strong> across India — choose
-            <strong>e-Apostille (QR)</strong> or <strong>sticker apostille</strong> with tracked delivery.
+  <p class="max-w-featured w-100p mx-auto ta-center opacity-90 my-1">
+    Fast, <strong>MEA-compliant apostille &amp; attestation</strong> across India — choose
+    <strong>e-Apostille (QR)</strong> or <strong>sticker apostille</strong> with <strong>tracked worldwide delivery</strong>.
+  </p>
+
+  <!-- Feature cards -->
+  <ul class="req-list flex flex-row wrap gap-2 my-2 max-w-featured mx-auto jc-center">
+    <li class="req-item w-sidebar info">
+      <div class="req-icon" aria-hidden="true">✅</div>
+      <div class="req-body">
+        <p class="req-title">MEA-ready process</p>
+        <p class="req-desc">
+          We <strong>pre-check your paperwork</strong> before submission (Notary → SDM/State → MEA) to avoid rejections.
+          <a href="https://easyapostille.in/resource/how-to-get-apostille-in-india-step-by-step/" class="td-none underline focus-vis-outline" title="How to get apostille in India — step by step">
+            Learn the steps
+          </a>
         </p>
+      </div>
+    </li>
 
-        <!-- Feature cards -->
-        <ul class="req-list flex flex-row wrap gap-2 my-2 max-w-featured mi-auto jc-center">
-            <li class="req-item w-sidebar info bg-color-warn">
-                <div class="req-icon" aria-hidden="true">✅</div>
-                <div class="req-body">
-                    <p class="req-title">MEA-ready process</p>
-                    <p class="req-desc">
-                    We <strong>pre-check your paperwork</strong> before submission (Notary → SDM/State → MEA) to avoid rejections.
-                    <a href="/resources/how-to-get-apostille-in-india-step-by-step/" class="td-none underline focus-vis-outline" title="How to get apostille in India — step by step">
-                        Learn the steps
-                    </a>
-                    </p>
-                </div>
-            </li>
+    <li class="req-item w-sidebar ok">
+      <div class="req-icon" aria-hidden="true">💬</div>
+      <div class="req-body">
+        <p class="req-title">Dedicated case manager</p>
+        <p class="req-desc">One point of contact on WhatsApp/email from document review to delivery.</p>
+      </div>
+    </li>
 
-            <li class="req-item w-sidebar ok bg-color-warn">
-                <div class="req-icon" aria-hidden="true">💬</div>
-                <div class="req-body">
-                    <p class="req-title">Dedicated case manager</p>
-                    <p class="req-desc">One point of contact on WhatsApp/email from document review to delivery.</p>
-                </div>
-            </li>
-
-            <li class="req-item w-sidebar info bg-color-warn">
-                <div class="req-icon" aria-hidden="true">⚡</div>
-                <div class="req-body">
-                    <p class="req-title">On-time delivery</p>
-                    <p class="req-desc">
-                    Typical turnaround for personal documents is <strong>~2-3 working days</strong> (queue-dependent). Live ETA shared upfront.
-                    </p>
-                </div>
-            </li>
-
-            <li class="req-item w-sidebar warn bg-color-warn">
-                <div class="req-icon" aria-hidden="true">₹</div>
-                <div class="req-body">
-                    <p class="req-title">Clear pricing</p>
-                    <p class="req-desc">
-                    <strong>No hidden charges</strong>. Multi-document <strong>discounts 5–15%</strong>. Pickup/return courier options.
-                    <Anchor href="/resources/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc/" className="td-none underline focus-vis-outline" title="Apostille price and cost in India">
-                        See price guide
-                    </Anchor>
-                    </p>
-                </div>
-            </li>
-
-            <li class="req-item w-sidebar info bg-color-warn">
-                <div class="req-icon" aria-hidden="true">📦</div>
-                <div class="req-body">
-                    <p class="req-title">Door-to-door service</p>
-                    <p class="req-desc">Upload scans or send originals via secure courier. <strong>Pan-India pickup &amp; tracked delivery</strong>.</p>
-                </div>
-            </li>
-
-            <li class="req-item w-sidebar ok bg-color-warn">
-                <div class="req-icon" aria-hidden="true">🔒</div>
-                <div class="req-body">
-                    <p class="req-title">Privacy &amp; security</p>
-                    <p class="req-desc">Strict document handling, secure storage, and safe disposal after completion.</p>
-                </div>
-            </li>
-        </ul>
-
-        <!-- Compact, curated internal links to keep link density low -->
-        <div class="max-w-featured w-100p mi-auto grid gap-1 my-2" role="navigation" aria-label="Popular services and guides">
-            <!-- Popular services (4 max) -->
-            <div class="ta-center">
-                <p class="bold uppercase my-02">Popular services</p>
-                <ul class="inline-flex wrap gap-05 no-bullets jc-center">
-                    <li><Anchor className="td-none underline focus-vis-outline" href="/services/pcc-apostille/" title="PCC apostille service">PCC</Anchor></li>
-                    <li><Anchor className="td-none underline focus-vis-outline" href="/services/degree-certificate-apostille/" title="Degree certificate apostille">Degree</Anchor></li>
-                    <li><Anchor className="td-none underline focus-vis-outline" href="/services/marriage-certificate-apostille/" title="Marriage certificate apostille">Marriage</Anchor></li>
-                    <li><Anchor className="td-none underline focus-vis-outline" href="/services/birth-certificate-apostille/" title="Birth certificate apostille">Birth</Anchor></li>
-                </ul>
-                <p class="text-s mt-02 opacity-80">
-                    <Anchor className="td-none underline focus-vis-outline" href="/services/personal-documents-apostille/" title="Personal documents apostille">
-                    Personal
-                    </Anchor> •
-                    <Anchor className="td-none underline focus-vis-outline" href="/services/education-documents-apostille/" title="Education documents apostille">
-                    Education
-                    </Anchor> •
-                    <Anchor className="td-none underline focus-vis-outline" href="/services/business-documents-apostille/" title="Business documents apostille">
-                    Business
-                    </Anchor>
-                </p>
-            </div>
-
-            <!-- Guides (2 + 1 “browse all”) -->
-            <div class="ta-center">
-                <p class="bold uppercase my-02">Guides</p>
-                <ul class="inline-flex wrap gap-05 no-bullets jc-center">
-                    <li>
-                        <Anchor className="td-none underline focus-vis-outline"
-                            href="/resources/what-is-apostille-meaning-process-certificate/"
-                            title="What is Apostille? Meaning, process and certificate (pillar)">
-                            What is Apostille?
-                        </Anchor>
-                    </li>
-                    <li>
-                        <Anchor className="td-none underline focus-vis-outline"
-                            href="/resources/hague-vs-non-hague-apostille-or-embassy-attestation/"
-                            title="Hague vs Non-Hague: Apostille or Embassy Attestation">
-                            Hague vs Non-Hague
-                        </Anchor>
-                    </li>
-                </ul>
-                <p class="text-s mt-02 opacity-80">
-                    <Anchor className="td-none underline focus-vis-outline"
-                        href="/resources/document-authentication-india-coc-hrd-vs-sdm-home-state-attestation/"
-                        title="Document authentication in India: CoC/HRD vs SDM/Home State">
-                        CoC/HRD vs SDM
-                    </Anchor>
-                    &nbsp;•&nbsp;
-                    <Anchor className="td-none underline focus-vis-outline"
-                        href="/resources/apostille-on-original-vs-copy-certificate-india/"
-                        title="Apostille on original vs copy">
-                        Original vs Copy
-                    </Anchor>
-                    &nbsp;•&nbsp;
-                    <Anchor className="td-none underline focus-vis-outline" href="/resources/" title="Browse all resources">
-                        More guides
-                    </Anchor>
-                </p>
-            </div>
-        </div>
-
-        <!-- CTAs -->
-        <div class="max-w-featured w-100p mi-auto flex wrap jc-center gap-05 my-2 ta-center">
-            <Anchor
-                href={buildWhatsAppLink({
-                    phone: '',
-                    text: 'Hi VerifiedApostille!',
-                    source: 'Home-Why',
-                })}
-                ariaLabel="Chat on WhatsApp"
-                variant="primary"
-                >
-                <Icon
-                    slot="icon-left"
-                    name="whatsapp"
-                    class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                    aria-hidden="true"
-                    focusable="false"
-                />
-                Chat on WhatsApp →
-            </Anchor>
-
-            <Anchor href="/contact/" ariaLabel="Email the VerifiedApostille team" variant="secondary">
-                <Icon
-                    slot="icon-left"
-                    name="email"
-                    class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                    aria-hidden="true"
-                    focusable="false"
-                />
-                Email us →
-            </Anchor>
-        </div>
-
-        <p class="max-w-featured w-100p mi-auto opacity-80 mt-05 ta-center">
-            Free document pre-check • MEA-approved flow • e-Apostille (QR) &amp; sticker options
+    <li class="req-item w-sidebar info">
+      <div class="req-icon" aria-hidden="true">⚡</div>
+      <div class="req-body">
+        <p class="req-title">On-time delivery</p>
+        <p class="req-desc">
+          Typical turnaround for personal documents is <strong>~2–3 working days</strong> (queue-dependent). Live ETA shared upfront.
         </p>
-    </section>
+      </div>
+    </li>
+
+    <li class="req-item w-sidebar warn">
+      <div class="req-icon" aria-hidden="true">💰</div>
+      <div class="req-body">
+        <p class="req-title">Clear pricing</p>
+        <p class="req-desc">
+          <strong>No hidden charges</strong>. Multi-document <strong>discounts 5–10%</strong>. Pickup/return courier options.
+          <Anchor href="/contact/" className="td-none underline focus-vis-outline" title="Request an all-inclusive quote">
+            Get a quote
+          </Anchor>
+        </p>
+      </div>
+    </li>
+
+    <li class="req-item w-sidebar info">
+      <div class="req-icon" aria-hidden="true">📦</div>
+      <div class="req-body">
+        <p class="req-title">Door-to-door service</p>
+        <p class="req-desc">
+          Upload scans or send originals via secure courier. <strong>Pan-India pickup</strong> &amp; <strong>tracked worldwide delivery</strong>.
+        </p>
+      </div>
+    </li>
+
+    <li class="req-item w-sidebar ok">
+      <div class="req-icon" aria-hidden="true">🔒</div>
+      <div class="req-body">
+        <p class="req-title">Privacy &amp; security</p>
+        <p class="req-desc">Strict document handling, secure storage, and safe disposal after completion.</p>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Compact, curated internal links to keep link density low -->
+  <div class="max-w-featured w-100p mx-auto grid gap-1 my-2" role="navigation" aria-label="Popular services and guides">
+    <!-- Popular services (4 max) -->
+    <div class="ta-center">
+      <p class="bold uppercase my-02">Popular services</p>
+      <ul class="inline-flex wrap gap-05 no-bullets jc-center">
+        <li><Anchor className="td-none underline focus-vis-outline" href="/service/pcc-apostille/" title="PCC apostille service">PCC</Anchor></li>
+        <li><Anchor className="td-none underline focus-vis-outline" href="/service/degree-certificate-apostille/" title="Degree certificate apostille">Degree</Anchor></li>
+        <li><Anchor className="td-none underline focus-vis-outline" href="/service/marriage-certificate-apostille/" title="Marriage certificate apostille">Marriage</Anchor></li>
+        <li><Anchor className="td-none underline focus-vis-outline" href="/service/birth-certificate-apostille/" title="Birth certificate apostille">Birth</Anchor></li>
+      </ul>
+      <p class="text-s mt-02 opacity-80">
+        <Anchor className="td-none underline focus-vis-outline" href="/service/personal-documents-apostille/" title="Personal documents apostille">
+          Personal
+        </Anchor>
+        •
+        <Anchor className="td-none underline focus-vis-outline" href="/service/education-documents-apostille/" title="Education documents apostille">
+          Education
+        </Anchor>
+        •
+        <Anchor className="td-none underline focus-vis-outline" href="/service/business-document-apostille/" title="Business documents apostille">
+          Business
+        </Anchor>
+      </p>
+    </div>
+
+    <!-- Guides (2 + 1 “browse all”) -->
+    <div class="ta-center">
+      <p class="bold uppercase my-02">Guides</p>
+      <ul class="inline-flex wrap gap-05 no-bullets jc-center">
+        <li>
+          <Anchor className="td-none underline focus-vis-outline"
+            href="/resource/apostille-process-in-india/"
+            title="What is Apostille? Meaning, process and certificate (pillar)">
+            What is Apostille?
+          </Anchor>
+        </li>
+        <li>
+          <Anchor className="td-none underline focus-vis-outline"
+            href="https://easyapostille.in/resource/hague-vs-non-hague-apostille-or-embassy-attestation/"
+            title="Hague vs Non-Hague: Apostille or Embassy Attestation">
+            Hague vs Non-Hague
+          </Anchor>
+        </li>
+      </ul>
+      <p class="text-s mt-02 opacity-80">
+        <Anchor className="td-none underline focus-vis-outline"
+          href="https://easyapostille.in/resource/document-authentication-india-coc-hrd-vs-sdm-home-state-attestation/"
+          title="Document authentication in India: CoC/HRD vs SDM/Home State">
+          CoC/HRD vs SDM
+        </Anchor>
+        &nbsp;•&nbsp;
+        <Anchor className="td-none underline focus-vis-outline"
+          href="https://easyapostille.in/resource/apostille-on-original-vs-copy-certificate-india/"
+          title="Apostille on original vs copy">
+          Original vs Copy
+        </Anchor>
+        &nbsp;•&nbsp;
+        <Anchor className="td-none underline focus-vis-outline" href="https://easyapostille.in/resource/" title="Browse all resources">
+          More guides
+        </Anchor>
+      </p>
+    </div>
+  </div>
+
+  <!-- CTAs -->
+  <div class="max-w-featured w-100p mx-auto flex wrap jc-center gap-05 my-2 ta-center">
+    <Anchor
+      href={buildWhatsAppLink({
+        phone: '919047433266',
+        text: 'Hi VerifiedApostille!',
+        source: 'Home-Why',
+      })}
+      ariaLabel="Chat on WhatsApp"
+      variant="primary"
+    >
+      <Icon
+        slot="icon-left"
+        name="whatsapp"
+        class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+        aria-hidden="true"
+        focusable="false"
+      />
+      Chat on WhatsApp →
+    </Anchor>
+
+    <Anchor href="/contact/" ariaLabel="Email the VerifiedApostille team" variant="secondary">
+      <Icon
+        slot="icon-left"
+        name="email"
+        class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
+        aria-hidden="true"
+        focusable="false"
+      />
+      Email us →
+    </Anchor>
+  </div>
+
+  <p class="max-w-featured w-100p mx-auto opacity-80 mt-05 ta-center">
+    Free document pre-check • MEA-approved flow • e-Apostille (QR) &amp; sticker options • Tracked worldwide delivery
+  </p>
+</section>
 
 
 
@@ -722,9 +725,9 @@ const faq = [
         <FaqList
           items={faq}
           id="faq"
-          class="post-faq bg-base-00 w-100p mi-auto my-2 p-2"
-          headingClass="max-w-featured mi-auto ta-center"   
-          listClass='max-w-featured mi-auto'
+          class="post-faq bg-base-00 w-100p mx-auto my-2 p-2"
+          headingClass="max-w-featured mx-auto ta-center"   
+          listClass='max-w-featured mx-auto'
           questionClass='text-base bold'
           answerClass='bg-primary-lighter-x'
           heading="Frequently Asked Questions"
@@ -737,7 +740,7 @@ const faq = [
     )}
 
 
-    <section id="home-contact" class="w-100p mi-auto my-2 p-2 ta-center">
+    <section id="home-contact" class="w-100p mx-auto my-2 p-2 ta-center">
         <h2 class="my-05">Still have questions?</h2>
         <p class="opacity-80 my-1">Prefer WhatsApp or a quick call? We're happy to help.</p>
 
@@ -758,10 +761,10 @@ const faq = [
            <Anchor href={`mailto:${email}`} className="td-none">{email}</Anchor>
         </p>
     </section>
-    <section id="home-compliance" class="w-100p bg-base-00 mi-auto p-2">
+    <section id="home-compliance" class="w-100p bg-base-00 mx-auto p-2">
         <h2 class="my-05 ta-center">Compliance &amp; Assurance</h2>
 
-        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mi-auto jc-center req-list">
+        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mx-auto jc-center req-list">
             <div class="box block w-sidebar">✅ <strong>MEA-compliant apostille</strong> via authorized channels — <em>sticker</em> &amp; <em>e-Apostille (QR verification)</em>.</div>
             <div class="box block w-sidebar">✅ Correct chain handled end-to-end: <strong>Notary → SDM/State → MEA</strong> (as applicable).</div>
             <div class="box block w-sidebar">✅ <strong>Acceptance guidance</strong> for university admissions, immigration, visa &amp; HR.</div>
@@ -769,7 +772,7 @@ const faq = [
             <div class="box block w-sidebar">✅ <strong>Secure pickup &amp; tracked delivery</strong> across India; privacy-first document handling.</div>
         </div>
 
-        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mi-auto jc-center">
+        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mx-auto jc-center">
             <Anchor
                 href={buildWhatsAppLink({
                     phone: '',

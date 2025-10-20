@@ -1,5 +1,4 @@
 ---
-// src/layouts/BaseLayout.astro
 import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
@@ -12,24 +11,38 @@ import InlineScript from '@/components/InlineScript.astro';
 import AdSenseHead from '@/components/ads/AdSenseHead.astro';
 import AdSenseLoader from '@/components/ads/AdSenseLoader.astro';
 
-import JsFilesToLoad from '@/components/JsFilesToLoad.astro';
-
 import type { HeadProps } from '@/types/HeadProps';
-import { siteFunctions } from '@/config/siteFunctions';
+import ScriptFlush from '@/components/ScriptFlush.astro';
+// FilesToLoadJS is used from pages/partials as needed; import there when you use it.
+// import FilesToLoadJS from '@/components/FilesToLoadJS.astro';
 
+const {
+  headProps = { title: 'Default Title', showBreadcrumb: false } as HeadProps,
+  hideHeader = false,
+  hideFooter = false,
+} = Astro.props;
 
-const { headProps = { title: 'Default Title', showBreadcrumb: false }, hideHeader = false, hideFooter = false } = Astro.props;
+const nonce = (Astro.locals as any)?.nonce;
 ---
-
 <!DOCTYPE html>
 <html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <slot name="headContent-top" />
+
     <AnalyticsHead />
-    <AdSenseHead /> 
+    <AdSenseHead />
     <BaseHead {...headProps} />
+
+    {/*
+      Flush HEAD scripts:
+      - includeGlobals: pulls from src/config/globalScripts.ts (head list)
+      - nonce: applied to <script nonce="...">
+      - clearAfterPrint=false so footer can still flush its queue later if needed
+    */}
+    <ScriptFlush position="head" nonce={nonce} includeGlobals={true} clearAfterPrint={false} />
+
     <slot name="headContent-bottom" />
   </head>
   <body>
@@ -43,17 +56,19 @@ const { headProps = { title: 'Default Title', showBreadcrumb: false }, hideHeade
     </main>
 
     {!hideFooter && <Footer />}
-    
-    {/* ✅ Show consent UI and wire consent updates */}
-    
-    <ConsentBanner />
 
-    {/* ✅ Put consent-guarded scripts BEFORE lazy loader */}
+    <ConsentBanner />
     <AnalyticsFooter />
     <AdSenseLoader />
     <InlineScript />
-    <JsFilesToLoad name="analytics-consent-handler" />
-    <JsFilesToLoad name="header-menu-theme" />
+
+    {/*
+      Flush FOOTER scripts:
+      - includeGlobals: pulls from src/config/globalScripts.ts (footer list)
+      - clearAfterPrint defaults to true for footer; explicit for clarity
+    */}
+    <ScriptFlush position="footer" nonce={nonce} includeGlobals={true} clearAfterPrint={true} />
+
     <slot name="extraScripts" />
   </body>
 </html>

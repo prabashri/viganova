@@ -1,0 +1,245 @@
+---
+import manifest from "@/data/assets-manifest.json";
+import { minifyJS } from "@/utils/minify";
+// import { registerScript } from "@/utils/scriptRegistry";
+import { registerScript, sanitizeReferrerPolicy, type ReferrerPolicy } from "@/utils/scriptRegistry"; // ✅
+
+type Cross = '' | 'anonymous' | 'use-credentials';
+
+interface Props {
+  // identity
+  name?: string;                 // preferred in PROD (resolved via manifest.js[name].file)
+  src?: string;                  // dev/debug or fallback
+
+  // modes
+  inline?: boolean;              // if true, emit inline <script> (minified)
+  code?: string;                 // required when inline=true
+
+  // behavior
+  module?: boolean;
+  async?: boolean;
+  defer?: boolean;
+  nomodule?: boolean;
+
+  // attrs
+  id?: string;
+  nonce?: string;
+  integrity?: string;
+  crossOrigin?: Cross;
+  referrerPolicy?: ReferrerPolicy;
+  data?: Record<string, string | number | boolean>;
+
+  // placement
+  target?: 'head' | 'footer';    // where to register (default footer)
+  footer?: boolean;              // back-compat toggler if target not set
+
+  // control
+  registerIfFooter?: boolean;    // default true
+  registerIfHead?: boolean;      // default false
+  priority?: number;
+  dedupe?: boolean;              // in-request emit de-dupe (inline/external immediate)
+
+  // build/dev
+  preferMinInProd?: boolean; // default: true
+  devSrcBuster?: boolean;        // default true (adds ?t=timestamp)
+  allowSrcInProd?: boolean;      // allow plain src in prod when name not found
+
+  // optional debug
+  debugRegister?: boolean;
+  debugId?: string;
+}
+
+let shortCircuit = false;
+let debugPayload: string | null = null;
+
+const {
+  name,
+  src,
+  inline = false,
+  code,
+
+  module: isModuleProp,
+  async: isAsync = false,
+  defer: deferProp,
+  nomodule = false,
+
+  id: idProp,
+  nonce: nonceProp,
+  integrity,
+  crossOrigin,
+  referrerPolicy,
+  data,
+
+  target,
+  footer = true,
+  registerIfFooter = true,
+  registerIfHead = false,
+  priority,
+  dedupe = true,
+
+  devSrcBuster = true,
+  allowSrcInProd = false,
+  preferMinInProd = true,        // ⬅️ new
+
+  debugRegister = false,
+  debugId,
+} = Astro.props as Props;
+
+const isDev = import.meta.env.DEV;
+const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
+
+// ---------- helpers ----------
+function resolveFromManifest(n?: string): string | null {
+  if (!n) return null;
+  const entry = (manifest as any)?.js?.[n];
+  return entry?.file ?? null;
+}
+
+function withDevBuster(u: string) {
+  if (!isDev || !devSrcBuster) return u;
+  return u.includes("?") ? `${u}&t=${bust}` : `${u}?t=${bust}`;
+}
+
+function resolveFinalSrc(): string | null {
+  // 1) If caller gave an explicit src, respect it.
+  if (src) {
+    // Dev: load exactly what you asked, with a buster for easy debugging
+    if (isDev) return withDevBuster(src);
+    // Prod: only allow when explicitly permitted
+    return allowSrcInProd ? src : null;
+  }
+
+  // 2) If no name, there's nothing we can resolve.
+  if (!name) return null;
+
+  if (isDev) {
+    // Dev: Prefer unminified debug build
+    const mf = resolveFromManifest(name);
+    // If dev has a manifest entry (some setups do), keep it (still add buster)
+    if (mf && !mf.endsWith('.min.js')) return withDevBuster(mf);
+    // Conventional dev path
+    return withDevBuster(`/scripts/${name}.js`);
+  }
+
+  // 3) Production
+  // First: try manifest (hashed/minified bundle from your build)
+  const mf = resolveFromManifest(name);
+  if (mf) return mf;
+
+  // Next: try conventional .min.js (drop-in fallback for static /public/scripts)
+  if (preferMinInProd) {
+    return `/scripts/${name}.min.js`;
+  }
+
+  // Finally: allow plain .js only when permitted
+  return allowSrcInProd ? `/scripts/${name}.js` : null;
+}
+
+function basenameNoExt(u: string): string {
+  const clean = u.split("#")[0].split("?")[0];
+  const last = clean.split("/").pop() || clean;
+  return last.replace(/\.(m?js)$/, "");
+}
+
+const finalSrc = inline ? null : resolveFinalSrc();
+const isModule = isModuleProp !== false && !nomodule;
+const useDefer = isAsync ? false : (deferProp !== false);
+const id = idProp ?? name ?? (src ? basenameNoExt(src) : (finalSrc ? basenameNoExt(finalSrc) : undefined));
+const pageNonce = nonceProp ?? (Astro.locals as any)?.nonce;
+
+function dataAttrs(d?: Record<string, string | number | boolean>) {
+  if (!d) return {};
+  const out: Record<string, any> = {};
+  for (const [k, v] of Object.entries(d)) out[`data-${k}`] = String(v);
+  return out;
+}
+
+// in-request de-dupe for immediate emission
+type Key = string;
+const jsOnce: Set<Key> = (Astro.locals as any).__jsOnce ??= new Set<Key>();
+const onceKeyExt = (u: string, m: boolean, a: boolean, df: boolean, _id?: string) =>
+  `ext|${_id ?? ''}|${u}|m:${m?'1':'0'}|a:${a?'1':'0'}|d:${df?'1':'0'}`;
+const onceKeyInline = (c: string, _id?: string) =>
+  `inline|${_id ?? ''}|${c.length}|${c.slice(0,24)}`;
+
+// ---------- registration path ----------
+const desiredPos = target ?? (footer ? 'footer' : 'head');
+const shouldRegister =
+  (!inline) && ((desiredPos === 'footer' && registerIfFooter) || (desiredPos === 'head' && registerIfHead));
+
+
+if (shouldRegister && (finalSrc || name || src)) {
+  registerScript({
+    name,
+    src: finalSrc ?? src,
+    module: isModule,
+    async: isAsync,
+    defer: useDefer,
+    nomodule,
+    id,
+    integrity,
+    crossOrigin,
+    referrerPolicy: sanitizeReferrerPolicy(referrerPolicy), 
+    data,
+    position: desiredPos,
+    priority,
+  });
+
+  if (debugRegister) {
+    debugPayload = JSON.stringify({
+      debug: debugId ?? id ?? name ?? src ?? "unknown",
+      pos: desiredPos,
+    });
+  }
+
+  shortCircuit = true; // only queued; will be flushed later
+}
+---
+{debugPayload && <meta name="js-register-debug" content={debugPayload} />}
+
+{!shortCircuit && (
+  <>
+    {/* INLINE (minified, nonce) */}
+    {inline && code?.trim() && (() => {
+      const min = minifyJS(code.trim());
+      if (!min) return null;
+
+      const k = onceKeyInline(min, id);
+      if (dedupe && jsOnce.has(k)) return null;
+      jsOnce.add(k);
+
+      return (
+        <script
+          id={id}
+          type={isModule ? ('module' as const) : undefined}
+          nonce={pageNonce}
+          {...(data ? (dataAttrs(data) as any) : {})}
+          set:html={min}
+        />
+      );
+    })()}
+
+    {/* EXTERNAL (emit now, not registered) */}
+    {!inline && finalSrc && (() => {
+      const k = onceKeyExt(finalSrc, !!isModule, !!isAsync, !!useDefer, id);
+      if (dedupe && jsOnce.has(k)) return null;
+      jsOnce.add(k);
+
+      return (
+        <script
+          id={id}
+          src={finalSrc}
+          type={isModule ? ('module' as const) : undefined}
+          async={isAsync ? (true as const) : undefined}
+          defer={!isAsync && useDefer ? (true as const) : undefined}
+          nomodule={nomodule ? (true as const) : undefined}
+          nonce={pageNonce}
+          integrity={integrity}
+          crossorigin={crossOrigin}
+          referrerpolicy={sanitizeReferrerPolicy(referrerPolicy)}
+          {...(data ? (dataAttrs(data) as any) : {})}
+        />
+      );
+    })()}
+  </>
+)}

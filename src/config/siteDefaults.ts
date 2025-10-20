@@ -175,7 +175,9 @@ export const siteDefaults = {
       ],
     },
   },
-
+/**
+ * add svg in public/icons/ and name here
+ */
   shareLinks: ["Whatsapp", "X", "Facebook", "LinkedIn", "Reddit", "Copy Link", "Email"],
 
   separator: "|",

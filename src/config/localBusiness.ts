@@ -17,7 +17,7 @@ function svc(key: PriceKey, url: string) {
   return { name: p.name, url, priceKey: key };
 }
 
-/* Brand / contacts */
+/* Brand / contacts (VerifiedApostille defaults) */
 const BRAND_NAME = siteDefaults.siteName || "VerifiedApostille";
 const BRAND_URL  = siteDefaults.siteUrl || "https://verifiedapostille.com/";
 const BRAND_SAME_AS = collectSameAs();
@@ -43,7 +43,7 @@ export const localBusiness: LocalBusinessConfig = {
   businessUnit: {
     name: BRAND_NAME,
     url: BRAND_URL,
-    logo: "",
+    logo: `${siteBase}/logos/desktop-logo-175w.png`,
     sameAs: BRAND_SAME_AS
   },
 
@@ -54,36 +54,41 @@ export const localBusiness: LocalBusinessConfig = {
     logo: PARENT.logo
   },
 
-  /* Global defaults */
+  /* Global defaults (GLOBAL SITE) */
   online: {
-    serviceUrl: `${siteBase}/services/`,
+    serviceUrl: `${siteBase}/service/`,
     bookingUrl: `${siteBase}/contact/`,
     servicePhone: CONTACT_PHONE,
     serviceEmail: CONTACT_EMAIL,
     whatsapp: CONTACT_WHATSAPP,
     availableLanguage: LANGUAGES,
     contactType: "customer support",
-    areaServed: ["India"]
+    areaServed: ["Worldwide"]          // ⬅️ global
   },
 
   primaryCategory: "Document authentication service",
   additionalCategories: ["Apostille services","Attestation services","Visa consultant","Notary public"],
 
+  // ⬇️ Routes mapped to verifiedapostille.com structure (/service/*)
   services: [
-    svc("meaApostille",       "/services/apostille-india/"),
-    svc("degreeSdmBundle",    "/services/degree-certificate-apostille/"),
-    svc("marksheetSdmBundle", "/services/marksheet-apostille/"),
-    svc("marriageSdmBundle",  "/services/marriage-certificate-apostille/"),
-    svc("birthSdmBundle",     "/services/birth-certificate-apostille/"),
-    svc("pccMeaApostille",    "/services/pcc-apostille/"),
-    svc("meaApostille",       "/services/business-document-apostille/")
+    svc("meaApostille",       "/service/business-document-apostille/"),
+    svc("degreeSdmBundle",    "/service/degree-certificate-apostille/"),
+    svc("marksheetSdmBundle", "/service/marksheets-apostille/"),
+    svc("marriageSdmBundle",  "/service/marriage-certificate-apostille/"),
+    svc("birthSdmBundle",     "/service/birth-certificate-apostille/"),
+    svc("pccMeaApostille",    "/service/pcc-apostille/"),
+    // you can add more mappings if you have price keys for them:
+    // svc("affidavitBundle", "/service/affidavit-apostille/"),
+    // svc("personalDocsBundle", "/service/personal-documents-apostille/"),
+    // svc("transferCertBundle", "/service/transfer-certificate-apostille/"),
   ],
 
   priceRange: "₹₹",
-  currenciesAccepted: "INR",
-  paymentAccepted: ["UPI", "Credit Card", "Debit Card", "Net Banking"],
+  currenciesAccepted: "INR, USD",      // ⬅️ accept both; primary pricing can still display INR
+  paymentAccepted: ["Credit Card", "Debit Card", "Net Banking", "UPI", "Wire Transfer"],
+
   availableLanguage: LANGUAGES,
-  areaServed: ["India"],
+  areaServed: ["Worldwide"],            // ⬅️ global
 
   legalName: PARENT_LEGAL_NAME,
   taxId: PARENT.taxId || PARENT.vatId || "",
@@ -102,9 +107,11 @@ export const localBusiness: LocalBusinessConfig = {
     { dayOfWeek: "Sunday",    closed: true }
   ],
 
-  /* Only enter what's needed per location */
+  /* Locations:
+     - Keep an online “India” node (service-area) for clarity in schema.
+     - Optionally include HQ physical address if you want it visible on verifiedapostille.com.
+  */
   locations: [
-    // ✅ ONLINE/SERVICE-AREA NODE: just channel info (no address)
     {
       "@idSuffix": "india",
       name: "VerifiedApostille (Online Service — India)",
@@ -120,10 +127,8 @@ export const localBusiness: LocalBusinessConfig = {
         availableLanguage: LANGUAGES,
         contactType: "customer support"
       }
-      // serviceChannels: { online: { ... } } // optional named variant(s)
     },
 
-    // ✅ PHYSICAL NODE: just give address (channels optional)
     ...(BRAND_ADDR ? [{
       "@idSuffix": "hq",
       name: "VerifiedApostille — Headquarters",
@@ -137,7 +142,6 @@ export const localBusiness: LocalBusinessConfig = {
       },
       hasMap: BRAND_MAP || undefined,
       openingHours: null
-      // online / serviceChannels optional for bookings
     }] : [])
   ],
 

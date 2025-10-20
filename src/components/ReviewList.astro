@@ -192,14 +192,14 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
 ---
 
 {showRating && uiValue != null && uiCount > 0 && (
-  <div class="flex flex-row text-xl bold ta-center br-secondary bg-base-00 col-base-100 br-r my-2 p-1 w-fit mi-auto">
+  <div class="flex flex-row text-xl bold ta-center br-secondary bg-base-00 col-base-100 br-r my-2 p-1 w-fit mx-auto">
     <StarRating rating={uiValue} showNumber />
     <span class="opacity-75">/ 5 from {uiCount} reviews</span>
   </div>
 )}
 
 {showReview && (
-  <WrapperTag class={`no-bullets flex wrap gap-2 jc-center my-2 mi-auto ${className}`} role={wrapperRole}>
+  <WrapperTag class={`no-bullets flex wrap gap-2 jc-center my-2 mx-auto ${className}`} role={wrapperRole}>
     {shown.map((r, i) => {
       const anchor = buildAnchorId(r, i);
       const badgeText = (r as any)?.target?.type || 'Service';
@@ -213,7 +213,7 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
       return (
         <ItemTag class={`${baseClasses} ${orientationClass}`} id={anchor} role={itemRole}>
           <div class={`${contentWrapperClass} pt-05 pb-0`}>
-            <h3 class="text-base bold clamp-2 h-60">
+            <h3 class="text-base bold clamp-2 my-1">
               <Anchor href={`#${anchor}`} className="td-none underline">{r.headline}</Anchor>
             </h3>
 
@@ -242,7 +242,7 @@ const itemRole = wrapper === 'ul' ? 'listitem' : undefined;
               </div>
             )}
 
-            <div class="flex ai-start gap-05 mt-1 hr">
+            <div class="flex ai-start gap-05 hr mb-0">
               {hasAvatarRI ? (
                 <ResponsiveImage
                   src={avatarPath}

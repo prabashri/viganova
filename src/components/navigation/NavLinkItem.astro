@@ -1,6 +1,7 @@
 ---
 import Anchor from '@/components/ui/Anchor.astro';
 import { Icon } from 'astro-icon/components';
+import IconMask from '@/components/IconMask.astro';
 
 const { item, index = 0, isActive = false } = Astro.props;
 
@@ -44,10 +45,13 @@ const dataId = index ? `nav-link-item-${index}` : undefined;
   {(showIconLeft || showIconRight) && iconPosition && (
     <div slot={iconPosition} class={`p-02 inline-flex ai-center jc-center ${iconSize} ${iconClass}`}>
       {item.image && (
-        <img delay-image="true" data-src={item.image} alt={item.altText || item.label} loading="lazy" class={imageSize} />
+        <img src={item.image} alt={item.altText || item.label} loading="lazy" class={imageSize} />
+      )}
+      {!item.image && item.iconMaskName && (
+        <IconMask name={item.iconMaskName} class={`${iconSize} fill-current`} />
       )}
       {!item.image && item.iconUrl && (
-        <img delay-image="true" data-src={item.iconUrl} alt={item.altText || item.label} loading="lazy" class={iconSize} />
+        <img src={item.iconUrl} alt={item.altText || item.label} loading="lazy" class={iconSize} />
       )}
       {!item.image && item.iconName && (
         <Icon name={item.iconName} class={`${iconSize} fill-current`} />

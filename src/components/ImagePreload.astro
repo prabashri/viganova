@@ -11,7 +11,6 @@ interface PreloadItem {
 const preloadImagesAuto = getPreloadImages();
 clearPreloadImages();
 
-
 const uniqueImages = Array.from(
   new Map(preloadImagesAuto.map(i => [`${i.src}|${i.media ?? ''}|${i.fetchPriority ?? 'auto'}`, i])).values()
 );
@@ -19,14 +18,6 @@ const uniqueImages = Array.from(
 const item = uniqueImages.length > 0
   ? uniqueImages.map(i => i.src).join(', ')
   : '';
-
-function getDelayImageAttr(src: string, fetchPriority?: string) {
-  if (fetchPriority === 'low') {
-    const fileName = src.split('/').pop()?.split('.')[0] ?? 'image';
-    return { 'delay-image': fileName };
-  }
-  return {};
-}
 
 const isDev = import.meta.env.DEV;
 ---
@@ -39,7 +30,6 @@ const isDev = import.meta.env.DEV;
     href={src}
     fetchpriority={fetchPriority ?? 'auto'}
     {...(media ? { media } : {})}
-    {...getDelayImageAttr(src, fetchPriority)}
   />
 ))}
 

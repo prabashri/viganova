@@ -12,6 +12,8 @@ import type { HeadProps } from '@/types/HeadProps';
 import { getEntry } from 'astro:content';
 import TableOfContents from '@/components/TableOfContents.astro';
 import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import FilesToLoadCSS from '@/components/FilesToLoadCSS.astro';
+
 import Breadcrumb from '@/components/ui/Breadcrumb.astro';
 import RelatedPostsList from '@/components/ui/RelatedPostsList.astro';
 
@@ -23,10 +25,12 @@ import TagList from '@/components/ui/TagList.astro';
 import PrevNextNav from '@/components/ui/PrevNextNav.astro';
 import Sidebar from '@/components/ui/Sidebar.astro';
 
+
 import { getImage, constructUrl, getImageMeta } from '@/utils/getImage';
 import { parseImageDims } from '@/utils/imageHelpers';
 import { machineAndHuman } from '@/utils/date-format';
-import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
+
+
 
 interface Props {
   title?: string;
@@ -179,7 +183,7 @@ const headProps: HeadProps = {
 
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top">
-    <CssFilesToLoad
+    <FilesToLoadCSS
         files={[
           { name: "post-layout", inline: true}
         ]}
@@ -202,13 +206,13 @@ const headProps: HeadProps = {
     )}
   </Fragment>
 
-  <article id="post-layout" class="post-layout w-100p gap jc-center" itemscope
+  <article id="post-layout" class="post-layout w-100p gap jc-center ji-center" itemscope
   itemtype="https://schema.org/Article">
     {/* Header */}
-    <header class="post-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
+    <header class="post-header w-100p bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
       { /* Breadcrumb */ }
       <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={title} breadcrumbs={headProps.breadcrumbs} />
-      <div id="post-header-content" class="max-w-featured mi-auto ta-center my-2 p-1">
+      <div id="post-header-content" class="max-w-featured mx-auto ta-center my-2 p-1">
         <h1 class="post-title">{title}</h1>
         {description && <p class="post-desc">{description}</p>}
 
@@ -258,7 +262,7 @@ const headProps: HeadProps = {
         width="960"
         id="hero-image"
         loading="eager"
-        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5"
+        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mx-auto mt-0-5"
         variant="desktop"
         addSchema={true}
       />
@@ -271,7 +275,7 @@ const headProps: HeadProps = {
         width="960"
         id="hero-image"
         loading="eager"
-        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5"
+        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mx-auto mt-0-5"
         variant="desktop"
         addSchema={true}
       />
@@ -288,7 +292,7 @@ const headProps: HeadProps = {
     </Sidebar>
 
     {/* Content */}
-    <div class="post-content max-w-content mi-auto my-05 p-1 bg br-primary-light br" itemprop="articleBody">
+    <div class="post-content max-w-content mx-auto my-05 p-1 bg br-primary-light br" itemprop="articleBody">
       <slot />
     </div>
 
@@ -296,7 +300,7 @@ const headProps: HeadProps = {
     <Sidebar variant="right">
       <RelatedPostsList items={relatedPosts} />
     </Sidebar>
-    <footer id="post-footer" class="post-footer max-w-content w-100p mi-auto my-05 p-05">
+    <footer id="post-footer" class="post-footer max-w-content w-100p mx-auto my-05 p-05">
       <ShareLink id="blog-footer-share-links" className="" title="share" />
 
       {Array.isArray(faq) && faq.length > 0 && (

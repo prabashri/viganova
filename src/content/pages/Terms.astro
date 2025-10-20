@@ -80,20 +80,20 @@ const hasJurisdiction = Boolean(rawCountry || rawRegion);
 const privacyPath =
   (siteDefaults as any)?.pages?.privacyPolicy?.path || '/privacy-policy/';
 ---
-<article class="prose mi-auto w-100p" itemscope itemtype="https://schema.org/TermsOfService">
+<article class="prose mx-auto w-100p" itemscope itemtype="https://schema.org/TermsOfService">
     <HeroPages
         variant="post"
         title={`Terms & Conditions of ${siteName}`}
         description={description}
         meta={false}        
-        headingClass="my-05 mi-auto"
+        headingClass="my-05 mx-auto"
         class='my-2 mn-h-230 jc-center'
         descriptionClass="max-w-featured text-xl my-1"
         
     />
  
 
-  <div class="max-w-content px-1 py-2 mi-auto">
+  <div class="max-w-content px-1 py-2 mx-auto">
 
     {updatedAtISO && updatedAt && (
       <p class="my-2">

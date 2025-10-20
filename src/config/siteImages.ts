@@ -3,14 +3,14 @@ import type { ImageSizeLabel } from '@/types/images';
 
 export const siteImages = {  
     /** General lightweight image used as background*/
-    image: "featured/easy-apostille-service.png",
+    image: "featured/verifiedapostille-service.jpg",
     imageAlt: "Image with VerifiedApostille logo, notary, verified and trusted stamp, with some documents graphics",
-    imageTitle: "Easy Apostille - Best Apostille Services in India",
+    imageTitle: "VerifiedApostille - Best Apostille Services for Overseas India",
 
     /** featured image for the website */
-    featuredImage: "featured/features-of-easy-apostille-services-india-mea-approved-certificate-attestation.png",
-    featuredImageAlt: "Easy Apostille services in India - MEA-approved agencies offering fast and secure apostille for original, physical and scanned certificates. Nationwide courier, discounts for multiple documents, and safe handling included.",
-    featuredImageTitle: "Easy Apostille - MEA Approved Certificate Attestation & Apostille Services in India",
+    featuredImage: "featured/verifiedapostille-service-for-overseas-indian-citizens-to-get-mea-apostille-attestation.png",
+    featuredImageAlt: "VerifiedApostille services for overseas Indians - MEA-approved agencies offering fast and secure apostille for original, physical and scanned certificates and get delivered worldwide",
+    featuredImageTitle: "VerifiedApostille - MEA Approved Certificate Attestation & Apostille Services for NRI Residents",
 
     /** image optimization settings for srcset and responsive image sizes */
     imageVariants: [

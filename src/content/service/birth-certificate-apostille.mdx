@@ -1,34 +1,34 @@
 ---
-title: "Birth Certificate Apostille (Sticker or e-Apostille)"
-description: "Get your Indian birth certificate apostilled via Notary → SDM/State → MEA. Choose Sticker or e-Apostille (QR). Doorstep pickup, secure return in 2-4 days."
-authors: 
+title: "Birth Certificate Apostille (Sticker or e-Apostille QR)"
+description: "Get your Indian birth certificate apostilled by MEA — ideal for NRIs and global clients. Choose Sticker or e-Apostille (QR). Worldwide courier delivery in 2-4 days."
+authors:
   - prabakaran-shankar
 publishedDate: "2025-09-20"
-lastModified: "2025-09-28"
+lastModified: "2025-10-18"
 
 slug: "birth-certificate-apostille"
 canonicalUrl: "/services/birth-certificate-apostille/"
 
-# Cover / Featured image
-heroImage: "featured/easyapostille-birth-certificate-apostille-service-india.png"
-heroImageAlt: "text explaining the Birth certificate apostille service in India and price"
+heroImage: "featured/verifiedapostille-birth-certificate-apostille-service-india.png"
+heroImageAlt: "Birth certificate apostille service for Indians abroad"
 heroImageTitle: "Birth Certificate Apostille (Sticker or e-Apostille QR)"
-heroImageCaption: "Birth certificate apostille service with secure delivery by EasyApostille"
+heroImageCaption: "Birth certificate apostille service with secure global delivery by VerifiedApostille"
 
 tags:
   - apostille
   - birth certificate
   - e-apostille
   - MEA
-  - india
+  - NRI
+  - India
 categories:
   - Service
 keywords:
-  - birth certificate apostille india
-  - e apostille qr birth certificate
-  - how to apostille birth certificate in india
-  - MEA apostille requirements for birth certificate
-  - apostille process india personal documents
+  - birth certificate apostille India
+  - birth certificate apostille for NRI
+  - e apostille QR verification
+  - apostille process MEA birth certificate
+  - apostille delivery abroad
 
 type: "service"
 showBreadcrumb: true
@@ -38,16 +38,18 @@ draft: false
 index: true
 
 relatedLinks:
-  - title: "HRD vs SDM vs Home Department + CoC (Complete Guide)"
-    url: "/resources/document-authentication-india-hrd-sdm-home-coc/"
+  - title: "Apostille Process in India"
+    url: "/resources/apostille-process-in-india/"
   - title: "Apostille on Original or Copy — What You Need to Know"
-    url: "/resources/apostille-on-original-vs-copy-certificate-india/"
-  - title: "Apostille Price in India"
-    url: "/resources/apostille-price-india-easyapostille/"
+    url: "https://easyapostille.in/resources/apostille-on-original-vs-copy-certificate-india/"
+  - title: "How to Get Apostille in India — Step-by-Step"
+    url: "https://easyapostille.in/resources/how-to-get-apostille-in-india-step-by-step/"
+  - title: "Hague vs Non-Hague Apostille or Embassy Attestation"
+    url: "https://easyapostille.in/resources/hague-vs-non-hague-apostille-or-embassy-attestation/"
 
 offers:
   - priceKey: birthSdmBundle
-    name: "Birth Certificate — Standard SDM-MEA Apostille"    
+    name: "Birth Certificate — Standard SDM-MEA Apostille"
   - priceKey: sdmBundle
     name: "Standard SDM-MEA Apostille"
   - priceKey: meaApostille
@@ -55,6 +57,7 @@ offers:
   - priceKey: meaAttestation
     name: "MEA Attestation"
 ---
+
 import Anchor from "@/components/ui/Anchor.astro";
 import FaqList from "@/components/ui/FaqList.astro";
 import { price, inr } from "@/config/pricing";
@@ -63,120 +66,130 @@ import CalloutBox from "@/components/ui/CalloutBox.astro";
 export const faqItems = [
   {
     question: "Do I need to send my original birth certificate?",
-    answer: "No, not necessary. Absolutely, its your choice. You can choose on apostille on original or copy based on your requirements. Sometimes, to verify the copy, you may need to send the original birth certificate for confirmation.",
+    answer: "Not always. You can choose apostille on the original or on a notarized copy. In rare cases, we may verify the copy using the original before proceeding.",
     speakable: true
   },
   {
     question: "Is notarization required for birth certificates?",
-    answer: "Municipal originals usually don't need Notary. Notary applies when using a true copy or when we add an affidavit for name/date corrections."
+    answer: "Municipal originals generally don’t need notarization. It’s only needed if you use a copy or if we attach an affidavit for name/date corrections."
   },
   {
-    question: "There's a minor name/date mismatch—can I still apostille it?",
-    answer: "Yes in most cases. We'll advise the simplest path: affidavit vs municipal reissue so the apostille matches your passport/records."
-  },
-  {
-    question: "My birth certificate is very old—will it be accepted?",
-    answer: "Often yes. If fields are missing or faded, we recommend getting a reissued copy from municipal records before apostille."
-  },
-  {
-    question: "Can parents apply on behalf of a child birth certificate who is abroad?",
-    answer: "Yes. Parents/guardians can submit with basic IDs and a short authorization letter (we'll share a template)."
+    question: "Can parents apply for a child’s birth certificate apostille from abroad?",
+    answer: "Yes. Parents or guardians can apply on behalf of a child using ID proofs and a short authorization letter — we’ll provide the format."
   },
   {
     question: "How long does it take to apostille a birth certificate?",
-    answer: "Many cases complete in ~2-3 working days once documents are in process. State route and reissues can add time; we share a firm ETA up front.",
+    answer: "Usually 2-3 working days once documents are in process. State route or reissue cases may take slightly longer, and we confirm your exact ETA in advance.",
     speakable: true
   },
   {
-    question: "How much does it cost for birth certificate apostille?",
-    answer: `Our standard SDM bundle for many birth-certificate cases is ${inr(price('birthSdmBundle') ?? price('sdmBundle'))} per document (Notary + SDM (Delhi) + MEA + premium delivery). Any State-route requirement or extras (affidavit/translation) are quoted only if needed.`
+    question: "Can you deliver my apostilled document abroad?",
+    answer: "Yes, we safely deliver your completed apostille documents anywhere in the world via DHL, Blue Dart, or other standard international couriers.",
+    speakable: true
   },
+  {
+    question: "How much does it cost for a birth certificate apostille?",
+    answer: `Our standard SDM bundle for most birth-certificate cases is ${inr(price('birthSdmBundle') ?? price('sdmBundle'))} per document (Notary + SDM (Delhi) + MEA + secure return). Multi-document discounts apply automatically.`
+  }
 ];
 
-An **apostille** from India's **MEA** makes your birth certificate valid in **Hague Convention** countries. Choose the mode that fits your recipient's checklist:
+An **apostille** from India’s **Ministry of External Affairs (MEA)** validates your birth certificate for **use in any Hague Convention country**.  
+VerifiedApostille assists Indians living abroad, NRIs, and international clients to complete this process quickly and securely.
 
-- **Sticker Apostille (General):** a physical MEA sticker on the document.  
-- **e-Apostille (QR):** a digital apostille with QR verification—fast, shareable, and widely accepted.
+---
+
+## Sticker vs e-Apostille (QR)
+
+- **Sticker Apostille (physical):** MEA sticker applied directly on the document — widely accepted for visas, migration, or legal submissions.  
+- **e-Apostille (QR):** Digital MEA apostille with QR verification — secure, shareable, and accepted by most countries.
+
+---
 
 ## Fee Structure
 
-- **EasyApostille bundle — {inr(price('birthSdmBundle') ?? price('sdmBundle'))} per document**  
-- Includes **Notary + SDM (Delhi) + MEA apostille + premium return** (serviceable locations) with live status updates.  
-- For **State Home Dept** route (if recipient insists), we quote case-by-case. 
-- **Multi-document discount:** **5-10%** off automatically.
+- **VerifiedApostille bundle — {inr(price('birthSdmBundle') ?? price('sdmBundle'))} per document**  
+- Includes **Notary + SDM (Delhi) + MEA apostille + premium delivery** (India and international).  
+- **5-10% discount** for multiple documents.  
+- State route (Home Department) available on request if required by destination.
 
-**Add-ons (only if needed):**
-- State **Home Department** route (if a country insists on State over SDM)  
-- **Affidavits / translations / name-mismatch fixes**  
-- **Municipal reissue** support (government fees at actuals)  
-- **Embassy/Consulate attestation** for non-Hague countries
+**Add-ons (if needed):**
+- State **Home Department** attestation  
+- **Affidavits / translations / correction support**  
+- **Municipal reissue** assistance (government fees extra)  
+- **Embassy / Consulate attestation** for non-Hague countries
 
 <CalloutBox type="info" class="my-1">
-  Birth certificate is a <Anchor href="/services/personal-documents-apostille/">**personal document**</Anchor>. For MEA apostille, either <Anchor href="/resources/document-authentication-india-coc-hrd-vs-sdm-home-state-attestation/">**SDM or State Home Department**</Anchor> pre-auth is needed depending on your State and recipient's rules.
+  A birth certificate is a <Anchor href="/services/personal-documents-apostille/">**personal document**</Anchor>.  
+  Depending on your state or country of submission, the MEA may require <Anchor href="https://easyapostille.in/resources/document-authentication-india-coc-hrd-vs-sdm-home-state-attestation/">**SDM or State Home Department**</Anchor> attestation first.
 
-  _You'll receive a single, **all-inclusive quote** before payment—no hidden fees._
+  _You’ll receive a single, **all-inclusive quote** before payment — no hidden charges._
 </CalloutBox>
 
+---
 
 ## Documents Required
 
-- **Birth certificate** (scan or original, as advised after eligibility check)  
-- **Passport** (first/last page) of the person named on the certificate  
-- **Parent/guardian ID** (when applying on behalf)  
-- **Affidavit/correction proof** only if name/date mismatch exists
+- **Birth certificate** (scan or original, as advised)  
+- **Passport** (first & last page) of the individual named  
+- **Parent/guardian ID** (for minors or overseas applications)  
+- **Affidavit/correction proof** if any mismatch in name/date
 
-**Accepted certificate types**
+**Accepted certificate types:**
 
-- Municipal/corporation/panchayat **originals**  
-- **Reissued/duplicate** copies from municipal records  
-- **Hospital-issued** certificates **with municipal endorsement**  
-- **Notarized true copies** (when the recipient accepts copies)
+- Municipal / corporation / panchayat **originals**  
+- **Reissued copies** from municipal records  
+- **Hospital-issued** certificates endorsed by municipal authorities  
+- **Notarized true copies** when accepted by destination country
+
+---
 
 ## Step-by-Step Process
 
-1. **Eligibility check** — share a scan; we confirm **Sticker vs e-Apostille** and **original vs copy**.  
-2. **Pickup/hand-in & verification** — we prep your file to avoid rejections.  
-3. **Notary** *(if required for your case)*  
-4. **SDM / State Home Department** *(as applicable to destination rules)*  
-5. **MEA Apostille** — Sticker or e-Apostille (QR)  
-6. **Instant digital share** — scan/e-Apostille PDF + verification link  
-7. **Secure delivery** — tracked, insured return of originals
+1. **Share a scan** for eligibility review (Sticker vs e-Apostille).  
+2. **Pickup or courier your document** — we verify and prepare.  
+3. **Notary (if needed)**.  
+4. **SDM or State Home Department attestation**.  
+5. **MEA Apostille** — Sticker or e-Apostille (QR).  
+6. **Digital confirmation** — scanned copy + verification link.  
+7. **Courier dispatch** — worldwide delivery with tracking.
 
-## Timelines
+---
 
-Most birth-certificate apostilles complete in **~2-3 working days** once in process.  
-State-specific routes or reissues may add time; we'll share your **real ETA** upfront.
+## Processing Time
+
+Most apostilles complete in **2-3 working days** once the document is in process.  
+State or reissue steps may extend the timeline — we share your confirmed schedule upfront.
+
+---
 
 ## Original vs Copy
 
-- **Civil/visa offices** often prefer the **original with Sticker apostille**.  
-- If the recipient **accepts e-Apostille**, a **scan/notarized copy** can be faster and easier to reuse.  
-- We always follow the **recipient's written checklist** to avoid delays.
+- **Embassies / Visa authorities** often require **Sticker apostille** on the **original**.  
+- Many **universities / HR agencies** accept **e-Apostille (QR)** on notarized copies.  
+- We always follow your **recipient’s written requirement** to avoid rejection.
 
-## Special Cases
-
-- **Name/date mismatch:** simple **affidavit** vs **municipal reissue**—we recommend the fastest compliant path.  
-- **Old/faded certificate:** get a **fresh municipal reprint** before apostille for best acceptance.  
-- **Applying from abroad:** **parents/guardians** can submit with basic IDs and authorization.
+---
 
 ## Delivery & Tracking
 
-- **Premium pickup & return** (included where serviceable)  
-- **WhatsApp/email updates** at each milestone  
-- **Tamper-proof packaging** + **tracking ID** on dispatch
+- **Doorstep pickup** in India and **worldwide courier return**.  
+- Secure packaging, live tracking, and WhatsApp/email updates.  
+- Handled via **DHL / Blue Dart / trusted logistics partners**.
+
+---
 
 ## How to Start
 
-1. **Send a scan** of your birth certificate + the recipient's requirement.  
-2. Get a **written route, all-inclusive price, and ETA**.  
-3. **Schedule pickup**, track progress, and receive your apostilled document—**securely packed**.
+1. **Upload or email your birth certificate** (scan or photo).  
+2. Receive a **clear route, price, and timeline**.  
+3. Approve & schedule pickup or courier.  
+4. Receive your **apostilled document**, safely delivered to your address worldwide.
 
 <CalloutBox type="cta-secondary" class="my-1">
-  For **non-Hague destinations**, we also manage the attestation chain: **Notary → State/SDM → MEA → Embassy/Consulate**.
-
-  <Anchor href="https://easyapostille.in">EasyApostille</Anchor> is always here to help.
+  For **non-Hague countries**, we also handle **Notary → State/SDM → MEA → Embassy/Consulate attestation**.
+  <br />
+  <strong>VerifiedApostille</strong> — Global Apostille Service for Indians Worldwide.
 </CalloutBox>
-
 
 <FaqList
   items={faqItems}

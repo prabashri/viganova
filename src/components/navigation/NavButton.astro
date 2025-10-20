@@ -2,6 +2,7 @@
 // src/components/navigation/NavButton.astro
 import Button from '@/components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
+import IconMask from '../IconMask.astro';
 
 const { item, index = 0, isActive = false } = Astro.props;
 
@@ -49,11 +50,14 @@ const showDescription = !!item.description;
         {item.iconName && (
             <Icon name={item.iconName} class={`${iconSize} fill-current`} />
         )}
+        {!item.iconName && item.iconMaskName && (
+            <IconMask name={item.iconMaskName} class={`${iconSize} fill-current`} />
+        )}
         {!item.iconName && item.iconUrl && (
-            <img delay-image="true" data-src={item.iconUrl} alt={item.altText || item.label} class={iconSize} loading="lazy"/>
+            <img src={item.iconUrl} alt={item.altText || item.label} class={iconSize} loading="lazy"/>
         )}
         {!item.iconName && item.image && (
-            <img delay-image="true" data-src={item.image} alt={item.altText || item.label} class={imageSize} loading="lazy"/>
+            <img src={item.image} alt={item.altText || item.label} class={imageSize} loading="lazy"/>
         )}     
         </div>
     ) : null}

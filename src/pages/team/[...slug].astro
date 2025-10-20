@@ -24,8 +24,7 @@ if (!post) throw Astro.redirect('/404/');
 const { Content } = await render(post);
 
 // ---------------------
-// 2) Authorable collections (type-safe)
-//    These are the ones that use baseSchema (have authors, slug, heroImage, etc.)
+// 2) Authorable collections
 // ---------------------
 const AUTHORABLE_KEYS = ['blog', 'service', 'resource', 'post'] as const;
 type AuthorableKey = typeof AUTHORABLE_KEYS[number];
@@ -33,27 +32,43 @@ type AuthorableKey = typeof AUTHORABLE_KEYS[number];
 type CollectionsMap = typeof siteDefaults.collections;
 type CfgFor<K extends keyof CollectionsMap> = CollectionsMap[K];
 
-// Build base path from siteDefaults (type-safe)
 function baseFor(key: AuthorableKey): string {
   const cfg = siteDefaults.collections[key] as CfgFor<AuthorableKey>;
   const base = (cfg?.base ?? String(key)).replace(/^\/|\/$/g, '');
   return base ? `${base}/` : '';
 }
 
-// Runtime author matcher that works for string or {id} refs
-function authorMatches(authors: unknown, wantedId: string): boolean {
-  const arr = Array.isArray(authors) ? authors : [];
-  return arr.some((a: any) => (typeof a === 'string' ? a === wantedId : a?.id === wantedId));
+// Works for string refs or { id } refs
+function authorMatches(authors: unknown, wantedId?: string): boolean {
+  if (!wantedId) return false;
+  const arr: any[] = Array.isArray(authors) ? authors : [];
+  return arr.some((a) => (typeof a === 'string' ? a === wantedId : a?.id === wantedId));
 }
 
-// Normalize last-modified (fallback to published)
+// Normalize last-modified (fallbacks)
 function getLastModified(e: CollectionEntry<AuthorableKey>): string {
-  // baseSchema has publishedDate; lastModified is optional
+  // prefer lastModified → updatedDate → publishedDate
   return (e.data as any).lastModified || (e.data as any).updatedDate || e.data.publishedDate;
 }
 
+// Hidden filter: draft OR any path segment starting with "_"
+function isHiddenEntry(e: CollectionEntry<AuthorableKey>): boolean {
+  if (e.data?.draft === true) return true;
+
+  const idHasHidden = e.id.split('/').some((seg) => seg.startsWith('_'));
+
+  // prefer `entry.slug` (Astro-provided), else frontmatter slug, else ""
+
+  const rawSlug: string = (e as any).slug ?? (e.data as any)?.slug ?? '';
+  const slugHasHidden = String(rawSlug)
+    .split('/')
+    .some((seg) => seg.startsWith('_'));
+
+  return idHasHidden || slugHasHidden;
+}
+
 // ---------------------
-// 3) Collect authored posts (type-safe per key)
+// 3) Collect authored posts
 // ---------------------
 type AuthoredPost = {
   title: string;
@@ -69,26 +84,22 @@ type AuthoredPost = {
 const authoredPosts: AuthoredPost[] = [];
 
 async function collectFrom(key: AuthorableKey) {
-  // getCollection is fully typed with this literal key
   const entries = await getCollection(key);
-
   const collectionBase = baseFor(key);
 
   for (const entry of entries) {
-    // Skip draft/frontmatter guards
-    if (entry.data.draft === true) continue;
-    if (entry.id.startsWith('_') || entry.data.slug.startsWith('_')) continue;
+    if (isHiddenEntry(entry)) continue;
+    if (!authorMatches((entry.data as any)?.authors, slugId)) continue;
 
-    // Must have an authors array referencing this team member
-    if (!slugId || typeof slugId !== 'string' || !authorMatches((entry.data as any).authors, slugId)) continue;
+
+    const entrySlug: string = (entry as any).slug ?? entry.data.slug;
 
     authoredPosts.push({
       title: entry.data.title,
       description: entry.data.description,
-      slug: entry.data.slug,
+      slug: entrySlug,
       collection: key,
       collectionBase,
-      // baseSchema fields
       heroImage: (entry.data as any).heroImage ?? null,
       heroImageAlt: (entry.data as any).heroImageAlt ?? entry.data.title,
       lastModified: getLastModified(entry),
@@ -96,10 +107,16 @@ async function collectFrom(key: AuthorableKey) {
   }
 }
 
-// Collect across all authorable collections
 for (const key of AUTHORABLE_KEYS) {
   await collectFrom(key);
 }
+
+// Sort newest → oldest by lastModified (string dates are ISO in content)
+authoredPosts.sort((a, b) => {
+  const da = a.lastModified ? new Date(a.lastModified).getTime() : 0;
+  const db = b.lastModified ? new Date(b.lastModified).getTime() : 0;
+  return db - da;
+});
 
 // ---------------------
 // 4) Slice for initial view
@@ -132,8 +149,8 @@ const {
   useImage = false,
   useInitial = false,
   initialText = '',
-  image = '',                  // 1:1 headshot (avatar)
-  imageAlt = '',               // 4:3 profile background/cover for ProfilePage/WebPage
+  image = '',
+  imageAlt = '',
   profileImage = '',
   profileImageAlt = '',
   profileImageCaption = '',
@@ -162,9 +179,9 @@ const teamProps = {
   gravatarEmail,
   useImage,
   useInitial,
-  initialText,  
-  photo: image, // Keep the 1:1 photo exclusively for the Person node/avatar
-  imageAlt, // Pass the 4:3 profile image so Schema.astro (via TeamLayout) can use it
+  initialText,
+  photo: image,
+  imageAlt,
   profileImage,
   profileImageAlt,
   profileImageCaption,
@@ -181,50 +198,45 @@ const teamProps = {
 const authorCards: CardProps[] = initialPosts.map((p) => ({
   link: `/${p.collectionBase}${p.slug}/`,
   linkAriaLabel: `Read post: ${p.title}`,
-
   image: p.heroImage || undefined,
+  afterImage: p.collection,
   imageAlt: p.heroImageAlt || p.title,
-
   title: p.title,
   description: p.description,
-
   date: p.lastModified ? new Date(p.lastModified).toLocaleDateString() : undefined,
-
   orientation: 'vertical',
   imageSize: 320,
   roleType: 'article',
   loading: 'lazy',
-
   className: 'w-100p mn-w-320',
   imageClassName: '',
-
   otherEntries: [],
 }));
 ---
 
-<TeamLayout {...teamProps}>
-  <Content />
-  <Fragment slot="posts">
-    {authorCards.length > 0 && (
-      <section id="author-posts-section" class="max-w-site w-100p mi-auto my-1 py-1">
-        <h2 class="text-xl bold">Posts by {name}</h2>
+  <TeamLayout {...teamProps}>
+    <Content />
+    <Fragment slot="posts">
+      {authorCards.length > 0 && (
+        <section id="author-posts-section" class="max-w-site w-100p mx-auto my-1 py-1">
+          <h2 class="text-xl bold">Posts by {name}</h2>
 
-        <div id="author-posts" class="flex max-w-site w-100p wrap gap my-1 ai-center jc-center">
-          {authorCards.map((card) => (
-            <Card {...card} />
-          ))}
-        </div>
+          <div id="author-posts" class="flex max-w-site w-100p wrap gap my-1 ai-f-start jc-center">
+            {authorCards.map((card) => (
+              <Card {...card} />
+            ))}
+          </div>
 
-        {hasMore && (
-          <LoadMorePosts
-            slug={slugId}
-            loaded={initialPosts.length}
-            total={authoredPosts.length}
-            sort="lastmodified"
-            collections={AUTHORABLE_KEYS as unknown as string[]}
-          />
-        )}
-      </section>
-    )}
-  </Fragment>
-</TeamLayout>
+          {hasMore && (
+            <LoadMorePosts
+              slug={slugId}
+              loaded={initialPosts.length}
+              total={authoredPosts.length}
+              sort="lastmodified"
+              collections={AUTHORABLE_KEYS as unknown as string[]}
+            />
+          )}
+        </section>
+      )}
+    </Fragment>
+  </TeamLayout>

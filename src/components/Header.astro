@@ -47,7 +47,7 @@ const separatorMap = {
   none: 'box-shadow-bottom'
 }
 
-const commonHeaderClasses = 'flex flex-col ai-center jc-center gap-05 mi-auto px-1 py-05 min-h-70px overflow-anchor-none';
+const commonHeaderClasses = 'flex flex-col ai-center jc-center gap-05 mx-auto px-1 py-05 min-h-70px overflow-anchor-none';
 const headerClasses = [
   commonHeaderClasses,
   modeMap[headerStyle.mode],
@@ -66,7 +66,7 @@ const navOrder = ( (siteNav && siteNav.length > 0 ) && primaryCTA && primaryCTA.
 
 ---
 <header class={`site-header ${headerClasses}`} role="banner" itemscope itemtype="https://schema.org/WPHeader">
-  <div class="flex flex-col big-flex-row max-w-site w-100p relative gap-05 mi-auto ai-f-start big-ai-center jc-space-between lg-wrap md-wrap">
+  <div class="flex flex-col big-flex-row max-w-site w-100p relative gap-05 mx-auto ai-f-start big-ai-center jc-space-between lg-wrap md-wrap">
     {/* LOGO */}
     <div class="flex flex-row wrap gap-05 max-w-site w-auto sm-w-100p my-0 ai-center jc-space-between">
       <Logo />

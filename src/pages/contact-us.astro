@@ -8,7 +8,7 @@ import { siteFunctions } from '../config/siteFunctions';
 
 import Contact from '@/content/pages/Contact.astro';
 import ContactFormHead from '@/components/forms/ContactFormHead.astro';
-import CssFilesToLoad from "@/components/CssFilesToLoad.astro";
+import FilesToLoadCSS from "@/components/FilesToLoadCSS.astro";
 
 import assetsManifest from '@/data/assets-manifest.json';
 
@@ -80,7 +80,7 @@ const pageSeo: HeadProps = {
       turnstileSitekey={siteFunctions.turnstileSitekey}
       placeScript="top"
     />
-    <CssFilesToLoad
+    <FilesToLoadCSS
         files={[
           { name: "contact-form", inline: true}
         ]}

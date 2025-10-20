@@ -1,0 +1,63 @@
+---
+import { registerPreloadImage } from '@/utils/preloadRegistry';
+
+type Loading = 'lazy' | 'eager';
+type FetchPriority = 'high' | 'low' | 'auto';
+
+interface Props {
+  src: string;
+  alt?: string;                 // "" for decorative
+  id?: string;
+  class?: string;
+  width?: number | string;
+  height?: number | string;
+  decoding?: 'async' | 'auto' | 'sync';
+  loading?: Loading;            // default 'lazy'
+  fetchPriority?: FetchPriority;// default 'auto' (forced to 'high' if eager)
+  sizes?: string;
+  srcset?: string;
+  crossorigin?: 'anonymous' | 'use-credentials';
+  draggable?: boolean | 'true' | 'false';
+}
+
+const {
+  src,
+  alt = '',
+  id,
+  class: cls = '',
+  width,
+  height,
+  decoding = 'async',
+  loading = 'lazy',
+  fetchPriority,
+  sizes,
+  srcset,
+  crossorigin,
+  draggable
+} = Astro.props as Props;
+
+if (loading === 'eager') {
+  registerPreloadImage({ src, fetchPriority: 'high' });
+}
+
+const common = {
+  id,
+  class: cls || undefined,
+  alt,
+  width: width as any,
+  height: height as any,
+  sizes,
+  decoding,
+  // lower-case attribute names match HTML (and Astro) expectations
+  fetchpriority: loading === 'eager' ? 'high' : fetchPriority,
+  ...(crossorigin ? { crossorigin } : {}),
+  ...(draggable !== undefined ? { draggable } : {}),
+  ...(srcset ? { srcset } : {}),
+};
+---
+
+{loading === 'eager' ? (
+  <img {...common} loading="eager" src={src} />
+) : (
+  <img {...common} loading="lazy"  src={src} />
+)}

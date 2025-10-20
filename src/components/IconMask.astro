@@ -1,0 +1,43 @@
+---
+import FilesToLoadJS from '@/components/FilesToLoadJS.astro';
+
+interface Props {
+  /** canonical icon name that matches a CSS mapping, e.g. "clipboard" */
+  name: string;
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
+  /** pass a class that sets color; avoid inline style for CSP */
+  class?: string;
+  decorative?: boolean;
+  title?: string;
+  eager?: boolean; // if true, set data-ready=1 immediately
+}
+
+const {
+  name,
+  size = 'md',
+  class: cls = '',
+  decorative = true,
+  title,
+  eager = false,
+} = Astro.props as Props;
+
+const sizeClass =
+  size === 'sm'  ? 'icon--sm'  :
+  size === 'md'  ? 'icon--md'  :
+  size === 'lg'  ? 'icon--lg'  :
+  size === 'xl'  ? 'icon--xl'  :
+  size === '2xl' ? 'icon--2xl' : 'icon--3xl';
+
+const iconClass = `icon--${name}`;
+---
+
+<span
+  class={`icon ${sizeClass} ${iconClass} ${cls}`}
+  {...(decorative ? { 'aria-hidden': 'true' } : { role: 'img' })}
+  {...(eager ? { 'data-ready': '1' } : {})}
+>
+  {!decorative && title && <span class="sr-only">{title}</span>}
+</span>
+
+<!-- load the lazy toggler; register to footer (no immediate emit) -->
+<FilesToLoadJS name="icon-mask" src="/scripts/icon-mask.js" target="footer" registerIfFooter={true} />

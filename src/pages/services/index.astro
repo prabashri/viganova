@@ -88,7 +88,7 @@ const otherCards: CardProps[] = otherPosts.map((p, i) => mapToCardProps(p, i));
   <HeroCollections
     title={heroTitle}
     description={metaDescription}
-    bgColorClass="bg-secondary-base"
+    bgColorClass="bg-secondary-darker"
     textColorClass="col-base-00"
     image=""    
     imageAlt="Services Hero Image"
@@ -96,14 +96,14 @@ const otherCards: CardProps[] = otherPosts.map((p, i) => mapToCardProps(p, i));
   />
 
   {featuredCards.length > 0 && (
-    <section class="max-w-site mi-auto my-1 py-1">
+    <section class="max-w-site mx-auto my-1 py-1">
       <h2 class="ta-center mb-2">Documents/Certificates Classification</h2>
       <CardCollections cards={featuredCards} wrapper="ul" roleType="list" entry={entry} />
     </section>
   )}
 
   {otherCards.length > 0 && (
-    <section class="max-w-site mi-auto my-2 py-2">
+    <section class="max-w-site mx-auto my-2 py-2">
       <h2 class="ta-center my-1">Individual Apostille Services</h2>
       <CardCollections cards={otherCards} wrapper="ul" roleType="list" entry={entry} />
     </section>

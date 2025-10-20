@@ -18,7 +18,7 @@ import FaqList from '@/components/ui/FaqList.astro';
 import TagList from '@/components/ui/TagList.astro';
 import PrevNextNav from '@/components/ui/PrevNextNav.astro';
 import Sidebar from '@/components/ui/Sidebar.astro';
-import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
+import FilesToLoadCSS from '@/components/FilesToLoadCSS.astro';
 
 import { getImageMeta, constructUrl } from '@/utils/getImage';
 import { parseImageDims } from '@/utils/imageHelpers';
@@ -187,7 +187,7 @@ const headProps: HeadProps = {
 
 <BaseLayout headProps={headProps}>
   <Fragment slot="headContent-top">
-    <CssFilesToLoad files={[{ name: "post-layout", inline: true }]} />
+    <FilesToLoadCSS files={[{ name: "post-layout", inline: true }]} />
   </Fragment>
 
   <Fragment slot="headContent-bottom">
@@ -200,12 +200,12 @@ const headProps: HeadProps = {
     )}
   </Fragment>
 
-  <article id="post-layout" class="post-layout w-100p gap jc-center"
+  <article id="post-layout" class="post-layout w-100p gap jc-center ji-center"
     itemscope itemtype="https://schema.org/Service">
     {/* Header */}
-    <header class="post-header bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
+    <header class="post-header w-100p bg-primary-darker col-base-00 mn-h-230 mx-h-320 h-fit py-2">
       <Breadcrumb showBreadcrumb={headProps.showBreadcrumb} title={title} breadcrumbs={headProps.breadcrumbs} />
-      <div id="post-header-content" class="max-w-featured mi-auto ta-center my-2 p-1">
+      <div id="post-header-content" class="max-w-featured mx-auto ta-center my-2 p-1">
         <h1 class="post-title" itemprop="name">{title}</h1>
         {description && <p class="post-desc" itemprop="description">{description}</p>}
       </div>
@@ -222,7 +222,7 @@ const headProps: HeadProps = {
         width="960"
         id="hero-image"
         loading="eager"
-        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5"
+        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mx-auto mt-0-5"
         variant="desktop"
         addSchema={true}
       />
@@ -235,7 +235,7 @@ const headProps: HeadProps = {
         width="960"
         id="hero-image"
         loading="eager"
-        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mi-auto mt-0-5"
+        className="hero-image max-w-95p w-90p lg-max-w-featured lg-w-100p full-max-w-featured full-w-100p mx-auto mt-0-5"
         variant="desktop"
         addSchema={true}
       />
@@ -287,7 +287,7 @@ const headProps: HeadProps = {
       <RelatedPostsList items={relatedPosts} />
     </Sidebar>
 
-    <footer id="post-footer" class="post-footer max-w-content w-100p mi-auto my-05 p-05">
+    <footer id="post-footer" class="post-footer max-w-content w-100p mx-auto my-05 p-05">
       <ShareLink id="blog-footer-share-links" className="" title="share" />
 
       {Array.isArray(faq) && faq.length > 0 && (

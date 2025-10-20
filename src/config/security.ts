@@ -171,18 +171,20 @@ function buildDirectives(): Directives {
 }
 
 /* Ordering helpers */
+// Script ordering: 'self' → nonce → 'strict-dynamic' → 'report-sample' → hosts
 function orderScriptSrc(list: string[], nonceToken?: string): string[] {
   const set = new Set(list);
   const hosts = Array.from(set).filter(v =>
-    v !== "'self'" && v !== "'report-sample'" && v !== nonceToken
+    v !== "'self'" && v !== "'report-sample'" && v !== nonceToken && v !== "'strict-dynamic'"
   );
   return [
     "'self'",
-    ...(nonceToken ? [nonceToken] : []),
+    ...(nonceToken ? [nonceToken, "'strict-dynamic'"] : []), // <-- add strict-dynamic when nonce is present
     "'report-sample'",
     ...hosts,
   ];
 }
+
 
 function orderStyleSrc(list: string[], nonceToken?: string): string[] {
   const set = new Set(list);
@@ -211,7 +213,9 @@ export function getSecurityHeaders(nonce?: string): Directives {
   );
 
   // Mirror to script-src-elem
-  h["script-src-elem"] = [...(h["script-src"] as string[])];
+  // (h as any)["style-src-elem"] = [...(h["style-src"] as string[])];
+
+  (h as any)["script-src-elem"] = [...(h["script-src"] as string[])];
 
   // Style ordering: 'self' → nonce → 'report-sample' → hosts
   const styleList = h["style-src"] as string[];

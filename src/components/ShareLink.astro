@@ -2,6 +2,7 @@
 // src/components/ShareLink.astro
 import { Icon } from 'astro-icon/components';
 import { siteDefaults } from '@/config/siteDefaults';
+import IconMask from '@/components/IconMask.astro';
 
 interface Props {
   id?: string;
@@ -80,7 +81,7 @@ function toIconName(name: string) {
 
         return (
           <li
-            class="icon-wrapper flex ai-center jc-center p-02 br"
+            class="icon-wrapper flex ai-center jc-center p-02 br-r fill-primary col-primary"
             role="none"
           >
             {platform.href ? (
@@ -96,7 +97,7 @@ function toIconName(name: string) {
                 tabindex={isFirst ? '0' : '-1'}
                 class="icon-link inline-flex ai-center jc-center br-r lh-0 focus-visible br-transparent hover-br hover-box-shadow p-02"
               >
-                <Icon name={icon} class={iconSize} />
+                <IconMask name={icon} class={iconSize} />
               </a>
             ) : (
               <button
@@ -106,9 +107,9 @@ function toIconName(name: string) {
                 aria-label="Copy Link"
                 role="button"
                 tabindex={isFirst ? '0' : '-1'}
-                class="icon-link inline-flex ai-center jc-center br-r lh-0 focus-visible br-transparent bg-transparent hover-br hover-box-shadow p-02"
+                class="icon-link col-primary inline-flex ai-center jc-center br-r lh-0 focus-visible br-transparent bg-transparent hover-br hover-box-shadow p-02"
               >
-                <Icon name="clipboard" class={iconSize} />
+                <IconMask name="clipboard" class={iconSize} />
               </button>
             )}
           </li>

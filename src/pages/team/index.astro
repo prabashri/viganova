@@ -8,7 +8,7 @@ import gravatarHashesJson from '../../data/email-hash.json';
 import type { HeadProps } from '../../types/HeadProps';
 import HeroCollections from '../../components/ui/HeroCollections.astro';
 import { siteImages } from '@/config/siteImages';
-import CssFilesToLoad from '@/components/CssFilesToLoad.astro';
+import FilesToLoadCSS from '@/components/FilesToLoadCSS.astro';
 
 const gravatarHashes: Record<string, string> = Object.fromEntries(
   Object.entries(gravatarHashesJson).map(([slug, obj]) => [slug, obj.sha256])
@@ -96,7 +96,7 @@ const headProps: HeadProps = {
 ---
 
 <BaseLayout headProps={headProps}>
- <CssFilesToLoad files={[{name:'team-index', inline:true}]} />
+ <FilesToLoadCSS files={[{name:'team-index', inline:true}]} />
   <script id="avatar-color-script" nonce={nonce} is:inline>
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.avatar-color-custom[data-color]').forEach(el => {
@@ -113,7 +113,7 @@ const headProps: HeadProps = {
     textColorClass="col-base-00"
   />
 
-  <section class="max-w-site mi-auto my-2 py-2">
+  <section class="max-w-site mx-auto my-2 py-2">
     <ul class="team-grid no-bullets flex wrap jc-center gap py-05 px-0">
       {[...featured, ...others].map(member => {
         const { slug, name, role, expertise, color, image, useImage, useInitial, initialText, useGravatar } = member.data;

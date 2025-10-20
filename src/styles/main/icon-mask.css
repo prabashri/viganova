@@ -1,0 +1,44 @@
+/* Base icon */
+/**
+ * Icon Mask CSS
+ * 
+ * This CSS file defines styles for icons using CSS masks.
+ * Icons are displayed as inline-block elements with customizable sizes.
+ * The mask image is applied only when the icon is marked as ready (data-ready="1").
+ * Size presets are provided for convenience.
+ * style src: src/styles/main/icon-mask.css
+ *  script src: public/scripts/icon-mask.js
+ *  component src: src/components/IconMask.astro
+ */
+/* base */
+.icon {
+  display:inline-block;
+  inline-size:var(--icon-size,1.25rem);
+  block-size:var(--icon-size,1.25rem);
+  background-color:currentColor;
+}
+.icon[data-ready="1"]{
+  -webkit-mask: var(--icon-url) no-repeat center / contain;
+          mask: var(--icon-url) no-repeat center / contain;
+}
+/* sizes */
+.icon--sm{--icon-size:1rem}
+.icon--md{--icon-size:1.25rem}
+.icon--lg{--icon-size:1.5rem}
+.icon--xl{--icon-size:1.75rem}
+.icon--2xl{--icon-size:2rem}
+.icon--3xl{--icon-size:2.5rem}
+
+/* per-icon mappings — always defined (no inline style) */
+.icon--map-pin   { --icon-url: url("/icons/map-pin.svg"); }
+.icon--clipboard { --icon-url: url("/icons/clipboard.svg"); }
+.icon--email     { --icon-url: url("/icons/email.svg"); }
+.icon--linkedin  { --icon-url: url("/icons/linkedin.svg"); }
+.icon--whatsapp  { --icon-url: url("/icons/whatsapp.svg"); }
+.icon--x  { --icon-url: url("/icons/x.svg"); }
+.icon--phone  { --icon-url: url("/icons/phone.svg"); }
+.icon--facebook  { --icon-url: url("/icons/facebook.svg"); }
+.icon--reddit  { --icon-url: url("/icons/reddit.svg"); }
+.icon--telegram  { --icon-url: url("/icons/telegram.svg"); }
+.icon--youtube  { --icon-url: url("/icons/youtube.svg"); }
+.icon--instagram  { --icon-url: url("/icons/instagram.svg"); }

@@ -6,7 +6,9 @@ import { siteDefaults } from '@/config/siteDefaults';
 import { Icon } from 'astro-icon/components';
 import { siteImages } from '@/config/siteImages';
 import Anchor from '@/components/ui/Anchor.astro';
+import IconMask from '@/components/IconMask.astro';
 import manifest from '@/data/assets-manifest.json';
+import FilesToLoadJS from '@/components/FilesToLoadJS.astro';
 
 const manifestLogos = manifest?.logos?.files || {};
 const hasDesktopSvg = Boolean(manifestLogos.desktopLogoSvg);
@@ -123,7 +125,7 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
 ---
 
 <footer class="site-footer bg-primary-darker-x col-base-10 text-small py-2 px-1" itemscope itemtype="https://schema.org/WPFooter">
-  <div class="footer-columns max-w-site w-100p mi-auto py-05 px-1 grid gap ta-start">
+  <div class="footer-columns max-w-site w-100p mx-auto py-05 px-1 grid gap ta-start">
 
     {/* Column 1: Site / brand (annotated as WebSite for itemprop="name") */}
     <div class="footer-col sm-hr" itemscope itemtype="https://schema.org/WebSite" itemid={`${siteUrl}#website`}>
@@ -182,10 +184,10 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
       <p class="bold uppercase">Connect with us</p>
       <SocialLink id="footer-social-links" />
       <ul class="no-bullets">
-        { email && <li class="my-05 py-02"><Anchor href={`mailto:${email}`}>{email}</Anchor></li> }
-        { phone && <li class="my-05 py-02"><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`}>{phone}</Anchor></li> }
-        { waHref && <li class="my-05 py-02"><Anchor href={waHref} target="_blank" rel="noopener">WhatsApp</Anchor></li> }      
-        { location && <li class="my-05 py-02">{location}</li> }
+        { email && <li class="my-05 py-02 flex flex-row wrap ai-center gap-05"><IconMask name="email" class="w-2-0" /><Anchor href={`mailto:${email}`} className="">{email}</Anchor></li> }
+        { phone && <li class="my-05 py-02 flex flex-row wrap ai-center gap-05"><IconMask name="phone" class="w-2-0" /><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`} className="">{phone}</Anchor></li> }
+        { waHref && <li class="my-05 py-02 flex flex-row wrap ai-center gap-05"><IconMask name="whatsapp" class="w-2-0" /><Anchor href={waHref} target="_blank" rel="noopener" className="">WhatsApp</Anchor></li> }
+        { location && <li class="my-05 py-02 flex flex-row wrap ai-f-start gap-05"><IconMask name="map-pin" class="w-2-0" /><span class="inline-flex flex-1">{location}</span></li> }
       </ul>
     </div>
   </div>
