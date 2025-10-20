@@ -572,7 +572,7 @@ const ts = (s: number) => new Date(s * 1000).toISOString().substring(11, 19);
 
   <Fragment slot="extraScripts">
     <script id="audio-schema" nonce={nonce} type="application/ld+json" set:html={JSON.stringify(audioSchema)}></script>
-    <script type="module" data-src="/scripts/audio-listen.js" async></script>
+    <script type="module" nonce={nonce} data-src="/scripts/audio-listen.js" async></script>
   </Fragment>
 
 </BaseLayout>

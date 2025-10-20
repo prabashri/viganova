@@ -25,20 +25,23 @@ const wantAh  = isProd && siteFunctions.ahrefAnalytics && isNonEmpty(ahrefsId);
 // ── Priority: GTM > GA (only one of these loads) ─────────────────────────────
 const loadGTM = wantGTM;
 const loadGA  = !loadGTM && wantGA;
+
+const nonce = (Astro.locals as any).nonce;
 ---
 
 {/* Load via data-src; your lazy-loader will flip to src later */}
 
 {loadGTM && (
-  <script id="google-tag-lib" async data-src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}></script>
+  <script nonce={nonce} id="google-tag-lib" async data-src={`https://www.googletagmanager.com/gtm.js?id=${gtmId}`}></script>
 )}
 
 {loadGA && (
-  <script id="google-analytics-lib" async data-src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
+  <script nonce={nonce} id="google-analytics-lib" async data-src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}></script>
 )}
 
 {wantCF && (
   <script
+    nonce={nonce}
     async id="cloudflare-analytics"
     data-src="https://static.cloudflareinsights.com/beacon.min.js"
     data-cf-beacon={JSON.stringify({ token: cfId })}
@@ -47,6 +50,7 @@ const loadGA  = !loadGTM && wantGA;
 
 {wantAh && (
   <script
+    nonce={nonce}
     async id="ahrefs-analytics"
     data-src="https://analytics.ahrefs.com/analytics.js"
     data-key={ahrefsId}

@@ -4,6 +4,7 @@ export const siteFunctions = {
     contactFormHandler: "https://nviewsweb-email-handler.nviews.workers.dev/", // external worker url
     /* CAPTCHA KEYS (for forms, comments, etc.) -------------------------- */
     turnstileEnabled: true,
+    // sitekey from easyapostille.in Cloudflare dashboard
     turnstileSitekey: "0x4AAAAAAB5d0h3hP88waWBq", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
     turnstileSitekeyTest: "1x00000000000000000000AA", // test key, always passes
     turnstileSecretTest: "1x0000000000000000000000000000000AA", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add

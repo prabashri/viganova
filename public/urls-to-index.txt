@@ -1,7 +1,4 @@
 https://verifiedapostille.com/about
-https://verifiedapostille.com/blog/first-post
-https://verifiedapostille.com/blog/second-post
-https://verifiedapostille.com/blog/third-post
 https://verifiedapostille.com/contact
 https://verifiedapostille.com/cookiePolicy
 https://verifiedapostille.com/notFound
@@ -10,18 +7,6 @@ https://verifiedapostille.com/post/first-post
 https://verifiedapostille.com/post/second-post
 https://verifiedapostille.com/privacyPolicy
 https://verifiedapostille.com/refund
-https://verifiedapostille.com/resource/apostille-minors-birth-certificate-parents-applying
-https://verifiedapostille.com/resource/apostille-name-mismatch-reissue-guide
-https://verifiedapostille.com/resource/apostille-on-original-vs-copy-certificate-india
-https://verifiedapostille.com/resource/apostille-price-cost-in-india-mea-notary-sdm-hrd-coc
-https://verifiedapostille.com/resource/document-authentication-india-coc-hrd-vs-sdm-home-state-attestation
-https://verifiedapostille.com/resource/e-apostille-pdf-download-share-verify
-https://verifiedapostille.com/resource/esanad-vs-service-provider-apostille
-https://verifiedapostille.com/resource/hague-vs-non-hague-apostille-or-embassy-attestation
-https://verifiedapostille.com/resource/how-to-check-or-verify-apostille-documents-in-india
-https://verifiedapostille.com/resource/how-to-get-apostille-in-india-step-by-step
-https://verifiedapostille.com/resource/how-to-get-pcc-certificate-in-india
-https://verifiedapostille.com/resource/how-to-get-qr-code-apostille-on-documents-online-e-sanad-india
 https://verifiedapostille.com/resource/apostille-process-in-india
 https://verifiedapostille.com/search
 https://verifiedapostille.com/service/affidavit-apostille

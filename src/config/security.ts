@@ -175,11 +175,11 @@ function buildDirectives(): Directives {
 function orderScriptSrc(list: string[], nonceToken?: string): string[] {
   const set = new Set(list);
   const hosts = Array.from(set).filter(v =>
-    v !== "'self'" && v !== "'report-sample'" && v !== nonceToken && v !== "'strict-dynamic'"
+    v !== "'self'" && v !== "'report-sample'" && v !== nonceToken
   );
   return [
     "'self'",
-    ...(nonceToken ? [nonceToken, "'strict-dynamic'"] : []), // <-- add strict-dynamic when nonce is present
+    ...(nonceToken ? [nonceToken] : []), // <-- add strict-dynamic when nonce is present
     "'report-sample'",
     ...hosts,
   ];

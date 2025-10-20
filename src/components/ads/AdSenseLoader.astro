@@ -24,7 +24,7 @@ const nonce = (Astro.locals as any).nonce;
   <>
     {/* External library (allowed by CSP via host allowlist) */}
     <script
-      async
+      async nonce={nonce}
       data-src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${clientId}`}
       crossorigin="anonymous">
     </script>

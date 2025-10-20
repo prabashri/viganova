@@ -593,6 +593,6 @@ const toISODuration = (secs?: number) => {
 
   <Fragment slot="extraScripts">
     <script id="video-schema" nonce={nonce} type="application/ld+json" set:html={JSON.stringify(videoSchema)}></script>
-    <script type="module" data-src="/scripts/video-watch.js" async></script>
+    <script type="module" nonce={nonce} data-src="/scripts/video-watch.js" async></script>
   </Fragment>
 </BaseLayout>

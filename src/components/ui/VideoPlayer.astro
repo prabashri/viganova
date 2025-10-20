@@ -272,4 +272,4 @@ const uid = `vp-${Math.random().toString(36).slice(2,9)}`;
       : <a href={watchPageUrl || pageCanonical} target="_blank" rel="noopener">Watch this video</a>}
   </noscript>
 </div>
-<script type="module" data-src="/scripts/video-watch.js" async></script>
+<script type="module" nonce={(Astro.locals as any).nonce} data-src="/scripts/video-watch.js" async></script>

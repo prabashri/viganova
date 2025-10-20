@@ -18,8 +18,26 @@
     "aspect": "1x1",
     "thumbnail": "120"
   },
-  "featured/apostille-on-original-certificate-or-document-photo-copy.png": {
-    "lastModified": 1760708775173,
+  "featured/apostille-process-in-india.jpg": {
+    "lastModified": 1760956221454,
+    "path": "/2025/10/",
+    "variants": [
+      "120",
+      "380",
+      "640",
+      "960",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "jpeg"
+    ],
+    "aspect": "16x9",
+    "thumbnail": "120"
+  },
+  "featured/verifiedapostille-birth-certificate-apostille-service-india.png": {
+    "lastModified": 1760959072978,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -36,8 +54,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/apostille-price-in-india.png": {
-    "lastModified": 1760708775175,
+  "featured/verifiedapostille-business-documents-apostille-service-india.png": {
+    "lastModified": 1760959163401,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -54,8 +72,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easy-apostille-service.png": {
-    "lastModified": 1760708775178,
+  "featured/verifiedapostille-degree-certificate-apostille-service-india.png": {
+    "lastModified": 1760959159034,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -72,8 +90,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-apostille-guide-india-hague-convention-mea.png": {
-    "lastModified": 1760708775179,
+  "featured/verifiedapostille-education-documents-apostille-service-india.png": {
+    "lastModified": 1760959154587,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -90,8 +108,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-birth-certificate-apostille-service-india.png": {
-    "lastModified": 1760708775180,
+  "featured/verifiedapostille-marksheet-apostille-service-india.png": {
+    "lastModified": 1760959150008,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -108,8 +126,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-business-documents-apostille-service-india.png": {
-    "lastModified": 1760708775182,
+  "featured/verifiedapostille-marriage-certificate-apostille-service-india.png": {
+    "lastModified": 1760959145123,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -126,8 +144,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-degree-certificate-apostille-service-india.png": {
-    "lastModified": 1760708775209,
+  "featured/verifiedapostille-pcc-apostille-service-india.png": {
+    "lastModified": 1760959134502,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -144,8 +162,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-education-documents-apostille-service-india.png": {
-    "lastModified": 1760708775210,
+  "featured/verifiedapostille-personal-documents-apostille-service-india.png": {
+    "lastModified": 1760959077124,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -162,8 +180,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-hague-vs-non-hague-apostille-vs-embassy-attestation.png": {
-    "lastModified": 1760708775212,
+  "featured/verifiedapostille-service-for-overseas-indian-citizens-to-get-mea-apostille-attestation.png": {
+    "lastModified": 1760942599114,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -180,8 +198,8 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-marksheet-apostille-service-india.png": {
-    "lastModified": 1760708775213,
+  "featured/verifiedapostille-service.jpg": {
+    "lastModified": 1760943204018,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -193,104 +211,13 @@
     "format": [
       "avif",
       "webp",
-      "png"
+      "jpeg"
     ],
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "featured/easyapostille-marriage-certificate-apostille-service-india.png": {
-    "lastModified": 1760708775214,
-    "path": "/2025/10/",
-    "variants": [
-      "120",
-      "380",
-      "640",
-      "960",
-      "1280"
-    ],
-    "format": [
-      "avif",
-      "webp",
-      "png"
-    ],
-    "aspect": "16x9",
-    "thumbnail": "120"
-  },
-  "featured/easyapostille-pcc-apostille-service-india.png": {
-    "lastModified": 1760708775216,
-    "path": "/2025/10/",
-    "variants": [
-      "120",
-      "380",
-      "640",
-      "960",
-      "1280"
-    ],
-    "format": [
-      "avif",
-      "webp",
-      "png"
-    ],
-    "aspect": "16x9",
-    "thumbnail": "120"
-  },
-  "featured/easyapostille-personal-documents-apostille-service-india.png": {
-    "lastModified": 1760708775217,
-    "path": "/2025/10/",
-    "variants": [
-      "120",
-      "380",
-      "640",
-      "960",
-      "1280"
-    ],
-    "format": [
-      "avif",
-      "webp",
-      "png"
-    ],
-    "aspect": "16x9",
-    "thumbnail": "120"
-  },
-  "featured/features-of-easy-apostille-services-india-mea-approved-certificate-attestation.png": {
-    "lastModified": 1760708775221,
-    "path": "/2025/10/",
-    "variants": [
-      "120",
-      "380",
-      "640",
-      "960",
-      "1280",
-      "1600"
-    ],
-    "format": [
-      "avif",
-      "webp",
-      "png"
-    ],
-    "aspect": "16x9",
-    "thumbnail": "120"
-  },
-  "featured/how-to-get-apostille-step-by-step-process-india.png": {
-    "lastModified": 1760708775223,
-    "path": "/2025/10/",
-    "variants": [
-      "120",
-      "380",
-      "640",
-      "960",
-      "1280"
-    ],
-    "format": [
-      "avif",
-      "webp",
-      "png"
-    ],
-    "aspect": "16x9",
-    "thumbnail": "120"
-  },
-  "featured/type-of-documents-for-state-hrd-sdm-coc-authenticaion-before-mea-apostille.png": {
-    "lastModified": 1760708775225,
+  "featured/verifiedapostille-transfer-certificate-apostille-service-india.png": {
+    "lastModified": 1760959534586,
     "path": "/2025/10/",
     "variants": [
       "120",

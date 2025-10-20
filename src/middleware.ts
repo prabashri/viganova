@@ -59,7 +59,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Inject nonce attribute into inline <script> (no src) and <style> on HTML only
-  /*
+  
   if (isHtml && response.body) {
     const rawHtml = await response.text();
 
@@ -79,7 +79,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
       headers,
     });
   }
-*/
+
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,

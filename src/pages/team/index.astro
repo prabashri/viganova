@@ -97,6 +97,7 @@ const headProps: HeadProps = {
 
 <BaseLayout headProps={headProps}>
  <FilesToLoadCSS files={[{name:'team-index', inline:true}]} />
+ 
   <script id="avatar-color-script" nonce={nonce} is:inline>
     document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll('.avatar-color-custom[data-color]').forEach(el => {

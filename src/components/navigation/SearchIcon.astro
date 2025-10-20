@@ -27,6 +27,7 @@ const date = new Date().toISOString();
   </div>  
 
   <script
+    nonce={(Astro.locals as any).nonce}
     type="module"
     data-src={searchScriptPath}
     data-search-index={searchIndexPath}
