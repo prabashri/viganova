@@ -35,6 +35,8 @@ const horizontalClass = 'flex flex-col big-flex-row big-flex-1 gap max-w-content
 const verticalClass = 'flex flex-col ai-center max-w-sidebar w-100p ';
 const orientationClass = orientation === 'horizontal' ? horizontalClass : verticalClass;
 const imageSizeFinal = imageSize || (orientation === 'horizontal' ? 160 : 320);
+const orientationImageClass = orientation === 'horizontal' ? 'card-horizontal-image' : 'vertical-image';
+const orientationImageWrapperClass = orientation === 'horizontal' ? 'card-horizontal-image-wrapper flex-1' : 'vertical-image-wrapper';
 const contentWrapperClass =
   orientation === 'horizontal' ? 'flex flex-col flex-1 p-05' : 'flex flex-col px-05 pt-0 pb-1';
 
@@ -62,9 +64,9 @@ const hasLink = typeof link === 'string' && link.length > 0;
               sizes={imageSizeFinal}
               width={imageSizeFinal}
               height={Math.round(imageSizeFinal * 0.56)}
-              className={`${className}`}
+              className={`${orientationImageWrapperClass} ${className}`}
               objectFit="cover"
-              imageClassName={`w-100p br-r-unset ${imageClassName} h-full`}
+              imageClassName={`w-100p ${orientationImageClass} ${imageClassName} h-full`}
               breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
               loading={loading}
             />
@@ -124,9 +126,9 @@ const hasLink = typeof link === 'string' && link.length > 0;
               sizes={imageSizeFinal}
               width={imageSizeFinal}
               height={Math.round(imageSizeFinal * 0.56)}
-              className={`${className}`}
+              className={`${orientationImageWrapperClass} ${className}`}
               objectFit="cover"
-              imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset w-100p ${imageClassName} h-full`}
+              imageClassName={`max-w-sidebar w-100p ${orientationImageClass} ${imageClassName} h-full`}
               breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
               loading={loading}
             />
@@ -189,9 +191,9 @@ const hasLink = typeof link === 'string' && link.length > 0;
             sizes={imageSizeFinal}
             width={imageSizeFinal}
             height={Math.round(imageSizeFinal * 0.56)}
-            className={`${className}`}
+            className={`${orientationImageWrapperClass} ${className}`}
             objectFit="cover"
-            imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset w-100p ${imageClassName} h-full`}
+            imageClassName={`max-w-sidebar w-100p ${orientationImageClass} ${imageClassName} h-full`}
             breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
             loading={loading}
           />
@@ -251,9 +253,9 @@ const hasLink = typeof link === 'string' && link.length > 0;
             sizes={imageSizeFinal}
             width={imageSizeFinal}
             height={Math.round(imageSizeFinal * 0.56)}
-            className={`${className}`}
+            className={`${orientationImageWrapperClass} ${className}`}
             objectFit="cover"
-            imageClassName={`br-thin-primary-light max-w-sidebar br-r-unset w-100p ${imageClassName} h-full`}
+            imageClassName={`max-w-sidebar br-r-unset w-100p ${orientationImageClass} ${imageClassName} h-full`}
             breakpoints={{ mobile: imageSizeFinal, desktop: imageSizeFinal }}
             loading={loading}
           />
