@@ -2,11 +2,13 @@
 // src/components/ScriptFlush.astro
 /* Emits scripts for the given position (head|footer).
    - Merges: (registered scripts) + (global scripts)
-   - Auto-ids for globals if missing (from name/src)
-   - Dedupes by id or src
+   - Resolves globals via assets-manifest.json (prod hashed / dev original)
+   - Auto-ids when missing
+   - Dedupes by id/src
    - Sorts by priority
    - Sanitizes referrerpolicy
 */
+import manifest from "@/data/assets-manifest.json";
 import {
   getRegisteredScripts,
   clearScriptRegistry,
@@ -20,6 +22,9 @@ interface Props {
   nonce?: string;
   includeGlobals?: boolean;
   clearAfterPrint?: boolean;
+  // Optional tuning (defaults match FilesToLoadJS behavior)
+  devSrcBuster?: boolean;       // default: true
+  preferMinInProd?: boolean;    // default: true
 }
 
 const {
@@ -27,29 +32,15 @@ const {
   nonce,
   includeGlobals = true,
   clearAfterPrint = (position === "footer"),
+  devSrcBuster = true,
+  preferMinInProd = true,
 } = Astro.props as Props;
 
-// --- helpers -------------------------------------------------
-function basenameNoExt(u: string): string {
-  const clean = u.split("#")[0].split("?")[0];
-  const last = clean.split("/").pop() || clean;
-  return last.replace(/\.(m?js)$/, "");
-}
+const isDev = import.meta.env.DEV;
+const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
 
-function pickId(s: AnyScript): string | undefined {
-  return (
-    s.id ||
-    s.name ||
-    (s.src ? basenameNoExt(s.src) : undefined)
-  );
-}
-
-function dataSpread(d?: Record<string, string | number | boolean>) {
-  if (!d) return {};
-  return Object.fromEntries(Object.entries(d).map(([k, v]) => [`data-${k}`, String(v)]));
-}
-
-// --- read & merge -------------------------------------------
+// ---------- helpers ----------
+type Cross = "" | "anonymous" | "use-credentials";
 type AnyScript = {
   id?: string;
   name?: string;
@@ -59,34 +50,88 @@ type AnyScript = {
   defer?: boolean;
   nomodule?: boolean;
   integrity?: string;
-  crossOrigin?: "" | "anonymous" | "use-credentials";
+  crossOrigin?: Cross;
   referrerPolicy?: ReferrerPolicy;
   data?: Record<string, string | number | boolean>;
-  code?: string;
-  inline?: string;
+  code?: string;   // inline payload
+  inline?: string; // legacy alias
   priority?: number;
 };
 
-// pull from registry
+function resolveFromManifest(n?: string): string | null {
+  if (!n) return null;
+  const entry = (manifest as any)?.js?.[n];
+  return entry?.file ?? null;
+}
+
+function withDevBuster(u: string) {
+  if (!isDev || !devSrcBuster) return u;
+  return u.includes("?") ? `${u}&t=${bust}` : `${u}?t=${bust}`;
+}
+
+function resolveGlobalSrc(name?: string, src?: string): string | null {
+  // If a global provides explicit src, honor it (dev adds buster)
+  if (src) return isDev ? withDevBuster(src) : src;
+
+  if (!name) return null;
+
+  if (isDev) {
+    // Prefer non-minified if manifest happens to exist
+    const mf = resolveFromManifest(name);
+    if (mf && !mf.endsWith(".min.js")) return withDevBuster(mf);
+    // Conventional dev path
+    return withDevBuster(`/scripts/${name}.js`);
+  }
+
+  // Production
+  const mf = resolveFromManifest(name);
+  if (mf) return mf;
+
+  if (preferMinInProd) return `/scripts/${name}.min.js`;
+
+  // Last resort
+  return `/scripts/${name}.js`;
+}
+
+function basenameNoExt(u: string): string {
+  const clean = u.split("#")[0].split("?")[0];
+  const last = clean.split("/").pop() || clean;
+  return last.replace(/\.(m?js)$/, "");
+}
+
+function pickId(s: AnyScript, resolvedSrc?: string): string | undefined {
+  return s.id || s.name || (resolvedSrc ? basenameNoExt(resolvedSrc) : undefined);
+}
+
+function dataSpread(d?: Record<string, string | number | boolean>) {
+  if (!d) return {};
+  return Object.fromEntries(Object.entries(d).map(([k, v]) => [`data-${k}`, String(v)]));
+}
+
+// ---------- read & merge ----------
 const registered: AnyScript[] = (getRegisteredScripts(position) || []) as AnyScript[];
+const globalsRaw: AnyScript[] = includeGlobals ? (getGlobalScripts(position) || []) : [];
 
-// globals (DO NOT register; just merge)
-const globals: AnyScript[] = includeGlobals ? (getGlobalScripts(position) || []) : [];
+// Resolve globals to final src using manifest/dev logic
+const globalsResolved: AnyScript[] = globalsRaw.map((g) => {
+  const finalSrc = resolveGlobalSrc(g.name, g.src || undefined);
+  const id = pickId(g, finalSrc || undefined);
+  return { ...g, id, src: finalSrc || undefined };
+});
 
-// merged list (globals first so their priority can still sort them)
-const merged: AnyScript[] = [...globals, ...registered];
+// merged: globals first (priority still controls final order)
+let list: AnyScript[] = [...globalsResolved, ...registered];
 
-// normalize + computed flags
-let list = merged.map((s) => {
-  const id = pickId(s);
+// normalize computed flags for template
+const normalized = list.map((s) => {
   const inlinePayload = s.code ?? s.inline ?? "";
-  const isModule = s.module !== false && !s.nomodule;     // default to module
-  const shouldDefer = !s.async && s.defer !== false;      // default to defer unless async or explicitly false
+  const isModule = s.module !== false && !s.nomodule;    // default module=true unless nomodule
+  const shouldDefer = !s.async && s.defer !== false;     // default defer=true unless async or explicitly false
   const refp = sanitizeReferrerPolicy(s.referrerPolicy);
 
   return {
     ...s,
-    id,
+    id: s.id ?? pickId(s, s.src),
     __inline: inlinePayload,
     __hasInline: Boolean(inlinePayload) && !s.src,
     __isModule: isModule,
@@ -97,15 +142,18 @@ let list = merged.map((s) => {
 
 // dedupe by (id || src)
 const seen = new Set<string>();
-list = list.filter((s) => {
-  const key = s.id ? `id:${s.id}` : (s.src ? `src:${s.src}` : `inline:${(s.__inline as string).slice(0,24)}`);
+const deduped = normalized.filter((s) => {
+  const key =
+    (s.id && `id:${s.id}`) ||
+    (s.src && `src:${s.src}`) ||
+    `inline:${(s.__inline as string).slice(0, 24)}`;
   if (seen.has(key)) return false;
   seen.add(key);
   return true;
 });
 
-// sort deterministically (priority asc, then name/id/src)
-list = list.sort((a, b) => {
+// sort by priority asc, then stable name/id/src
+const sorted = deduped.sort((a, b) => {
   const pa = a.priority ?? 0;
   const pb = b.priority ?? 0;
   if (pa !== pb) return pa - pb;
@@ -115,7 +163,7 @@ list = list.sort((a, b) => {
 });
 ---
 
-{list.map((s) =>
+{sorted.map((s) =>
   s.__hasInline ? (
     <script
       id={s.id}
@@ -123,8 +171,8 @@ list = list.sort((a, b) => {
       nomodule={s.nomodule ? true : undefined}
       nonce={nonce}
       integrity={s.integrity}
-      crossorigin={s.crossOrigin}
-      referrerpolicy={s.__referrer}
+      crossorigin={s.crossOrigin} 
+      referrerpolicy={s.__referrer} 
       {...dataSpread(s.data)}
     >
       {s.__inline}
