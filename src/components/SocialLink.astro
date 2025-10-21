@@ -2,6 +2,7 @@
 // src/components/SocialLink.astro
 import { Icon } from 'astro-icon/components';
 import { siteDefaults } from '@/config/siteDefaults';
+import IconMask from '@/components/IconMask.astro';
 
 interface Props {
   id?: string;
@@ -72,9 +73,9 @@ function getRel(href: string): string | undefined {
         {...(rel ? { rel } : {})}
         aria-label={label}
         title={label}
-        class={`icon-link flex ai-center jc-center p-02 br-r lh-0 focus-visible bg-primary-lighter-x ${itemClass}`}
+        class={`icon-link flex ai-center jc-center p-02 br-r lh-0 focus-visible bg-primary-lighter-x col-primary ${itemClass}`}
       >
-        <Icon name={key} class={iconSize} />
+        <IconMask name={key} class={iconSize} />
         <span class="sr-only">{label}</span>
       </a>
     );

@@ -1,13 +1,19 @@
 ---
+// src/components/ScriptFlush.astro
+/* Emits registered scripts for the given position (head|footer).
+   Registers global scripts (optional) and clears the registry (optional).
+*/
 import {
   getRegisteredScripts,
   registerScript,
   clearScriptRegistry,
+  sanitizeReferrerPolicy,
+  type ReferrerPolicy,
 } from "@/utils/scriptRegistry";
 import { getGlobalScripts } from "@/config/globalScripts";
 
 interface Props {
-  position: 'head' | 'footer';
+  position: "head" | "footer";
   nonce?: string;
   includeGlobals?: boolean;
   clearAfterPrint?: boolean;
@@ -17,35 +23,91 @@ const {
   position,
   nonce,
   includeGlobals = true,
-  clearAfterPrint = (position === 'footer'),
+  clearAfterPrint = (position === "footer"),
 } = Astro.props as Props;
 
+// 1) Register globals BEFORE reading the registry
 if (includeGlobals) {
-  const globals = getGlobalScripts(position);
+  const globals = getGlobalScripts(position) || [];
   for (const g of globals) registerScript({ ...g, position });
 }
 
-const list = getRegisteredScripts(position);
+// 2) Read registry and sort deterministically
+let list = getRegisteredScripts(position) || [];
+list = [...list].sort((a, b) => {
+  const pa = a.priority ?? 0;
+  const pb = b.priority ?? 0;
+  if (pa !== pb) return pa - pb;
+  const na = (a.name || a.id || a.src || "").toString();
+  const nb = (b.name || b.id || b.src || "").toString();
+  return na.localeCompare(nb);
+});
+
+// 3) Normalize for template (no TS assertions in template)
+type AnyScript = {
+  id?: string;
+  name?: string;
+  src?: string;
+  module?: boolean;
+  async?: boolean;
+  defer?: boolean;
+  nomodule?: boolean;
+  integrity?: string;
+  crossOrigin?: '' | 'anonymous' | 'use-credentials';
+  referrerPolicy?: ReferrerPolicy;
+  data?: Record<string, string | number | boolean>;
+  code?: string;   // inline code payload
+  inline?: string; // legacy alias
+};
+
+const normalized = list.map((s) => {
+  const ss = s as AnyScript;
+  const inlinePayload = ss.code ?? ss.inline ?? "";
+  return {
+    ...ss,
+    __inline: inlinePayload,
+    __hasInline: inlinePayload && !ss.src,
+    __isModule: ss.module !== false && !ss.nomodule, // default module=true unless nomodule
+    __shouldDefer: !ss.async && ss.defer !== false,  // default defer=true unless async or explicitly false
+    __referrer: sanitizeReferrerPolicy(ss.referrerPolicy), // <- sanitize here
+  };
+});
 
 function dataSpread(d?: Record<string, string | number | boolean>) {
   if (!d) return {};
-  return Object.fromEntries(Object.entries(d).map(([k,v]) => [`data-${k}`, String(v)]));
+  return Object.fromEntries(Object.entries(d).map(([k, v]) => [`data-${k}`, String(v)]));
 }
 ---
-{list.map((s) => (
-  <script
-    id={s.id}
-    src={s.src}
-    type={s.module === false ? undefined : 'module'}
-    async={s.async ? true : undefined}
-    defer={s.async ? undefined : (s.defer === false ? undefined : true)}
-    nomodule={s.nomodule ? true : undefined}
-    nonce={nonce}
-    integrity={s.integrity}
-    crossorigin={s.crossOrigin}
-    referrerpolicy={s.referrerPolicy}
-    {...dataSpread(s.data)}
-  />
-))}
+
+{normalized.map((s) =>
+  s.__hasInline ? (
+    <script
+      id={s.id}
+      type={s.__isModule ? "module" : undefined}
+      nomodule={s.nomodule ? true : undefined}
+      nonce={nonce}
+      integrity={s.integrity}
+      crossorigin={s.crossOrigin}          
+      referrerpolicy={s.__referrer}        
+      {...dataSpread(s.data)}
+    >
+      {s.__inline}
+    </script>
+  ) : (
+    <script
+      id={s.id}
+      src={s.src}
+      type={s.__isModule ? "module" : undefined}
+      async={s.async ? true : undefined}
+      defer={s.async ? undefined : (s.__shouldDefer ? true : undefined)}
+      nomodule={s.nomodule ? true : undefined}
+      nonce={nonce}
+      integrity={s.integrity}
+      crossorigin={s.crossOrigin}         
+      referrerpolicy={s.__referrer}
+      {...dataSpread(s.data)}
+    />
+  )
+)}
 
 {clearAfterPrint && clearScriptRegistry()}

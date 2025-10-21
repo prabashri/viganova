@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.6m7sk8.css",
-      "datetime": "2025-10-20T13:46:11.107Z",
+      "file": "/styles/main.z1nkvx.css",
+      "datetime": "2025-10-21T01:33:44.303Z",
       "names": [
         "base",
         "blockquote",
@@ -76,7 +76,7 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-20T13:46:14.945Z",
+      "datetime": "2025-10-21T01:33:47.078Z",
       "names": [
         "audio-layout",
         "contact-form",
@@ -92,7 +92,7 @@
     },
     "pages:home": {
       "file": "",
-      "datetime": "2025-10-20T13:46:14.787Z",
+      "datetime": "2025-10-21T01:33:46.775Z",
       "name": "home",
       "removed": true
     },
@@ -198,8 +198,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.72ejiv.json",
-      "datetime": "2025-10-20T13:45:59.643Z"
+      "file": "/search-index.tobd5b.json",
+      "datetime": "2025-10-21T01:33:31.445Z"
     }
   },
   "js": {
