@@ -36,7 +36,7 @@ const PARENT_LEGAL_NAME = PARENT.legalName || PARENT.name || "NViews Media Priva
 const LANGUAGES = ["en", "ta", "hi", "ml"];
 
 export const localBusiness: LocalBusinessConfig = {
-  enabled: true,
+  enabled: false,
   schemaType: "ProfessionalService",
   businessMode: "online",
 

@@ -1,6 +1,6 @@
 {
   "avatar/praba-photo-2025.png": {
-    "lastModified": 1760708775165,
+    "lastModified": 1761061097771,
     "path": "/2025/10/",
     "variants": [
       "60",
@@ -18,8 +18,23 @@
     "aspect": "1x1",
     "thumbnail": "120"
   },
+  "electrolyzer-tech.jpg": {
+    "lastModified": 1761192306118,
+    "path": "/2025/10/",
+    "variants": [
+      "380",
+      "640",
+      "800"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "jpeg"
+    ],
+    "aspect": "1x1"
+  },
   "featured/apostille-process-in-india.jpg": {
-    "lastModified": 1760956221454,
+    "lastModified": 1761061097774,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -37,7 +52,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-birth-certificate-apostille-service-india.png": {
-    "lastModified": 1760959072978,
+    "lastModified": 1761061097777,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -55,7 +70,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-business-documents-apostille-service-india.png": {
-    "lastModified": 1760959163401,
+    "lastModified": 1761061097788,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -73,7 +88,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-degree-certificate-apostille-service-india.png": {
-    "lastModified": 1760959159034,
+    "lastModified": 1761061097793,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -91,7 +106,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-education-documents-apostille-service-india.png": {
-    "lastModified": 1760959154587,
+    "lastModified": 1761061097796,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -109,7 +124,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-marksheet-apostille-service-india.png": {
-    "lastModified": 1760959150008,
+    "lastModified": 1761061097813,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -127,7 +142,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-marriage-certificate-apostille-service-india.png": {
-    "lastModified": 1760959145123,
+    "lastModified": 1761061097821,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -145,7 +160,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-pcc-apostille-service-india.png": {
-    "lastModified": 1760959134502,
+    "lastModified": 1761061097827,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -163,7 +178,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-personal-documents-apostille-service-india.png": {
-    "lastModified": 1760959077124,
+    "lastModified": 1761061097830,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -181,7 +196,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-service-for-overseas-indian-citizens-to-get-mea-apostille-attestation.png": {
-    "lastModified": 1760942599114,
+    "lastModified": 1761061097836,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -199,7 +214,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-service.jpg": {
-    "lastModified": 1760943204018,
+    "lastModified": 1761061097838,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -217,7 +232,7 @@
     "thumbnail": "120"
   },
   "featured/verifiedapostille-transfer-certificate-apostille-service-india.png": {
-    "lastModified": 1760959534586,
+    "lastModified": 1761061097846,
     "path": "/2025/10/",
     "variants": [
       "120",
@@ -234,13 +249,44 @@
     "aspect": "16x9",
     "thumbnail": "120"
   },
-  "photocopy-of-marriage-certificate-apostille-stamp-india-with-notary-sdm-sign.jpg": {
-    "lastModified": 1760760081727,
+  "green-ammonia.jpg": {
+    "lastModified": 1761192313659,
     "path": "/2025/10/",
     "variants": [
       "380",
       "640",
-      "1280"
+      "800"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "jpeg"
+    ],
+    "aspect": "1x1"
+  },
+  "hero-image.jpg": {
+    "lastModified": 1761197698053,
+    "path": "/2025/10/",
+    "variants": [
+      "380",
+      "640",
+      "1280",
+      "1344"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "16x9"
+  },
+  "hydrogen-production.jpg": {
+    "lastModified": 1761192322572,
+    "path": "/2025/10/",
+    "variants": [
+      "380",
+      "640",
+      "800"
     ],
     "format": [
       "avif",
@@ -250,7 +296,7 @@
     "aspect": "1x1"
   },
   "profile/prabakaran-shankar-2025.png": {
-    "lastModified": 1760708775227,
+    "lastModified": 1761061097851,
     "path": "/2025/10/",
     "variants": [
       "320",
@@ -265,8 +311,23 @@
     ],
     "aspect": "3x4"
   },
+  "research-lab.jpg": {
+    "lastModified": 1761192329001,
+    "path": "/2025/10/",
+    "variants": [
+      "380",
+      "640",
+      "800"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "jpeg"
+    ],
+    "aspect": "1x1"
+  },
   "resources/amrita-university-esanad-certificate-verification-fees-2025-09-27.png": {
-    "lastModified": 1760708775229,
+    "lastModified": 1761061097878,
     "path": "/2025/10/",
     "variants": [
       "380",
@@ -281,7 +342,7 @@
     "aspect": "16x9"
   },
   "resources/model-of-apostille-certificate-by-hague-and-apostille-sticker-stamp-of-india.jpeg": {
-    "lastModified": 1760708775232,
+    "lastModified": 1761061097883,
     "path": "/2025/10/",
     "variants": [
       "380",
@@ -296,7 +357,7 @@
     "aspect": "16x9"
   },
   "tags/astroweb.png": {
-    "lastModified": 1760708775234,
+    "lastModified": 1761061097886,
     "path": "/2025/10/",
     "variants": [
       "380",
@@ -309,5 +370,20 @@
       "png"
     ],
     "aspect": "16x9"
+  },
+  "viganova-green-energy-solutions-electrolyzer-hydrogen-ammonia-production.png": {
+    "lastModified": 1761148061125,
+    "path": "/2025/10/",
+    "variants": [
+      "380",
+      "640",
+      "1280"
+    ],
+    "format": [
+      "avif",
+      "webp",
+      "png"
+    ],
+    "aspect": "1x1"
   }
 }

@@ -20,21 +20,21 @@ export const siteColors = {
    */
   darkAdjustmentMode: 'swap', // swap optional (default 'adjust')
 
-  primaryColorDarkerX: "hsla(232, 96%, 08%, 1)",
-  primaryColorDarker: "hsla(232, 96%, 15%, 1)",
-  primaryColorDark: "hsla(232, 96%, 25%, 1)",
-  primaryColor: "hsla(232, 96%, 33%, 1.00)",
-  primaryColorLight: "hsla(232, 96%, 65%, 1.00)",
-  primaryColorLighter: "hsla(232, 96%, 80%, 1.00)",
-  primaryColorLighterX: "hsla(232, 96%, 95%, 1)",
+  primaryColorDarkerX: "hsla(155, 100%, 05%, 1)",
+  primaryColorDarker: "hsla(155, 100%, 8%, 1)",
+  primaryColorDark: "hsla(155, 100%, 10%, 1.00)",
+  primaryColor: "hsla(155, 100%, 19%, 1.00)",
+  primaryColorLight: "hsla(155, 87%, 56%, 1.00)",
+  primaryColorLighter: "hsla(155, 100%, 80%, 1.00)",
+  primaryColorLighterX: "hsla(155, 100%, 93%, 1.00)",
 
-  secondaryColorDarkerX: "hsla(0, 90%, 08%, 1.00)",
-  secondaryColorDarker:"hsla(0, 90%, 20%, 1.00)",
-  secondaryColorDark: "hsla(0, 90%, 30%, 1.00)",
-  secondaryColor: "hsla(0, 90%, 50%, 1.00)",
-  secondaryColorLight: "hsla(0, 90%, 78%, 1.00)",
-  secondaryColorLighter: "hsla(0, 90%, 88%, 1.00)",
-  secondaryColorLighterX: "hsla(0, 90%, 92%, 1.00)",
+  secondaryColorDarkerX: "hsla(48, 100%, 05%, 1.00)",
+  secondaryColorDarker:"hsla(48, 100%, 15%, 1.00)",
+  secondaryColorDark: "hsla(48, 100%, 25%, 1.00)",
+  secondaryColor: "hsla(48, 100%, 46%, 1.00)",
+  secondaryColorLight: "hsla(48, 100%, 78%, 1.00)",
+  secondaryColorLighter: "hsla(48, 100%, 88%, 1.00)",
+  secondaryColorLighterX: "hsla(48, 100%, 92%, 1.00)",
 
   backgroundColor: "hsla(0, 0%, 100%, 1.00)",
 
@@ -46,21 +46,21 @@ export const siteColors = {
 
   darkTextColor: "#ffffff", // Optional dark mode text color
 
-  darkPrimaryColorDarkerX: "hsla(232, 96%, 95%, 1)",
-  darkPrimaryColorDarker: "hsla(232, 96%, 90%, 1)",
-  darkPrimaryColorDark: "hsla(232, 96%, 85%, 1)",
-  darkPrimaryColor: "hsla(232, 96%, 70%, 1.00)",
-  darkPrimaryColorLight: "hsla(232, 96%, 33%, 1)",
-  darkPrimaryColorLighter: "hsla(232, 96%, 20%, 1)",
-  darkPrimaryColorLighterX: "hsla(232, 96%, 10%, 1)",
-  
-  darkSecondaryColorDarkerX: "hsla(0, 90%, 08%, 1.00)",
-  darkSecondaryColorDarker: "hsla(0, 90%, 20%, 1.00)",
-  darkSecondaryColorDark: "hsla(0, 90%, 30%, 1.00)",
-  darkSecondaryColor: "hsla(0, 90%, 50%, 1.00)",
-  darkSecondaryColorLight: "hsla(0, 90%, 78%, 1.00)",
-  darkSecondaryColorLighter: "hsla(0, 90%, 88%, 1.00)",
-  darkSecondaryColorLighterX: "hsla(0, 90%, 92%, 1.00)",
+  darkPrimaryColorDarkerX: "hsla(155, 100%, 93%, 1.00)",
+  darkPrimaryColorDarker: "hsla(155, 100%, 80%, 1.00)",
+  darkPrimaryColorDark: "hsla(155, 100%, 56%, 1.00)",
+  darkPrimaryColor: "hsla(155, 100%, 19%, 1.00)",
+  darkPrimaryColorLight: "hsla(155, 100%, 12%, 1)",
+  darkPrimaryColorLighter: "hsla(155, 100%, 8%, 1)",
+  darkPrimaryColorLighterX: "hsla(155, 100%, 5%, 1)",
+
+  darkSecondaryColorDarkerX: "hsla(48, 100%, 5%, 1.00)",
+  darkSecondaryColorDarker: "hsla(48, 100%, 15%, 1.00)",
+  darkSecondaryColorDark: "hsla(48, 100%, 25%, 1.00)",
+  darkSecondaryColor: "hsla(48, 100%, 46%, 1.00)",
+  darkSecondaryColorLight: "hsla(48, 100%, 78%, 1.00)",
+  darkSecondaryColorLighter: "hsla(48, 100%, 88%, 1.00)",
+  darkSecondaryColorLighterX: "hsla(48, 100%, 92%, 1.00)",
     // Optional dark mode colors
 
 

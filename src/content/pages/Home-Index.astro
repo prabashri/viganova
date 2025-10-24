@@ -1,0 +1,238 @@
+---
+// import { Button } from "@/components/ui/button";
+// import { Card } from "@/components/ui/card";
+// import { Link } from "react-router-dom";
+// import Navbar from "@/components/Navbar";
+// import Footer from "@/components/Footer";
+import heroImage from "@/assets/hero-image.jpg";
+import hydrogenProduction from "@/assets/hydrogen-production.jpg";
+import electrolyzerTech from "@/assets/electrolyzer-tech.jpg";
+import greenAmmonia from "@/assets/green-ammonia.jpg";
+import researchLab from "@/assets/research-lab.jpg";
+import { Droplets, Zap, Leaf, FlaskConical, CheckCircle2, Globe, Lightbulb, TrendingUp } from "lucide-react";
+
+const Index = () => {
+  const services = [
+    {
+      title: "Green Hydrogen Production",
+      description: "Harnessing renewable energy sources like solar and wind to produce clean, zero-emission hydrogen fuel.",
+      icon: Droplets,
+      image: "hydrogen-production.jpg",
+    },
+    {
+      title: "Electrolyzer Technology",
+      description: "Advanced electrolyzer systems optimized for high performance, durability, and industrial-scale applications.",
+      icon: Zap,
+      image: "electrolyzer-tech.jpg",
+    },
+    {
+      title: "Green Ammonia & Urea Synthesis",
+      description: "Sustainable alternatives for fertilizers and industrial chemicals, reducing carbon footprints in agriculture.",
+      icon: Leaf,
+      image: "green-ammonia.jpg",
+    },
+    {
+      title: "R&D and Industrial Consulting",
+      description: "Collaborating with industries and institutions to implement cleaner, more efficient technologies.",
+      icon: FlaskConical,
+      image: "research-lab.jpg",
+    },
+  ];
+
+  const whyChooseUs = [
+    {
+      title: "Sustainability-Driven Innovation",
+      description: "Pioneering solutions that align technology with environmental responsibility",
+      icon: Leaf,
+    },
+    {
+      title: "End-to-End Expertise",
+      description: "From R&D to deployment, we offer turnkey clean energy systems",
+      icon: CheckCircle2,
+    },
+    {
+      title: "Global Vision",
+      description: "Bridging innovation and implementation for worldwide green energy transformation",
+      icon: Globe,
+    },
+  ];
+
+---
+    <div class="min-h-screen bg-background">
+
+
+      {/* Hero Section */}
+      <section class="relative pt-16 overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-hero opacity-90" />
+        <div class="absolute inset-0">
+          <img
+            src={heroImage}
+            alt="Green energy infrastructure with wind turbines and hydrogen facilities"
+            class="w-full h-full object-cover mix-blend-overlay"
+          />
+        </div>
+        <div class="relative container mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32">
+          <div class="max-w-3xl animate-fade-in-up">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground mb-6">
+              Empowering a Greener Tomorrow with Hydrogen Innovation
+            </h1>
+            <p class="text-lg md:text-xl text-primary-foreground/90 mb-8">
+              Viga Nova Green Energy Pvt. Ltd. is a Tamil Nadu–based clean-tech company committed to advancing green hydrogen production and renewable energy innovation.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <Button variant="hero" size="lg" asChild>
+                <Link to="/services">Explore Our Solutions</Link>
+              </Button>
+              <Button variant="outline" size="lg" class="bg-background/10 backdrop-blur-sm border-primary-foreground/20 text-primary-foreground hover:bg-background/20" asChild>
+                <Link to="/contact">Get in Touch</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Preview Section */}
+      <section class="py-16 md:py-24 bg-muted">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="max-w-3xl mx-auto text-center animate-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              About Viga Nova Green Energy
+            </h2>
+            <p class="text-lg text-muted-foreground mb-8">
+              We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
+            </p>
+            <Button variant="default" size="lg" asChild>
+              <Link to="/about">Learn More About Us</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Our Focus Areas
+            </h2>
+            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Comprehensive solutions for a sustainable energy future
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {services.map((service, index) => (
+              <Card
+                key={index}
+                class="overflow-hidden group hover:shadow-xl transition-all duration-300 animate-fade-in-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div class="relative h-48 overflow-hidden">
+                  <img
+                    src={service.image}
+                    alt={service.title}
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div class="absolute inset-0 bg-gradient-primary opacity-20 group-hover:opacity-30 transition-opacity" />
+                </div>
+                <div class="p-6">
+                  <div class="flex items-center space-x-3 mb-3">
+                    <div class="w-10 h-10 bg-accent/10 rounded-lg flex items-center justify-center">
+                      <service.icon class="w-5 h-5 text-accent" />
+                    </div>
+                    <h3 class="text-xl font-semibold text-foreground">{service.title}</h3>
+                  </div>
+                  <p class="text-muted-foreground">{service.description}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+
+          <div class="text-center mt-12">
+            <Button variant="default" size="lg" asChild>
+              <Link to="/services">View All Services</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Us Section */}
+      <section class="py-16 md:py-24 bg-gradient-secondary">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="text-center mb-12 animate-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
+              Why Choose Us
+            </h2>
+            <p class="text-lg text-primary-foreground/90 max-w-2xl mx-auto">
+              Leading the way in clean energy innovation
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {whyChooseUs.map((item, index) => (
+              <div
+                key={index}
+                class="text-center animate-fade-in-up"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div class="w-16 h-16 bg-primary-foreground/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <item.icon class="w-8 h-8 text-primary-foreground" />
+                </div>
+                <h3 class="text-xl font-semibold text-primary-foreground mb-2">{item.title}</h3>
+                <p class="text-primary-foreground/80">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & Vision Section */}
+      <section class="py-16 md:py-24">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+            <div class="space-y-4 animate-fade-in">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                  <TrendingUp class="w-6 h-6 text-accent" />
+                </div>
+                <h3 class="text-2xl font-bold text-foreground">Our Mission</h3>
+              </div>
+              <p class="text-muted-foreground">
+                To revolutionize energy systems by making green hydrogen and clean energy technologies accessible, efficient, and impactful for industries worldwide.
+              </p>
+            </div>
+
+            <div class="space-y-4 animate-fade-in-up">
+              <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                  <Lightbulb class="w-6 h-6 text-secondary" />
+                </div>
+                <h3 class="text-2xl font-bold text-foreground">Our Vision</h3>
+              </div>
+              <p class="text-muted-foreground">
+                A carbon-neutral world powered by sustainable hydrogen and renewable innovation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section class="py-16 md:py-24 bg-muted">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div class="max-w-3xl mx-auto animate-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-6">
+              Ready to Build a Sustainable Future?
+            </h2>
+            <p class="text-lg text-muted-foreground mb-8">
+              Whether you're an industry partner, researcher, or policymaker — join us in building a cleaner, hydrogen-powered tomorrow.
+            </p>
+            <Button variant="hero" size="lg" asChild>
+              <Link to="/contact">Contact Us Today</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+    </div>

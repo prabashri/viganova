@@ -195,15 +195,15 @@ if (hasData && meta) {
 }
 ---
 {!hasData ? (
-  <div class={`flex flex-1 ai-center jc-center bg-primary-lighter br-r w-100p ${aspectClass} h-fit ${className}`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-100p h-auto ${imageClassName} ${objectFitClass}`}>
+  <div class={`flex flex-1 ai-center jc-center bg-primary-lighter br-r w-100p ${aspectClass} h-100p ${className}`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 225" class={`w-100p h-100p ${imageClassName} ${objectFitClass}`}>
       <rect width="400" height="225" fill="#00000000"></rect>
     </svg>
     <span class="absolute bold text-base">{siteDefaults.siteName}</span>
   </div>
 ) : (
   caption ? (
-    <figure id={id} class={`block image-wrapper w-100p ${aspectClass} h-fit ${className}`}>
+    <figure id={id} class={`block image-wrapper w-100p ${aspectClass} h-100p ${className}`}>
       <picture>
         {formats.map(fmt => (
           <source
@@ -223,13 +223,13 @@ if (hasData && meta) {
           loading={loading === 'eager' ? 'eager' : 'lazy'}
           decoding="async"
           fetchpriority={loading === 'eager' ? 'high' : undefined}
-          class={`block w-100p h-auto br-r ${imageClassName} ${objectFitClass}`}
+          class={`block w-100p h-100p br-r ${imageClassName} ${objectFitClass}`}
         />
       </picture>
       <figcaption class="text-s">{caption}</figcaption>
     </figure>
   ) : (
-    <figure id={id} class={`block image-wrapper w-100p ${aspectClass} h-fit ${className}`}>
+    <figure id={id} class={`block image-wrapper w-100p ${aspectClass} h-100p ${className}`}>
       <picture>
         {formats.map(fmt => (
           <source
@@ -249,7 +249,7 @@ if (hasData && meta) {
           loading={loading === 'eager' ? 'eager' : 'lazy'}
           decoding="async"
           fetchpriority={loading === 'eager' ? 'high' : undefined}
-          class={`block w-100p h-auto br-r ${imageClassName} ${objectFitClass}`}
+          class={`block w-100p h-100p br-r ${imageClassName} ${objectFitClass}`}
         />
       </picture>
     </figure>

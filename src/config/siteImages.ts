@@ -66,16 +66,16 @@ export const siteImages = {
     thumbnail: true,
     /* thumbnailSize: 120,*/
 
-    desktopLogo: "src/assets/logos/verifiedapostille-logo-w700.png",
+    desktopLogo: "src/assets/logos/viganova-logo.png",
     desktopLogoSvg: "src/assets/logos/DesktopLogo.svg",
 
-    mobileLogo: "src/assets/logos/verifiedapostille-mobile-logo-w1024.png",
+    mobileLogo: "src/assets/logos/viganova-mobile-logo.png",
     mobileLogoSvg: "src/assets/logos/MobileLogo.svg",
 
-    siteIcon: "src/assets/logos/verifiedapostille-favicon-w1024.png",
+    siteIcon: "src/assets/logos/viganova-mobile-logo.png",
     siteIconSvg: "src/assets/logos/Icon.svg",
 
-    favIcon: "src/assets/logos/verifiedapostille-favicon-w1024.png",
+    favIcon: "src/assets/logos/viganova-mobile-logo.png",
     favIconSvg: "src/assets/logos/Icon.svg",
 
 }

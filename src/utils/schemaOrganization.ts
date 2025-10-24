@@ -35,15 +35,25 @@ function sameAsFromSite(): string[] | undefined {
  * Merge in site-level fallbacks (brand name, url, contact, legal bits).
  */
 function getPrimaryOrgConfig() {
-  // Brand/website entity (EasyApostille)
   const org = (siteDefaults as any).organization || {};
 
   const brandName =
-    siteDefaults.siteName || siteDefaults.shortName || siteDefaults.title || "Organization";
+    siteDefaults.siteName ||
+    siteDefaults.shortName ||
+    siteDefaults.title ||
+    "Organization";
+
+  // normalize founders: always an array internally
+  const rawFounder = (siteDefaults as any).founder ?? (org as any).founder;
+  const foundersArray = Array.isArray(rawFounder)
+    ? rawFounder
+    : rawFounder
+    ? [rawFounder]
+    : undefined;
 
   const merged = {
     type: siteDefaults.organizationType || "Organization",
-    name: brandName,                         // public brand name
+    name: brandName,
     url: siteDefaults.siteUrl || "/",
     email:
       org.email ||
@@ -51,17 +61,16 @@ function getPrimaryOrgConfig() {
       siteDefaults.admin?.email ||
       siteDefaults.incharge?.email,
 
-    // A simple fallback-only field if resolver ever needs it
-    // (prefer leaving this undefined so resolver chooses from manifest)
     logo: undefined as unknown as string,
 
     sameAs: sameAsFromSite(),
 
-    // contacts/address
     contact: {
       email: siteDefaults.contact?.email || siteDefaults.incharge?.contact?.email,
       phone: siteDefaults.contact?.phone || siteDefaults.incharge?.contact?.phone,
-      whatsapp: siteDefaults.contact?.whatsapp || siteDefaults.incharge?.contact?.whatsapp,
+      whatsapp:
+        siteDefaults.contact?.whatsapp ||
+        siteDefaults.incharge?.contact?.whatsapp,
     },
     address: {
       streetAddress: siteDefaults.address?.streetAddress,
@@ -71,7 +80,6 @@ function getPrimaryOrgConfig() {
       addressCountry: siteDefaults.address?.addressCountry,
     },
 
-    // legal/registration bits
     legalName: siteDefaults.legalName || org.legalName,
     jurisdictionCountry: siteDefaults.jurisdictionCountry || org.jurisdictionCountry,
     jurisdictionRegion: siteDefaults.jurisdictionRegion || org.jurisdictionRegion,
@@ -80,7 +88,7 @@ function getPrimaryOrgConfig() {
 
     // leadership
     incharge: (siteDefaults as any).incharge || org.incharge,
-    founder: (siteDefaults.founder?.name || org.founder?.name) ? (siteDefaults as any).founder || org.founder : undefined,
+    founder: foundersArray, // <-- always array or undefined
   };
 
   (merged as any).url = toAbsoluteUrl(merged.url);
@@ -171,21 +179,38 @@ function orgLogoImageObject() {
 }
 
 
-/** Optional “incharge” (person) or “founder” (person) blocks when present */
-function maybePerson(p?: any) {
+function buildPersonNode(p?: any) {
   if (!p?.name) return undefined;
-  const personId= toAbsoluteUrl(p.internalId);
+
+  // Stable @id for the person
+  const baseId = p.internalId
+    ? toAbsoluteUrl(p.internalId)
+    : (p.url ? toAbsoluteUrl(p.url) : undefined);
+
   const node: Record<string, any> = {
     "@type": "Person",
     name: p.name,
-    id: personId + '#person',
+    ...(baseId ? { "@id": baseId + "#person" } : {}),
     ...(p.url ? { url: toAbsoluteUrl(p.url) } : {}),
     ...(p.jobTitle ? { jobTitle: p.jobTitle } : {}),
     ...(p.email ? { email: normalizeEmail(p.email) } : {}),
-    ...(Array.isArray(p.sameAs) && p.sameAs.length ? { sameAs: p.sameAs } : {}),
+    ...(Array.isArray(p.sameAs) && p.sameAs.length
+      ? { sameAs: p.sameAs }
+      : {}),
   };
+
   return node;
 }
+
+function buildPeopleArray(maybeMany: any): any[] | undefined {
+  if (!maybeMany) return undefined;
+  const arr = Array.isArray(maybeMany) ? maybeMany : [maybeMany];
+  const built = arr
+    .map((p) => buildPersonNode(p))
+    .filter(Boolean);
+  return built.length ? built : undefined;
+}
+
 
 /** ContactPoint arrays (customer support / WhatsApp) */
 function contactPoints() {
@@ -245,13 +270,30 @@ function buildParentOrganizationNode() {
     "@id": parentOrgId,
     name: cfg.name,
     url: parentOrgUrl,
-    ...(cfg.legalName ? { legalName: cfg.legalName } : {}),
-    ...(cfg.jurisdictionCountry ? { areaServed: cfg.jurisdictionCountry } : {}),
-    ...(cfg.foundingDate ? { foundingDate: cfg.foundingDate } : {}),
-    ...(cfg.registrationId ? { identifier: cfg.registrationId } : {}),
-    ...(Array.isArray(cfg.sameAs) && cfg.sameAs.length ? { sameAs: cfg.sameAs } : {}),
+
+    ...(cfg.legalName
+      ? { legalName: cfg.legalName }
+      : {}),
+
+    // areaServed can be a country/region string. We're using jurisdictionCountry like before.
+    ...(cfg.jurisdictionCountry
+      ? { areaServed: cfg.jurisdictionCountry }
+      : {}),
+
+    ...(cfg.foundingDate
+      ? { foundingDate: cfg.foundingDate }
+      : {}),
+
+    ...(cfg.registrationId
+      ? { identifier: cfg.registrationId }
+      : {}),
+
+    ...(Array.isArray(cfg.sameAs) && cfg.sameAs.length
+      ? { sameAs: cfg.sameAs }
+      : {}),
   };
 
+  // Attach parent organization logo if available
   const parentLogo = resolveLogoFromManifest({
     manifest,
     kind: "parentOrganization",
@@ -260,14 +302,35 @@ function buildParentOrganizationNode() {
   }) as { url?: string; width?: number };
 
   if (parentLogo?.url) {
-    node.logo = { "@type": "ImageObject", url: parentLogo.url, ...(parentLogo.width ? { width: parentLogo.width } : {}) };
+    node.logo = {
+      "@type": "ImageObject",
+      url: parentLogo.url,
+      ...(parentLogo.width ? { width: parentLogo.width } : {}),
+    };
   }
 
-  const pFounder = maybePerson(cfg.founder);
-  if (pFounder) node.founder = pFounder;
+  // 🔁 Founders (can be one or many)
+  // cfg.founder may now be a single object OR an array of founders.
+  const parentFounders = buildPeopleArray((cfg as any).founder);
+  if (parentFounders) {
+    node.founder =
+      parentFounders.length === 1 ? parentFounders[0] : parentFounders;
+  }
 
-  return { parentNode: node, parentOrgId };
+  // 🔁 Incharge / key contact (optional, mirrors what we do for main org)
+  const parentIncharge = buildPeopleArray((cfg as any).incharge);
+  if (parentIncharge) {
+    // we expose them as `employee` so Google still understands it's a Person
+    node.employee =
+      parentIncharge.length === 1 ? parentIncharge[0] : parentIncharge;
+  }
+
+  return {
+    parentNode: node,
+    parentOrgId,
+  };
 }
+
 
 /** Build a single, canonical Organization node with proper @id references.
  *  Ensures brand and parentOrganization use @id links only (no inline types).
@@ -305,12 +368,24 @@ export function buildOrganizationSchema() {
     
   };
 
-  // Leadership
-  const founder = maybePerson(orgCfg.founder);
-  if (founder) node.founder = founder;
+// Leadership / Founders
+const founders = buildPeopleArray(orgCfg.founder);
+if (founders) {
+  // schema.org allows Organization.founder to be Person OR [Person, ...]
+  node.founder = founders.length === 1 ? founders[0] : founders;
+}
 
-  const incharge = maybePerson(orgCfg.incharge);
-  if (incharge) node.employee = incharge; // or "director" per preference
+// Primary contact / director-ish person
+const inchargeArr = buildPeopleArray(orgCfg.incharge);
+if (inchargeArr) {
+  // You can choose how to expose this.
+  // Option A: treat as employees (array)
+  node.employee = inchargeArr.length === 1 ? inchargeArr[0] : inchargeArr;
+
+  // Option B: also expose as contactPoint[0]?.contactType = "director/CEO"
+  // if you want Google to understand leadership, but that's optional.
+}
+
 
   // ✅ Final export structure
   return {

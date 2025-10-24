@@ -2,43 +2,40 @@
 import type { StaticPageDefaults, PageFlags, PageKey } from '../types/siteDefaults';
 import { normalizePageFlags } from '../types/siteDefaults';
 
-const SITE_NAME = "VerifiedApostille";
-const CONTACT_EMAIL = "contact@verifiedapostille.com";
+const SITE_NAME = "VigaNova";
+const CONTACT_EMAIL = "contact@viganova.com";
 
 export const siteDefaults = {
   siteName: SITE_NAME,
-  shortName: "VerifiedApostille",
+  shortName: "VigaNova",
   publishedDate: "September 12 2025",
 
-  cloudflareUrl: "https://verifiedapostille.pages.dev",
+  cloudflareUrl: "https://viganova.pages.dev",
 
-  domainName: "verifiedapostille.com",
-  siteUrl: "https://verifiedapostille.com/", // ensure trailing slash
+  domainName: "viganova.com",
+  siteUrl: "https://viganova.com/", // ensure trailing slash
 
-  title: `VerifiedApostille - Fast & Secure Apostille Services in India for NRI & Residents`,
+  title: `Viga Nova Green Energy Solutions`,
   description:
-    "MEA apostille, attestation services with fast, secure, discounts & free premium worldwide delivery options. Trusted by NRIs & residents across India.",
+    "Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies",
   keywords: [
-    "Apostille Services India",
-    "MEA Approved Apostille",
-    "Degree Certificate Apostille",
-    "Document Authentication",
-    "Apostille for Visa",
-    "Study Abroad Apostille",
-    "PCC Apostille",
-    "Marriage Certificate Apostille",
-    "Business Document Apostille",
+    "green energy",
+    "sustainability",
+    "renewable energy",
+    "solar power",
+    "hydrogen energy solutions",
+    "electrolyzers"
   ],
 
   socialLinks: {
-    x: "verifiedapostille", // handle WITHOUT @
-    // github: "https://github.com/VerifiedApostille",
-    // linkedin: "https://linkedin.com/company/VerifiedApostille",
-    facebook: "https://facebook.com/verifiedapostille",
-    instagram: "https://instagram.com/verifiedapostille",
-    // youtube: "https://youtube.com/@VerifiedApostille",
-    // mastodon: "https://mastodon.social/@VerifiedApostille",
-    // bluesky: "https://bsky.app/profile/VerifiedApostille",
+    x: "viganova", // handle WITHOUT @
+    // github: "https://github.com/VigaNova",
+    // linkedin: "https://linkedin.com/company/VigaNova",
+    facebook: "https://facebook.com/viganova",
+    instagram: "https://instagram.com/viganova",
+    // youtube: "https://youtube.com/@VigaNova",
+    // mastodon: "https://mastodon.social/@VigaNova",
+    // bluesky: "https://bsky.app/profile/VigaNova",
     email: CONTACT_EMAIL,
   },
 
@@ -50,19 +47,19 @@ export const siteDefaults = {
 
   contact: {
     email: CONTACT_EMAIL,
-    phone: "+919047433266",
-    whatsapp: "919047433266",
-    phone2: "+919789629727",
-    whatsapp2: "919789629727",
+    phone: "+919715359576",
+    whatsapp: "919715359576",
+    phone2: "",
+    whatsapp2: "",
   },
   address: {
-    streetAddress: "Shop No. 912, Johnson Complex, Rajaji Nagar",
-    addressLocality: "Thanjavur",
+    streetAddress: "46/1, Thiyagarajapuram Road, Sankarapuram",
+    addressLocality: "Villupuram",
     addressRegion: "Tamil Nadu",
-    postalCode: "613004",
+    postalCode: "606401",
     addressCountry: "India",
     addressCountryCode: "IN", // ISO 3166-1 alpha-2 https://wikipedia.org/wiki/ISO_3166-1
-    googleMap: "https://maps.app.goo.gl/YFQ5zVLgmkHaGK5x7",
+    googleMap: "",
   },
   // incharge of the organization (main contact person)
   incharge: {
@@ -73,8 +70,8 @@ export const siteDefaults = {
     jobTitle: "Founder & CEO",
     contact: {
       email: "praba@thenviews.com",
-      phone: "+919789629727",
-      whatsapp: "919789629727",
+      phone: "+919715359576",
+      whatsapp: "919715359576",
     },
     image: "",
     url: "https://prabakaranshankar.com",
@@ -90,30 +87,48 @@ export const siteDefaults = {
   organizationType: "Organization", // Person | Airline | Consortium | Cooperative | Corporation | EducationalOrganization | FundingScheme | GovernmentOrganization | LibrarySystem | LocalBusiness | MedicalOrganization | NGO | NewsMediaOrganization | OnlineBusiness | PerformingGroup | PoliticalParty | Project | ResearchOrganization | SearchRescueOrganization | SportsOrganization | WorkersUnion
 
   jurisdictionCountry: "IN",
-  jurisdictionRegion: "TN-Thanjavur", // free text OK
-  foundingDate: "2025-09-01",
+  jurisdictionRegion: "TN-Villupuram", // free text OK
+  foundingDate: "2025-10-10",
   // dissolutionDate: '',
-  legalName: "",
+  legalName: "Viga Nova Green Energy Pvt. Ltd.",
   taxId: "",
   registrationId: "",
-  founder: {
-    type: "Person",
-    name: "Prabakaran Shankar",
-    email: "praba@thenviews.com",
-    jobTitle: "Founder & CEO",
-    contact: {
-      email: "praba@thenviews.com",
-      phone: "+919789629727",
-      whatsapp: "919789629727",
-    },
-    image: "",
-    url: "https://prabakaranshankar.com",
-    internalId: "team/prabakaran-shankar/",
-    sameAs: [
-      "https://linkedin.com/in/prabakaranshankar",
-      "https://x.com/@madanpraba",
+  founder: [
+      {
+        type: "Person",
+        name: "TAMILSELVAN",
+        email: "tamilselvan@viganova.com",
+        jobTitle: "Co-Founder",
+        contact: {
+          email: "tamilselvan@viganova.com",
+          phone: "+91xxxxxxxxxx",
+          whatsapp: "91xxxxxxxxxx",
+        },
+        image: "",
+        url: "https://viganova.com/team/tamilselvan",
+        internalId: "team/tamilselvan/",
+        sameAs: [
+          "https://linkedin.com/in/tamilselvan",
+        ],
+      },
+      {
+        type: "Person",
+        name: "SINRAJ SIVAKUMAR",
+        email: "sinraj@viganova.com",
+        jobTitle: "Co-Founder",
+        contact: {
+          email: "sinraj@viganova.com",
+          phone: "+91yyyyyyyyyy",
+          whatsapp: "91yyyyyyyyyy",
+        },
+        image: "",
+        url: "https://viganova.com/team/sinraj",
+        internalId: "team/sinraj/",
+        sameAs: [
+          "https://linkedin.com/in/sinraj",
+        ],
+      },
     ],
-  },
 
   // Organization block (main entity). If this is removed or partial,
   // schemaOrganization.ts will fill from site-level fields.
@@ -122,58 +137,76 @@ export const siteDefaults = {
     type: "Organization", // Change to 'Person' if site is personal brand
 
     // Common fields (both Organization & Person use name, url, logo, sameAs)
-    name: "NViews Media Private Limited", // or 'Prabakaran Shankar' if type = 'Person'
-    url: "https://thenviews.com/", // ensure trailing slash
-    email: "admin@thenviews.com",
+    name: "Viga Nova Green Energy Pvt. Ltd.", // or 'Prabakaran Shankar' if type = 'Person'
+    url: "https://viganova.com/", // ensure trailing slash
+    email: "admin@viganova.com",
     // put it in src/assets/images/logos/ 
-    logo: "src/assets/images/logos/nviews-logo.png",
+    logo: "",
     sameAs: [
-      "https://linkedin.com/company/thenviews/",
-      "https://prabakaranshankar.com",
+      "https://linkedin.com/company/viganova/",
+      
     ],
     contact: {
-      email: "contact@thenviews.com",
-      phone: "+919789629727",
-      whatsapp: "919789629727",
+      email: "contact@viganova.com",
+      phone: "+919715359576",
+      whatsapp: "919715359576",
     },
     address: {
-      streetAddress: "Shop No. 912, Johnson Complex, Rajaji Nagar",
-      addressLocality: "Thanjavur",
+      streetAddress: "46/1, Thiyagarajapuram Road, Sankarapuram",
+      addressLocality: "Villupuram",
       addressRegion: "Tamil Nadu",
-      postalCode: "613004",
+      postalCode: "606401",
       addressCountry: "India",
       addressCountryCode: "IN", // ISO 3166-1 alpha-2 https://wikipedia.org/wiki/ISO_3166-1
-      googleMap: "https://maps.app.goo.gl/YFQ5zVLgmkHaGK5x7",
-    },    
+      googleMap: "",
+    },   
 
     jurisdictionCountry: "IN",
-    jurisdictionRegion: "TN-Thanjavur", // free text OK
-    foundingDate: "2020-01-01",
+    jurisdictionRegion: "TN-Villupuram", // free text OK
+    foundingDate: "2025-10-10",
     // dissolutionDate: '',
-    legalName: "NViews Media Private Limited",
+    legalName: "Viga Nova Green Energy Private Limited",
     taxId: "",
-    registrationId: "U74999TN2020PTC135205",
+    registrationId: "U20191TN2025PTC185265",
     vatId: "",
     dunsId: "",
 
-    founder: {
-      type: "Person",
-      name: "Prabakaran Shankar",
-      email: "praba@thenviews.com",
-      jobTitle: "Founder & CEO",
-      contact: {
-        email: "praba@thenviews.com",
-        phone: "+919789629727",
-        whatsapp: "919789629727",
+    founder: [
+      {
+        type: "Person",
+        name: "TAMILSELVAN",
+        email: "tamilselvan@viganova.com",
+        jobTitle: "Co-Founder",
+        contact: {
+          email: "tamilselvan@viganova.com",
+          phone: "+91xxxxxxxxxx",
+          whatsapp: "91xxxxxxxxxx",
+        },
+        image: "",
+        url: "https://viganova.com/team/tamilselvan",
+        internalId: "team/tamilselvan/",
+        sameAs: [
+          "https://linkedin.com/in/tamilselvan",
+        ],
       },
-      image: "",
-      url: "https://prabakaranshankar.com",
-      internalId: "team/prabakaran-shankar/",
-      sameAs: [
-        "https://linkedin.com/in/prabakaranshankar",
-        "https://x.com/@madanpraba",
-      ],
-    },
+      {
+        type: "Person",
+        name: "SINRAJ SIVAKUMAR",
+        email: "sinraj@viganova.com",
+        jobTitle: "Co-Founder",
+        contact: {
+          email: "sinraj@viganova.com",
+          phone: "+91yyyyyyyyyy",
+          whatsapp: "91yyyyyyyyyy",
+        },
+        image: "",
+        url: "https://viganova.com/team/sinraj",
+        internalId: "team/sinraj/",
+        sameAs: [
+          "https://linkedin.com/in/sinraj",
+        ],
+      },
+    ],
   },
 /**
  * add svg in public/icons/ and name here
@@ -212,8 +245,8 @@ export const siteDefaults = {
 
   collections: {
     blog: {
-      index: true,
-      sitemap: true,
+      index: false,
+      sitemap: false,
       base: "blog",
       label: "Blog",
       title: "Blog",
@@ -226,8 +259,8 @@ export const siteDefaults = {
       showInFooterNav: false,
     },
     service: {
-      index: true,
-      sitemap: true,
+      index: false,
+      sitemap: false,
       base: "services",
       label: "Services",
       rss: true,
@@ -238,8 +271,8 @@ export const siteDefaults = {
       showInFooterNav: true,
     },
     resource: {
-      index: true,
-      sitemap: true,
+      index: false,
+      sitemap: false,
       base: "resources",
       label: "Resources",
       rss: true,
@@ -250,8 +283,8 @@ export const siteDefaults = {
       showInFooterNav: true,
     },
     post: {
-      index: true,
-      sitemap: true,
+      index: false,
+      sitemap: false,
       base: "",
       label: "Post",
       rss: false,
@@ -262,8 +295,8 @@ export const siteDefaults = {
       showInFooterNav: false,
     },
     videos: {
-      index: true,
-      sitemap: true,
+      index: false,
+      sitemap: false,
       base: "videos",
       label: "Videos",
       rss: true,
@@ -274,8 +307,8 @@ export const siteDefaults = {
       showInFooterNav: false,
     },
     audio: {
-      index: true,
-      sitemap: true,
+      index: false,
+      sitemap: false,
       base: "audio",
       label: "Audio",
       rss: false,
@@ -385,10 +418,10 @@ export const siteDefaults = {
       icon: "arrow-uturn-left",
       title: `Refund Policy — Terms for Refunds and Cancellations at ${SITE_NAME}`,
       description: `Understand the refund and cancellation terms for services at ${SITE_NAME}. This page outlines your rights, the process for requesting refunds, and any applicable fees.`,
-      enabled: true,
-      index: true,
-      sitemap: true,
-      showInFooterNav: true,
+      enabled: false,
+      index: false,
+      sitemap: false,
+      showInFooterNav: false,
       path: "/refund-policy/",
       location: "content/pages/Refund.astro",
     },

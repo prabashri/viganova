@@ -1,5 +1,7 @@
  /* colors respect light/dark; tweak if needed */
-
+.object-p-bottom{
+	object-position: bottom;
+}
 .dots-background {
     background-attachment: local;
     background-image: radial-gradient(hsl(232deg 96% 33% / 8%) 1px, transparent 2px);

@@ -5,27 +5,27 @@ export const siteFunctions = {
     /* CAPTCHA KEYS (for forms, comments, etc.) -------------------------- */
     turnstileEnabled: true,
     // sitekey from easyapostille.in Cloudflare dashboard
-    turnstileSitekey: "0x4AAAAAAB5d0h3hP88waWBq", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
+    turnstileSitekey: "", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
     turnstileSitekeyTest: "1x00000000000000000000AA", // test key, always passes
     turnstileSecretTest: "1x0000000000000000000000000000000AA", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
     /** google adsense account */
-    enableAdSense: true,
-    adsense: "ca-pub-8380181212468292",
+    enableAdSense: false,
+    adsense: "",
 
     enableOtherAds: false, // e.g., Ezoic, Media.net, etc.
 
 
-    googleAnalytics: true, // enable Google Analytics
-    analyticsId: "G-6KCKPN2GF6", // google analytics id   
+    googleAnalytics: false, // enable Google Analytics
+    analyticsId: "", // google analytics id   G-6KCKPN2GF6
     /* by default google analytics used if id provided*/
     googleTag: false, // enable Google Tag Manager
-    googleTagId: "GTM-K9NQ9CBL", // google tag manager id
+    googleTagId: "", // google tag manager id GTM-K9NQ9CBL
     
     ahrefAnalytics: false, // enable Ahrefs Analytics
     ahrefAnalyticsId: "", 
     
     cloudflareAnalytics: false, // enable Cloudflare Web Analytics
-    cloudflareAnalyticsId: "4be9b10a675a4f35bf2dcf007478da91", 
+    cloudflareAnalyticsId: "", 
      /* Cloudflare RUM (auto /cdn-cgi/rum) */
     enableCloudflareRUM: true,   // ← new flag
     

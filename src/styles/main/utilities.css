@@ -591,6 +591,9 @@ hr, .hr {
 .h-fit {
 	height: fit-content;
 }
+.h-100p {
+	height: 100%;
+}
 .h-webkit {
 	height: -webkit-fill-available;
 }
@@ -781,6 +784,7 @@ hr, .hr {
 
 .max-h-80vh {
 	max-height: 80vh;
+
 }
 .max-h-95vh {
 	max-height: 95vh;
@@ -790,9 +794,7 @@ hr, .hr {
 	max-width: 420px;
 }
 
-.max-w-95p {
-	max-width: 95%;
-}
+
 
 .max-w-featured {
 	max-width: var(--featured-image-width, 960px);
@@ -809,6 +811,12 @@ hr, .hr {
 
 .max-w-site {
 	max-width: var(--site-width, 1280px);
+}
+.max-w-95p {
+	max-width: 95%;
+}
+.max-w-100p, .max-w-full {
+	max-width: 100%;
 }
 .outline-none {
 	outline: none;
@@ -863,6 +871,7 @@ hr, .hr {
 .object-contain{
 	object-fit: contain;
 }
+
 .overflow-wrap-anywhere {
 	overflow-wrap: anywhere;
 }
