@@ -1,13 +1,4 @@
 ---
-// src/components/ScriptFlush.astro
-/* Emits scripts for the given position (head|footer).
-   - Merges: (registered scripts) + (global scripts)
-   - Resolves globals via assets-manifest.json (prod hashed / dev original)
-   - Auto-ids when missing
-   - Dedupes by id/src
-   - Sorts by priority
-   - Sanitizes referrerpolicy
-*/
 import manifest from "@/data/assets-manifest.json";
 import {
   getRegisteredScripts,
@@ -22,9 +13,8 @@ interface Props {
   nonce?: string;
   includeGlobals?: boolean;
   clearAfterPrint?: boolean;
-  // Optional tuning (defaults match FilesToLoadJS behavior)
-  devSrcBuster?: boolean;       // default: true
-  preferMinInProd?: boolean;    // default: true
+  devSrcBuster?: boolean;    // default: true
+  preferMinInProd?: boolean; // default: true
 }
 
 const {
@@ -39,7 +29,6 @@ const {
 const isDev = import.meta.env.DEV;
 const bust = (import.meta as any)?.hot?.data?.timestamp ?? Date.now();
 
-// ---------- helpers ----------
 type Cross = "" | "anonymous" | "use-credentials";
 type AnyScript = {
   id?: string;
@@ -53,9 +42,13 @@ type AnyScript = {
   crossOrigin?: Cross;
   referrerPolicy?: ReferrerPolicy;
   data?: Record<string, string | number | boolean>;
-  code?: string;   // inline payload
-  inline?: string; // legacy alias
+  code?: string;
+  inline?: string;
   priority?: number;
+
+  // OPTIONAL convention:
+  // manual === true means "don't auto-load this with <script src>, leave it for my loader"
+  manual?: boolean;
 };
 
 function resolveFromManifest(n?: string): string | null {
@@ -70,26 +63,19 @@ function withDevBuster(u: string) {
 }
 
 function resolveGlobalSrc(name?: string, src?: string): string | null {
-  // If a global provides explicit src, honor it (dev adds buster)
   if (src) return isDev ? withDevBuster(src) : src;
-
   if (!name) return null;
 
   if (isDev) {
-    // Prefer non-minified if manifest happens to exist
     const mf = resolveFromManifest(name);
     if (mf && !mf.endsWith(".min.js")) return withDevBuster(mf);
-    // Conventional dev path
     return withDevBuster(`/scripts/${name}.js`);
   }
 
-  // Production
   const mf = resolveFromManifest(name);
   if (mf) return mf;
 
   if (preferMinInProd) return `/scripts/${name}.min.js`;
-
-  // Last resort
   return `/scripts/${name}.js`;
 }
 
@@ -100,47 +86,74 @@ function basenameNoExt(u: string): string {
 }
 
 function pickId(s: AnyScript, resolvedSrc?: string): string | undefined {
-  return s.id || s.name || (resolvedSrc ? basenameNoExt(resolvedSrc) : undefined);
+  return (
+    s.id ||
+    s.name ||
+    (resolvedSrc ? basenameNoExt(resolvedSrc) : undefined)
+  );
 }
 
 function dataSpread(d?: Record<string, string | number | boolean>) {
   if (!d) return {};
-  return Object.fromEntries(Object.entries(d).map(([k, v]) => [`data-${k}`, String(v)]));
+  return Object.fromEntries(
+    Object.entries(d).map(([k, v]) => [`data-${k}`, String(v)])
+  );
+}
+
+/* NEW:
+   decide whether this script should be manual-loaded (data-src only)
+   Rules you control:
+   - explicit s.manual === true
+   - OR data.lazy === "true"/"1"
+*/
+function shouldManualLoad(s: AnyScript): boolean {
+  if (s.manual === true) return true;
+  const lazyFlag = s.data?.lazy;
+  if (lazyFlag === "true" || lazyFlag === "1") return true;
+  return false;
 }
 
 // ---------- read & merge ----------
 const registered: AnyScript[] = (getRegisteredScripts(position) || []) as AnyScript[];
 const globalsRaw: AnyScript[] = includeGlobals ? (getGlobalScripts(position) || []) : [];
 
-// Resolve globals to final src using manifest/dev logic
+// Resolve globals -> final src (hashed/minified/etc)
 const globalsResolved: AnyScript[] = globalsRaw.map((g) => {
   const finalSrc = resolveGlobalSrc(g.name, g.src || undefined);
   const id = pickId(g, finalSrc || undefined);
   return { ...g, id, src: finalSrc || undefined };
 });
 
-// merged: globals first (priority still controls final order)
+// globals first, then registered
 let list: AnyScript[] = [...globalsResolved, ...registered];
 
-// normalize computed flags for template
+// normalize
 const normalized = list.map((s) => {
   const inlinePayload = s.code ?? s.inline ?? "";
-  const isModule = s.module !== false && !s.nomodule;    // default module=true unless nomodule
-  const shouldDefer = !s.async && s.defer !== false;     // default defer=true unless async or explicitly false
+  const isModule = s.module !== false && !s.nomodule; // default = module unless nomodule
+  const shouldDefer = !s.async && s.defer !== false;  // default = defer unless async or explicitly false
   const refp = sanitizeReferrerPolicy(s.referrerPolicy);
+
+  // decide src vs data-src
+  const manual = shouldManualLoad(s);
+  const attrName = manual ? "data-src" : "src";
+  const attrValue = s.src; // resolved earlier
 
   return {
     ...s,
     id: s.id ?? pickId(s, s.src),
     __inline: inlinePayload,
-    __hasInline: Boolean(inlinePayload) && !s.src,
+    __hasInline: Boolean(inlinePayload) && !s.src, // inline-only means no external src
     __isModule: isModule,
     __shouldDefer: shouldDefer,
     __referrer: refp,
+    __manual: manual,
+    __srcAttrName: attrName as "src" | "data-src",
+    __srcAttrValue: attrValue,
   };
 });
 
-// dedupe by (id || src)
+// dedupe by (id || src || inline)
 const seen = new Set<string>();
 const deduped = normalized.filter((s) => {
   const key =
@@ -152,7 +165,7 @@ const deduped = normalized.filter((s) => {
   return true;
 });
 
-// sort by priority asc, then stable name/id/src
+// sort stable by priority then id/name
 const sorted = deduped.sort((a, b) => {
   const pa = a.priority ?? 0;
   const pb = b.priority ?? 0;
@@ -171,8 +184,8 @@ const sorted = deduped.sort((a, b) => {
       nomodule={s.nomodule ? true : undefined}
       nonce={nonce}
       integrity={s.integrity}
-      crossorigin={s.crossOrigin} 
-      referrerpolicy={s.__referrer} 
+      crossorigin={s.crossOrigin}
+      referrerpolicy={s.__referrer}
       {...dataSpread(s.data)}
     >
       {s.__inline}
@@ -180,7 +193,9 @@ const sorted = deduped.sort((a, b) => {
   ) : (
     <script
       id={s.id}
-      src={s.src}
+      {...{
+        [s.__srcAttrName]: s.__srcAttrValue,
+      }}
       type={s.__isModule ? "module" : undefined}
       async={s.async ? true : undefined}
       defer={s.async ? undefined : (s.__shouldDefer ? true : undefined)}

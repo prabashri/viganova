@@ -56,7 +56,9 @@ svg use {
   }
 }
 
-
+.w-120{
+    width: 120px;
+}
 .sm-display {
   display: block
 }
@@ -74,14 +76,14 @@ svg use {
   flex-direction: column;
   background-color: var(--bg); /* optional styling */
 }
-
+/*
 .sm-display-inherit, .full-display-none, .display {
   display: inherit 
 }
 .big-display-inherit, .sm-display-none, .display-none {
   display: none 
 }
-
+*/
 @media (min-width: 768px) {
 	.md-ai-center {
 	    align-items:center;	
@@ -96,7 +98,7 @@ svg use {
   .sm-display-inherit, .full-display-none {
   display: none;
   }
-  .big-display-inherit, .sm-display-none {
+  .big-display-inherit {
     display: inherit
   }
   .big-absolute{
@@ -173,3 +175,5 @@ header a:hover,
 footer a:hover {
   text-decoration: underline; /* Or custom hover style */
 }
+
+

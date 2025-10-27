@@ -8,6 +8,7 @@ import FaqList from '@/components/ui/FaqList.astro';
 import { Icon } from 'astro-icon/components';
 import { buildWhatsAppLink } from '@/utils/whatsapp';
 import { getAllReviews, getGlobalAggregate } from "@/utils/reviews";
+import Card from '@/components/ui/Card.astro';
 
 import StarRating from '@/components/ui/StarRating.astro';
 
@@ -101,136 +102,209 @@ const faq = [
       variant="desktop" 
       id="hero-image"
     />    
-    <div id="hero-section" class="flex flex-col big-flex-row max-w-featured mx-auto w-100p py-2 px-1 ai-center jc-center gap relative">
-            {/** Left: Text */}
-            {/** Right: Image */}
-            
-            <div class="hero-text flex-1 relative col-primary ta-start">
-                <h1 class="post-title regular text-base">
-                    Viga Nova Green Energy Solutions
-                </h1>
-                <h2 class="text-5xl">
-                  Advancing Clean Green Energy, Shaping Tomorrow
-                </h2>
-                <p>
-                Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies
-                </p>
+    <div id="hero-section" class="flex flex-col big-flex-row max-w-featured mx-auto w-100p py-2 px-1 ai-center jc-center gap relative">            
+      <div class="hero-text flex-1 relative col-primary ta-start">
+        <h1 class="post-title regular text-base">
+            Viga Nova Green Energy Solutions
+        </h1>
+        <h2 class="text-5xl">
+          Advancing Clean Green Energy, Shaping Tomorrow
+        </h2>
+        <p>
+        Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies
+        </p>
+        <div class="cta-container my-1 flex flex-row wrap gap ai-f-start">
+          <Anchor
+            href="#green-energy-production"
+            type="button"
+            variant="primary"
+            ariaLabel="Start Apostille Process on WhatsApp"
+            title="Share certificates or documents securely on WhatsApp to begin"
+            dataId="cta-wa-start"
+            className="cta-button flex flex-col ai-f-start gap-0"
+            dataAction="link_click"
+            dataLabel="WhatsApp • Start Apostille"
+          >
+            <Icon
+              slot="icon-left"
+              name="hydrogen-tank"
+              id="hero-cta-1"
+              class="block round fill-base-100 w-5-0 h-5-0"
+              aria-hidden="true"
+              focusable="false"
+            />
+            Green Hydrogen Production 
+          </Anchor>
+          <Anchor
+            href="#electrolyzer-systems"
+            type="button"
+            variant="primary"
+            ariaLabel="Start Apostille Process on WhatsApp"
+            title="Share certificates or documents securely on WhatsApp to begin"
+            dataId="cta-wa-start"
+            className="cta-button flex flex-col ai-f-start gap-0"
+            dataAction="link_click"
+            dataLabel="WhatsApp • Start Apostille"
+          >
+            <Icon
+              slot="icon-left"
+              name="electrochemistry"
+              id="hero-cta-1"
+              class="block round fill-base-100 w-5-0 h-5-0"
+              aria-hidden="true"
+              focusable="false"
+            />
+            Electrolyzer Systems
+          </Anchor>
 
-            
-
-                <div class="cta-container my-1 flex flex-row wrap gap ai-f-start">
-                    <Anchor
-                        href="#green-energy-production"
-                        type="button"
-                        variant="primary"
-                        ariaLabel="Start Apostille Process on WhatsApp"
-                        title="Share certificates or documents securely on WhatsApp to begin"
-                        dataId="cta-wa-start"
-                        className="cta-button"
-                        dataAction="link_click"
-                        dataLabel="WhatsApp • Start Apostille"
-                    >
-                        <Icon
-                            slot="icon-left"
-                            name="whatsapp"
-                            id="hero-cta-1"
-                            class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                            aria-hidden="true"
-                            focusable="false"
-                        />
-                        Green Hydrogen Production 
-                    </Anchor>
-                    <Anchor
-                        href="#electrolyzer-systems"
-                        type="button"
-                        variant="primary"
-                        ariaLabel="Start Apostille Process on WhatsApp"
-                        title="Share certificates or documents securely on WhatsApp to begin"
-                        dataId="cta-wa-start"
-                        className="cta-button"
-                        dataAction="link_click"
-                        dataLabel="WhatsApp • Start Apostille"
-                    >
-                        <Icon
-                            slot="icon-left"
-                            name="whatsapp"
-                            id="hero-cta-1"
-                            class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                            aria-hidden="true"
-                            focusable="false"
-                        />
-                        Electrolyzer Systems
-                    </Anchor>
-
-                    <Anchor
-                        href="#green-ammonia-urea"
-                        type="button"
-                        variant="primary"
-                        ariaLabel="Start Apostille Process on WhatsApp"
-                        title="Share certificates or documents securely on WhatsApp to begin"
-                        dataId="cta-wa-start"
-                        className="cta-button"
-                        dataAction="link_click"
-                        dataLabel="WhatsApp • Start Apostille"
-                    >
-                        <Icon
-                            slot="icon-left"
-                            name="whatsapp"
-                            id="hero-cta-1"
-                            class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                            aria-hidden="true"
-                            focusable="false"
-                        />
-                        Green Ammonia &amp; Urea 
-                    </Anchor>
+          <Anchor
+            href="#green-ammonia-urea"
+            type="button"
+            variant="primary"
+            ariaLabel="Start Apostille Process on WhatsApp"
+            title="Share certificates or documents securely on WhatsApp to begin"
+            dataId="cta-wa-start"
+            className="cta-button flex flex-col ai-f-start gap-0"
+            dataAction="link_click"
+            dataLabel="WhatsApp • Start Apostille"
+          >
+            <Icon
+              slot="icon-left"
+              name="ammonia"
+              id="hero-cta-1"
+              class="block round fill-base-100 w-5-0 h-5-0"
+              aria-hidden="true"
+              focusable="false"
+            />
+            Green Ammonia &amp; Urea 
+          </Anchor>
 
 
-                    <Anchor
-                        href="#rd-consulting"
-                        type="button"
-                        variant="secondary"
-                        ariaLabel="Get a free consultation and quote via WhatsApp"
-                        title="Request a free consultation and quote on WhatsApp"
-                        dataId="cta-wa-quote" data-action="link_click" data-label="WhatsApp • Get a Free Consultation"
-                        className="cta-button secondary"
-                    >
-                        <Icon
-                            slot="icon-left"
-                            name="whatsapp"
-                            id="hero-cta-2"
-                            class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                            aria-hidden="true"
-                            focusable="false"
-                        />
-                        R&amp;D &amp; Consulting
-                    </Anchor>
-                </div>				
-            </div>
-            
-        </div>      
-    </header>
-    <section id="about-us-section" class="max-w-full w-100p mx-auto my-1 p-2" aria-labelledby="about-us-section">
-        <div class="max-w-featured w-100p mx-auto my-2 p-2">
-          <h2 id="about-us-heading" class="ta-center">
-              About Viga Nova Green Energy
-            </h2>
-            <p class="ta-center my-1">
-              We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
-            </p>
-            <Anchor variant="primary" href="/about-us/">Learn More About Us</Anchor>
-        </div>
-      </section>
-      <section id="about-us-section" class="max-w-full w-100p mx-auto my-1 p-2" aria-labelledby="about-us-section">
-        <div class="max-w-featured w-100p mx-auto my-2 p-2">
-          <h2 id="about-us-heading" class="ta-center">
-             Our Focus Areas
-            </h2>
-            <p class="ta-center my-1">
-              We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
-            </p>
-            <Anchor variant="primary" href="/about-us/">Learn More About Us</Anchor>
-        </div>
-      </section>
+          <Anchor
+            href="#rd-consulting"
+            type="button"
+            variant="secondary"
+            ariaLabel="Get a free consultation and quote via WhatsApp"
+            title="Request a free consultation and quote on WhatsApp"
+            dataId="cta-wa-quote" data-action="link_click" data-label="WhatsApp • Get a Free Consultation"
+            className="cta-button secondary flex flex-col ai-f-start gap-0"
+          >
+            <Icon
+              slot="icon-left"
+              name="chemical-beakers"
+              id="hero-cta-2"
+              class="block round fill-base-100 w-5-0 h-5-0"
+              aria-hidden="true"
+              focusable="false"
+            />
+            R&amp;D &amp; Consulting
+          </Anchor>
+        </div>				
+      </div>            
+    </div>      
+  </header>
+  <section id="about-us-section" class="max-w-full w-100p mx-auto my-1 p-2" aria-labelledby="about-us-section">
+    <div class="max-w-featured w-100p mx-auto my-2 p-2 ji-center">
+      <h2 id="about-us-heading" class="ta-center">
+        About Viga Nova Green Energy
+      </h2>
+      <p class="ta-center my-1">
+        We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
+      </p>
+      <Anchor className="w-fit" variant="primary" href="/about-us/">Learn More About Us</Anchor>
+    </div>
+  </section>
+  <section id="about-us-section" class="max-w-full w-100p mx-auto" aria-labelledby="about-us-section">
+    <div class="max-w-featured w-100p mx-auto my-2 p-2">
+      <h2 id="about-us-heading" class="ta-center">
+          Our Focus Areas
+        </h2>
+        <p class="ta-center my-1">
+          We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
+        </p>
+        <Anchor className="w-fit" variant="primary" href="/about-us/">Learn More About Us</Anchor>
+    </div>
+    <div id="green-energy-production" class="card-container flex flex-col big-flex-row-reverse max-w-featured w-100p mx-auto my-2 p-2">
+      <div class="card-content flex-1 px-2">
+        <Icon slot="icon-left" name="hydrogen-tank" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
+        <h3 class="card-title my-s-0">Green Hydrogen Production</h3>
+        <p class="card-description">Innovative solutions for green hydrogen production.</p>
+        <Anchor className="w-fit" variant="primary" href="/services/green-hydrogen/">Learn More</Anchor>
+      </div>
+      <ResponsiveImage
+        src="hydrogen-production.jpg"
+        alt="hydrogen-production"
+        title="Hydrogen Production"
+        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
+        className="card-image w-100p h-200px object-cover br-r flex-1"
+        imageClassName=''
+        loading="lazy"
+        variant="desktop" 
+        id="card-image-1"
+      />      
+    </div>
+
+    <div id="electrolyzer-systems" class="card-container flex flex-col big-flex-row max-w-featured w-100p mx-auto my-2 p-2">      
+      <div class="card-content flex-1 px-2">
+        <Icon slot="icon-left" name="electrochemistry" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
+        <h3 class="card-title my-s-0">Electrolyzer Systems</h3>
+        <p class="card-description">Innovative solutions for electrolyzer systems.</p>
+        <Anchor className="w-fit" variant="primary" href="/services/electrolyzer-systems/">Learn More</Anchor>
+      </div>
+      <ResponsiveImage
+        src="electrolyzer-tech.jpg"
+        alt="Electrolyzer Systems"
+        title="Electrolyzer Systems"
+        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
+        className="card-image w-100p h-200px object-cover br-r flex-1"
+        imageClassName=''
+        loading="lazy"
+        variant="desktop" 
+        id="card-image-2"
+      />
+    </div>
+
+    <div id="green-ammonia-urea" class="card-container flex flex-col big-flex-row-reverse max-w-featured w-100p mx-auto my-2 p-2">
+      
+      <div class="card-content flex-1 px-2">
+        <Icon slot="icon-left" name="ammonia" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
+        <h3 class="card-title my-s-0">Green Ammonia Production</h3>
+        <p class="card-description">Innovative solutions for green ammonia production.</p>
+        <Anchor className="w-fit" variant="primary" href="/services/green-ammonia/">Learn More</Anchor>
+      </div>
+      <ResponsiveImage
+        src="green-ammonia.jpg"
+        alt="green-ammonia"
+        title="Green Ammonia"
+        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
+        className="card-image w-100p h-200px object-cover br-r flex-1"
+        imageClassName=''
+        loading="lazy"
+        variant="desktop" 
+        id="card-image-3"
+      />
+    </div>
+
+    <div id="rd-consulting" class="card-container flex flex-col big-flex-row max-w-featured w-100p mx-auto my-2 p-2">      
+      <div class="card-content flex-1 px-2">
+        <Icon slot="icon-left" name="chemical-beakers" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
+        <h3 class="card-title my-s-0">Research & Development Consulting</h3>
+        <p class="card-description">Innovative solutions for research and development.</p>
+        <Anchor className="w-fit" variant="primary" href="/services/research-development/">Learn More</Anchor>
+      </div>
+      <ResponsiveImage
+        src="research-lab.jpg"
+        alt="Research & Development Consulting"
+        title="Research & Development Consulting"
+        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
+        className="card-image w-100p h-200px object-cover br-r flex-1"
+        imageClassName=''
+        loading="lazy"
+        variant="desktop" 
+        id="card-image-2"
+      />
+    </div>
+  </section>
   
     { /*-- Link added --*/ }
 <section id="why-VerifiedApostille" class="max-w-site w-100p mx-auto my-1 p-2" aria-labelledby="why-VerifiedApostille-h2">

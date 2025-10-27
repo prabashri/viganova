@@ -60,12 +60,12 @@ const dataId = index ? `nav-link-item-${index}` : undefined;
   )}
 
   {showDescription ? (
-    <div class="inline-flex flex-col label-block flex-1">
+    <div class="inline-flex flex-col label-block flex-1 big-lh-0">
         <div class="label text-s">{item.label}</div>
-        <div class="description text-xs sm-display-inherit">{item.description}</div>
+        <div class="description text-xs big-display-none">{item.description}</div>
     </div>
     ) : (
-    <div class="inline-flex label text-s flex-1">{item.label}</div>
+    <div class="inline-flex label text-s flex-1 py-05 big-lh-0">{item.label}</div>
     )}
 
 </Anchor>

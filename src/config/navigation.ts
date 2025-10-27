@@ -56,7 +56,7 @@ export const siteNav: NavItem[] = [
     label: 'Our Business',
     href: '/services/',
     type: 'dropdown',
-    iconName: '',
+    iconName: 'gear-wheel',
     menuId: 'dropdown-tools',
     content: [
       {

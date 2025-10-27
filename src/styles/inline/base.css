@@ -41,6 +41,12 @@
   --sidebar-width: 360px;
   --toc-width: 320px;
 
+  /** Line heights */
+  --line-height-base: 1.6;
+  --line-height-lg: 1.5;
+  /* Line height for smaller text or headings */
+  --line-height-sm: 1.4;
+
   /* Shadows */
   --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.1);
   --shadow-base: 0 8px 24px rgba(0, 0, 0, 0.2);
@@ -75,16 +81,14 @@
 Core setup
 */
 html {
-  scroll-behavior: smooth;
-  font-size: 16px; /* Base font size */
-  line-height: 1.5; /* Default line height */
+  scroll-behavior: smooth;  
   height: 100%;
   width: 100%;
   font-display: swap;
 }
 html, body { 
   font-family: var(--font-family-base);  
-  line-height: 1.6;
+  line-height: var(--line-height-base);
   color: var(--text-color);
   background-color: var(--background-color, hsla(230, 100%, 99%, 1.00));
   word-wrap: break-word;
@@ -136,7 +140,7 @@ h6, .text-l, .text-lg, .fs-l {
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-family-heading);
   font-weight: var(--font-weight-bold);
-  line-height: 1.4;
+  line-height: var(--line-height-sm);
   margin-top: clamp(1rem, calc(0.571rem + 1.905vw), 2rem);
   margin-bottom: clamp(0.5rem, calc(0.286rem + 0.952vw), 1rem);
 }

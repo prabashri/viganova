@@ -41,7 +41,7 @@
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-10-24T08:28:21.337Z",
+      "datetime": "2025-10-27T14:00:59.736Z",
       "names": [
         "base",
         "colors",
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.0vbdvn.css",
-      "datetime": "2025-10-24T08:28:24.971Z",
+      "file": "/styles/main.vr50fu.css",
+      "datetime": "2025-10-27T14:01:02.529Z",
       "names": [
         "base",
         "blockquote",
@@ -76,7 +76,7 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-24T08:28:27.626Z",
+      "datetime": "2025-10-27T14:01:05.514Z",
       "names": [
         "audio-layout",
         "contact-form",
@@ -92,7 +92,7 @@
     },
     "pages:home": {
       "file": "",
-      "datetime": "2025-10-24T08:28:27.409Z",
+      "datetime": "2025-10-27T14:01:05.273Z",
       "name": "home",
       "removed": true
     },
@@ -127,12 +127,12 @@
       "inlineModule": "/src/data/page-css/audio-layout.ts"
     },
     "pages:home-page": {
-      "file": "/styles/home-page.88bc5f.css",
-      "datetime": "2025-10-24T06:30:45.734Z",
+      "file": "/styles/home-page.388abb.css",
+      "datetime": "2025-10-27T14:01:05.441Z",
       "name": "home-page",
-      "hash": "88bc5f",
-      "mtimeMs": 1761202548118,
-      "bytes": 4721,
+      "hash": "388abb",
+      "mtimeMs": 1761569342383,
+      "bytes": 4842,
       "source": "src\\styles\\pages\\home-page.css",
       "inlineModule": "/src/data/page-css/home-page.ts"
     },
@@ -198,8 +198,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.jbmg0q.json",
-      "datetime": "2025-10-24T08:28:11.766Z"
+      "file": "/search-index.r0c3jb.json",
+      "datetime": "2025-10-27T14:00:46.630Z"
     }
   },
   "js": {

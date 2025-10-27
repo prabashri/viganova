@@ -60,7 +60,7 @@ import { headerContainer, navPanel } from "@/components/navigation/headerVariant
         id="main-nav"
         class={
           cn(
-            "main-nav relative max-w-site w-100p sm-bg scroll-container flex flex-row text-small p-02 gap br-r full-br-r-1 col-base-100 z-100 big-display-inherit",
+            "main-nav relative max-w-site w-auto sm-bg scroll-container flex flex-row text-small p-02 gap br-r full-br-r-1 col-base-100 z-100 big-display-inherit",
             navPanel(headerStyle.mode),
             primaryCTA?.length ? "md-w-100p lg-w-100p order-2 md-order-3 lg-order-3" : "order-2 lg-order-2"
           )
@@ -156,7 +156,7 @@ import { headerContainer, navPanel } from "@/components/navigation/headerVariant
               title={cta.title || cta.label}
               variant={cta.variant || "primary"}
               ariaLabel={cta.ariaLabel || cta.label}
-              className={cn(cta.icon && "flex ai-center ac-center gap-05", cta.className)}
+              className={cn(cta.icon && "flex ai-center ac-center gap-05 lh-0", cta.className)}
             >
               {cta.icon && (
                 <Icon
