@@ -1,0 +1,68 @@
+---
+// FocusCard.astro
+/**
+ * css for this component is in src/styles/pages/home-page.css
+ */
+import Anchor from '@/components/ui/Anchor.astro';
+import ResponsiveImage from '@/components/ResponsiveImage.astro';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  id: string;
+  iconName: string;
+  title: string;
+  description: string;
+  href: string;
+  img: {
+    src: string;
+    alt: string;
+    title: string;
+  };
+  reverse?: boolean; // true -> image left on desktop
+}
+
+const { id, iconName, title, description, href, img, reverse = false } = Astro.props;
+---
+<section
+  id={id}
+  class={`focus-card-wrapper relative my-2 p-2 max-w-featured w-100p mx-auto br-r ${
+    reverse ? 'flex flex-col big-flex-row-reverse' : 'flex flex-col big-flex-row'
+  }`}
+>
+    {/* decorative bar / accent behind card */}
+    <div
+        class="focus-card-accent z-0 absolute top-0 left-0 w-100p h-100p pointer-none br-r"
+        aria-hidden="true"
+    ></div>
+
+    {/* text block */}
+    <div class="card-content flex-1 big-px-2 relative z-2">
+        <Icon
+        slot="icon-left"
+        name={iconName}
+        id={`${id}-icon`}
+        class="block bg-primary-lighter-x col-primary fill-primary br-r w-5-0 h-5-0"
+        aria-hidden="true"
+        focusable="false"
+        />
+        <h3 class="card-title my-s-0">{title}</h3>
+        <p class="card-description">{description}</p>
+        <Anchor className="w-fit my-1" variant="primary" href={href}>
+        Learn More
+        </Anchor>
+    </div>
+
+    {/* image block */} 
+    <ResponsiveImage
+      src={img.src}
+      alt={img.alt}
+      title={img.title}
+      width="380"
+      breakpoints={{ mobile: 380, desktop: 640 }}
+      className="card-image-wrapper flex-1 relative overflow-hidden w-100p h-200px object-cover br-r"
+      imageClassName=""
+      loading="lazy"
+      variant="desktop"
+      id={`${id}-image`}
+    /> 
+</section>

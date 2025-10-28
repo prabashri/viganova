@@ -1,8 +1,8 @@
 ---
-// src/content/pages/About.astro
 import { siteDefaults } from '@/config/siteDefaults';
 import HeroPages from '@/components/ui/HeroPages.astro';
 import Anchor from '@/components/ui/Anchor.astro';
+import CalloutBox from '@/components/ui/CalloutBox.astro';
 
 // Props (all optional; fall back to siteDefaults/modifiedDates)
 interface Props {
@@ -14,59 +14,53 @@ interface Props {
 
 const props = Astro.props as Props;
 
-/* ---------------- Derived fields from siteDefaults (correct paths) ---------------- */
+/* ---------------- Derived fields from siteDefaults (reused where still relevant) ---------------- */
 
-// Primary author/contact name (prefer incharge, then founder)
-const authorName =
-  siteDefaults?.incharge?.name ||
-  siteDefaults?.founder?.name ||
-  'Editor';
+// Primary company / site name
+const companyName = siteDefaults.siteName || 'Viga Nova Green Energy';
 
-// Internal profile route (prefer internalId), else external URL, else undefined
-const authorInternal =
-  siteDefaults?.incharge?.internalId
-    ? `/${siteDefaults.incharge.internalId.replace(/^\/?/, '')}`
-    : undefined;
+// Founders — you can wire this into siteDefaults later if you want
+const founders = [
+  {
+    name: 'Dr. Vishnu',
+    role: 'Co-Founder, Electrochemical Energy Research',
+    blurb:
+      'Specializes in electrochemical energy systems, including oxygen evolution (OER) and hydrogen evolution reactions (HER), translating lab innovation into scalable clean hydrogen production.',
+    affiliation: 'Ph.D.',
+  },
+  {
+    name: 'Dr. Ganesh Kumar Mani',
+    role: 'Co-Founder, Advanced Materials & Systems Engineering',
+    blurb:
+      'Assistant Professor at KAIST, focused on high-performance materials, catalyst design, and system-level optimization for next-generation energy devices.',
+    affiliation: 'Ph.D., Assistant Professor, KAIST',
+  },
+];
 
-const authorHref =
-  authorInternal ||
-  siteDefaults?.incharge?.url ||
-  undefined;
+// Basic info. You could lift these into siteDefaults later.
+const established = '2021.03';
+const hqRegion = 'India & South Korea collaboration';
+const missionTagline =
+  'We offer comprehensive solutions for hydrogen energy to contribute to a better world. Viga Nova is paving the way for a clean, reliable energy future through innovation, science, and scalable deployment.';
 
-// Handy links if configured (keep your fallbacks)
-const contactPath = (siteDefaults as any)?.pages?.contact?.path || '/contact-us/';
-const privacyPath = (siteDefaults as any)?.pages?.privacyPolicy?.path || '/privacy-policy/';
-const refundPath  = (siteDefaults as any)?.pages?.refundPolicy?.path  || '/refund/';
-const termsPath   = (siteDefaults as any)?.pages?.terms?.path         || '/terms/';
-const teamPath    = (siteDefaults as any)?.collections?.team?.base
-  ? `/${(siteDefaults as any).collections.team.base}/`
-  : '/team/';
+// Contact info from siteDefaults (optional)
+const email = siteDefaults.contact?.email;
+const phone = siteDefaults.contact?.phone;
+const telHref  = phone ? `tel:${phone.replace(/[^\d+]/g, '')}` : undefined;
 
-// WhatsApp / tel deeplinks from top-level contact
-const waDigits = (siteDefaults.contact?.whatsapp || '').replace(/[^\d]/g, '');
-const waHref   = waDigits ? `https://wa.me/${waDigits}` : undefined;
-const telHref  = siteDefaults.contact?.phone
-  ? `tel:${siteDefaults.contact.phone.replace(/[^\d+]/g, '')}`
-  : undefined;
+// If you have a contact page in siteDefaults, we'll link to that. Otherwise fall back:
+const contactPath =
+  (siteDefaults as any)?.pages?.contact?.path || '/contact-us/';
 
-// Incharge profile fallback (internal page > team index > external URL)
-const prabaHref =
-  authorInternal ||
-  teamPath ||
-  siteDefaults?.incharge?.url ||
-  '';
-
-// Choose best available address: site-level address, else parentOrganization.address
+// We’ll reuse address if present (for credibility / physical presence)
 const addr =
   siteDefaults.address ||
-  siteDefaults.parentOrganization?.address ||
+  (siteDefaults as any).parentOrganization?.address ||
   null;
 
-// Helper to join non-empty parts with commas
 const joinParts = (...xs: Array<string | undefined>) =>
   xs.filter(Boolean).join(', ');
 
-// Build a human-friendly location line
 const location = addr
   ? joinParts(
       addr.streetAddress,
@@ -77,139 +71,222 @@ const location = addr
   : '';
 ---
 
-<article class="w-100p">
+<article class="w-100p post-content">
   <HeroPages
     variant="post"
-    title={props.title}
+    title={props.title || `${companyName}: About Us`}
     meta={false}
-    description={props.description}
-    publishedAt={props.publishedAt}
+    description={
+      props.description ||
+      missionTagline
+    }
+    publishedAt={props.publishedAt || established}
     updatedAt={props.updatedAt}
-    authorName={authorName}
-    authorHref={authorHref}
+    authorName={companyName}
+    authorHref="/"
   />
 
   <section class="max-w-content mx-auto px-1 py-2">
-    <h2 id="who-we-help">Who we help</h2>
-    <p>
-      <strong>VerifiedApostille</strong> helps <strong>students</strong>, <strong>professionals</strong>, <strong>families</strong>, and <strong>businesses</strong>
-      get Indian documents accepted abroad—fast, compliant, and secure. We support both <strong>Sticker</strong> and <strong>e-Apostille (QR)</strong>, and deliver worldwide.
-      <br />
-      <span class="text-s opacity-80">
-        India-only customers who prefer a domestic workflow can also use our India brand at
-        {' '}
-        <Anchor href="https://easyapostille.in" rel="noopener">EasyApostille.in</Anchor>.
-      </span>
-    </p>
-    <ul>
-      <li><strong>Students:</strong> university admissions, WES/credential evaluations, visa filing.</li>
-      <li><strong>Professionals:</strong> work visas, employment contracts, PCC requirements.</li>
-      <li><strong>Families:</strong> birth/marriage/adoption/death certificates for overseas use.</li>
-      <li><strong>Businesses:</strong> POA, MOA/AOA, incorporation, board resolutions, invoices.</li>
-    </ul>
 
-    <h2 id="who-we-are">Who we are</h2>
-    <ul>
-      <li>
-        <strong>Team Head — <Anchor href={prabaHref}>Prabakaran Shankar</Anchor>:</strong>
-        strategy and oversight of apostille/attestation workflows (Notary → SDM/HRD/CoC → MEA).
-      </li>
-      <li>
-        <strong>Client Success — Lakshmishri Prabakaran:</strong>
-        leads <strong>communications</strong>, document pre-checks, and timeline updates on WhatsApp/email.
-      </li>
-      <li>
-        <strong>Dispatch &amp; QA — Vasudevan Shankar:</strong>
-        manages <strong>dispatch, verification, and final checks</strong> before and after processing.
-      </li>
-    </ul>
+    {/* Mission / Vision */}
+    <h2 id="our-mission">Our Mission</h2>
     <p>
-      Prefer <strong>WhatsApp</strong> for quick coordination{waHref ? <> — <Anchor href={waHref}>chat now</Anchor></> : ''}. For complex cases, we can arrange a <strong>video call</strong>.
+      <strong>{companyName}</strong> is focused on accelerating India’s clean
+      energy transition through practical, production-grade hydrogen solutions.
+      We believe green hydrogen is not a distant promise — it’s an essential
+      building block for an industrial future that is cleaner, safer, and
+      independent of fossil imports.
     </p>
-    <p class="text-s col-base-70 p-1 my-1 br-left-thicker-primary">
-      We’re an independent facilitation service (not a Government/MEA office). Where required, we coordinate through authorised partners.
+    <p>
+      We aim to lead the future energy industry by advancing electrolyzer
+      technology, hydrogen storage, and Power-to-Gas systems that can operate at
+      scale. Our work is driven by one simple idea: a pollution-free India is
+      not optional. It’s urgent.
     </p>
 
-    <h2 id="where-we-are">Where we are</h2>
-    <ul>
+    {/* Snapshot / Company facts */}
+    <div class="my-2 p-1 br-r bg-primary-lighter-x col-primary text-small flex flex-col gap">
+      <div><strong>Established:</strong> {established}</div>
+      <div><strong>Core Focus:</strong> Green hydrogen, electrolyzers, hydrogen storage, Power-to-Gas</div>
+      <div><strong>Founding Vision:</strong> Enable affordable clean energy infrastructure for India</div>
+      <div><strong>Operating Model:</strong> Lab-to-industry transfer of electrochemical innovation</div>
       {location && (
-        <li>
-          <strong>Operations address (India):</strong> {location}
-          {siteDefaults?.address?.googleMap && (
-            <> — <Anchor href={siteDefaults.address.googleMap}>Google Maps</Anchor></>
-          )}
-        </li>
+        <div><strong>Operations / Lab Partners:</strong> {location} • {hqRegion}</div>
       )}
-      <li><strong>Team head (overseas):</strong> Suwon, South Korea</li>
-      <li><strong>Dispatch lead (India):</strong> Thandalam, Chennai 600012</li>
-    </ul>
+    </div>
 
-    <h2 id="how-it-works">How it works (short version)</h2>
-    <ol>
-      <li><strong>Check:</strong> share scans; we confirm steps for your destination authority.</li>
-      <li><strong>Notary:</strong> preparation &amp; notarisation (where applicable).</li>
-      <li><strong>SDM/HRD/CoC:</strong> pre-authentication as per document type.</li>
-      <li><strong>MEA:</strong> apostille/attestation (Sticker or e-Apostille QR).</li>
-      <li><strong>Return:</strong> tracked delivery back to you (India &amp; worldwide).</li>
-    </ol>
-
-    <h2 id="courier">Courier &amp; safe handling</h2>
+    {/* Founders */}
+    <h2 id="founders">Founders</h2>
     <p>
-      We use trusted <strong>national and international couriers</strong> for pickups and returns, including
-      <strong> Blue Dart</strong>, <strong>DTDC</strong>, <strong>The Professional Couriers</strong>, and globally
-      <strong> DHL</strong>/<strong>FedEx</strong> (routes permitting). Originals are packed securely and tracked.
-      <br />
-      <span class="text-s opacity-80">
-        Premium options such as <strong>insurance</strong>, <strong>priority delivery</strong>, and <strong>signature on delivery</strong>
-        are available on request. India-only users may also book via
-        {' '}<Anchor href="https://easyapostille.in" rel="noopener">EasyApostille.in</Anchor>.
-      </span>
+      {companyName} was founded by researchers who believe science should not
+      die in a journal PDF — it should exist in the real world, solving real
+      problems.
     </p>
 
-    <h2 id="what-to-prepare">What to prepare</h2>
-    <ul>
-      <li>Clear <strong>PDF/PNG/JPG scans</strong> (front &amp; back if applicable).</li>
-      <li>A government <strong>ID</strong> for verification.</li>
-      <li>Any destination-specific <strong>supporting documents</strong> (transcripts, affidavits, translations).</li>
+    <ul class="no-bullets flex flex-col gap">
+      {founders.map(f => (
+        <li class="my-1 p-1 br-r bg-base-10 bg-opacity-5 flex flex-col">
+          <span class="bold">{f.name}</span>
+          <span class="text-s opacity-80">{f.affiliation}</span>
+          <span class="text-s opacity-80">{f.role}</span>
+          <span class="mt-05">{f.blurb}</span>
+        </li>
+      ))}
     </ul>
 
-    <h2 id="fees-refunds">Fees &amp; refunds</h2>
-    <ul>
-      <li>Quotes show our service fees; <strong>government/office/courier costs</strong> may be separate unless stated.</li>
-      <li>
-        Refunds follow our <Anchor href={refundPath}><strong>Refund Policy</strong></Anchor>:
-        <ul>
-          <li><strong>No refund</strong> once Notary has started (handover/queue confirmed).</li>
-          <li><strong>Before Notary start</strong>: typically 75% of service fee refunded (25% admin retained); courier/third-party costs deducted if used.</li>
-        </ul>
-      </li>
-      <li>Full legal terms: <Anchor href={termsPath}><strong>Terms &amp; Conditions</strong></Anchor>. See also our <Anchor href={privacyPath}><strong>Privacy Policy</strong></Anchor>.</li>
-    </ul>
+    <p class="text-s opacity-80 my-1">
+      Together, they planted the seed for {companyName} in 2021 with one goal:
+      build world-class hydrogen technology in India, for India — and for a
+      future where clean air and economic growth are not in conflict.
+    </p>
 
-    <h2 id="contact">Talk to us</h2>
+    {/* Technology pillars */}
+    <h2 id="what-we-build">What We Build</h2>
+
+    <h3>Electrolyzer Systems</h3>
     <p>
-      Tell us your document type and destination country:
-      {' '}
-      <Anchor href={contactPath}><strong>Contact {siteDefaults.siteName}</strong></Anchor>
-      {' '}or email{' '}
-      <Anchor href={`mailto:${siteDefaults.contact?.email || 'contact@verifiedapostille.com'}`}>
-        <strong>{siteDefaults.contact?.email || 'contact@verifiedapostille.com'}</strong>
-      </Anchor>
+      Our water electrolysis systems are optimized for green hydrogen
+      production. We focus on catalytic efficiency (OER / HER performance),
+      durability under continuous load, and stack design suitable for
+      industrial operation — not just lab demos.
+    </p>
+
+    <CalloutBox type="tip" heading="Goal">
+      High-output hydrogen with lower energy cost per kilogram.
+    </CalloutBox>
+
+    <h3>Advanced Hybrid Hydrogen Storage</h3>
+    <p>
+      Hydrogen is only valuable if you can store and move it safely.
+      We are developing a hybrid compressed gas / liquid hydrogen storage
+      approach that reduces boil-off losses (a pain point in pure liquid
+      storage) while maintaining the volumetric efficiency industry needs.
+    </p>
+
+    <CalloutBox type="tip" heading="Goal">
+      Practical storage solutions that serve mobility, backup power,
+      and industrial hydrogen logistics.
+    </CalloutBox>
+
+    <h3>Power-to-Gas (P2G)</h3>
+    <p>
+      Power-to-Gas systems convert excess renewable electricity into storable,
+      dispatchable chemical energy. We are building integrated P2G solutions to
+      support both hydrogen production and energy buffering — so clean power can
+      be generated when it’s windy/sunny and used when it’s not.
+    </p>
+
+    <CalloutBox type="tip" heading="Goal">
+      Enable grid resilience and energy independence using green fuel
+      instead of fossil reserves.
+    </CalloutBox>
+
+    {/* Research credibility */}
+    <h2 id="research">Research & Scientific Backbone</h2>
+    <p>
+      Our founders’ backgrounds span electrochemistry, high-performance
+      catalyst development, membrane interfaces, and system-level power
+      engineering.
+    </p>
+    <p>
+      Academic work in electrochemical energy systems — including OER (oxygen
+      evolution reaction) and HER (hydrogen evolution reaction) pathways — is
+      being translated directly into commercially relevant stack designs. This
+      is how we intend to differentiate: not by branding, but by science that
+      ships.
+    </p>
+    <p class="bold">
+      We believe that India can be a producer of world-class hydrogen
+      technology, not just an importer of it.
+    </p>
+
+    {/* Vision */}
+    <h2 id="vision">Our Vision</h2>
+    <p>
+      We are building toward large-scale deployment of green hydrogen
+      infrastructure in India — not just for heavy industry, but for mobility,
+      grid support, agriculture, and decentralized energy security.
+    </p>
+    <p>
+      We see hydrogen not as a trend, but as the backbone of a circular,
+      decarbonized energy economy. Cleaner cities. Exportable tech. Skilled
+      local manufacturing. Real climate impact.
+    </p>
+
+    <p class="p-1 my-1 br-left-thicker-primary bold opacity-80">
+      A pollution-free future isn't a pitch line for us.
+      It's the reason {companyName} exists.
+    </p>
+
+    <h2 id="ceo-message">Founders’ Message</h2>
+    <div class="my-2 p-1 bg-base-10 br-r text-base col-base-90">
+      <p>
+        At <strong>Viga Nova Green Energy</strong>, our journey began with a simple conviction — 
+        that clean hydrogen must become the heart of a sustainable India.
+      </p>
+      <p>
+        As researchers who have spent years advancing electrochemical energy systems, 
+        we witnessed first-hand how science can bridge the gap between possibility and impact. 
+        The transition from laboratory insight to industrial reality is never easy, 
+        but it is the only path to a truly carbon-neutral future.
+      </p>
+      <p>
+        Our mission is to transform hydrogen into a practical, affordable, and scalable 
+        solution for industries, transportation, and communities. Through innovation in 
+        <strong>electrolyzer technology</strong>, <strong>hybrid hydrogen storage</strong>, and 
+        <strong>Power-to-Gas integration</strong>, we are building the foundations of a cleaner 
+        energy ecosystem.
+      </p>
+      <p>
+        India’s future demands both energy security and environmental responsibility. 
+        Viga Nova is committed to uniting these goals through science-driven engineering, 
+        collaboration, and a spirit of continuous discovery.
+      </p>
+      <p>
+        We invite our partners, investors, and fellow researchers to join us in this endeavor —
+        to create a future where prosperity and sustainability advance together.
+      </p>
+      <div class="mt-1">
+        <p><strong>Dr. Vishnu</strong><br /><span class="text-s opacity-80">Co-Founder, Electrochemical Energy Systems</span></p>
+        <p><strong>Dr. Ganesh Kumar Mani</strong><br /><span class="text-s opacity-80">Co-Founder &amp; Assistant Professor, KAIST</span></p>
+      </div>
+    </div>
+
+
+    {/* Contact / partnership CTA */}
+    <h2 id="contact">Partner With Us</h2>
+    <p>
+      We collaborate with universities, public agencies, industrial partners,
+      and infrastructure planners who are serious about deploying
+      hydrogen-ready systems — storage, electrolyzers, and P2G.
+    </p>
+
+    <p>
+      Let’s talk about research collaboration, pilot deployment, JV
+      manufacturing in India, or custom electrolyzer stacks designed around
+      your constraints.
+    </p>
+
+    <p>
+      <Anchor href={contactPath}><strong>Contact {companyName}</strong></Anchor>
+      {email && (
+        <>
+          {' '}or email{' '}
+          <Anchor href={`mailto:${email}`}><strong>{email}</strong></Anchor>
+        </>
+      )}
       {telHref && (
         <>
-          {' '}| call <Anchor href={telHref}><strong>{siteDefaults.contact?.phone}</strong></Anchor>
-        </>
-      )}
-      {waHref && (
-        <>
-          {' '}| WhatsApp <Anchor href={waHref}><strong>{waDigits}</strong></Anchor>
+          {' '}| call <Anchor href={telHref}><strong>{phone}</strong></Anchor>
         </>
       )}
     </p>
 
-    <p class="text-s opacity-80 mt-1">
-      Operating globally as <strong>VerifiedApostille.com</strong>. For India-first journeys and local content,
-      visit our domestic site <Anchor href="https://easyapostille.in" rel="noopener">EasyApostille.in</Anchor>.
+    <p class="text-s opacity-70 mt-1">
+      We are headquartered in India with academic and technical collaboration in
+      South Korea. We are building hydrogen technology for real-world use in a
+      country that needs it at scale.
     </p>
+
   </section>
 </article>

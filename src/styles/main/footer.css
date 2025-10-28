@@ -11,3 +11,18 @@
   padding: 0;
 }
 
+.site-logo-chip-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 6px;
+  border-radius: 0 0 var(--radius-md, .5rem) var(--radius-md, .5rem);
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(200,255,220,0.8) 0%,
+    rgba(200,255,220,0) 70%
+  );
+  z-index: -1;
+}

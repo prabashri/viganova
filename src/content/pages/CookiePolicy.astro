@@ -19,20 +19,29 @@ const eff = props.updatedAt
   : (props.publishedAt ? machineAndHuman(props.publishedAt) : undefined);
 
 const siteName = siteDefaults.siteName;
-const websiteUrl = siteDefaults.siteUrl || `https://${siteDefaults.domainName}`;
-const contactEmail = siteDefaults.contact?.email || siteDefaults.admin?.email || `contact@${siteDefaults.domainName}`;
+const websiteUrl =
+  siteDefaults.siteUrl || `https://${siteDefaults.domainName}`;
+const contactEmail =
+  siteDefaults.contact?.email ||
+  siteDefaults.admin?.email ||
+  `contact@${siteDefaults.domainName}`;
+
 const orgDisplayName =
-  siteDefaults.parentOrganization?.legalName ||
+  (siteDefaults as any).parentOrganization?.legalName ||
   siteDefaults.legalName ||
-  siteDefaults.parentOrganization?.name ||
+  (siteDefaults as any).parentOrganization?.name ||
   siteDefaults.siteName;
 
 const pageDesc =
   props.description ??
-  `Learn how ${siteName} uses cookies and similar technologies for essential site functionality, analytics, and advertising. Manage or clear cookies anytime through your browser settings.`;
+  `How ${siteName} uses cookies and similar technologies for essential site functionality, reliability, security, performance analytics, and optional media embeds. Learn how to manage or clear cookies.`;
 ---
 
-<article class="prose mx-auto" itemscope itemtype="https://schema.org/WebPage">
+<article
+  class="prose mx-auto"
+  itemscope
+  itemtype="https://schema.org/WebPage"
+>
   <HeroPages
     variant="post"
     title={`Cookie Policy of ${siteName}`}
@@ -53,73 +62,189 @@ const pageDesc =
     )}
 
     <p>
-      This Cookie Policy explains how <strong>{orgDisplayName}</strong> (“we”, “us”, or “our”) uses cookies and similar technologies on
-      <Anchor href={websiteUrl}> {websiteUrl}</Anchor>. It also explains your choices for managing or deleting cookies.
+      This Cookie Policy explains how <strong>{orgDisplayName}</strong> (“we”, “us”, or
+      “our”) uses cookies and similar technologies on
+      <Anchor href={websiteUrl}> {websiteUrl}</Anchor>. It also explains the
+      choices you have to control or delete cookies.
+    </p>
+
+    <p class="text-s opacity-80">
+      {siteName} operates in the clean energy / hydrogen technology sector. Our
+      website is primarily used for information, technical outreach, and
+      partnership discussions. We do not run ad networks or sell personal
+      browsing data.
     </p>
 
     <h2>1) What are cookies?</h2>
     <p>
-      Cookies are small text files stored on your device when you visit a website. They help websites remember your preferences,
-      improve functionality, and analyze traffic. Similar technologies include local storage, pixels, and tags.
+      Cookies are small text files stored on your device when you visit a
+      website. They help the site remember certain information (such as basic
+      preferences or session status). We may also use related technologies
+      such as local storage, pixels, or tags to measure performance and keep
+      the site stable and secure.
     </p>
 
     <h2>2) How we use cookies</h2>
+    <p>
+      We use cookies and similar technologies for the following purposes:
+    </p>
     <ul>
-      <li><strong>Essential cookies</strong> – Required for security, basic navigation, and core functions. These cannot be disabled.</li>
-      <li><strong>Functional cookies</strong> – Remember language or region preferences to improve usability.</li>
-      <li><strong>Analytics cookies</strong> – Collect anonymous usage data to help us understand performance and improve user experience.</li>
-      <li><strong>Advertising cookies</strong> – Display relevant ads and measure ad effectiveness (via partners like Google).</li>
+      <li>
+        <strong>Essential / security cookies</strong> — Required so the site
+        can load correctly, protect against abuse, and let forms or basic
+        navigation work. These are always on because the site will not work
+        properly without them.
+      </li>
+      <li>
+        <strong>Functional cookies</strong> — May remember certain
+        preferences like language/region or presentation mode so you don’t
+        have to re-enter the same information.
+      </li>
+      <li>
+        <strong>Analytics / performance cookies</strong> — Help us
+        understand which pages are visited, which features are useful, and
+        where users experience friction. This improves reliability and helps
+        us prioritize engineering effort. We aim to analyze trends, not
+        identify individuals.{' '}
+        {siteFunctions?.analyticsId && (
+          <>For example, we may use analytics tagged with ID {siteFunctions.analyticsId}.</>
+        )}
+      </li>
+      <li>
+        <strong>Embedded media / technical demos</strong> — When we embed
+        things like videos, diagrams, or interactive demos from third-party
+        platforms (for example, to explain electrolyzer stack design or
+        hydrogen storage systems), those platforms may set their own cookies.
+      </li>
     </ul>
+
+    <p class="text-s opacity-80">
+      We do <strong>not</strong> operate behavioral advertising networks and
+      we do <strong>not</strong> sell your browsing behavior.
+    </p>
 
     <h2>3) Third-party cookies</h2>
     <p>
-      We may allow third-party services (e.g., Google Analytics, YouTube embeds, or ad networks) to set cookies to provide analytics
-      or advertising features. Each provider has its own privacy policy:
+      Some cookies or tracking technologies may be placed by third-party
+      services we integrate for functionality, analytics, media, or
+      communication. Examples:
     </p>
     <ul>
-      <li><Anchor href="https://policies.google.com/privacy" rel="nofollow noopener" target="_blank">Google Privacy & Terms</Anchor></li>
-      <li><Anchor href="/privacy-policy/">Our Privacy Policy</Anchor></li>
+      <li>
+        <strong>Analytics providers</strong> (to measure site usage and
+        performance).
+      </li>
+      <li>
+        <strong>Video / media hosting</strong> (for product explainers,
+        research talks, hydrogen system walkthroughs).
+      </li>
+      <li>
+        <strong>Communication tools</strong> (for contact forms, call
+        scheduling, investor/partner inquiries).
+      </li>
+    </ul>
+    <p>
+      These providers have their own privacy and cookie policies. For example:
+    </p>
+    <ul>
+      <li>
+        <Anchor
+          href="https://policies.google.com/privacy"
+          rel="nofollow noopener"
+          target="_blank"
+        >
+          Google Privacy &amp; Terms
+        </Anchor>
+      </li>
+      <li>
+        <Anchor href="/privacy-policy/">
+          {siteName} Privacy Policy
+        </Anchor>
+      </li>
     </ul>
 
     <h2>4) Managing your cookie preferences</h2>
     <p>
-      You can control cookies via:
+      You are in control. You can usually manage cookies in two ways:
     </p>
     <ul>
-      <li><strong>Our cookie banner</strong> — Use the “Cookie preferences” or “Privacy & cookie settings” button to adjust your consent.</li>
-      <li><strong>Your browser settings</strong> — You can delete existing cookies and block new ones from being set.</li>
+      <li>
+        <strong>Browser controls</strong> — Most browsers let you block,
+        limit, or delete cookies. You can also clear cookies at any time.
+      </li>
+      <li>
+        <strong>Cookie / consent banner</strong> — If we display a cookie
+        banner or “preferences” panel, you can use it to allow only essential
+        cookies and opt out of analytics/optional cookies.
+      </li>
     </ul>
 
-    <h3>How to clear cookies in major browsers:</h3>
+    <h3>How to clear cookies in major browsers</h3>
     <ul>
-      <li><strong>Google Chrome:</strong> Settings → Privacy & Security → Clear browsing data → “Cookies and other site data”.</li>
-      <li><strong>Microsoft Edge:</strong> Settings → Privacy, Search, and Services → Clear browsing data → Choose “Cookies and other site data”.</li>
-      <li><strong>Mozilla Firefox:</strong> Options → Privacy & Security → Cookies and Site Data → “Clear Data…”.</li>
-      <li><strong>Safari (macOS/iOS):</strong> Preferences → Privacy → Manage Website Data → Remove All.</li>
-      <li><strong>Opera:</strong> Settings → Privacy & Security → Clear browsing data → “Cookies and other site data”.</li>
+      <li>
+        <strong>Chrome:</strong> Settings → Privacy &amp; Security → Clear
+        browsing data → “Cookies and other site data”.
+      </li>
+      <li>
+        <strong>Edge:</strong> Settings → Privacy, Search, and Services →
+        Clear browsing data → “Cookies and other site data”.
+      </li>
+      <li>
+        <strong>Firefox:</strong> Settings → Privacy &amp; Security →
+        Cookies and Site Data → “Clear Data…”.
+      </li>
+      <li>
+        <strong>Safari (macOS / iOS):</strong> Settings / Preferences →
+        Privacy → Manage Website Data → Remove All.
+      </li>
+      <li>
+        <strong>Opera:</strong> Settings → Privacy &amp; Security → Clear
+        browsing data → “Cookies and other site data”.
+      </li>
     </ul>
 
     <p class="text-s col-base-70 italic">
-      Tip: You can also use private/incognito mode to automatically clear cookies when you close the browser.
+      Tip: Private / Incognito windows generally delete cookies at the end of
+      your session.
     </p>
 
-    <h2>5) Disabling cookies</h2>
+    <h2>5) What happens if you block cookies?</h2>
     <p>
-      Blocking some cookies may impact website performance or functionality. Essential cookies are required for security and
-      cannot be disabled through our interface.
+      You can browse most informational pages with strict cookie settings.
+      However, blocking some cookies — especially essential or functional
+      ones — may cause certain forms, dashboards, media embeds, or
+      interactive visuals not to load or not to behave as intended.
     </p>
 
-    <h2>6) Updates</h2>
+    <h2>6) Updates to this Cookie Policy</h2>
     <p>
-      We may update this Cookie Policy from time to time. The “Effective date” above reflects the latest version.
-      Continued use of our website means you agree to the updated policy.
+      We may update this Cookie Policy if we add new site features (for
+      example, live dashboards, partner portals, pilot-program status
+      tracking) or change which analytics / infrastructure vendors we use.
+      The “Effective date” above will always show the latest version. If you
+      continue to use the site after updates, that means you accept the
+      revised Cookie Policy.
     </p>
 
     <h2>7) Contact</h2>
     <p>
-      For cookie or privacy concerns, contact us at:
-      <br />
-      📧 <Anchor href={`mailto:${contactEmail}`}><strong>{contactEmail}</strong></Anchor>
+      If you have questions about cookies, analytics, or data usage, contact
+      us at:
+    </p>
+    <p class="my-05">
+      📧{' '}
+      <Anchor href={`mailto:${contactEmail}`}>
+        <strong>{contactEmail}</strong>
+      </Anchor>
+    </p>
+
+    <p class="text-s opacity-70">
+      For broader details on how we handle personal and business information,
+      including inquiries about hydrogen systems, electrolyzer performance,
+      storage, or Power-to-Gas deployments, please review our{' '}
+      <Anchor href="/privacy-policy/">
+        <strong>Privacy Policy</strong>
+      </Anchor>.
     </p>
   </div>
 </article>

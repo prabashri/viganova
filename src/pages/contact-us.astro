@@ -52,7 +52,7 @@ const contactFormSrc = isDev
   : (man?.js?.['contact-form.js'] || man?.['contact-form.js'] || '/scripts/contact-form.js');
 
 // Turnstile + handler availability
-const isFormAvailable = Boolean(siteFunctions.contactFormHandler && siteFunctions.turnstileSitekey);
+const isFormAvailable = isDev ? true : Boolean(siteFunctions.contactFormHandler && siteFunctions.turnstileSitekey);
 
 // SEO
 const pageSeo: HeadProps = {

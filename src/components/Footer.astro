@@ -10,6 +10,14 @@ import IconMask from '@/components/IconMask.astro';
 import manifest from '@/data/assets-manifest.json';
 import FilesToLoadJS from '@/components/FilesToLoadJS.astro';
 
+import { resolveLogoFromManifest } from "@/utils/resolveLogos";
+import { toAbsoluteUrl, idFor } from "@/utils/urls";
+
+// ⬇ NEW: bring in service data
+import { servicePagesList } from '@/config/siteServicePages';
+
+// ======== Site Basics ========
+
 const manifestLogos = manifest?.logos?.files || {};
 const hasDesktopSvg = Boolean(manifestLogos.desktopLogoSvg);
 
@@ -29,8 +37,10 @@ const location = addr
       addr.addressLocality,
       addr.addressRegion,
       addr.postalCode,
-      (addr.addressCountryCode || addr.addressCountry)
-    ].filter(Boolean).join(', ')
+      (addr.addressCountryCode || addr.addressCountry),
+    ]
+      .filter(Boolean)
+      .join(', ')
   : '';
 
 // Contact (primary + optional secondary)
@@ -39,13 +49,11 @@ const phone = siteDefaults.contact?.phone || '';
 const waDigits = (siteDefaults.contact?.whatsapp || '').replace(/\D/g, '');
 const waHref = waDigits ? `https://wa.me/${waDigits}` : undefined;
 
-
 // Logo alt
 const desktopAlt = `${siteName} Desktop Logo`;
 
-/* =========================
-   Dynamic footer navigation
-   ========================= */
+// ======== Footer Nav Builders (pages / collections) ========
+
 type Colls = typeof siteDefaults.collections;
 type Pages = typeof siteDefaults.pages;
 
@@ -54,14 +62,23 @@ const pages = (siteDefaults.pages || {}) as Pages;
 
 const clean = (s = '') => s.replace(/^\/+|\/+$/g, '');
 const withSlash = (s = '') => ('/' + clean(s) + '/').replace(/\/+/g, '/');
-const rootOr = (base: string) => base ? withSlash(base) : '/';
+const rootOr = (base: string) => (base ? withSlash(base) : '/');
 
-// Build collection top links (e.g., /blog/, /services/, /resources/, etc.)
-const preferredCollectionOrder = ['post','service','resource','blog','videos','audio','team'];
+// We keep this in case you still expose other collections like /blog, /resources, etc.
+const preferredCollectionOrder = [
+  'post',
+  'service',
+  'resource',
+  'blog',
+  'videos',
+  'audio',
+  'team',
+];
 
 function buildCollectionMainLinks() {
-  const entries = Object.entries(collections)
-    .filter(([, cfg]) => Boolean(cfg?.index || cfg?.sitemap) && Boolean(cfg?.showInFooterNav));
+  const entries = Object.entries(collections).filter(
+    ([, cfg]) => Boolean(cfg?.index || cfg?.sitemap) && Boolean(cfg?.showInFooterNav)
+  );
 
   // Order by preferred list first, then by label
   const ordered = entries.sort((a, b) => {
@@ -85,96 +102,133 @@ function buildCollectionMainLinks() {
   });
 }
 
-// Build static page links from pages config
 function buildPageLinks() {
   return Object.entries(pages)
-    .filter(([, p]) => Boolean(
-      p?.enabled &&
-      (
-        ('showInFooterNav' in p ? p.showInFooterNav : false)
-      )
-    ))
+    .filter(
+      ([, p]) =>
+        Boolean(p?.enabled) &&
+        Boolean('showInFooterNav' in p ? (p as any).showInFooterNav : false)
+    )
     .map(([key, p]) => ({
       key,
       label: p?.label,
       title: p?.title || '',
       href: p?.path || '/',
     }))
-    .sort((a, b) => a.label.localeCompare(b.label));
+    .sort((a, b) => String(a.label).localeCompare(String(b.label)));
 }
 
-// Compose “Main Pages”:
-//  - Home (always first)
-//  - Collection roots (Services/Resources/Blog/Videos/Audio/Team/etc. when index/sitemap true)
-//  - Static pages (About/Contact/Privacy/Refund/Terms/etc. when enabled + showInFooterNav)
 const homeLink = { key: 'home', label: 'Home', href: '/' };
 
 const collectionLinks = buildCollectionMainLinks()
-  // Avoid duplicating root “/” if you use `post.base: ""`
-  .filter(c => c.href !== '/' || c.key === 'post');
+  // Avoid duplicating "/" twice if you have a root collection with empty base
+  .filter((c) => c.href !== '/' || c.key === 'post');
 
 const pageLinks = buildPageLinks();
 
 // De-duplicate by href while preserving order
 const seen = new Set<string>();
-const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
+const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter((item) => {
   if (seen.has(item.href)) return false;
   seen.add(item.href);
   return true;
 });
+
+// ======== Services column data (from siteServicePages.ts) ========
+//
+// We only show services that have href and title.
+// We'll present title text, and if you want a shorter label like "Electrolyzers"
+// you can switch to service.shortLabel here.
+//
+const footerServices = servicePagesList
+  .filter((svc) => !!svc.href && !!svc.title)
+  .map((svc) => ({
+    href: svc.href,
+    label: svc.title,
+  }));
+
+const ORG_LOGO_RESOLVED = resolveLogoFromManifest({
+  manifest,
+  kind: "desktop",
+  mode: "original",
+});
 ---
 
-<footer class="site-footer bg-primary-darker-x col-base-10 text-small py-2 px-1" itemscope itemtype="https://schema.org/WPFooter">
+<footer
+  class="site-footer bg-primary-darker-x col-base-10 text-small py-2 px-1"
+  itemscope
+  itemtype="https://schema.org/WPFooter"
+>
   <div class="footer-columns max-w-site w-100p mx-auto py-05 px-1 grid gap ta-start">
-
-    {/* Column 1: Site / brand (annotated as WebSite for itemprop="name") */}
-    <div class="footer-col sm-hr" itemscope itemtype="https://schema.org/WebSite" itemid={`${siteUrl}#website`}>
+    {/* Column 1: Brand / copyright */}
+    <div
+      class="footer-col sm-hr"
+      itemscope
+      itemtype="https://schema.org/WebSite"
+      itemid={`${siteUrl}#website`}
+    >
       {/* url + name for the WebSite node */}
       <meta itemprop="url" content={siteUrl} />
+
       <a
         href={siteUrl}
         aria-label={`${siteName} — Home`}
         title={`${siteName} — Home`}
-        class="inline-flex ai-center gap-05 td-none br-r bg-primary-lighter-x"
+        class="inline-flex ai-center td-none br-r p-0 m-0 bg-primary-lighter-x relative lh-0 site-logo-chip-underline"
       >
-        {hasDesktopSvg ? (
-          <Icon name="DesktopLogo" class="h-60 w-auto big-display-inherit br" aria-label={desktopAlt} title={desktopAlt} aria-hidden="true" focusable="false"/>
-        ) : siteImages.desktopLogo ? (
-          <img src={siteImages.desktopLogo} alt={desktopAlt} title={desktopAlt} class="h-60 w-auto big-display-inherit br" aria-hidden="true"/>
+        { siteImages.desktopLogo ? (
+          <img
+            src={ORG_LOGO_RESOLVED?.url}
+            alt={desktopAlt}
+            title={desktopAlt}
+            class="h-60 w-auto"
+            aria-hidden="true"
+          />
         ) : (
-          <span class="bold big-display-inherit col-primary hover-col-base-100" itemprop="name">{siteName}</span>
+          <span
+            class="bold col-primary hover-col-base-100"
+            itemprop="name"
+          >
+            {siteName}
+          </span>
         )}
       </a>
-
-      {/* If the logo image is shown, also expose the name for microdata */}
-      { (siteImages.desktopLogo || hasDesktopSvg) && (
-        <p class="bold" itemprop="name">{siteName}</p>
-      )}
-
       <p class="text-base">{siteTitle}</p>
+      {location && (
+          <div class="my-05 py-02 flex flex-row wrap ai-f-start gap-05">
+            <IconMask name="map-pin" class="w-2-0" />
+            <span class="inline-flex flex-1">{location}</span>
+          </div>
+        )}
+      {siteDefaults.registrationId && <p class="py-05">{siteDefaults.registrationLabel}: {siteDefaults.registrationId}</p>}
+      {siteDefaults.taxId && <p class="py-05">{siteDefaults.taxLabel}: {siteDefaults.taxId}</p>}
       <p class="py-05">&copy; {today.getFullYear()} {siteName}. All rights reserved.</p>
     </div>
 
-    {/* Column 2: Services (popular) */}
+    {/* Column 2: Services (dynamic from servicePagesList) */}
     <div class="footer-col sm-hr">
-      <p class="bold uppercase"><Anchor href={rootOr(collections?.service?.base || 'services')}>Apostille Services</Anchor></p>
+      <p class="bold uppercase">
+        <Anchor href={rootOr(collections?.service?.base || 'services')}>
+          Our Services
+        </Anchor>
+      </p>
       <ul class="no-bullets">
-        <li class="my-05 py-02"><Anchor href="/services/degree-certificate-apostille/">Degree Certificate</Anchor></li>
-        <li class="my-05 py-02"><Anchor href="/services/marksheets-apostille/">Marksheets</Anchor></li>
-        <li class="my-05 py-02"><Anchor href="/services/birth-certificate-apostille/">Birth Certificate</Anchor></li>
-        <li class="my-05 py-02"><Anchor href="/services/marriage-certificate-apostille/">Marriage Certificate</Anchor></li>
-        <li class="my-05 py-02"><Anchor href="/services/pcc-apostille/">PCC (Police Clearance)</Anchor></li>
-        {/* <li class="my-05 py-02"><Anchor href="/services/affidavit-apostille/">Affidavit / POA</Anchor></li> */}
-        <li class="my-05 py-02"><Anchor href="/services/business-document-apostille/">Business Documents</Anchor></li>
+        {footerServices.map((svc) => (
+          <li class="my-05 py-02">
+            <Anchor href={svc.href}>{svc.label}</Anchor>
+          </li>
+        ))}
       </ul>
     </div>
 
-    {/* Column 3: Main pages — now built from siteDefaults.collections + siteDefaults.pages */}
+    {/* Column 3: Main Pages / Explore */}
     <div class="footer-col sm-hr">
-      <p class="bold uppercase">Main Pages</p>
+      <p class="bold uppercase">Explore</p>
       <ul class="no-bullets">
-        {collectionLinks.map(link => (
-          <li class="my-05 py-02"><Anchor href={link.href}>{link.label}</Anchor></li>
+        {collectionLinks.map((link) => (
+          <li class="my-05 py-02">
+            <Anchor href={link.href}>{link.label}</Anchor>
+          </li>
         ))}
       </ul>
     </div>
@@ -184,25 +238,56 @@ const mainLinks = [homeLink, ...collectionLinks, ...pageLinks].filter(item => {
       <p class="bold uppercase">Connect with us</p>
       <SocialLink id="footer-social-links" />
       <ul class="no-bullets">
-        { email && <li class="my-05 py-02 flex flex-row wrap ai-center gap-05"><IconMask name="email" class="w-2-0" /><Anchor href={`mailto:${email}`} className="">{email}</Anchor></li> }
-        { phone && <li class="my-05 py-02 flex flex-row wrap ai-center gap-05"><IconMask name="phone" class="w-2-0" /><Anchor href={`tel:${phone.replace(/[^\d+]/g,'')}`} className="">{phone}</Anchor></li> }
-        { waHref && <li class="my-05 py-02 flex flex-row wrap ai-center gap-05"><IconMask name="whatsapp" class="w-2-0" /><Anchor href={waHref} target="_blank" rel="noopener" className="">WhatsApp</Anchor></li> }
-        { location && <li class="my-05 py-02 flex flex-row wrap ai-f-start gap-05"><IconMask name="map-pin" class="w-2-0" /><span class="inline-flex flex-1">{location}</span></li> }
+        {email && (
+          <li class="my-05 py-02 flex flex-row wrap ai-center gap-05">
+            <IconMask name="email" class="w-2-0" />
+            <Anchor href={`mailto:${email}`} className="">
+              {email}
+            </Anchor>
+          </li>
+        )}
+        {phone && (
+          <li class="my-05 py-02 flex flex-row wrap ai-center gap-05">
+            <IconMask name="phone" class="w-2-0" />
+            <Anchor
+              href={`tel:${phone.replace(/[^\d+]/g, '')}`}
+              className=""
+            >
+              {phone}
+            </Anchor>
+          </li>
+        )}
+        {waHref && (
+          <li class="my-05 py-02 flex flex-row wrap ai-center gap-05">
+            <IconMask name="whatsapp" class="w-2-0" />
+            <Anchor href={waHref} target="_blank" rel="noopener" className="">
+              WhatsApp
+            </Anchor>
+          </li>
+        )}
+        
       </ul>
     </div>
   </div>
+
+  {/* Lower nav row, typically legal / policy links */}
   <div class="footer-bottom py-1">
     <ul class="flex flex-row wrap gap no-bullets jc-center no-bullets list-separator">
-      {pageLinks.map(link => (
-        <li class="my-05 py-02"><Anchor href={link.href} title={link.title}>{link.label}</Anchor></li>
+      {pageLinks.map((link) => (
+        <li class="my-05 py-02">
+          <Anchor href={link.href} title={link.title}>
+            {link.label}
+          </Anchor>
+        </li>
       ))}
     </ul>
   </div>
+
   {/* Bottom bar */}
   <div class="footer-bottom ta-center py-1 hr">
     <p class="text-small">
-      Built with <Anchor href="https://astro.build">Astro</Anchor> • Theme by
-      {' '}<Anchor href="https://nviewsweb.com">NViewsWEB</Anchor>.
+      Built with <Anchor href="https://astro.build">Astro</Anchor> • Theme by{" "}
+      <Anchor href="https://nviewsweb.com">NViewsWEB</Anchor>.
     </p>
   </div>
 </footer>

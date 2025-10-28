@@ -1,5 +1,4 @@
 ---
-// src/content/pages/PrivacyPolicy.astro
 import HeroPages from '@/components/ui/HeroPages.astro';
 import Anchor from '@/components/ui/Anchor.astro';
 import { siteDefaults } from '@/config/siteDefaults';
@@ -28,14 +27,14 @@ const adminEmail   = siteDefaults.admin?.email || contactEmail;
 const termsPath =
   (siteDefaults as any)?.pages?.terms?.path || '/terms/';
 
-// NEW: Cookie & Refund links if configured
+// Cookie / Refund / etc. (may not exist yet in energy context, leaving fallback routes)
 const cookiePath =
   (siteDefaults as any)?.pages?.cookiePolicy?.path || '/cookie-policy/';
 const refundPath =
   (siteDefaults as any)?.pages?.refund?.path || '/refund-policy/';
 
 // Choose best address: site-level, then parentOrganization
-const addr = siteDefaults.address || siteDefaults.parentOrganization?.address || null;
+const addr = siteDefaults.address || (siteDefaults as any).parentOrganization?.address || null;
 
 // Join non-empty parts with commas
 const join = (...xs: Array<string | undefined>) => xs.filter(Boolean).join(', ');
@@ -52,15 +51,15 @@ const location = addr
 
 // Legal/display name of operating entity
 const orgDisplayName =
-  siteDefaults.parentOrganization?.legalName ||
+  (siteDefaults as any).parentOrganization?.legalName ||
   siteDefaults.legalName ||
-  siteDefaults.parentOrganization?.name ||
+  (siteDefaults as any).parentOrganization?.name ||
   siteDefaults.siteName;
 
-// Default page description
+// Default page description (rewritten for Viga Nova / green energy)
 const pageDesc =
   props.description ??
-  `${siteDefaults.siteName} explains how we collect, use, share, protect, and retain information while facilitating certificate & document attestation and apostille services in India (Notary → SDM → MEA) via authorised partners.`;
+  `${siteDefaults.siteName} explains how we collect, use, protect, and retain personal and business information shared with us (for example, when you contact us about hydrogen technology, electrolyzers, storage systems, or research collaboration).`;
 ---
 
 <article class="prose mx-auto" itemscope itemtype="https://schema.org/PrivacyPolicy">
@@ -78,160 +77,285 @@ const pageDesc =
   <div class="max-w-content px-1 py-2 mx-auto">
     {eff?.human && (
       <p class="my-2">
-        <strong>Effective date:</strong>
-        {' '}
+        <strong>Effective date:</strong>{' '}
         <time datetime={eff.iso}>{eff.human}</time>
       </p>
     )}
 
     <p class="text-l mb-1">
       This Privacy Policy explains how <strong>{orgDisplayName}</strong> (“we”, “us”, or “our”)
-      collects, uses, shares, protects, and retains information when you use our website and services to
-      facilitate certificate and document attestation and apostille in India. We are committed to protecting
-      your privacy and handling your data responsibly as stated in this policy.
+      collects, uses, shares, protects, and retains information when you visit our website,
+      contact us, or engage with us about hydrogen energy systems, electrolyzers, energy
+      storage, Power-to-Gas solutions, or research and development initiatives.
     </p>
 
     <p>
-      {siteDefaults.siteName} (<Anchor href={websiteUrl}>{websiteUrl}</Anchor>) provides facilitation for certificate
-      and document attestation and apostille in India. We handle your documents safely and securely and coordinate
-      with <strong>Notary</strong>, <strong>Sub-Divisional Magistrate (SDM)</strong>, and the
-      {' '}<strong>Ministry of External Affairs (MEA)</strong> through authorised/representative partners where required.
-      After processing, we arrange safe return delivery to your address.
+      {siteDefaults.siteName} (<Anchor href={websiteUrl}>{websiteUrl}</Anchor>) is focused on
+      next-generation clean energy technologies. We work with research institutions, industry,
+      government, and strategic partners to advance hydrogen production, storage, and energy
+      infrastructure. In doing so, we may receive certain personal, business, or technical
+      information from you. This policy describes how we handle that information.
     </p>
 
     <h2>1) Who we are</h2>
     <p>
-      “We”, “us”, or “our” refers to <strong>{orgDisplayName}</strong>, operating the service branded as
-      {' '}<strong>{siteDefaults.siteName}</strong>. We are an independent facilitation/assistance service and are
-      <em> not</em> the Government or the MEA. Notary offices, SDM, MEA, and their outsourced providers are independent entities.
+      “We”, “us”, or “our” refers to <strong>{orgDisplayName}</strong>, operating under the brand
+      <strong> {siteDefaults.siteName}</strong>. We are an independent clean energy / hydrogen
+      technology company. We are <em>not</em> a government office or regulatory body.
       {location && <> Our primary correspondence address is <strong>{location}</strong>.</>}
-      {' '}For questions, contact us at <Anchor href={`mailto:${contactEmail}`}>{contactEmail}</Anchor>.
+      {' '}For questions about this Privacy Policy, contact us at{' '}
+      <Anchor href={`mailto:${contactEmail}`}>{contactEmail}</Anchor>.
     </p>
 
     <h2>2) Scope of this policy</h2>
     <p>
-      This policy covers information collected via our website, contact channels (email/phone/WhatsApp), pickup/delivery logistics,
-      and while facilitating attestation/apostille workflows (Notary → SDM → MEA).
+      This policy applies to information we collect:
+    </p>
+    <ul>
+      <li>when you visit our website or landing pages,</li>
+      <li>when you contact us by email, phone, or messaging apps,</li>
+      <li>when you request product or partnership information, pricing, or technical specifications,</li>
+      <li>when you discuss pilot programs, research collaboration, investment, or commercial deployment with us,</li>
+      <li>when you sign up for updates, briefings, newsletters, or events hosted by us.</li>
+    </ul>
+    <p>
+      This policy does <strong>not</strong> cover systems, websites, or platforms operated by
+      third parties, including universities, laboratories, payment processors, logistics
+      providers, or government agencies. Those entities apply their own privacy policies.
     </p>
 
     <h2>3) Information we collect</h2>
     <ul>
-      <li><strong>Identity &amp; contact</strong>: name, phone, email, address, and communication preferences.</li>
-      <li><strong>Document data</strong>: scans/copies of certificates (e.g., birth, marriage, degree, PCC), IDs, authorisations/POA, and details required by Notary/SDM/MEA.</li>
-      <li><strong>Order &amp; logistics</strong>: service type, pickup/delivery details, tracking numbers.</li>
-      <li><strong>Payments</strong>: handled by payment gateways; we store only necessary transaction references for billing/tax.</li>
-      <li><strong>Device &amp; usage</strong>: IP, browser/OS, pages viewed, and cookies/analytics for performance and security.</li>
+      <li>
+        <strong>Contact information:</strong> name, email address, phone number, company / institution,
+        role/title, region.
+      </li>
+      <li>
+        <strong>Business / technical inquiries:</strong> details you voluntarily share about your project,
+        including hydrogen production needs, electrolyzer capacity requirements, storage/transport
+        considerations, P2G interest, site constraints, or timeline.
+      </li>
+      <li>
+        <strong>Communications:</strong> messages you send us (for example, R&amp;D partnership requests,
+        pilot site discussions, integration questions).
+      </li>
+      <li>
+        <strong>Operational logistics:</strong> if we start working together, we may request site/location
+        details, utility specs, safety/regulatory constraints, or installation requirements.
+      </li>
+      <li>
+        <strong>Website / device data:</strong> IP address, browser/OS type, pages visited, referring URL,
+        timestamps, and basic analytics/cookie data that help us secure and improve the site.
+      </li>
+      <li>
+        <strong>Payment or commercial records:</strong> if we enter into a commercial relationship,
+        we may collect invoicing details, purchase orders, and billing-related information.
+        We do <em>not</em> store full payment card numbers ourselves.
+      </li>
     </ul>
 
-    <h2>4) How we collect it</h2>
+    <h2>4) How we collect this information</h2>
     <ul>
-      <li>Directly from you via website forms, email, phone, chat/WhatsApp, and pickup/delivery.</li>
-      <li>From your authorised representative (if nominated).</li>
-      <li>Automatically via cookies/analytics when you use our website.</li>
+      <li><strong>Directly from you:</strong> when you email us, call us, submit a form, or request technical material.</li>
+      <li><strong>From your organization:</strong> when a colleague or partner lists you as a point of contact.</li>
+      <li><strong>Automatically:</strong> via cookies, analytics scripts, and server logs when you browse our site.</li>
     </ul>
 
-    <h2>5) Why we use it (lawful grounds)</h2>
+    <h2>5) How we use your information (lawful bases)</h2>
     <ul>
-      <li><strong>Service/contract</strong>: prepare submissions, coordinate Notary/SDM/MEA steps, update you, and return your documents.</li>
-      <li><strong>Compliance</strong>: legal/record-keeping/KYC obligations as applicable.</li>
-      <li><strong>Legitimate interests</strong>: secure our systems, prevent fraud/abuse, and improve quality.</li>
-      <li><strong>Consent</strong>: where required (e.g., marketing, optional cookies). You may withdraw consent at any time.</li>
+      <li>
+        <strong>To respond to you:</strong> answer technical questions, send requested documentation,
+        arrange calls, discuss pilots or deployment opportunities.
+      </li>
+      <li>
+        <strong>To explore partnerships:</strong> research collaboration, manufacturing, integration,
+        funding, or demonstration projects.
+      </li>
+      <li>
+        <strong>To improve our technology and services:</strong> understand what performance,
+        safety, cost, or regulatory requirements matter most to industry and public-sector users.
+      </li>
+      <li>
+        <strong>To maintain security and reliability:</strong> protect our infrastructure,
+        detect abuse, prevent fraud, and comply with applicable law.
+      </li>
+      <li>
+        <strong>With your consent:</strong> if you opt in to receive updates, newsletters,
+        product announcements, or event invites.
+      </li>
     </ul>
 
-    <h2>6) Document scan handling (PDF/PNG/JPG; email/WhatsApp accepted)</h2>
+    <h2>6) Research &amp; technical collaboration</h2>
     <p>
-      We may collect <strong>scanned copies</strong> of your documents (PDF/PNG/JPG) to prepare filings when physical originals are not required.
-      You may submit via secure upload (where available), <strong>email</strong>, or <strong>WhatsApp</strong>. Email and messaging apps are operated by
-      third parties and may not offer end-to-end encryption by default. If you choose these channels, you accept their inherent risks.
+      We sometimes work with universities, labs, and industrial partners to evaluate new
+      hydrogen production methods, electrolyzer stack performance, catalyst lifetime,
+      storage systems, or Power-to-Gas integration.
     </p>
     <ul>
-      <li>We <strong>print</strong> only what is necessary to complete the process and <strong>securely shred</strong> printed copies after use.</li>
-      <li>We <strong>do not sell</strong>, publicly post, or disclose your documents; we <strong>do not</strong> use your documents to train AI models.</li>
-      <li><strong>Retention</strong>: unless required by law, we delete document scans within <strong>30 days</strong> of order completion and
-          securely dispose of printed copies within <strong>7–14 days</strong>. Invoices/tax records are retained as required by law.</li>
+      <li>
+        We may share <strong>non-public technical information</strong> that you provide with
+        specific partners <strong>only</strong> if it is necessary for evaluating feasibility
+        or collaboration — and typically under NDA or similar confidentiality controls.
+      </li>
+      <li>
+        We do <strong>not</strong> sell your information.
+      </li>
+      <li>
+        We do <strong>not</strong> publish proprietary details you send us as marketing material
+        without explicit permission.
+      </li>
+      <li>
+        We do <strong>not</strong> use your private project data to train general-purpose AI models.
+      </li>
     </ul>
 
     <h2>7) Sharing &amp; disclosures</h2>
-    <p>We do <strong>not</strong> sell your data. We share only what is necessary to deliver the service:</p>
-    <ul>
-      <li><strong>Notaries &amp; SDM offices</strong> (notarisation/attestation).</li>
-      <li><strong>MEA &amp; its authorised/outsourced service providers</strong> (apostille/attestation processing).</li>
-      <li><strong>Courier/logistics partners</strong> (secure pickup/return with tracking).</li>
-      <li><strong>Payment gateways</strong> (payment processing; we don’t store full card data).</li>
-      <li><strong>Hosting/CDN, security, email</strong> (site operations), and <strong>analytics</strong>{siteFunctions?.analyticsId && <> (e.g., GA ID: {siteFunctions.analyticsId})</>}.</li>
-      <li><strong>When required by law</strong> or to protect rights, users, or the public.</li>
-    </ul>
-    <p class="col-base-70">
-      Note: Government bodies and their vendors apply their <em>own</em> policies. We cannot control internal handling within Notary, SDM, or MEA offices.
+    <p>
+      We do <strong>not</strong> sell your personal data. We may share limited information with:
     </p>
+    <ul>
+      <li>
+        <strong>Vendors / service providers</strong> who help us operate our website, email,
+        analytics, communications, hosting, storage, or security systems.
+        {siteFunctions?.analyticsId && <> (Analytics ID: {siteFunctions.analyticsId})</>}
+      </li>
+      <li>
+        <strong>Advisors, integrators, or engineering partners</strong> who help evaluate a
+        deployment or pilot that you specifically asked us about.
+      </li>
+      <li>
+        <strong>Payment / billing providers</strong> to process commercial transactions,
+        invoices, or POs.
+      </li>
+      <li>
+        <strong>Regulatory or safety bodies</strong> only if legally required or relevant to
+        compliance/safety certification.
+      </li>
+      <li>
+        <strong>Law enforcement / legal requests</strong> if required by applicable law, or
+        to protect rights, safety, or security.
+      </li>
+    </ul>
 
     <h2>8) Security</h2>
     <ul>
-      <li>HTTPS, access controls (least-privilege), device security, secure printers, and disposal procedures.</li>
-      <li>Operational logs and limited audit trails; partner diligence and minimum necessary disclosures.</li>
+      <li>We use HTTPS, access controls, and commercially reasonable security practices.</li>
+      <li>We restrict internal access to sensitive project information to personnel who need it.</li>
+      <li>We encourage using official company email channels for sharing sensitive specs rather than unsecured social messaging apps.</li>
     </ul>
 
-    <h2>9) International processing</h2>
+    <h2>9) International transfers</h2>
     <p>
-      Hosting/email/analytics or other vendors may process data outside India. We use reputable providers and apply appropriate safeguards consistent with applicable laws.
+      We may store or process information in multiple countries/regions (for example, India,
+      South Korea, the EU, or the US) depending on our hosting, academic collaborations,
+      or vendor infrastructure. By engaging with us, you understand your information may
+      be transferred across borders.
     </p>
 
-    <h2>10) Your choices &amp; rights</h2>
-    <ul>
-      <li>Request <strong>access, correction, or deletion</strong> of your personal data.</li>
-      <li><strong>Withdraw consent</strong> (for optional processing) at any time.</li>
-      <li><strong>Opt out</strong> of non-essential cookies via your browser or available controls.</li>
-      <li>We aim to respond within <strong>15 business days</strong>.</li>
-    </ul>
+    <h2>10) Data retention</h2>
+    <p>
+      We retain business contact info and project inquiry details for as long as needed to
+      communicate with you, plan or execute collaboration, comply with legal requirements,
+      and maintain reasonable business records. If you become a commercial partner or pilot
+      site, we may retain relevant technical and contractual records for audit/compliance
+      and safety traceability.
+    </p>
+    <p class="text-s opacity-80">
+      If you would like us to delete certain contact or inquiry data, you can request that
+      (see “Your rights” below) and we will comply where legally and operationally possible.
+    </p>
 
     <h2>11) Cookies &amp; analytics</h2>
     <p>
-      We may use cookies for functionality, performance, and analytics. Manage preferences in your browser or cookie controls.
-      For details on categories, partners, and how to clear cookies in major browsers, see our
-      {' '}<Anchor href={cookiePath}><strong>Cookie Policy</strong></Anchor>.
+      We may use cookies and similar technologies for essential site functionality,
+      security, performance analytics, and to understand interest in our technology.
+      You can usually disable non-essential cookies through your browser.
+    </p>
+    <p class="text-s opacity-80">
+      For details on how cookies work and how to manage them, see our
+      {' '}
+      <Anchor href={cookiePath}><strong>Cookie Policy</strong></Anchor>.
     </p>
 
+    <h2>12) Your rights &amp; choices</h2>
+    <ul>
+      <li>
+        You may <strong>request access, correction, or deletion</strong> of personal information we hold about you.
+      </li>
+      <li>
+        You may <strong>withdraw consent</strong> to optional communications (for example, newsletters or marketing updates).
+      </li>
+      <li>
+        You may <strong>object</strong> to certain processing where permitted by law.
+      </li>
+      <li>
+        We aim to respond within <strong>15 business days</strong>.
+      </li>
+    </ul>
 
-    <h2>12) Communications</h2>
+    <h2>13) Communications and updates</h2>
     <p>
-      We use email/phone/WhatsApp strictly to deliver your service (updates, queries, delivery coordination).
-      Marketing messages are sent only with consent and include opt-out options.
+      We use your contact details to respond to your inquiries, coordinate technical
+      discussions, and (if you opt in) send relevant updates about our hydrogen systems,
+      storage solutions, or pilot programs. You can opt out of non-essential updates at
+      any time by replying or contacting us.
     </p>
 
-    <h2>13) Minors’ data</h2>
+    <h2>14) Children / minors</h2>
     <p>
-      If you submit documents for a <strong>minor</strong>, you confirm you are the parent/guardian or otherwise lawfully authorised to provide such data for the requested purpose.
+      Our website and services are intended for professionals, researchers, partners,
+      regulators, and businesses in the clean energy sector. We do not knowingly collect
+      personal information from children.
     </p>
 
-    <h2>14) Breach response</h2>
+    <h2>15) Changes to this Policy</h2>
     <p>
-      In the unlikely event of a security incident affecting personal data, we will investigate, mitigate, and notify affected users and/or authorities as required by applicable law.
+      We may update this Privacy Policy as our technology, partnerships, or legal
+      obligations evolve. The <strong>Effective date</strong> above reflects the most
+      recent version. Continued use of our website or continued engagement with us
+      after changes means you accept the updated Policy.
     </p>
 
-    <h2>15) Changes to this policy</h2>
-    <p>
-      We may update this Policy. The <strong>Effective date</strong> above reflects the latest version. Continued use of our website/services means you accept the updated policy.
-    </p>
-
-    <h2>16) Contact &amp; grievance</h2>
+    <h2>16) Contact &amp; privacy questions</h2>
     <p>For privacy questions, requests, or grievances, contact:</p>
+
     <p class="my-05">
       📧 <Anchor href={`mailto:${contactEmail}`}><strong>{contactEmail}</strong></Anchor>
     </p>
+
     {adminEmail && adminEmail !== contactEmail && (
-      <p class="my-05">Admin: <Anchor href={`mailto:${adminEmail}`}><strong>{adminEmail}</strong></Anchor></p>
+      <p class="my-05">
+        Admin:{' '}
+        <Anchor href={`mailto:${adminEmail}`}>
+          <strong>{adminEmail}</strong>
+        </Anchor>
+      </p>
     )}
-    {siteDefaults?.contact?.phone && <p class="my-05">📞 {siteDefaults.contact.phone}</p>}
-    {location && <p class="my-05">📍 {location}</p>}
+
+    {siteDefaults?.contact?.phone && (
+      <p class="my-05">📞 {siteDefaults.contact.phone}</p>
+    )}
+
+    {location && (
+      <p class="my-05">📍 {location}</p>
+    )}
 
     <hr class="my-2" />
 
     <p class="text-s col-base-70">
-      Looking for our service terms? Read our <Anchor href={termsPath}><strong>Terms &amp; Conditions</strong></Anchor>.
+      See also our{' '}
+      <Anchor href={termsPath}><strong>Terms &amp; Conditions</strong></Anchor>.
       <br />
-      Learn more about cookies in our <Anchor href={cookiePath}><strong>Cookie Policy</strong></Anchor>.
+      Learn how cookies are used in our{' '}
+      <Anchor href={cookiePath}><strong>Cookie Policy</strong></Anchor>.
+      {/*
+        Refund/Return policy may or may not be relevant to industrial systems.
+        Keeping it referenced, but you can safely hide this line if you don't do
+        consumer checkout / e-commerce.
+      */}
       <br />
-      See payment reversals and cancellations in our <Anchor href={refundPath}><strong>Refund Policy</strong></Anchor>.
+      Billing / commercial commitments are governed separately; see{' '}
+      <Anchor href={refundPath}><strong>Refund Policy</strong></Anchor> if applicable.
     </p>
   </div>
 </article>

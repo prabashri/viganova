@@ -840,7 +840,7 @@ hr, .hr {
 
 .no-bullets {
 	list-style: none;
-	margin-left: 0;
+	margin-inline-start: 0;
 }
 .overscroll-contain {	
 	overscroll-behavior: contain;
@@ -1406,11 +1406,14 @@ hr, .hr {
 		min-height: 230px;
 	}
 	.big-float-right {
-	float: right !important;
-}
-.big-float-left {
-	float: left !important;
-}
+		float: right !important;
+	}
+	.big-float-left {
+		float: left !important;
+	}
+	.big-px-2 {
+		padding-inline: 2rem !important;
+	}
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {

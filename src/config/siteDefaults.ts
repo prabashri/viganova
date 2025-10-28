@@ -92,7 +92,9 @@ export const siteDefaults = {
   // dissolutionDate: '',
   legalName: "Viga Nova Green Energy Pvt. Ltd.",
   taxId: "",
-  registrationId: "",
+  taxLabel: "GSTIN",
+  registrationId: "U20119TN2025PTC185265",
+  registrationLabel: "CIN",
   founder: [
       {
         type: "Person",
@@ -132,6 +134,7 @@ export const siteDefaults = {
 
   // Organization block (main entity). If this is removed or partial,
   // schemaOrganization.ts will fill from site-level fields.
+  /*
   parentOrganization: {
     // Set entity type dynamically: 'Organization' or 'Person'
     type: "Organization", // Change to 'Person' if site is personal brand
@@ -167,7 +170,7 @@ export const siteDefaults = {
     // dissolutionDate: '',
     legalName: "Viga Nova Green Energy Private Limited",
     taxId: "",
-    registrationId: "U20191TN2025PTC185265",
+    registrationId: "U20119TN2025PTC185265",
     vatId: "",
     dunsId: "",
 
@@ -208,6 +211,7 @@ export const siteDefaults = {
       },
     ],
   },
+  */
 /**
  * add svg in public/icons/ and name here
  */
@@ -406,10 +410,10 @@ export const siteDefaults = {
       icon: "file-text",
       title: `Terms & Conditions — Legal Terms for Using ${SITE_NAME} Services`,
       description: `Read the terms and acceptable use for ${SITE_NAME}. This page covers service rules, limitations, disclaimers, payments, and your rights when using our website and document services.`,
-      enabled: true,
-      index: true,
-      sitemap: true,
-      showInFooterNav: true,
+      enabled: false,
+      index: false,
+      sitemap: false,
+      showInFooterNav: false,
       path: "/terms/",
       location: "content/pages/Terms.astro",
     },

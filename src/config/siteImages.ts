@@ -66,16 +66,16 @@ export const siteImages = {
     thumbnail: true,
     /* thumbnailSize: 120,*/
 
-    desktopLogo: "src/assets/logos/viganova-logo.png",
+    desktopLogo: "src/assets/logos/viganova-logo-white-bg.png",
     desktopLogoSvg: "src/assets/logos/DesktopLogo.svg",
 
-    mobileLogo: "src/assets/logos/viganova-mobile-logo.png",
+    mobileLogo: "src/assets/logos/viganova-mobile-logo-white-bg.png",
     mobileLogoSvg: "src/assets/logos/MobileLogo.svg",
 
-    siteIcon: "src/assets/logos/viganova-mobile-logo.png",
+    siteIcon: "src/assets/logos/viganova-mobile-logo-white-bg.png",
     siteIconSvg: "src/assets/logos/Icon.svg",
 
-    favIcon: "src/assets/logos/viganova-mobile-logo.png",
+    favIcon: "src/assets/logos/viganova-mobile-logo-white-bg.png",
     favIconSvg: "src/assets/logos/Icon.svg",
 
 }

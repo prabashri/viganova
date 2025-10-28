@@ -110,16 +110,18 @@ function collectSameAsFromSiteDefaults(): string[] {
   return Array.from(new Set(out));
 }
 
-const PARENT = siteDefaults.parentOrganization || {};
+// `parentOrganization` is not declared on the siteDefaults type so cast to any when accessing it
+const PARENT = (siteDefaults as any).parentOrganization || {};
 const ORG_ID =
-  orgIdFromCaller ?? idFor("organization", siteDefaults.parentOrganization?.url || "/");
+  orgIdFromCaller ?? idFor("organization", (siteDefaults as any).parentOrganization?.url || "/");
 const ORG_NAME_FALLBACK =
   siteDefaults.siteName || siteDefaults.legalName || PARENT.name || siteDefaults.title;
-const ORG_LOGO_FALLBACK = siteDefaults.parentOrganization?.logo;
+const ORG_LOGO_FALLBACK = (siteDefaults as any).parentOrganization?.logo;
 
 const ORG_LOGO_RESOLVED = resolveLogoFromManifest({
   manifest,
   kind: "organization",
+  mode: "schema",
   toAbsoluteUrl
 });
 
@@ -379,13 +381,20 @@ function locationToSchema(loc: LocationEntry, index: number) {
       "@type": "Brand",
       name: localBusiness.businessUnit.name || siteDefaults.siteName,
       url: toAbsoluteUrl(localBusiness.businessUnit.url || "/"),
-      logonew: ORG_LOGO_RESOLVED,
       logo: (() => {
+        // prefer explicit BU logo if present
         const buLogo = localBusiness.businessUnit.logo;
-        if (buLogo && (buLogo.startsWith("/") || /^https?:\/\//i.test(buLogo))) return toAbsoluteUrl(buLogo);
-        return ORG_LOGO_RESOLVED.url || (ORG_LOGO_FALLBACK ? toAbsoluteUrl(ORG_LOGO_FALLBACK) : undefined);
-      })()
+        if (buLogo && (buLogo.startsWith("/") || /^https?:\/\//i.test(buLogo))) {
+          return toAbsoluteUrl(buLogo);
+        }
+        // else fall back to resolved org logo (already absolute)
+        if (ORG_LOGO_RESOLVED?.url) return ORG_LOGO_RESOLVED.url;
+        // else final absolute fallback
+        if (ORG_LOGO_FALLBACK) return toAbsoluteUrl(ORG_LOGO_FALLBACK);
+        return undefined;
+      })(),
     },
+
 
     sameAs: sameAsBase.length ? Array.from(new Set(sameAsBase)) : undefined,
 

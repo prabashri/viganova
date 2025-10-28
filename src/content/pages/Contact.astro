@@ -21,7 +21,7 @@ const {
 
 /* --------- robust fallbacks --------- */
 const brand =
-  (siteDefaults.parentOrganization?.name) ||
+  ((siteDefaults as any).parentOrganization?.name) ||
   siteDefaults.siteName;
 
 const contactEmail =
@@ -39,7 +39,7 @@ const whatsappRaw =
 
 const addr =
   siteDefaults.address ||
-  siteDefaults.parentOrganization?.address || null;
+  ((siteDefaults as any).parentOrganization?.address) || null;
 
 const googleMapUrl = addr?.googleMap || '';
 

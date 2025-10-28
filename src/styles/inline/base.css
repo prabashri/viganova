@@ -34,6 +34,9 @@
 
   /* Layout sizing */
   --border-radius: 5px;
+  --border-radius-lg: 10px;
+
+  
   --max-width: 1280px;
   --featured-image-width: 960px;
   --site-width: 1280px;

@@ -23,11 +23,11 @@
 }
 /* sizes */
 .icon--sm{--icon-size:1rem}
-.icon--md{--icon-size:1.25rem}
-.icon--lg{--icon-size:1.5rem}
-.icon--xl{--icon-size:1.75rem}
-.icon--2xl{--icon-size:2rem}
-.icon--3xl{--icon-size:2.5rem}
+.icon--md{--icon-size:1.5rem}
+.icon--lg{--icon-size:2rem}
+.icon--xl{--icon-size:3rem}
+.icon--2xl{--icon-size:4rem}
+.icon--3xl{--icon-size:5rem}
 
 /* per-icon mappings — always defined (no inline style) */
 .icon--map-pin   { --icon-url: url("/icons/map-pin.svg"); }
@@ -42,3 +42,9 @@
 .icon--telegram  { --icon-url: url("/icons/telegram.svg"); }
 .icon--youtube  { --icon-url: url("/icons/youtube.svg"); }
 .icon--instagram  { --icon-url: url("/icons/instagram.svg"); }
+.icon--leaf-2  { --icon-url: url("/icons/leaf-2.svg"); }
+.icon--leaf  { --icon-url: url("/icons/leaf.svg"); }
+.icon--globe  { --icon-url: url("/icons/globe.svg"); }
+.icon--circle-tick  { --icon-url: url("/icons/circle-tick.svg"); }
+.icon--idea  { --icon-url: url("/icons/idea-2.svg"); }
+.icon--power-trending  { --icon-url: url("/icons/power-trending.svg"); }

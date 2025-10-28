@@ -9,12 +9,16 @@ import { Icon } from 'astro-icon/components';
 import { buildWhatsAppLink } from '@/utils/whatsapp';
 import { getAllReviews, getGlobalAggregate } from "@/utils/reviews";
 import Card from '@/components/ui/Card.astro';
+import FocusCard from '@/components/ui/FocusCard.astro';
+
+import { servicePagesList } from '@/config/siteServicePages';
 
 import StarRating from '@/components/ui/StarRating.astro';
 
 import ReviewList from "@/components/ReviewList.astro";
 
 import { inr, price } from '@/config/pricing';
+import IconMask from '@/components/IconMask.astro';
 
 const all = await getAllReviews();
 const agg = await getGlobalAggregate();
@@ -45,51 +49,157 @@ const waHref1  = wa1 ? buildWhatsAppLink({
   text: 'Hi VigaNova!',
   source: 'home-contact',
 }) : '';
-
+/* FAQ entries */
+/*
 const faq = [
     {
-        question: "What is the cost of MEA apostille through VigaNova?",
-        answer: `Our standard SDM bundle covers Notary + SDM (Delhi) + MEA + premium return for just ₹${inr(price('sdmBundle'))} per document. Multi-document discounts are available; HRD/CoC routes are quoted after verification.`,
-        speakable: true
+      question: "",
+      answer: "",
+      speakable: true
     },
-    {
-        question: "Can I courier or email my documents from abroad?",
-        answer: "Yes. Overseas Indian clients can send scanned copies by email or courier the originals to our Delhi service center. We guide you through every step securely."
-    },
-    {
-        question: "Can you send the apostilled documents to my country?",
-        answer: "Yes, we're happy to take full responsibility for safely delivering your completed apostille documents to your address anywhere in the world via Blue Dart, DHL, or other standard international courier services."
-    },
-    {
-        question: "Is the apostille valid abroad?",
-        answer: "Yes. Apostilles issued by the Ministry of External Affairs (MEA), India, are legally valid in all Hague Convention member countries."
-    },
-    {
-        question: "Which documents can I apostille?",
-        answer: "You can apostille personal (birth, marriage, PCC), educational (degree, diploma), and commercial documents (invoices, agreements, power of attorney)."
-    },
-    {
-        question: "How long does the process take?",
-        answer: "Typically 2-3 working days for most personal and educational documents. Processing time may vary slightly depending on document type or issuing state."
-    },
-
-    {
-        question: "How can I track my apostille request?",
-        answer: "You'll receive live status updates and tracking links at each step — from receipt to completion and dispatch."
-    },
-    {
-        question: "What payment methods do you accept?",
-        answer: "We accept secure payments via UPI and bank transfer. A GST invoice is provided for all transactions."
-    },
-    {
-        question: "Is my data safe with VerifiedApostille?",
-        answer: "Absolutely. We follow strict data-handling, encryption, and disposal policies to keep all client information secure and confidential."
-    }
+    
 ];
-
+*/
+const ctas = servicePagesList.map((s: any, i: number) => ({
+  href: `#${s.id}`,
+  icon: s.icon,
+  label: s.title || s.shortLabel,
+  variant: i === servicePagesList.length - 1 ? "secondary" : "primary",
+  dataId: `cta-${s.id}`,
+  ariaLabel: `Learn more about ${s.title}`,
+  title: s.description,
+}));
+const ctas_old = [
+  {
+    href: '#green-energy-production',
+    icon: 'hydrogen-tank',
+    label: 'Green Hydrogen Production',
+    variant: 'primary',
+    dataId: 'cta-green-h2',
+    ariaLabel: 'Learn about green hydrogen production',
+    title:
+      'Clean hydrogen from renewable power, engineered for industrial scale and long-term cost competitiveness.',
+  },
+  {
+    href: '#electrolyzer-systems',
+    icon: 'electrochemistry',
+    label: 'Electrolyzer Systems',
+    variant: 'primary',
+    dataId: 'cta-electrolyzer',
+    ariaLabel: 'Explore our electrolyzer systems',
+    title:
+      'High-efficiency alkaline and PEM electrolyzer stacks, from lab validation to deployment.',
+  },
+  {
+    href: '#green-ammonia-urea',
+    icon: 'ammonia',
+    label: 'Green Ammonia & Urea',
+    variant: 'primary',
+    dataId: 'cta-green-ammonia',
+    ariaLabel: 'See our green ammonia and urea solutions',
+    title:
+      'Decarbonized ammonia for fertilizer and energy storage using nitrogen + green hydrogen.',
+  },
+  {
+    href: '#rd-consulting',
+    icon: 'chemical-beakers',
+    label: 'R&D & Consulting',
+    variant: 'secondary',
+    dataId: 'cta-rd',
+    ariaLabel: 'Get R&D and consulting support',
+    title:
+      'Custom materials, process optimization, and pilot-scale strategy for hydrogen and ammonia.',
+  },
+];
+// Each FocusCard needs id, icon, title, description, href, img, reverse
+const focusAreas = servicePagesList.map((s: any) => ({
+  id: s.id,
+  iconName: s.icon,
+  title: s.title,
+  description: s.description,
+  href: s.href,
+  img: s.imageSquare, // square images for home cards
+  reverse: s.reverse,
+}));
+const focusAreas_old = [
+  {
+    id: 'green-energy-production',
+    iconName: 'hydrogen-tank',
+    title: 'Green Hydrogen Production',
+    description:
+      'Clean hydrogen from renewable power, engineered for industrial scale and long-term cost competitiveness.',
+    href: '/services/green-hydrogen/',
+    img: {
+      src: 'hydrogen-production.jpg',
+      alt: 'Green hydrogen production plant',
+      title: 'Hydrogen Production',
+    },
+    reverse: true,
+  },
+  {
+    id: 'electrolyzer-systems',
+    iconName: 'electrochemistry',
+    title: 'Electrolyzer Systems',
+    description:
+      'High-efficiency alkaline and PEM electrolyzer stacks, from lab validation to deployment.',
+    href: '/services/electrolyzer-systems/',
+    img: {
+      src: 'electrolyzer-tech.jpg',
+      alt: 'Electrolyzer stack and system integration',
+      title: 'Electrolyzer Systems',
+    },
+    reverse: false,
+  },
+  {
+    id: 'green-ammonia-urea',
+    iconName: 'ammonia',
+    title: 'Green Ammonia Production',
+    description:
+      'Decarbonized ammonia for fertilizer and energy storage using nitrogen + green hydrogen — no fossil feedstock.',
+    href: '/services/green-ammonia/',
+    img: {
+      src: 'green-ammonia.jpg',
+      alt: 'Green ammonia synthesis loop',
+      title: 'Green Ammonia',
+    },
+    reverse: true,
+  },
+  {
+    id: 'rd-consulting',
+    iconName: 'chemical-beakers',
+    title: 'Research & Development Consulting',
+    description:
+      'Custom materials, process optimization, and scale-up strategy from lab prototype to pilot plant.',
+    href: '/services/research-development/',
+    img: {
+      src: 'research-lab.jpg',
+      alt: 'Advanced electrochemistry and materials R&D lab',
+      title: 'Research & Development Consulting',
+    },
+    reverse: false,
+  },
+];
+const whyChooseUs = [
+  {
+    title: "Sustainability-Driven Innovation",
+    description: "Pioneering solutions that align technology with environmental responsibility",
+    icon: "leaf-2",
+  },
+  {
+    title: "End-to-End Expertise",
+    description: "From R&D to deployment, we offer turnkey clean energy systems",
+    icon: "circle-tick",
+  },
+  {
+    title: "Global Vision",
+    description: "Bridging innovation and implementation for worldwide green energy transformation",
+    icon: "globe",
+  },
+];
 ---
-<article id="post-layout">
-  <header id="post-header" class="post-header dots-background max-w-100p max-h-80vh h-100p w-100p  mx-auto ta-center relative overflow-hidden pb-2">
+<article id="post-layout" class="post-layout col-primary-dark">
+  { /*-- Hero Section --*/ }
+  <header id="post-header" class="post-header dots-background max-w-100p max-h-80vh h-100p w-100p mx-auto ta-center relative overflow-hidden pb-2">
     <ResponsiveImage
       src="hero-image.jpg"
       alt="Viga Nova Green Energy Solutions - Electrolyzer for Hydrogen and Ammonia Production"
@@ -97,114 +207,53 @@ const faq = [
       width="380" breakpoints={{ mobile: 380, desktop: 640 }}
       addSchema={true}
       className="hero-image absolute inset-0 opacity-90 object-p-bottom object-cover"
-      imageClassName=''
+      imageClassName='br-r-unset'
       loading="eager"
       variant="desktop" 
       id="hero-image"
     />    
-    <div id="hero-section" class="flex flex-col big-flex-row max-w-featured mx-auto w-100p py-2 px-1 ai-center jc-center gap relative">            
-      <div class="hero-text flex-1 relative col-primary ta-start">
-        <h1 class="post-title regular text-base">
-            Viga Nova Green Energy Solutions
-        </h1>
-        <h2 class="text-5xl">
-          Advancing Clean Green Energy, Shaping Tomorrow
-        </h2>
-        <p>
-        Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies
-        </p>
-        <div class="cta-container my-1 flex flex-row wrap gap ai-f-start">
+    <div id="hero-section" class="flex flex-col max-w-featured mx-auto w-100p py-2 px-1 ai-f-start jc-center gap relative ta-start my-2">
+      <h1 class="post-title regular text-base">
+        Viga Nova Green Energy Solutions
+      </h1>
+      <h2 class="text-6xl my-0">
+        Advancing Clean Green Energy, Shaping Tomorrow
+      </h2>
+      <p>
+      Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies
+      </p>
+        
+      <div class="cta-container my-1 flex flex-row wrap gap ai-f-start">
+        {ctas.map((item) => (
           <Anchor
-            href="#green-energy-production"
+            href={item.href}
             type="button"
-            variant="primary"
-            ariaLabel="Start Apostille Process on WhatsApp"
-            title="Share certificates or documents securely on WhatsApp to begin"
-            dataId="cta-wa-start"
-            className="cta-button flex flex-col ai-f-start gap-0"
+            variant={(item.variant as 'primary' | 'secondary') ?? 'primary'}
+            ariaLabel={item.ariaLabel}
+            title={item.title}
+            dataId={item.dataId}
+            className={`cta-chip flex flex-col ai-f-start gap-0 br-r`}
             dataAction="link_click"
-            dataLabel="WhatsApp • Start Apostille"
+            dataLabel={item.label}
           >
-            <Icon
-              slot="icon-left"
-              name="hydrogen-tank"
-              id="hero-cta-1"
-              class="block round fill-base-100 w-5-0 h-5-0"
-              aria-hidden="true"
-              focusable="false"
-            />
-            Green Hydrogen Production 
+            <span class="cta-icon-wrap flex ai-center jc-center br-r">
+              <Icon
+                slot="icon-left"
+                name={item.icon}
+                id={`${item.dataId}-icon`}
+                class="block fill-base-100 w-5-0 h-5-0"
+                aria-hidden="true"
+                focusable="false"
+              />
+            </span>
+            <span class="cta-text block">{item.label}</span>
           </Anchor>
-          <Anchor
-            href="#electrolyzer-systems"
-            type="button"
-            variant="primary"
-            ariaLabel="Start Apostille Process on WhatsApp"
-            title="Share certificates or documents securely on WhatsApp to begin"
-            dataId="cta-wa-start"
-            className="cta-button flex flex-col ai-f-start gap-0"
-            dataAction="link_click"
-            dataLabel="WhatsApp • Start Apostille"
-          >
-            <Icon
-              slot="icon-left"
-              name="electrochemistry"
-              id="hero-cta-1"
-              class="block round fill-base-100 w-5-0 h-5-0"
-              aria-hidden="true"
-              focusable="false"
-            />
-            Electrolyzer Systems
-          </Anchor>
-
-          <Anchor
-            href="#green-ammonia-urea"
-            type="button"
-            variant="primary"
-            ariaLabel="Start Apostille Process on WhatsApp"
-            title="Share certificates or documents securely on WhatsApp to begin"
-            dataId="cta-wa-start"
-            className="cta-button flex flex-col ai-f-start gap-0"
-            dataAction="link_click"
-            dataLabel="WhatsApp • Start Apostille"
-          >
-            <Icon
-              slot="icon-left"
-              name="ammonia"
-              id="hero-cta-1"
-              class="block round fill-base-100 w-5-0 h-5-0"
-              aria-hidden="true"
-              focusable="false"
-            />
-            Green Ammonia &amp; Urea 
-          </Anchor>
-
-
-          <Anchor
-            href="#rd-consulting"
-            type="button"
-            variant="secondary"
-            ariaLabel="Get a free consultation and quote via WhatsApp"
-            title="Request a free consultation and quote on WhatsApp"
-            dataId="cta-wa-quote" data-action="link_click" data-label="WhatsApp • Get a Free Consultation"
-            className="cta-button secondary flex flex-col ai-f-start gap-0"
-          >
-            <Icon
-              slot="icon-left"
-              name="chemical-beakers"
-              id="hero-cta-2"
-              class="block round fill-base-100 w-5-0 h-5-0"
-              aria-hidden="true"
-              focusable="false"
-            />
-            R&amp;D &amp; Consulting
-          </Anchor>
-        </div>				
-      </div>            
+        ))}
+      </div>      
     </div>      
   </header>
-  <section id="about-us-section" class="max-w-full w-100p mx-auto my-1 p-2" aria-labelledby="about-us-section">
-    <div class="max-w-featured w-100p mx-auto my-2 p-2 ji-center">
+  <section id="about-us-section" class="max-w-full w-100p mx-auto bg-primary-lighter-x" aria-labelledby="about-us-section">
+    <div class="max-w-featured w-100p mx-auto p-2 ji-center">
       <h2 id="about-us-heading" class="ta-center">
         About Viga Nova Green Energy
       </h2>
@@ -214,282 +263,109 @@ const faq = [
       <Anchor className="w-fit" variant="primary" href="/about-us/">Learn More About Us</Anchor>
     </div>
   </section>
-  <section id="about-us-section" class="max-w-full w-100p mx-auto" aria-labelledby="about-us-section">
-    <div class="max-w-featured w-100p mx-auto my-2 p-2">
-      <h2 id="about-us-heading" class="ta-center">
-          Our Focus Areas
-        </h2>
-        <p class="ta-center my-1">
-          We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
-        </p>
-        <Anchor className="w-fit" variant="primary" href="/about-us/">Learn More About Us</Anchor>
-    </div>
-    <div id="green-energy-production" class="card-container flex flex-col big-flex-row-reverse max-w-featured w-100p mx-auto my-2 p-2">
-      <div class="card-content flex-1 px-2">
-        <Icon slot="icon-left" name="hydrogen-tank" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
-        <h3 class="card-title my-s-0">Green Hydrogen Production</h3>
-        <p class="card-description">Innovative solutions for green hydrogen production.</p>
-        <Anchor className="w-fit" variant="primary" href="/services/green-hydrogen/">Learn More</Anchor>
+
+  <section id="focus-area-section" class="max-w-full w-100p mx-auto" aria-labelledby="focus-area-section">
+    <div class="focus-areas-grid">
+      <h2 id="focus-area-heading" class="max-w-featured w-100p mx-auto p-1 ta-center">
+        Our Focus Areas
+      </h2>
+      <p class="max-w-featured w-100p mx-auto p-1 ta-center">
+        We aim to accelerate the transition to a sustainable energy future by developing cost-effective, scalable, and high-efficiency hydrogen and ammonia systems that help industries decarbonize and thrive responsibly.
+      </p>
+      <div class="bubble-background" aria-hidden="true">   
       </div>
-      <ResponsiveImage
-        src="hydrogen-production.jpg"
-        alt="hydrogen-production"
-        title="Hydrogen Production"
-        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
-        className="card-image w-100p h-200px object-cover br-r flex-1"
-        imageClassName=''
-        loading="lazy"
-        variant="desktop" 
-        id="card-image-1"
-      />      
+
+      {focusAreas.map(area => (
+        <FocusCard
+          id={area.id}
+          iconName={area.iconName}
+          title={area.title}
+          description={area.description}
+          href={area.href}
+          img={area.img}
+          reverse={area.reverse}
+        />
+      ))}
     </div>
 
-    <div id="electrolyzer-systems" class="card-container flex flex-col big-flex-row max-w-featured w-100p mx-auto my-2 p-2">      
-      <div class="card-content flex-1 px-2">
-        <Icon slot="icon-left" name="electrochemistry" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
-        <h3 class="card-title my-s-0">Electrolyzer Systems</h3>
-        <p class="card-description">Innovative solutions for electrolyzer systems.</p>
-        <Anchor className="w-fit" variant="primary" href="/services/electrolyzer-systems/">Learn More</Anchor>
-      </div>
-      <ResponsiveImage
-        src="electrolyzer-tech.jpg"
-        alt="Electrolyzer Systems"
-        title="Electrolyzer Systems"
-        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
-        className="card-image w-100p h-200px object-cover br-r flex-1"
-        imageClassName=''
-        loading="lazy"
-        variant="desktop" 
-        id="card-image-2"
-      />
-    </div>
-
-    <div id="green-ammonia-urea" class="card-container flex flex-col big-flex-row-reverse max-w-featured w-100p mx-auto my-2 p-2">
-      
-      <div class="card-content flex-1 px-2">
-        <Icon slot="icon-left" name="ammonia" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
-        <h3 class="card-title my-s-0">Green Ammonia Production</h3>
-        <p class="card-description">Innovative solutions for green ammonia production.</p>
-        <Anchor className="w-fit" variant="primary" href="/services/green-ammonia/">Learn More</Anchor>
-      </div>
-      <ResponsiveImage
-        src="green-ammonia.jpg"
-        alt="green-ammonia"
-        title="Green Ammonia"
-        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
-        className="card-image w-100p h-200px object-cover br-r flex-1"
-        imageClassName=''
-        loading="lazy"
-        variant="desktop" 
-        id="card-image-3"
-      />
-    </div>
-
-    <div id="rd-consulting" class="card-container flex flex-col big-flex-row max-w-featured w-100p mx-auto my-2 p-2">      
-      <div class="card-content flex-1 px-2">
-        <Icon slot="icon-left" name="chemical-beakers" id="focus-area-1" class="block round col-primary fill-primary w-5-0 h-5-0" aria-hidden="true" focusable="false" />
-        <h3 class="card-title my-s-0">Research & Development Consulting</h3>
-        <p class="card-description">Innovative solutions for research and development.</p>
-        <Anchor className="w-fit" variant="primary" href="/services/research-development/">Learn More</Anchor>
-      </div>
-      <ResponsiveImage
-        src="research-lab.jpg"
-        alt="Research & Development Consulting"
-        title="Research & Development Consulting"
-        width="380" breakpoints={{ mobile: 380, desktop: 640 }}
-        className="card-image w-100p h-200px object-cover br-r flex-1"
-        imageClassName=''
-        loading="lazy"
-        variant="desktop" 
-        id="card-image-2"
-      />
-    </div>
   </section>
   
     { /*-- Link added --*/ }
-<section id="why-VerifiedApostille" class="max-w-site w-100p mx-auto my-1 p-2" aria-labelledby="why-VerifiedApostille-h2">
-  <h2 id="why-VerifiedApostille-h2" class="ta-center my-05">
-    Why everyone chooses <span class="nowrap">VerifiedApostille</span>
+<section id="why-choose-us-section" class="bg-gradient-primary w-100p mx-auto my-1 p-2 col-base-00" aria-labelledby="why-choose-us-section">
+  <h2 id="why-choose-us-h2" class="ta-center max-w-featured w-100p mx-auto my-05">
+    Why Choose Us
   </h2>
 
   <p class="max-w-featured w-100p mx-auto ta-center opacity-90 my-1">
-    Fast, <strong>MEA-compliant apostille &amp; attestation</strong> across India — choose
-    <strong>e-Apostille (QR)</strong> or <strong>sticker apostille</strong> with <strong>tracked worldwide delivery</strong>.
+    Leading the way in <strong>clean energy innovation</strong> with expertise, sustainability, and a global vision.
   </p>
 
   <!-- Feature cards -->
-  <ul class="req-list flex flex-row wrap gap-2 my-2 max-w-featured mx-auto jc-center">
-    <li class="req-item w-sidebar info">
-      <div class="req-icon" aria-hidden="true">✅</div>
-      <div class="req-body">
-        <p class="req-title">MEA-ready process</p>
-        <p class="req-desc">
-          We <strong>pre-check your paperwork</strong> before submission (Notary → SDM/State → MEA) to avoid rejections.
-          <a href="https://easyapostille.in/resources/how-to-get-apostille-in-india-step-by-step/" class="td-none underline focus-vis-outline" title="How to get apostille in India — step by step">
-            Learn the steps
-          </a>
-        </p>
-      </div>
-    </li>
-
-    <li class="req-item w-sidebar ok">
-      <div class="req-icon" aria-hidden="true">💬</div>
-      <div class="req-body">
-        <p class="req-title">Dedicated case manager</p>
-        <p class="req-desc">One point of contact on WhatsApp/email from document review to delivery.</p>
-      </div>
-    </li>
-
-    <li class="req-item w-sidebar info">
-      <div class="req-icon" aria-hidden="true">⚡</div>
-      <div class="req-body">
-        <p class="req-title">On-time delivery</p>
-        <p class="req-desc">
-          Typical turnaround for personal documents is <strong>~2–3 working days</strong> (queue-dependent). Live ETA shared upfront.
-        </p>
-      </div>
-    </li>
-
-    <li class="req-item w-sidebar warn">
-      <div class="req-icon" aria-hidden="true">💰</div>
-      <div class="req-body">
-        <p class="req-title">Clear pricing</p>
-        <p class="req-desc">
-          <strong>No hidden charges</strong>. Multi-document <strong>discounts 5–10%</strong>. Pickup/return courier options.
-          <Anchor href="/contact-us/" className="td-none underline focus-vis-outline" title="Request an all-inclusive quote">
-            Get a quote
-          </Anchor>
-        </p>
-      </div>
-    </li>
-
-    <li class="req-item w-sidebar info">
-      <div class="req-icon" aria-hidden="true">📦</div>
-      <div class="req-body">
-        <p class="req-title">Door-to-door service</p>
-        <p class="req-desc">
-          Upload scans or send originals via secure courier. <strong>Pan-India pickup</strong> &amp; <strong>tracked worldwide delivery</strong>.
-        </p>
-      </div>
-    </li>
-
-    <li class="req-item w-sidebar ok">
-      <div class="req-icon" aria-hidden="true">🔒</div>
-      <div class="req-body">
-        <p class="req-title">Privacy &amp; security</p>
-        <p class="req-desc">Strict document handling, secure storage, and safe disposal after completion.</p>
-      </div>
-    </li>
-  </ul>
-
-  <!-- Compact, curated internal links to keep link density low -->
-  <div class="max-w-featured w-100p mx-auto grid gap-1 my-2" role="navigation" aria-label="Popular services and guides">
-    <!-- Popular services (4 max) -->
-    <div class="ta-center">
-      <p class="bold uppercase my-02">Popular services</p>
-      <ul class="inline-flex wrap gap-05 no-bullets jc-center">
-        <li><Anchor className="td-none underline focus-vis-outline" href="/service/pcc-apostille/" title="PCC apostille service">PCC</Anchor></li>
-        <li><Anchor className="td-none underline focus-vis-outline" href="/service/degree-certificate-apostille/" title="Degree certificate apostille">Degree</Anchor></li>
-        <li><Anchor className="td-none underline focus-vis-outline" href="/service/marriage-certificate-apostille/" title="Marriage certificate apostille">Marriage</Anchor></li>
-        <li><Anchor className="td-none underline focus-vis-outline" href="/service/birth-certificate-apostille/" title="Birth certificate apostille">Birth</Anchor></li>
-      </ul>
-      <p class="text-s mt-02 opacity-80">
-        <Anchor className="td-none underline focus-vis-outline" href="/service/personal-documents-apostille/" title="Personal documents apostille">
-          Personal
-        </Anchor>
-        •
-        <Anchor className="td-none underline focus-vis-outline" href="/service/education-documents-apostille/" title="Education documents apostille">
-          Education
-        </Anchor>
-        •
-        <Anchor className="td-none underline focus-vis-outline" href="/service/business-document-apostille/" title="Business documents apostille">
-          Business
-        </Anchor>
-      </p>
-    </div>
-
-    <!-- Guides (2 + 1 “browse all”) -->
-    <div class="ta-center">
-      <p class="bold uppercase my-02">Guides</p>
-      <ul class="inline-flex wrap gap-05 no-bullets jc-center">
-        <li>
-          <Anchor className="td-none underline focus-vis-outline"
-            href="/resources/apostille-process-in-india/"
-            title="What is Apostille? Meaning, process and certificate (pillar)">
-            What is Apostille?
-          </Anchor>
-        </li>
-        <li>
-          <Anchor className="td-none underline focus-vis-outline"
-            href="https://easyapostille.in/resources/hague-vs-non-hague-apostille-or-embassy-attestation/"
-            title="Hague vs Non-Hague: Apostille or Embassy Attestation">
-            Hague vs Non-Hague
-          </Anchor>
-        </li>
-      </ul>
-      <p class="text-s mt-02 opacity-80">
-        <Anchor className="td-none underline focus-vis-outline"
-          href="https://easyapostille.in/resources/document-authentication-india-coc-hrd-vs-sdm-home-state-attestation/"
-          title="Document authentication in India: CoC/HRD vs SDM/Home State">
-          CoC/HRD vs SDM
-        </Anchor>
-        &nbsp;•&nbsp;
-        <Anchor className="td-none underline focus-vis-outline"
-          href="https://easyapostille.in/resources/apostille-on-original-vs-copy-certificate-india/"
-          title="Apostille on original vs copy">
-          Original vs Copy
-        </Anchor>
-        &nbsp;•&nbsp;
-        <Anchor className="td-none underline focus-vis-outline" href="https://easyapostille.in/resources/" title="Browse all resources">
-          More guides
-        </Anchor>
-      </p>
-    </div>
-  </div>
-
-  <!-- CTAs -->
-  <div class="max-w-featured w-100p mx-auto flex wrap jc-center gap-05 my-2 ta-center">
-    <Anchor
-      href={buildWhatsAppLink({
-        phone: '919047433266',
-        text: 'Hi VerifiedApostille!',
-        source: 'Home-Why',
-      })}
-      ariaLabel="Chat on WhatsApp"
-      variant="primary"
-    >
-      <Icon
-        slot="icon-left"
-        name="whatsapp"
-        class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-        aria-hidden="true"
-        focusable="false"
-      />
-      Chat on WhatsApp →
-    </Anchor>
-
-    <Anchor href="/contact-us/" ariaLabel="Email the VerifiedApostille team" variant="secondary">
-      <Icon
-        slot="icon-left"
-        name="email"
-        class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-        aria-hidden="true"
-        focusable="false"
-      />
-      Email us →
-    </Anchor>
-  </div>
-
-  <p class="max-w-featured w-100p mx-auto opacity-80 mt-05 ta-center">
-    Free document pre-check • MEA-approved flow • e-Apostille (QR) &amp; sticker options • Tracked worldwide delivery
-  </p>
+  <ul class="no-bullets flex flex-row wrap gap-05 my-2 mx-auto mi-s-auto max-w-site w-100p p-2 jc-center" role="list">
+    {whyChooseUs.map(area => (
+      <li class="max-w-sidebar w-100p p-1 flex flex-col gap-05 ta-center ai-center">
+        <div class="flex w-fit ai-center bg-primary-lighter jc-center br-r">
+          <IconMask
+            name={area.icon} size='2xl'
+            class="col-primary fill-primary w-3-0 h-3-0"
+            aria-hidden="true"            
+          />
+        </div>
+        <h3 class="my-0 text-lg">{area.title}</h3>
+        <p class="">{area.description}</p>
+      </li>
+    ))}    
+  </ul>  
 </section>
 
+<div id="vision-mission-section" class="w-100p mx-auto my-1 p-2" aria-labelledby="vision-mission-section">
+  <div class="flex flex-row wrap gap-05 my-2 mx-auto max-w-featured w-100p p-2 ac-f-start ai-f-start jc-f-start" role="list">   
+    <div class="w-100p p-1 flex flex-col flex-1 gap-05 ai-f-start br-r h-webkit box-shadow-light hover-box-shadow-strong transition-shadow">
+      <div class="flex flex-row gap-05 w-fit ai-center jc-center br-r">
+        <div class="bg-primary-lighter-x br-r w-3-0 h-3-0">
+          <IconMask
+            name="power-trending" size='xl'
+            class="col-primary fill-primary"
+            aria-hidden="true"            
+          />
+        </div>
+        <h3 class="my-0 text-xl">Our Mission</h3>
+      </div>
+      
+      <p class="text-small my-1 col-base-80">To revolutionize energy systems by making green hydrogen and clean energy technologies accessible, efficient, and impactful for industries worldwide.</p>
+    </div>
+    <div class="w-100p p-1 flex flex-col flex-1 gap-05 ai-f-start br-r h-webkit box-shadow-light hover-box-shadow-strong transition-shadow">
+      <div class="flex flex-row gap-05 w-fit ai-center jc-center br-r">
+        <div class="bg-primary-lighter-x br-r w-3-0 h-3-0">
+          <IconMask
+            name="idea" size='xl'
+            class="col-primary fill-primary"
+            aria-hidden="true"            
+          />
+        </div>
+        <h3 class="my-0 text-lg">Our Vision</h3>
+      </div>
+      
+      <p class="text-small my-1 col-base-80">A carbon-neutral world powered by sustainable hydrogen and renewable innovation.</p>
+    </div>  
+  </div> 
+  <Anchor className="w-sidebar mx-auto my-1 p-1" variant="primary" href="/about-us/#ceo-message">CEO Message</Anchor> 
+</div>
 
+<div id="call-to-action-section" class="w-100p mx-auto p-2 bg-primary-lighter-x" aria-labelledby="call-to-action-section">
+  <div class="flex flex-col gap-05 my-2 mx-auto max-w-featured w-100p p-2 ai-center ta-center" role="list">
+    <h2>Ready to Build a Sustainable Future?</h2> 
+    <p>Whether you're an industry partner, researcher, or policymaker — join us in building a cleaner, hydrogen-powered tomorrow.</p>
+    <div class="flex flex-row wrap gap-05 my-1">  
+      <Anchor className="w-fit" variant="primary" href="/contact-us/">Contact Us</Anchor>
+      <Anchor className="w-fit" variant="secondary" href="/services/">Explore Our Services</Anchor>  
+    </div>
+  </div> 
+</div>
 
    
 
-    {Array.isArray(faq) && faq.length > 0 && (
+    {/* Array.isArray(faq) && faq.length > 0 && (
         <FaqList
           items={faq}
           id="faq"
@@ -505,69 +381,5 @@ const faq = [
           addSpeakableSchema={true}
           htmlAnswers={false}
         />
-    )}
-
-
-    <section id="home-contact" class="w-100p mx-auto my-2 p-2 ta-center">
-        <h2 class="my-05">Still have questions?</h2>
-        <p class="opacity-80 my-1">Prefer WhatsApp or a quick call? We're happy to help.</p>
-
-        <div class="flex wrap jc-center gap-05">
-            <Anchor href={waHref1} className="" variant="primary"> <Icon
-                slot="icon-left"
-                name="whatsapp"
-                id="home-cta-5"
-                class="block bg-base-00 round fill-base-100 w-1-5 h-1-5"
-                aria-hidden="true"
-                focusable="false"
-            />Open WhatsApp</Anchor>
-        </div>
-
-        <p class="mt-1">
-           <Anchor href={telHref1} className="td-none">Call {tel1}</Anchor>         
-           <span> &nbsp;•&nbsp; </span>
-           <Anchor href={`mailto:${email}`} className="td-none">{email}</Anchor>
-        </p>
-    </section>
-    <section id="home-compliance" class="w-100p bg-base-00 mx-auto p-2">
-        <h2 class="my-05 ta-center">Compliance &amp; Assurance</h2>
-
-        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mx-auto jc-center req-list">
-            <div class="box block w-sidebar">✅ <strong>MEA-compliant apostille</strong> via authorized channels — <em>sticker</em> &amp; <em>e-Apostille (QR verification)</em>.</div>
-            <div class="box block w-sidebar">✅ Correct chain handled end-to-end: <strong>Notary → SDM/State → MEA</strong> (as applicable).</div>
-            <div class="box block w-sidebar">✅ <strong>Acceptance guidance</strong> for university admissions, immigration, visa &amp; HR.</div>
-            <div class="box block w-sidebar">✅ <strong>GST invoice</strong> available on request.</div>
-            <div class="box block w-sidebar">✅ <strong>Secure pickup &amp; tracked delivery</strong> across India; privacy-first document handling.</div>
-        </div>
-
-        <div class="flex flex-row wrap gap-2 my-2 max-w-featured mx-auto jc-center">
-            <Anchor
-                href={buildWhatsAppLink({
-                    phone: '',
-                        text: 'Hi VerifiedApostille! I need MEA apostille help. Please share eligibility, ETA & all-inclusive quote.',
-                        source: 'Home-Compliance-CTA',
-                        })}
-                    className="mt-1 inline-flex ai-center gap-05 w-100p"
-                    ariaLabel="Start your apostille on WhatsApp"
-                    variant="primary" dataId='home-compliance-whatsapp' dataAction='link_click' dataLabel='Start Apostille in whatsapp chat'
-                >
-                <Icon
-                    slot="icon-left"
-                    name="whatsapp"
-                    class="block bg-base-00 round w-1-5 h-1-5"
-                    aria-hidden="true"
-                    focusable="false"
-                />
-                Start your apostille on WhatsApp →
-            </Anchor>
-        </div>
-   
-        <p class="mt-1 ta-center">
-            Prefer email? <Anchor className="td-none underline" href={`mailto:${email}`} dataAction='link_click' dataId='home-compliance-email'>{email}</Anchor>
-        </p>        
-
-        <p class="text-xs opacity-80 mt-05 ta-center">
-            Typical timeline for many personal documents: <strong>~2–3 working days</strong> (we confirm your exact ETA before payment).
-        </p>
-    </section>   
+    ) */}   
 </article>
