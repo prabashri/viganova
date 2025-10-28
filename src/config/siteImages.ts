@@ -3,14 +3,14 @@ import type { ImageSizeLabel } from '@/types/images';
 
 export const siteImages = {  
     /** General lightweight image used as background*/
-    image: "featured/verifiedapostille-service.jpg",
-    imageAlt: "Image with VerifiedApostille logo, notary, verified and trusted stamp, with some documents graphics",
-    imageTitle: "VerifiedApostille - Best Apostille Services for Overseas India",
+    image: "featured/viga-nova-green-energy-solutions.png",
+    imageAlt: "Image with Viga Nova Green Energy Solutions with green energy icons and sustainable future",
+    imageTitle: "Viga Nova - Best Green Energy Solutions from India to transform the future",
 
     /** featured image for the website */
-    featuredImage: "featured/verifiedapostille-service-for-overseas-indian-citizens-to-get-mea-apostille-attestation.png",
-    featuredImageAlt: "VerifiedApostille services for overseas Indians - MEA-approved agencies offering fast and secure apostille for original, physical and scanned certificates and get delivered worldwide",
-    featuredImageTitle: "VerifiedApostille - MEA Approved Certificate Attestation & Apostille Services for NRI Residents",
+    featuredImage: "featured/viga-nova-green-energy-solutions-vision-mission.png",
+    featuredImageAlt: "Viga Nova logo with vision and mission for a sustainable future with green energy solutions",
+    featuredImageTitle: "Viga Nova - Vision and Mission for a Sustainable Future",
 
     /** image optimization settings for srcset and responsive image sizes */
     imageVariants: [
