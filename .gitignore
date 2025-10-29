@@ -33,6 +33,8 @@ pnpm-debug.log*
 /src/data/image-format-details.json
 # Generated assets (your list)
 public/sw.js
+public/logos/
+
 public/scripts/*.min.js
 public/styles/*.css
 public/search-index*.json

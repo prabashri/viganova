@@ -1,0 +1,8 @@
+.w-5-0 {
+	/* width: 5rem; */
+    width: clamp(40px, calc(25.455px + 4.545vw), 80px);
+}
+.h-5-0 {
+	/* height: 5rem; */
+    height: clamp(40px, calc(25.455px + 4.545vw), 80px);
+}

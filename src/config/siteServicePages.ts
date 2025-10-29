@@ -11,7 +11,7 @@ export const servicePages = {
     shortLabel: "Hydrogen Production",
     description:
       "Clean hydrogen from renewable power, engineered for industrial scale and long-term cost competitiveness.",
-    href: "/#green-hydrogen", //"/services/green-hydrogen/",
+    href: "/#green-energy-production", //"/services/green-hydrogen/",
     reverse: true,
 
     // Two image variants
@@ -35,7 +35,7 @@ export const servicePages = {
   electrolyzer: {
     id: "electrolyzer-systems",
     icon: "electrochemistry",
-    title: "Electrolyzer Systems",
+    title: "Electrolyzer Systems & Sales",
     shortLabel: "Electrolyzers",
     description:
       "High-efficiency alkaline and PEM electrolyzer stacks, from lab validation to deployment.",
@@ -66,7 +66,7 @@ export const servicePages = {
     shortLabel: "Ammonia & Urea",
     description:
       "Decarbonized ammonia for fertilizer and energy storage using nitrogen + green hydrogen — no fossil feedstock.",
-    href: "/#green-ammonia", // "/services/green-ammonia/",
+    href: "/#green-ammonia-urea", // "/services/green-ammonia/",
     reverse: true,
 
     imageSquare: {

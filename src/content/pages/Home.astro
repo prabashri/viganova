@@ -199,7 +199,7 @@ const whyChooseUs = [
 ---
 <article id="post-layout" class="post-layout col-primary-dark">
   { /*-- Hero Section --*/ }
-  <header id="post-header" class="post-header dots-background max-w-100p max-h-80vh h-100p w-100p mx-auto ta-center relative overflow-hidden pb-2">
+  <header id="post-header" class="post-header dots-background max-w-100p h-100p w-100p mx-auto ta-center relative overflow-hidden pb-2">
     <ResponsiveImage
       src="hero-image.jpg"
       alt="Viga Nova Green Energy Solutions - Electrolyzer for Hydrogen and Ammonia Production"
@@ -232,7 +232,7 @@ const whyChooseUs = [
             ariaLabel={item.ariaLabel}
             title={item.title}
             dataId={item.dataId}
-            className={`cta-chip flex flex-col ai-f-start gap-0 br-r`}
+            className={`cta-chip flex big-flex-col ai-center big-ai-f-start gap-05 big-gap-0 br-r`}
             dataAction="link_click"
             dataLabel={item.label}
           >
@@ -291,7 +291,7 @@ const whyChooseUs = [
   </section>
   
     { /*-- Link added --*/ }
-<section id="why-choose-us-section" class="bg-gradient-primary w-100p mx-auto my-1 p-2 col-base-00" aria-labelledby="why-choose-us-section">
+<section id="why-choose-us-section" class="bg-gradient-primary w-100p mx-auto my-1 p-1 col-base-00" aria-labelledby="why-choose-us-section">
   <h2 id="why-choose-us-h2" class="ta-center max-w-featured w-100p mx-auto my-05">
     Why Choose Us
   </h2>
@@ -301,7 +301,7 @@ const whyChooseUs = [
   </p>
 
   <!-- Feature cards -->
-  <ul class="no-bullets flex flex-row wrap gap-05 my-2 mx-auto mi-s-auto max-w-site w-100p p-2 jc-center" role="list">
+  <ul class="no-bullets flex flex-row wrap gap-05 my-2 mx-auto mi-s-auto max-w-site w-100p jc-center" role="list">
     {whyChooseUs.map(area => (
       <li class="max-w-sidebar w-100p p-1 flex flex-col gap-05 ta-center ai-center">
         <div class="flex w-fit ai-center bg-primary-lighter jc-center br-r">
@@ -318,8 +318,8 @@ const whyChooseUs = [
   </ul>  
 </section>
 
-<div id="vision-mission-section" class="w-100p mx-auto my-1 p-2" aria-labelledby="vision-mission-section">
-  <div class="flex flex-row wrap gap-05 my-2 mx-auto max-w-featured w-100p p-2 ac-f-start ai-f-start jc-f-start" role="list">   
+<div id="vision-mission-section" class="w-100p mx-auto my-1 p-1" aria-labelledby="vision-mission-section">
+  <div class="flex flex-row wrap gap-05 my-2 mx-auto max-w-featured w-100p ac-f-start ai-f-start jc-f-start" role="list">   
     <div class="w-100p p-1 flex flex-col flex-1 gap-05 ai-f-start br-r h-webkit box-shadow-light hover-box-shadow-strong transition-shadow">
       <div class="flex flex-row gap-05 w-fit ai-center jc-center br-r">
         <div class="bg-primary-lighter-x br-r w-3-0 h-3-0">
@@ -349,11 +349,11 @@ const whyChooseUs = [
       <p class="text-small my-1 col-base-80">A carbon-neutral world powered by sustainable hydrogen and renewable innovation.</p>
     </div>  
   </div> 
-  <Anchor className="w-sidebar mx-auto my-1 p-1" variant="primary" href="/about-us/#ceo-message">CEO Message</Anchor> 
+  <Anchor className="max-w-sidebar w-100p mx-auto my-1 p-1" variant="primary" href="/about-us/#ceo-message">CEO Message</Anchor> 
 </div>
 
-<div id="call-to-action-section" class="w-100p mx-auto p-2 bg-primary-lighter-x" aria-labelledby="call-to-action-section">
-  <div class="flex flex-col gap-05 my-2 mx-auto max-w-featured w-100p p-2 ai-center ta-center" role="list">
+<div id="call-to-action-section" class="w-100p mx-auto bg-primary-lighter-x" aria-labelledby="call-to-action-section">
+  <div class="flex flex-col gap-05 my-2 mx-auto max-w-featured w-100p p-1 ai-center ta-center" role="list">
     <h2>Ready to Build a Sustainable Future?</h2> 
     <p>Whether you're an industry partner, researcher, or policymaker — join us in building a cleaner, hydrogen-powered tomorrow.</p>
     <div class="flex flex-row wrap gap-05 my-1">  

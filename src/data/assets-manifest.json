@@ -1,34 +1,34 @@
 {
   "configModified": {
-    "siteDefaults": 1761292712339,
+    "siteDefaults": 1761661395756,
     "siteLogo": 1754383794286,
     "siteColors": 1761294388761,
-    "siteImages": 1761142162277
+    "siteImages": 1761669502366
   },
   "icons": {
     "android-chrome-192x192.png": {
-      "datetime": "2025-10-24T05:37:12.804Z"
+      "datetime": "2025-10-24T05:37:07.538Z"
     },
     "android-chrome-512x512.png": {
-      "datetime": "2025-10-24T05:37:12.804Z"
+      "datetime": "2025-10-24T05:37:07.538Z"
     },
     "apple-touch-icon.png": {
-      "datetime": "2025-10-24T05:37:12.804Z"
+      "datetime": "2025-10-24T05:37:07.538Z"
     },
     "favicon-16x16.png": {
       "datetime": "2025-06-27T05:12:16.114Z"
     },
     "favicon-32x32.png": {
-      "datetime": "2025-10-24T05:37:12.804Z"
+      "datetime": "2025-10-24T05:37:07.538Z"
     },
     "favicon.ico": {
-      "datetime": "2025-10-24T05:37:12.804Z"
+      "datetime": "2025-10-24T05:37:07.538Z"
     },
     "favicon.svg": {
       "datetime": "2025-10-24T05:34:12.823Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-24T08:28:35.682Z"
+      "datetime": "2025-10-29T00:08:32.874Z"
     }
   },
   "css": {
@@ -41,7 +41,7 @@
     },
     "inline": {
       "file": "/src/data/generated-inline-css.ts",
-      "datetime": "2025-10-27T14:00:59.736Z",
+      "datetime": "2025-10-29T00:08:14.970Z",
       "names": [
         "base",
         "colors",
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.vr50fu.css",
-      "datetime": "2025-10-27T14:01:02.529Z",
+      "file": "/styles/main.30djjv.css",
+      "datetime": "2025-10-29T00:08:18.089Z",
       "names": [
         "base",
         "blockquote",
@@ -76,7 +76,7 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-27T14:01:05.514Z",
+      "datetime": "2025-10-29T00:08:21.678Z",
       "names": [
         "audio-layout",
         "contact-form",
@@ -92,7 +92,7 @@
     },
     "pages:home": {
       "file": "",
-      "datetime": "2025-10-27T14:01:05.273Z",
+      "datetime": "2025-10-29T00:08:20.929Z",
       "name": "home",
       "removed": true
     },
@@ -127,12 +127,12 @@
       "inlineModule": "/src/data/page-css/audio-layout.ts"
     },
     "pages:home-page": {
-      "file": "/styles/home-page.388abb.css",
-      "datetime": "2025-10-27T14:01:05.441Z",
+      "file": "/styles/home-page.a65bf7.css",
+      "datetime": "2025-10-29T00:08:21.483Z",
       "name": "home-page",
-      "hash": "388abb",
-      "mtimeMs": 1761569342383,
-      "bytes": 4842,
+      "hash": "a65bf7",
+      "mtimeMs": 1761641346047,
+      "bytes": 3243,
       "source": "src\\styles\\pages\\home-page.css",
       "inlineModule": "/src/data/page-css/home-page.ts"
     },
@@ -198,8 +198,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.r0c3jb.json",
-      "datetime": "2025-10-27T14:00:46.630Z"
+      "file": "/search-index.shv0px.json",
+      "datetime": "2025-10-29T00:07:58.851Z"
     }
   },
   "js": {
