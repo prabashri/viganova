@@ -65,21 +65,21 @@ export const siteDefaults = {
   incharge: {
     // for person, no need to fill this
     type: "Person",
-    name: "Prabakaran Shankar",
-    email: "praba@thenviews.com",
+    name: "Vishnu",
+    email: "vishnu@viganova.com",
     jobTitle: "Founder & CEO",
     contact: {
-      email: "praba@thenviews.com",
+      email: "vishnu@viganova.com",
       phone: "+919715359576",
       whatsapp: "919715359576",
     },
     image: "",
-    url: "https://prabakaranshankar.com",
-    internalId: "team/prabakaran-shankar/",
+    url: "https://viganova.com/team/vishnu",
+    internalId: "team/vishnu/",
     // only if dont have internalId
     sameAs: [
-      "https://linkedin.com/in/prabakaranshankar",
-      "https://x.com/@madanpraba",
+      "https://linkedin.com/in/vishnu",
+      "https://x.com/@vishnu",
     ],
   },
   // https://schema.org/Organization
