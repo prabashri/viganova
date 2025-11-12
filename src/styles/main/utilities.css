@@ -1371,6 +1371,9 @@ hr, .hr {
 	.big-flex-row{
 		flex-direction: row !important;
 	}
+	.big-flex-col{
+		flex-direction: column !important;
+	}
 	.big-jc-between {
 		justify-content: space-between;
 	}
