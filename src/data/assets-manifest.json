@@ -1,6 +1,6 @@
 {
   "configModified": {
-    "siteDefaults": 1761661395756,
+    "siteDefaults": 1761871895648,
     "siteLogo": 1754383794286,
     "siteColors": 1761294388761,
     "siteImages": 1761669502366
@@ -28,7 +28,7 @@
       "datetime": "2025-10-24T05:34:12.823Z"
     },
     "manifest.webmanifest": {
-      "datetime": "2025-10-29T00:08:32.874Z"
+      "datetime": "2025-11-20T12:19:43.819Z"
     }
   },
   "css": {
@@ -51,8 +51,8 @@
       ]
     },
     "main": {
-      "file": "/styles/main.30djjv.css",
-      "datetime": "2025-10-29T00:08:18.089Z",
+      "file": "/styles/main.achnjl.css",
+      "datetime": "2025-11-20T12:19:35.425Z",
       "names": [
         "base",
         "blockquote",
@@ -76,11 +76,12 @@
     },
     "pages": {
       "file": "/styles/",
-      "datetime": "2025-10-29T00:08:21.678Z",
+      "datetime": "2025-11-20T12:19:38.162Z",
       "names": [
         "audio-layout",
         "contact-form",
         "home-page-file",
+        "home-page-inline",
         "home-page",
         "post-layout",
         "team-index",
@@ -92,7 +93,7 @@
     },
     "pages:home": {
       "file": "",
-      "datetime": "2025-10-29T00:08:20.929Z",
+      "datetime": "2025-11-20T12:19:37.996Z",
       "name": "home",
       "removed": true
     },
@@ -185,6 +186,16 @@
       "bytes": 4644,
       "source": "src\\styles\\pages\\home-page-file.css",
       "inlineModule": "/src/data/page-css/home-page-file.ts"
+    },
+    "pages:home-page-inline": {
+      "file": "/styles/home-page-inline.ad7af3.css",
+      "datetime": "2025-11-20T12:19:38.063Z",
+      "name": "home-page-inline",
+      "hash": "ad7af3",
+      "mtimeMs": 1761697086120,
+      "bytes": 99,
+      "source": "src\\styles\\pages\\home-page-inline.css",
+      "inlineModule": "/src/data/page-css/home-page-inline.ts"
     }
   },
   "logos": {
@@ -198,8 +209,8 @@
   },
   "json": {
     "search-index": {
-      "file": "/search-index.shv0px.json",
-      "datetime": "2025-10-29T00:07:58.851Z"
+      "file": "/search-index.vkt2wa.json",
+      "datetime": "2025-11-20T12:19:24.358Z"
     }
   },
   "js": {
