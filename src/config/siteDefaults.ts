@@ -17,7 +17,7 @@ export const siteDefaults = {
 
   title: `Viga Nova Green Energy Solutions`,
   description:
-    "Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies",
+    "Empowering the world's transition to a hydrogen-powered, carbon-neutral future through innovation in green energy and advanced electrolyzer technologies.",
   keywords: [
     "green energy",
     "sustainability",
@@ -58,163 +58,82 @@ export const siteDefaults = {
     addressRegion: "Tamil Nadu",
     postalCode: "606401",
     addressCountry: "India",
-    addressCountryCode: "IN", // ISO 3166-1 alpha-2 https://wikipedia.org/wiki/ISO_3166-1
+    addressCountryCode: "IN", // ISO 3166-1 alpha-2
     googleMap: "",
   },
+
   // incharge of the organization (main contact person)
   incharge: {
-    // for person, no need to fill this
     type: "Person",
-    name: "Vishnu",
-    email: "vishnu@viganova.com",
+    name: "Ganesh Kumar Mani",
+    email: "ganesh@viganova.com",
     jobTitle: "Founder & CEO",
     contact: {
-      email: "vishnu@viganova.com",
+      email: "ganesh@viganova.com",
       phone: "+919715359576",
       whatsapp: "919715359576",
     },
     image: "",
-    url: "https://viganova.com/team/vishnu",
-    internalId: "team/vishnu/",
+    url: "https://www.linkedin.com/in/ganesh-kumar-mani-07700482",
+    internalId: "", // team/ganesh-kumar-mani/
     // only if dont have internalId
     sameAs: [
-      "https://linkedin.com/in/vishnu",
-      "https://x.com/@vishnu",
+      "https://www.linkedin.com/in/ganesh-kumar-mani-07700482",    
     ],
   },
-  // https://schema.org/Organization
-  // https://schema.org/Person
-  organizationType: "Organization", // Person | Airline | Consortium | Cooperative | Corporation | EducationalOrganization | FundingScheme | GovernmentOrganization | LibrarySystem | LocalBusiness | MedicalOrganization | NGO | NewsMediaOrganization | OnlineBusiness | PerformingGroup | PoliticalParty | Project | ResearchOrganization | SearchRescueOrganization | SportsOrganization | WorkersUnion
+
+  organizationType: "Organization",
 
   jurisdictionCountry: "IN",
-  jurisdictionRegion: "TN-Villupuram", // free text OK
+  jurisdictionRegion: "TN-Villupuram",
   foundingDate: "2025-10-10",
   // dissolutionDate: '',
-  legalName: "Viga Nova Green Energy Pvt. Ltd.",
+  legalName: "Viga Nova Green Energy Private Limited",
   taxId: "",
   taxLabel: "GSTIN",
   registrationId: "U20119TN2025PTC185265",
   registrationLabel: "CIN",
+
   founder: [
-      {
-        type: "Person",
-        name: "TAMILSELVAN",
+    {
+      type: "Person",
+      name: "TAMILSELVAN",
+      email: "tamilselvan@viganova.com",
+      jobTitle: "Co-Founder",
+      contact: {
         email: "tamilselvan@viganova.com",
-        jobTitle: "Co-Founder",
-        contact: {
-          email: "tamilselvan@viganova.com",
-          phone: "+91xxxxxxxxxx",
-          whatsapp: "91xxxxxxxxxx",
-        },
-        image: "",
-        url: "https://viganova.com/team/tamilselvan",
-        internalId: "team/tamilselvan/",
-        sameAs: [
-          "https://linkedin.com/in/tamilselvan",
-        ],
+        phone: "+91xxxxxxxxxx",
+        whatsapp: "91xxxxxxxxxx",
       },
-      {
-        type: "Person",
-        name: "SINRAJ SIVAKUMAR",
-        email: "sinraj@viganova.com",
-        jobTitle: "Co-Founder",
-        contact: {
-          email: "sinraj@viganova.com",
-          phone: "+91yyyyyyyyyy",
-          whatsapp: "91yyyyyyyyyy",
-        },
-        image: "",
-        url: "https://viganova.com/team/sinraj",
-        internalId: "team/sinraj/",
-        sameAs: [
-          "https://linkedin.com/in/sinraj",
-        ],
-      },
-    ],
-
-  // Organization block (main entity). If this is removed or partial,
-  // schemaOrganization.ts will fill from site-level fields.
-  /*
-  parentOrganization: {
-    // Set entity type dynamically: 'Organization' or 'Person'
-    type: "Organization", // Change to 'Person' if site is personal brand
-
-    // Common fields (both Organization & Person use name, url, logo, sameAs)
-    name: "Viga Nova Green Energy Pvt. Ltd.", // or 'Prabakaran Shankar' if type = 'Person'
-    url: "https://viganova.com/", // ensure trailing slash
-    email: "admin@viganova.com",
-    // put it in src/assets/images/logos/ 
-    logo: "",
-    sameAs: [
-      "https://linkedin.com/company/viganova/",
-      
-    ],
-    contact: {
-      email: "contact@viganova.com",
-      phone: "+919715359576",
-      whatsapp: "919715359576",
+      image: "",
+      url: "https://viganova.com/team/tamilselvan",
+      internalId: "team/tamilselvan/",
+      sameAs: [
+        "https://linkedin.com/in/tamilselvan",
+      ],
     },
-    address: {
-      streetAddress: "46/1, Thiyagarajapuram Road, Sankarapuram",
-      addressLocality: "Villupuram",
-      addressRegion: "Tamil Nadu",
-      postalCode: "606401",
-      addressCountry: "India",
-      addressCountryCode: "IN", // ISO 3166-1 alpha-2 https://wikipedia.org/wiki/ISO_3166-1
-      googleMap: "",
-    },   
-
-    jurisdictionCountry: "IN",
-    jurisdictionRegion: "TN-Villupuram", // free text OK
-    foundingDate: "2025-10-10",
-    // dissolutionDate: '',
-    legalName: "Viga Nova Green Energy Private Limited",
-    taxId: "",
-    registrationId: "U20119TN2025PTC185265",
-    vatId: "",
-    dunsId: "",
-
-    founder: [
-      {
-        type: "Person",
-        name: "TAMILSELVAN",
-        email: "tamilselvan@viganova.com",
-        jobTitle: "Co-Founder",
-        contact: {
-          email: "tamilselvan@viganova.com",
-          phone: "+91xxxxxxxxxx",
-          whatsapp: "91xxxxxxxxxx",
-        },
-        image: "",
-        url: "https://viganova.com/team/tamilselvan",
-        internalId: "team/tamilselvan/",
-        sameAs: [
-          "https://linkedin.com/in/tamilselvan",
-        ],
-      },
-      {
-        type: "Person",
-        name: "SINRAJ SIVAKUMAR",
+    {
+      type: "Person",
+      name: "SINRAJ SIVAKUMAR",
+      email: "sinraj@viganova.com",
+      jobTitle: "Co-Founder",
+      contact: {
         email: "sinraj@viganova.com",
-        jobTitle: "Co-Founder",
-        contact: {
-          email: "sinraj@viganova.com",
-          phone: "+91yyyyyyyyyy",
-          whatsapp: "91yyyyyyyyyy",
-        },
-        image: "",
-        url: "https://viganova.com/team/sinraj",
-        internalId: "team/sinraj/",
-        sameAs: [
-          "https://linkedin.com/in/sinraj",
-        ],
+        phone: "+91yyyyyyyyyy",
+        whatsapp: "91yyyyyyyyyy",
       },
-    ],
-  },
-  */
-/**
- * add svg in public/icons/ and name here
- */
+      image: "",
+      url: "https://viganova.com/team/sinraj",
+      internalId: "team/sinraj/",
+      sameAs: [
+        "https://linkedin.com/in/sinraj",
+      ],
+    },
+  ],
+
+  /**
+   * add svg in public/icons/ and name here
+   */
   shareLinks: ["Whatsapp", "X", "Facebook", "LinkedIn", "Reddit", "Copy Link", "Email"],
 
   separator: "|",
@@ -322,7 +241,7 @@ export const siteDefaults = {
       search: true,
       showInFooterNav: false,
     },
-    review:{
+    review: {
       index: false,
       sitemap: false,
       base: "reviews",
@@ -360,7 +279,7 @@ export const siteDefaults = {
       label: "Privacy Policy",
       icon: "shield-check",
       title: `Privacy Policy — How ${SITE_NAME} Collects, Uses & Protects Your Data`,
-      description: `Learn how ${SITE_NAME} collects, uses, and safeguards your information. We explain cookies, analytics, limited retention, and your choices in clear, human-readable language.`,
+      description: `Learn how ${SITE_NAME} collects, uses, and safeguards your information when you explore our green hydrogen and clean energy solutions. We explain cookies, analytics, limited retention, and your choices in clear, human-readable language.`,
       enabled: true,
       index: true,
       sitemap: true,
@@ -372,19 +291,19 @@ export const siteDefaults = {
       label: "Cookie Policy",
       icon: "cookie",
       title: `Cookie Policy — How ${SITE_NAME} Uses Cookies & Similar Technologies`,
-      description: `Understand how ${SITE_NAME} uses essential, functional, analytics, and advertising cookies; how to manage preferences; and how to clear cookies in major browsers.`,
+      description: `Understand how ${SITE_NAME} uses essential, functional, and analytics cookies to improve your experience, and how you can manage your preferences.`,
       enabled: true,
-      index: true,            // indexable (ok if you’re fine with it being public)
-      sitemap: true,          // include in sitemap.xml
-      showInFooterNav: true,  // show link in footer
+      index: true,
+      sitemap: true,
+      showInFooterNav: true,
       path: "/cookie-policy/",
       location: "content/pages/CookiePolicy.astro",
     },
     contact: {
       label: "Contact Us",
       icon: "phone",
-      title: `Contact ${SITE_NAME} — Quotes, Support, and Fast Apostille Help`,
-      description: `Reach ${SITE_NAME} for fast answers, quotes, or support. Message us for document checks, timelines, and pricing—our team replies quickly and guides you through every step of the process.`,
+      title: `Contact ${SITE_NAME} — Green Hydrogen Projects, Partnerships & Support`,
+      description: `Reach ${SITE_NAME} to discuss green hydrogen projects, electrolyzer solutions, pilot deployments, partnerships, or general inquiries. Share your requirements and our team will help you explore the right clean energy pathway.`,
       enabled: true,
       index: true,
       sitemap: true,
@@ -396,8 +315,8 @@ export const siteDefaults = {
     about: {
       label: "About Us",
       icon: "info-circle",
-      title: `About ${SITE_NAME} — Who We Are, Our Mission, and How We Help`,
-      description: `Discover ${SITE_NAME}'s story, values, team and expertise in delivering secure, reliable apostille and attestation services you can trust.`,
+      title: `About ${SITE_NAME} — Advancing Green Hydrogen & Clean Energy Innovation`,
+      description: `Discover how ${SITE_NAME} is building a hydrogen-powered, carbon-neutral future through advanced electrolyzer technologies and integrated green energy solutions for industry, infrastructure, and communities.`,
       enabled: true,
       index: true,
       sitemap: true,
@@ -409,7 +328,7 @@ export const siteDefaults = {
       label: "Terms & Conditions",
       icon: "file-text",
       title: `Terms & Conditions — Legal Terms for Using ${SITE_NAME} Services`,
-      description: `Read the terms and acceptable use for ${SITE_NAME}. This page covers service rules, limitations, disclaimers, payments, and your rights when using our website and document services.`,
+      description: `Read the terms and acceptable use for ${SITE_NAME}. This page covers website usage, limitations, disclaimers, and other legal conditions related to our green hydrogen, consulting, and technology services.`,
       enabled: false,
       index: false,
       sitemap: false,
@@ -421,7 +340,7 @@ export const siteDefaults = {
       label: "Refund Policy",
       icon: "arrow-uturn-left",
       title: `Refund Policy — Terms for Refunds and Cancellations at ${SITE_NAME}`,
-      description: `Understand the refund and cancellation terms for services at ${SITE_NAME}. This page outlines your rights, the process for requesting refunds, and any applicable fees.`,
+      description: `Understand the refund and cancellation terms for feasibility studies, consulting engagements, training programs, and other services at ${SITE_NAME}. This page explains eligibility, timelines, and applicable conditions.`,
       enabled: false,
       index: false,
       sitemap: false,
@@ -432,8 +351,8 @@ export const siteDefaults = {
     search: {
       label: "Search",
       icon: "search",
-      title: `Search ${SITE_NAME} — Find Guides, Services, and Apostille Resources`,
-      description: `Search ${SITE_NAME} to find articles, guides, pricing information, timelines, and help topics. Filter results to quickly discover the resources you need to complete your document tasks.`,
+      title: `Search ${SITE_NAME} — Explore Hydrogen Insights, Projects & Services`,
+      description: `Search ${SITE_NAME} to quickly find articles, project highlights, technology overviews, FAQs, and service information related to green hydrogen, electrolyzers, and renewable energy solutions.`,
       enabled: true,
       index: true,
       sitemap: false,
@@ -444,8 +363,8 @@ export const siteDefaults = {
     notFound: {
       label: "404 Not Found",
       icon: "alert-triangle",
-      title: `Page Not Found — Let ${SITE_NAME} Help You Get Back on Track`,
-      description: `We couldn't find that page on ${SITE_NAME}. Try our search, browse popular guides, or return home to explore services, pricing, timelines, and support for your apostille and attestation needs.`,
+      title: `Page Not Found — Let ${SITE_NAME} Guide Your Clean Energy Journey`,
+      description: `We couldn't find that page on ${SITE_NAME}. Try our search, browse our hydrogen knowledge resources, or return home to explore our technologies, services, and vision for a carbon-neutral future.`,
       enabled: true,
       index: false,
       sitemap: false,

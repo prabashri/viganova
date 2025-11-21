@@ -5,7 +5,7 @@ export const siteFunctions = {
     /* CAPTCHA KEYS (for forms, comments, etc.) -------------------------- */
     turnstileEnabled: true,
     // sitekey from easyapostille.in Cloudflare dashboard
-    turnstileSitekey: "", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
+    turnstileSitekey: "0x4AAAAAACCI6AYVV44ZI8kl", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
     turnstileSitekeyTest: "1x00000000000000000000AA", // test key, always passes
     turnstileSecretTest: "1x0000000000000000000000000000000AA", // https://dash.cloudflare.com/1caa5b7ce96dd93ff08ae0e8cde90b72/turnstile/add
     /** google adsense account */

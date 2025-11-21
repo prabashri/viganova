@@ -200,8 +200,13 @@ const ORG_LOGO_RESOLVED = resolveLogoFromManifest({
             <span class="inline-flex flex-1">{location}</span>
           </div>
         )}
-      {siteDefaults.registrationId && <p class="py-05">{siteDefaults.registrationLabel}: {siteDefaults.registrationId}</p>}
-      {siteDefaults.taxId && <p class="py-05">{siteDefaults.taxLabel}: {siteDefaults.taxId}</p>}
+      { (siteDefaults.legalName && siteDefaults.registrationId ) && (
+        <div class="my-05 py-02 flex flex-row wrap ai-f-start gap-0">
+          <p class="text-sm my-0 py-0">{siteDefaults.legalName}</p>
+          <p class="text-sm my-0 py-0">{siteDefaults.registrationLabel}: {siteDefaults.registrationId}</p>
+        </div>
+      )}  
+      
       <p class="py-05">&copy; {today.getFullYear()} {siteName}. All rights reserved.</p>
     </div>
 
